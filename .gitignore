@@ -1,0 +1,114 @@
+# Tracking works as an allowlist: nothing is committed unless a rule below
+# names it. Stating what the repository carries, rather than listing what it
+# does not, keeps the published set a deliberate decision rather than a
+# consequence of whatever happens to be in the working directory.
+#
+# Order matters throughout. The last pattern that matches a path decides it,
+# and Git never descends into a directory that is still excluded, so a rule
+# about a file has no effect until its parent directory is re-included.
+#
+# To add a new top-level source directory, add the two lines for it in the
+# "Source tree" section, then run `make check-allowlist`.
+#
+# Note: with an allowlist, `git clean -fd` will appear to do nothing and
+# `git clean -fdx` will delete every untracked file in the tree. Always run
+# `git clean -fdxn` first.
+
+# ---------------------------------------------------------------- deny all --
+# No slash in the pattern, so this matches at every depth, not just the root.
+*
+
+
+# ------------------------------------------------------------- source tree --
+# Two lines per top-level source directory:
+#     !/<dir>/        re-include the directory, so Git descends into it
+#     !/<dir>/**/     re-include the directories under it, at any depth
+# Neither line tracks a file. Files are selected by extension below.
+!/adapter/
+!/adapter/**/
+!/cmd/
+!/cmd/**/
+!/examples/
+!/examples/**/
+!/docs/
+!/docs/**/
+
+
+# ------------------------------------------------------------ source files --
+# Unanchored, so they apply inside every directory opened above and nowhere
+# else. The test for adding an unanchored rule is "would this be safe at the
+# repository root?" -- *.go yes, *.md and *.json no.
+!*.go
+!*.sysml
+!*.kerml
+!*.graphql
+!*.graphqls
+!*.proto
+
+
+# -------------------------------- prose and config inside the source tree --
+# Depth-bounded rather than recursive, so a file written several levels down
+# cannot be swept in by a rule intended for a top-level README.
+!/docs/*.md
+!/docs/*/*.md
+!/docs/*/*.svg
+!/docs/*/*.png
+!/examples/*/README.md
+!/examples/*/*.yml
+!/examples/*/*.yaml
+!/examples/*/*.json
+!/examples/*/Dockerfile
+
+
+# ------------------------------------------------------------- fixtures ---
+# Test fixtures are data of whatever shape the test needs, so a testdata
+# directory is tracked whole rather than by extension. The re-exclusions below
+# still apply to it: a fixture tree is not a place for dependencies, build
+# output or per-machine state.
+!**/testdata/
+!**/testdata/**
+
+# ---------------------------------------------------- hard re-exclusions ---
+# These come after every rule above, so they win. The directory-only forms
+# stop Git descending, which confines every unanchored rule above to real
+# source.
+
+# Dependency and build trees are reproducible from the manifests.
+node_modules/
+vendor/
+**/dist/
+**/build/
+**/coverage/
+.venv/
+__pycache__/
+
+# Build and test output.
+/bin/
+*.out
+*.test
+*.prof
+*.exe
+
+# Hidden entries are per-machine tooling state, not source, at every depth.
+**/.*
+
+
+# ------------------------------------------------- repository root files ---
+# After the hidden-entry rule, so the dot entries this project does track are
+# put back. Anchored, so a file of the same name deeper in the tree is not
+# swept in with them.
+!/.gitignore
+!/.gitattributes
+!/LICENSE
+!/README.md
+!/CONTRIBUTING.md
+!/SECURITY.md
+!/Makefile
+!/go.mod
+!/go.sum
+
+!/.github/
+!/.github/workflows/
+!/.github/workflows/*.yml
+
+
