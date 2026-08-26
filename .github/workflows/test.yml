@@ -1,0 +1,35 @@
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          # Follows the go directive in go.mod, so there is one place to bump.
+          go-version-file: go.mod
+
+      - name: Build
+        run: go build ./...
+
+      - name: Test
+        run: |
+          # A module with no packages is the expected state until the first
+          # one lands. Distinguish that from a broken module: `go list` exits
+          # non-zero for the latter, so a real fault still fails the job.
+          packages="$(go list ./...)"
+          if [ -z "$packages" ]; then
+            echo "no packages yet; nothing to test"
+            exit 0
+          fi
+          go test -race -shuffle=on ./...

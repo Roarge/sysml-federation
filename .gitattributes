@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+*.go        text diff=golang
+*.sysml     text
+*.kerml     text
+*.graphql   text
+*.graphqls  text
+go.sum      text -diff
+*.png       binary
+*.svg       text
