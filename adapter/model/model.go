@@ -66,6 +66,12 @@ type Part struct {
 	Satisfies           []string // requirement IDs this part satisfies
 }
 
+// IsEntity marks a part as an element other services may look up by its
+// identifier. The subgraph serves these types as they are rather than
+// copying them into a second set of structures, and the code generator asks
+// a type it serves that way to carry the marker.
+func (*Part) IsEntity() {}
+
 // Requirement is one requirement usage with its constraint read into a
 // quantity, a comparison and a limit.
 type Requirement struct {
@@ -85,11 +91,19 @@ type Requirement struct {
 	limitSpan syntax.Span // the limit literal's span when LimitEditable
 }
 
+// IsEntity marks a requirement as an element other services may look up by
+// its identifier.
+func (*Requirement) IsEntity() {}
+
 // VerificationCase is one verification usage.
 type VerificationCase struct {
 	ID, ShortName, Name string
 	Verifies            []string // requirement IDs
 }
+
+// IsEntity marks a verification case as an element other services may look
+// up by its identifier.
+func (*VerificationCase) IsEntity() {}
 
 // Model is the resolved projection of one source file. A Model is never
 // modified after Parse returns, and every mutation returns a new one.
