@@ -247,6 +247,12 @@ main {
   margin-bottom: 24px;
 }
 
+/* An article tucks its byline against the series line underneath it. The home
+   page has no series line, so its byline takes the paragraph space instead. */
+.layout-home .prose > h1 + p {
+  margin-bottom: 20px;
+}
+
 .layout-article .prose > h1 + p em,
 .layout-home .prose > h1 + p em {
   font-style: normal;
@@ -352,9 +358,10 @@ pre code {
   max-width: none;
 }
 
+/* The opening runs to as many paragraphs as the argument needs, so the
+   measure is set on every paragraph rather than on a counted few. */
 .layout-home .prose > h1,
-.layout-home .prose > h1 + p,
-.layout-home .prose > h1 + p + p,
+.layout-home .prose > p,
 .prose.is-index > h1,
 .prose.is-index > p {
   max-width: var(--measure);
@@ -366,7 +373,7 @@ pre code {
   margin-bottom: 20px;
 }
 
-.layout-home .prose > h1 + p {
+.layout-home .prose > p {
   margin-bottom: 20px;
 }
 
@@ -376,11 +383,10 @@ pre code {
   margin-bottom: 20px;
 }
 
-.layout-home .prose > h1 + p + p {
-  font-size: 20px;
-  line-height: 1.5;
-  color: var(--ink);
-  margin-bottom: 56px;
+/* The opening paragraphs are one voice at one size, and the space that
+   separates them from the numbered list belongs to the list. */
+.layout-home .prose > ol {
+  margin-top: 56px;
 }
 
 .layout-home .prose > h2 {
