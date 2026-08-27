@@ -47,8 +47,14 @@ configuration alone. The image copies `/router` and fetches the
 vendor's LICENSE at the pinned tag with a pinned checksum to sit beside it,
 the supervisor starts the child with
 `LISTEN_ADDR=127.0.0.1:3002`, `EXECUTION_CONFIG_FILE_PATH=/app/config.json`,
-`PLAYGROUND_PATH=/playground` and the four telemetry variables of SR-03,
-and waits for `/health/ready` before opening the published port.
+`PLAYGROUND_PATH=/playground`, the four telemetry variables of SR-03,
+`SUBGRAPH_ERROR_PROPAGATION_MODE=pass-through` and `PROMETHEUS_ENABLED=false`,
+and waits for `/health/ready` before opening the published port. Pass-through
+puts a subgraph's own error at the top of the answer, so a refused edit reaches
+the client as the subgraph wrote it rather than nested under the router's
+fetch-failure text, which is what SR-24 and SR-25 exist for. The other closes
+the Prometheus scrape endpoint the router serves by default, which nothing here
+reads.
 
 ## Alternatives considered
 
@@ -105,7 +111,7 @@ removes the two known sources, since the usage tracker is disabled by SR-03
 and no router extension is loaded, and no tini is added.
 
 ## Requirements affected
-SR-03, SR-05, SR-06, SR-07
+SR-03, SR-05, SR-06, SR-07, SR-24, SR-25
 
 ## Sources
 The Cosmo router image and its LICENSE at 0.343.1, the router module's release tags and the `replace` block its examples repository requires, and the vendor's pages on running the router from environment and a static execution configuration. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the runtime and deployment views, and [What the research overturned](../articles/03-what-the-research-overturned.md) for the embedding claim as it was checked.

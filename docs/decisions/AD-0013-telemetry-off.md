@@ -74,6 +74,14 @@ the supervisor's environment for the child and in the public text that
 describes static composition, so an organisation building its own image
 around the adapter knows what to set.
 
+The router also serves a Prometheus scrape endpoint, on `127.0.0.1:8088` unless
+it is told otherwise. That is a different mechanism from the exporters this
+record disables, since a scrape endpoint waits to be read and opens nothing
+outbound, so the air-gap claim never rested on it either way. It is switched off
+in the child's environment with `PROMETHEUS_ENABLED=false` because nothing here
+reads it, and a port with no reader is one more thing a port table has to
+explain.
+
 The cost is a dependency on two variable names the vendor does not document.
 A later release could rename them, add a second tracker or change the default,
 and nothing in the vendor's documentation would announce it. The router version
