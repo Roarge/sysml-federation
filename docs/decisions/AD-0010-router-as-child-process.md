@@ -47,8 +47,14 @@ configuration alone. The image copies `/router` and fetches the
 vendor's LICENSE at the pinned tag with a pinned checksum to sit beside it,
 the supervisor starts the child with
 `LISTEN_ADDR=127.0.0.1:3002`, `EXECUTION_CONFIG_FILE_PATH=/app/config.json`,
-`PLAYGROUND_PATH=/playground` and the four telemetry variables of SR-03,
-and waits for `/health/ready` before opening the published port.
+`PLAYGROUND_PATH=/playground`, the four telemetry variables of SR-03,
+`SUBGRAPH_ERROR_PROPAGATION_MODE=pass-through` and `PROMETHEUS_ENABLED=false`,
+and waits for `/health/ready` before opening the published port. Pass-through
+puts a subgraph's own error at the top of the answer, so a refused edit reaches
+the client as the subgraph wrote it rather than nested under the router's
+fetch-failure text, which is what SR-24 and SR-25 exist for. The other closes
+the Prometheus scrape endpoint the router serves by default, which nothing here
+reads.
 
 ## Alternatives considered
 
@@ -83,6 +89,22 @@ must move together. The licence obligation is explicit: the image
 carries the router's LICENSE next to `/router` (SR-07), and `NOTICE` names
 the router with its version (SR-08).
 
+The bump has a second obligation. `SUBGRAPH_ERROR_PROPAGATION_MODE` is a name
+the vendor documents nowhere: the binary's help lists no environment variables
+at all, and the name is readable only in the struct tags compiled into the
+router's own configuration. Should a release rename or drop it, the router
+returns to its default and puts `Failed to fetch from Subgraph` at the top of
+the errors array with the subgraph's own message two levels below, which is
+where SR-24 and SR-25 came from. Both would then be met on paper and not in
+the answer a client reads, the statement in the example README that a refusal
+arrives unwrapped would be false, and no test would fail, because the tests
+assert the environment the supervisor builds and not what the router makes of
+it. A router bump therefore means driving one refused edit through the composed
+stack and reading `errors[0].message` before the image is tagged.
+`PROMETHEUS_ENABLED` is undocumented on the same terms and is checked in the
+same pass, where losing it reopens a listener rather than breaking a
+requirement (AD-0013).
+
 The cost is a second process to start, watch and stop. The supervisor is
 the parent of a child it cannot inspect from the inside, so readiness is
 read from `/health/ready` and the `healthcheck` subcommand of
@@ -105,7 +127,7 @@ removes the two known sources, since the usage tracker is disabled by SR-03
 and no router extension is loaded, and no tini is added.
 
 ## Requirements affected
-SR-03, SR-05, SR-06, SR-07
+SR-03, SR-05, SR-06, SR-07, SR-24, SR-25
 
 ## Sources
 The Cosmo router image and its LICENSE at 0.343.1, the router module's release tags and the `replace` block its examples repository requires, and the vendor's pages on running the router from environment and a static execution configuration. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the runtime and deployment views, and [What the research overturned](../articles/03-what-the-research-overturned.md) for the embedding claim as it was checked.
