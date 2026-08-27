@@ -24,9 +24,9 @@ That is the practical shape of lock-in. It is rarely a clause in a contract. It 
 
 Every one of those copies starts drifting the moment it is made.
 
-## Two answers that assumed a full-time integrator
+## The promise has been made before
 
-The industry has attacked this before. The [service bus](https://en.wikipedia.org/wiki/Enterprise_service_bus) generation put a central integration platform in the middle, with adapters at the edges, a canonical data model in the centre and transformation logic owned by an integration team. [OSLC](https://en.wikipedia.org/wiki/Open_Services_for_Lifecycle_Collaboration) took a lighter route through linked data, identifying resources by URI and describing them with resource shapes, so that tools could reference each other's objects without importing them.
+The industry has attacked this twice. The [service bus](https://en.wikipedia.org/wiki/Enterprise_service_bus) generation put a central integration platform in the middle, with adapters at the edges, a canonical data model in the centre and transformation logic owned by an integration team. [OSLC](https://en.wikipedia.org/wiki/Open_Services_for_Lifecycle_Collaboration) took a lighter route through linked data, identifying resources by URI and describing them with resource shapes, so that tools could reference each other's objects without importing them.
 
 Both were an improvement on having nothing, and both carried the same assumption. Somebody is employed to do integration full time. That assumption, rather than any technical limit, turns out to be the binding constraint.
 
