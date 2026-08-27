@@ -2,11 +2,15 @@
 
 *Roar Georgsen, 27 August 2026*
 
-One system, four descriptions. A requirements file, an interface sheet, a power budget spreadsheet, a hazard analysis a third team owns. Every copy starts drifting the moment it is made. Model based systems engineering was supposed to end that, and has been five years from mainstream adoption for about a quarter of a century. The industry tried a central integration platform, then a linked data layer. Both assumed somebody employed to do integration full time. Firms with fewer than 25 engineers have no such person, and they are where most engineering happens. This is for them.
+The goal is to make a SysML v2 model usable by software that knows nothing about SysML, without anyone taking a copy of it.
 
-SysML v2 dropped the UML profile and came with a standard API. What it returns is the metamodel, so every downstream tool must learn SysML before it can read a requirement. I would rather the model's owners published a small, plainly typed projection, joined by federation to whatever else describes the same system. Nobody outside systems engineering should need to know what SysML is.
+The problem is that engineering organisations describe one system in several places at once. A requirements file, an interface sheet, a power budget in a spreadsheet, a hazard analysis another team owns. Model based systems engineering was meant to replace those with a single model that everything else reads from, and it has not, largely because models sit inside tools that make getting data out awkward. SysML v2 improves that. It has a textual notation that lives in Git and a standard API. What the API hands back is the metamodel, so any tool that wants to read a requirement has to learn SysML first, and an organisation with fewer than 25 engineers has nobody to do that work.
 
-A demo is being built. A query pipeline of five servers, an analysis that has never parsed a model file, a requirements document that has never computed anything, and a requirement that fails until the right server changes. What the demo has to prove is that the connecting layer can exist with nobody employed to maintain it. The design is written up below in the present tense, and it runs from the first tagged release.
+The proposed solution is federation. The people who own the model publish a small projection of it, plainly typed, and other services attach their own data to the model's objects by agreeing on an identifier. No service imports or calls another. A build step merges the schemas and fails if they contradict each other, so the contract is checked before anything is deployed.
+
+The project is at proof of concept stage and is being built now. It is a SysML v2 adapter that serves a projection as a subgraph, a WunderGraph Cosmo router in front of it, and one worked example, a query pipeline of five servers whose capacity is rolled up by a second service and reported by a requirements document held by a third. Neither of those two has parsed a model file.
+
+What comes next is a larger example and an adapter that covers more of the language. The likely route is SysML v2's own views and viewpoints, so that a systems engineer decides what to federate by writing a view in the model rather than by configuring the adapter.
 
 1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
    The integration problem MBSE never solved, what SysML v2 changes, and the claim this repository makes.
