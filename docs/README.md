@@ -4,7 +4,7 @@
 
 The goal is to make a SysML v2 model easy to integrate. The proposal is federation. The model's owners publish a small projection of it, and other services attach their own data to its objects by agreeing on an identifier.
 
-So far this is a proof of concept, a SysML v2 adapter behind a WunderGraph Cosmo router with one worked example. Next is a larger example and an adapter driven by SysML v2's own views and viewpoints.
+So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with one worked example. Next is a larger example and an adapter driven by SysML v2's own views and viewpoints.
 
 1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
    The integration problem MBSE never solved, what SysML v2 changes, and the claim this repository makes.
