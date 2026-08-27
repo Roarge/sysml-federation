@@ -1,0 +1,22 @@
+{
+  "nodes": [
+    {
+      "id": "intro",
+      "kind": "PROSE",
+      "text": "The capacity figures in this document come from an idealised rollup: a chain carries the throughput of its weakest server and parallel branches add, with perfect balancing and no queueing. An allocated limit on one server can therefore fail while the pipeline as a whole passes, because a branch delivering more than its share covers one delivering less."
+    },
+    {
+      "id": "PIPE-R1",
+      "kind": "REQUIREMENT",
+      "requirement": "PIPE-R1",
+      "children": [
+        { "id": "PIPE-R1.1", "kind": "REQUIREMENT", "requirement": "PIPE-R1.1" },
+        { "id": "PIPE-R1.2", "kind": "REQUIREMENT", "requirement": "PIPE-R1.2" },
+        { "id": "PIPE-R1.3", "kind": "REQUIREMENT", "requirement": "PIPE-R1.3" },
+        { "id": "PIPE-R1.4", "kind": "REQUIREMENT", "requirement": "PIPE-R1.4" },
+        { "id": "PIPE-R1.5", "kind": "REQUIREMENT", "requirement": "PIPE-R1.5" }
+      ]
+    },
+    { "id": "PIPE-R2", "kind": "REQUIREMENT", "requirement": "PIPE-R2" }
+  ]
+}

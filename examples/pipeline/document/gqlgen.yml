@@ -1,0 +1,22 @@
+schema:
+  - schema.graphql
+exec:
+  layout: single-file
+  filename: generated.go
+  package: document
+federation:
+  filename: federation.go
+  package: document
+  version: 2
+model:
+  filename: models_gen.go
+  package: document
+resolver:
+  layout: follow-schema
+  dir: .
+  package: document
+  filename_template: "{name}.resolvers.go"
+omit_getters: true
+omit_gqlgen_version_in_file_notice: true
+local_prefix: github.com/Roarge/sysml-federation
+skip_mod_tidy: true
