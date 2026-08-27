@@ -56,6 +56,17 @@ func TestSR23_ExpressionBoundValuesAreNotEditable(t *testing.T) {
 	assert.Equal(t, lit.Expression, "")
 }
 
+func TestSR23_RedefinitionWithoutAValue(t *testing.T) {
+	inherited := value(t, "package P { part def D { attribute x = 5; } part u : D { attribute :>> x; } }", "x")
+	if inherited.Value == nil {
+		t.Fatal("x lost the value its definition binds")
+	}
+	assert.Equal(t, *inherited.Value, 5)
+
+	unbound := value(t, "package P { part def D { attribute x : Real; } part u : D { attribute :>> x; } }", "x")
+	assert.True(t, unbound.Value == nil, "an attribute no declaration binds reports no value")
+}
+
 func TestEvalRefusals(t *testing.T) {
 	const head = "package P { part def D { attribute a : Real; attribute b : Real; }\n"
 	tabletest.Run(t, []tabletest.Case[string, refusal]{

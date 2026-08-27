@@ -177,7 +177,9 @@ func (b *builder) slot(slots *[]attrSlot, a *syntax.AttributeUsage, owner string
 	if a.Redefines {
 		for i := range *slots {
 			if (*slots)[i].name == a.Name {
-				(*slots)[i].bind = a
+				if a.Value != nil {
+					(*slots)[i].bind = a
+				}
 				return
 			}
 		}
