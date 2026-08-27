@@ -24,13 +24,13 @@ That is the practical shape of lock-in. It is rarely a clause in a contract. It 
 
 Every one of those copies starts drifting the moment it is made.
 
-## Two answers that assumed a full-time integrator
+## The promise has been made before
 
-The industry has attacked this before. The [service bus](https://en.wikipedia.org/wiki/Enterprise_service_bus) generation put a central integration platform in the middle, with adapters at the edges, a canonical data model in the centre and transformation logic owned by an integration team. [OSLC](https://en.wikipedia.org/wiki/Open_Services_for_Lifecycle_Collaboration) took a lighter route through linked data, identifying resources by URI and describing them with resource shapes, so that tools could reference each other's objects without importing them.
+The industry has attacked this twice. The [service bus](https://en.wikipedia.org/wiki/Enterprise_service_bus) generation put a central integration platform in the middle, with adapters at the edges, a canonical data model in the centre and transformation logic owned by an integration team. [OSLC](https://en.wikipedia.org/wiki/Open_Services_for_Lifecycle_Collaboration) took a lighter route through linked data, identifying resources by URI and describing them with resource shapes, so that tools could reference each other's objects without importing them.
 
-Both were an improvement on having nothing, and both carried the same assumption. Somebody is employed to do integration full time. That assumption, rather than any technical limit, turns out to be the binding constraint.
+Both were an improvement on having nothing, and both put the integration in the middle, where it needs a team of its own. That team owns the mapping between systems it did not build. A large organisation runs hundreds of them, across domains no single group can hold in its head, so the mapping ends up written by the people furthest from the thing being mapped. Headcount is not the constraint, and a large organisation can afford the team. The constraint is that the knowledge and the responsibility have been put in different places.
 
-Organisations with fewer than 25 engineers do not have that person. Most engineering happens in them, and they are the ones for whom the existing answers are unaffordable. They are who this work is for.
+A small organisation cannot staff that middle at all, so the older answers were never affordable below a certain size. Most engineering happens in organisations with fewer than 25 engineers, and they are who this work is for.
 
 ## What SysML v2 settles
 
@@ -92,7 +92,7 @@ Neither service imports the other. Neither calls the other. A client asks for a 
 
 Two properties follow that matter more than the syntax.
 
-The merged schema is computed rather than authored. Nobody writes it and nobody owns it, which is the opposite of a canonical data model negotiated by committee, and it is why the approach needs no central integration team. If two services define incompatible things the merge fails, in the pipeline of whoever pushed the change, with a message naming the conflict.
+The merged schema is computed rather than authored. Nobody writes it and nobody owns it, which is the opposite of a canonical data model negotiated by committee, and it is why the approach needs no central integration team. Each service's own schema is written by the people who build that service and understand its domain, so the integration sits where the knowledge already is rather than in a layer that has to acquire it second hand. If two services define incompatible things the merge fails, in the pipeline of whoever pushed the change, with a message naming the conflict.
 
 The router holds no logic. It transforms nothing, orchestrates nothing and enforces no rule of its own, and it resolves a typed graph and stops there. Everything the service bus generation put in the middle stays in the services here, which is what keeps the middle from becoming a bottleneck.
 
