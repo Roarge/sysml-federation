@@ -9,30 +9,27 @@ apps show it, the viewer beside its red block and the document in each
 requirement's row (SR-14, SR-37). The service is allowed exactly two model-specific
 names, the quantity it computes and the attribute it reads, and it selects
 from the adapter only fields of the generic projection declared in its
-`@requires` (SR-31, P7). It never sees the words "server" or "pipeline", and
+`@requires` (SR-31). It never sees the words "server" or "pipeline", and
 it never sees the derivation relationship between `PIPE-R1` and its five
-derived requirements, because derivation is not in its field set
-(the capacity model page). The README promises that a failing requirement is
+derived requirements, because derivation is not in its field set.
+The README promises that a failing requirement is
 marked as failing with the stage responsible named, so the reason has to name
 the cut.
 
-The wording had drifted before it was fixed. The story canvas at gate 1
+The wording had drifted before it was fixed. The storyboard at gate 1
 carried the shipped failure reason four ways and was aligned on "parse is
-the bottleneck at 1200" (the engineering log, gate 1 addendum). The first
+the bottleneck at 1200". The first
 templates on the capacity model page carried "capacity" and "server", which
-the gate 2 second pass caught as words the service is not allowed to know,
+the second pass at gate 2 caught as words the service is not allowed to know,
 and the derived requirements had been given a template chosen by the
-requirement being derived, which the service cannot know (the engineering
-log, gate 2 entry and addendum). The canvas board that quotes a reason was
-then aligned with the template.
+requirement being derived, which the service cannot know. The board that
+quotes a reason was then aligned with the template.
 
 There was also the question of which service owns the sentence a document
 reader sees. The document knows the derivation, its shipped prose paragraph
 explains why an allocated limit on a server can fail while the pipeline as a
 whole passes, and "allocated" is the brief's own word for the derived limits.
-The gate 2 review settled the ownership as P17. The other half of P17, the
-UI server's place in the image rather than in either app, is recorded in
-AD-0011.
+The reading at gate 2 settled that ownership on the document.
 
 ## Decision
 
@@ -53,7 +50,7 @@ knows the derivation and may add them beside the reason.
 
 Templates carrying the model's own words, "capacity" and "server", which the
 first draft of the capacity page used and which read naturally for the
-example. They lost at the gate 2 second pass because the service is
+example. They lost at the second pass at gate 2 because the service is
 configured with two names and may know no other (SR-31), so the templates
 now use the configured names and the word "part".
 
@@ -91,8 +88,9 @@ run by no service, and the row shows no current value (SR-37).
 
 The INCONCLUSIVE reason for a requirement of another quantity depends on the
 verification case's short name arriving through the nested `@requires`,
-which is C-15's spike. The flat `Part.wiring` fallback keeps `verifiedBy {
-shortName }` in the field set, so the template survives either outcome.
+which is the first spike of the implementation phase. The flat `Part.wiring`
+fallback keeps `verifiedBy { shortName }` in the field set, so the template
+survives either outcome.
 
 ## Requirements affected
 
@@ -100,9 +98,4 @@ SR-30, SR-37
 
 ## Sources
 
-The design brief P7, P15, P17 and the shipped document, the capacity model
-page "Verdicts" (the template table, leaf selection and the "allocated"
-paragraph) and "Allocation of derived limits", the requirements list SR-14,
-SR-30, SR-31, SR-37, the engineering log's gate 1 addendum, gate 2 entry
-(P17) and gate 2 addendum, the constraints list C-15, the architecture
-description V2 capacity service schema and fallback.
+[From use cases to requirements](../articles/05-from-use-cases-to-requirements.md), which publishes the seven templates, the verdict precedence and the worked example they render for. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the reason as the storyboard first carried it. The SysML v2 Systems Library's `VerdictKind` for the four words a verdict may take.

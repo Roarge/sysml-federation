@@ -18,12 +18,12 @@ shipped tree.
 The language offers one author-controlled identifier. Any definition or
 usage may carry a short name in angle brackets before its name, as in
 `<'PIPE-R1'>`, and the official files use both the quoted and the unquoted
-form (C-23). At the API level an element's `elementId` is a UUID assigned
+form. At the API level an element's `elementId` is a UUID assigned
 by the tool, the API 1.0 OpenAPI has `alias` arrays on Project and Commit
 and no `humanId` field on elements, and short names are optional per
-element (C-32). Whether the pilot's serialiser produces the same
+element. Whether the pilot's serialiser produces the same
 `elementId` for the same text on two runs is not verifiable from public
-documents (C-43).
+documents.
 
 The brief's example table gives every server, the pipeline, every
 requirement and the verification case a short name in the PIPE family, and
@@ -32,10 +32,9 @@ The adapter reads files rather than fronting a repository (AD-0003), so no
 tool-assigned identifier exists at all until a conforming repository stands
 behind it.
 
-The design-phase plan settled the key on its own as decision 8 and the brief
-carries it as P9. At gate 2 the review found that no requirement stood behind
-the story criterion that short names are the identifiers seen in both apps,
-and SR-21 was added.
+The plan settled the key on its own. The reading at gate 2 then found that no
+requirement stood behind the story criterion that short names are the
+identifiers seen in both apps, and SR-21 was added.
 
 ## Decision
 
@@ -52,10 +51,10 @@ are out of scope.
 
 The API-level `elementId`. It is the identifier a conforming SysML v2
 repository would return, and the research kept the pilot's JSON
-serialisation in view as a possible second loader for that reason (C-43).
+serialisation in view as a possible second loader for that reason.
 It lost because the value is assigned by the tool rather than by the
 author, no tool stands behind the adapter today, and its stability across
-runs of the serialiser could not be verified (C-32, C-43). A key nobody
+runs of the serialiser could not be verified. A key nobody
 writes down cannot be quoted in the document service's configuration or
 typed into the playground.
 
@@ -67,7 +66,7 @@ architecture asks for `requirement(id: "PIPE-R1")`, so the key a reader
 meets in the document, the viewer and the playground is the short one.
 
 An alias or human id from the API. None exists at element level in API
-1.0 (C-32), so there was nothing to choose.
+1.0, so there was nothing to choose.
 
 ## Consequences
 
@@ -87,12 +86,12 @@ name.
 Renaming a short name is a breaking change for every service that stores
 it, and the demo does not handle it. The document service's shipped tree
 would name an id the adapter no longer serves. The brief lists renames as
-out of scope (P9).
+out of scope.
 
 The research adds that a projection keyed on a value the model text
 carries, rather than on anything a tool assigns, makes a later swap to a
-conforming repository a source change rather than a schema change. C-32
-names no spike, and nothing in this record waits on one.
+conforming repository a source change rather than a schema change. No spike
+belongs to this record.
 
 ## Requirements affected
 
@@ -100,4 +99,4 @@ SR-21
 
 ## Sources
 
-The design brief P9 and the example model table. The constraints list C-23, C-32, C-43. The requirements list SR-21. The architecture description V2 Composition and The merged graph. The engineering log, gate 2 entry. The research notes on SysML, options. The design-phase plan, decision 8. The capacity model page, the closing section.
+The repository README, "Federation, for the systems engineers". The SysML 2.0 language specification on short names, and the Systems Modeling API and Services 1.0 OpenAPI for `elementId` and the absence of an element-level alias. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the example's short names, and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the composition view and the merged graph.

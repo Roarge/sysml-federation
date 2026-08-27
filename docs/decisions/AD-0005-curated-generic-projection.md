@@ -24,23 +24,22 @@ that this is the part of the design most likely to change. That is the
 question this record inherits.
 
 Two facts bound the answer for this phase. The adapter reads the textual
-notation through a hand-written strict subset parser (D8) that owns a small
-AST, which is what keeps the projection plainly typed (C-45), and the
+notation through a hand-written strict subset parser (AD-0015) that owns a
+small AST, which is what keeps the projection plainly typed, and the
 repository forbids the empty interface in any value position of hand-written
-code (C-71), so a type that holds whatever an element happens to carry has no
+code, so a type that holds whatever an element happens to carry has no
 natural home. The only author-controlled stable identifier in the language is
-the declared short name (C-32), which P9 makes the entity key.
+the declared short name, which AD-0018 makes the entity key.
 
 The rollup fixed the field set. To compute a capacity the analysis needs
 parts with a numeric attribute, directed connections between sibling parts,
 and a requirement with a subject, a constrained quantity, a comparison and a
-limit, and the plan observes that this set is generic. P7 names the resulting
-projection, parts, attributes, ports, connections, requirements with their
-relationships and verification cases, the model's text and version, and
-states the whole of what the capacity service and the adapter agree on: the
+limit, and the plan observes that this set is generic. The resulting
+projection is parts, attributes, ports, connections, requirements with their
+relationships and verification cases, the model's text and version, and with
+it comes the whole of what the capacity service and the adapter agree on: the
 entity key, the field set in the service's `@requires`, and two configured
-names. The words "server" and "pipeline" stay in the example and the two apps
-(C-87).
+names. The words "server" and "pipeline" stay in the example and the two apps.
 
 ## Decision
 
@@ -73,9 +72,9 @@ accepted.
 
 One attribute name as the whole contract. The plan's first ownership table
 had the adapter and the capacity service agree on nothing beyond the name of
-the attribute the service reads. The rollup evaluation during planning
-replaced that with the three-part statement now in P7, and the gate 2
-addendum brought the ownership table in line. It lost because the field set
+the attribute the service reads. Working the rollup out during planning
+replaced that with the three-part statement above, and the second gate
+brought the ownership table in line. It lost because the field set
 the service declares in its `@requires` is a structural dependency on the
 projection, and leaving it unstated would have made the contract look
 smaller than it is (SR-31).
@@ -93,7 +92,7 @@ projected field has a declared type, the empty-interface rule holds in the
 adapter's hand-written code without an exception.
 
 The cost is coverage. What the adapter serves today is a fraction of the
-language, every new construct is adapter work (C-45), and a model that uses
+language, every new construct is adapter work, and a model that uses
 anything outside the subset does not load at all (SR-18). That is the honest
 behaviour for a subset parser and it is also a hard limit on the README's
 goal of serving any conforming model. The escape hatch that would soften it
@@ -102,13 +101,14 @@ metamodel through the back door, which is the tension the README already
 names.
 
 Two spikes touch this record. If Cosmo composition or gqlgen refuse the
-nested-list `@requires` in the capacity schema (C-15), the fallback adds
+nested-list `@requires` in the capacity schema, the fallback adds
 `Part.wiring: String`, a JSON document of the children and connections behind
 one scalar. That keeps the semantics and loses the plain typing for that one
 field, so the spike decides whether the projection stays wholly typed. The
 ports and connections syntax is quoted from the OMG training folders before
-the model is written (C-34), which fills the last gap in the subset the
-projection is drawn from.
+the model is written, which fills the last gap in the subset the
+projection is drawn from. Both are settled in
+[Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md).
 
 ## Requirements affected
 
@@ -116,4 +116,4 @@ SR-16, SR-17, SR-21
 
 ## Sources
 
-README "What SysML v2 fixes, and what it leaves open", "Nobody outside systems engineering should need to know what SysML is" and "The adapter and the examples". The design brief D6, D8, P7, P9. The architecture description V2 adapter schema and V5 Generality. The design-phase plan, section "How the rollup shapes the architecture". The engineering log, design-phase planning entry and the gate 2 addendum. The constraints list C-15, C-32, C-34, C-45, C-71, C-87. The requirements list SR-16, SR-17, SR-18, SR-21, SR-31.
+The repository README, "What SysML v2 fixes, and what it leaves open", "Nobody outside systems engineering should need to know what SysML is" and "The adapter and the examples". The SysML v2 API and Services specification for what the metamodel returns. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the projected type set and the adapter view, and [The demo being built](../articles/10-the-demo-being-built.md) for the packages that produce it.

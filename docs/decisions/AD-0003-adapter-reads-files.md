@@ -18,12 +18,12 @@ rather than taken from a conforming repository's commits.
 What a repository would cost is on record. The OMG pilot's API server is
 EPL-2.0, Scala on Play, JDK 11 and PostgreSQL, and the research notes its
 implementation has not changed since 2025-04. The launch shape is one image
-and one `docker run` with nothing but Docker installed (D5), and the
+and one `docker run` with nothing but Docker installed, and the
 brief's non-goals repeat that the demo is not a SysML v2 API
 implementation. The pilot can also emit the standard JSON serialisation
 from text files with a Java 17 tool, a flat element graph in which
 memberships are themselves elements and every reference is a UUID whose
-stability across runs is unverified (C-43). That is the shape a repository
+stability across runs is unverified. That is the shape a repository
 returns over the API, and the research keeps it as the best second input
 path.
 
@@ -31,14 +31,13 @@ The identifier question is settled independently of the source. The
 declared short name is the only author-controlled stable identifier in the
 language, the API-level `elementId` is a tool-assigned UUID, and the API
 1.0 OpenAPI has no human id field, so every published element carries a
-short name and the adapter falls back to the qualified name (C-32, P9). The
-brief's P10 holds state in memory with a version counter as the versioning
-stand-in, and C-92 gives that counter its mechanism. `Model.version`
-carries it, every accepted mutation increments it, and
+short name and the adapter falls back to the qualified name. State is
+held in memory with a version counter as the versioning stand-in.
+`Model.version` carries it, every accepted mutation increments it, and
 `Subscription.modelChanged` publishes it. A model that is only files also
 needs a check that the files are valid SysML as the reference tools read
-it, since a subset parser cannot prove conformance (C-35). Which parser
-reads the files is D8 and AD-0015, and what the projection does with
+it, since a subset parser cannot prove conformance. Which parser
+reads the files is AD-0015, and what the projection does with
 elements nobody has projected is AD-0005.
 
 ## Decision
@@ -46,7 +45,7 @@ elements nobody has projected is AD-0005.
 We will have the adapter read the model from SysML v2 textual notation
 files on disk when it starts, hold the parsed model in memory, and stand in
 for a repository's commits with a monotonically increasing counter served
-as `Model.version` (P10, C-92). The adapter neither implements nor calls
+as `Model.version`. The adapter neither implements nor calls
 the SysML v2 API. The example ships its model file inside the image, the
 parser records the source span of every numeric literal so the served text
 can be patched in place, and the example file is accepted by the OMG pilot
@@ -68,13 +67,13 @@ stage. The research ranks it the best second input path because the read
 path would be reusable against a real repository. It is not the first cut,
 because it needs Java 17 at build time, the adapter would have to walk the
 metamodel it was meant to hide, and the `elementId` values are UUIDs whose
-stability across regenerations could not be verified (C-43).
+stability across regenerations could not be verified.
 
 A parser run at runtime as a sidecar, whether OpenSysML's gRPC server, the
 pilot's Java tooling or Syside Automator. That adds a second process and a
 second language runtime to the one-command container, the OpenSysML API is
 pre-1.0 and returns its own tree rather than the OMG JSON, and Syside is
-excluded outright by its licence terms on air-gapped use (C-44).
+excluded outright by its licence terms on air-gapped use.
 
 ## Consequences
 
@@ -98,13 +97,12 @@ generically.
 
 No spike is named for the file path itself. The syntax the file may contain
 rests on spikes that belong to the parser: ports and `connect` quoted from
-the OMG training folders (C-34), the plain numeric binding and the duration
-literal confirmed in the pilot (C-26, C-36), and the 2.1 Beta 2 change list
-read before the validation run (C-22). The validation itself runs locally
-and never in CI (C-35).
+the OMG training folders, the plain numeric binding and the duration
+literal confirmed in the pilot, and the 2.1 Beta 2 change list read before
+the validation run. The validation itself runs locally and never in CI.
 
 ## Requirements affected
 SR-22, SR-26, SR-45
 
 ## Sources
-README "Placeholders" and "What this is not", the constraints list C-22, C-26, C-32, C-34 to C-36, C-43, C-44, C-92, the design brief D5, P9, P10 and non-goals, the requirements list SR-09, SR-18, SR-22, SR-26, SR-45, the research notes on SysML, options and the API services finding, the architecture description V1 and V5, the engineering log's 2026-08-26 planning entry (D8).
+The repository README, "Placeholders" and "What this is not". The SysML v2 API and Services specification for `elementId` and the absence of a human identifier field. The OMG pilot implementation's API server, its licence and its runtime requirements. [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the syntax the two reference tools accept, and [The demo being built](../articles/10-the-demo-being-built.md) for the file as it ships.

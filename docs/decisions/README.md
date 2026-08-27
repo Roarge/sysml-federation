@@ -9,13 +9,15 @@ qualification the decision carries. A decision that replaces an earlier one
 gets its own number rather than overwriting it, and a number is never reused.
 
 Inside the records, `SR-nn` is a system requirement and `SC-nn` a design
-constraint, both from the requirements list of forty-five requirements and
-seven constraints. `C-nn` is an entry on the technical constraints card. `D`
-and `P` numbers are decisions in the design brief. `US-nn` is a use case on
-the storyboard, and a name beginning `PIPE-` is a short name inside the
-example model. The requirements list, the constraints card and the brief were
-design-phase working documents. The articles summarise their content, and
-article 05 explains the requirements and the capacity model in full.
+constraint, from the set of forty-five requirements and seven constraints
+that [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md)
+describes, and a name beginning `PIPE-` is a short name inside the example
+model. `C-nn` is an entry on the technical constraints card, a design-phase
+working document that is not published, so those references are there to show
+what a decision rested on rather than to be looked up. The four gates the
+records refer to are the design phase's own, and
+[How the design was run](../articles/02-how-the-design-was-run.md) says what
+each produced.
 
 ## The shape of the system
 

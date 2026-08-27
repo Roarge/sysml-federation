@@ -17,22 +17,19 @@ The demo's audience is a visitor with Docker and fifteen minutes who has never
 seen SysML, and its one memorable moment is a bottleneck moving. That moment
 depends on arithmetic a reader can check in their head: a chain is governed
 by its smallest member, parallel branches add, and raising a server outside
-the bottleneck changes nothing. D12 fixed the example as servers wired serial
-and parallel with the requirement checking a rollup over that wiring, and the
-brief lists no queueing model among the non-goals and "the capacity
+the bottleneck changes nothing. The brief fixed the example as servers wired
+serial and parallel with the requirement checking a rollup over that wiring,
+lists no queueing model among the non-goals and carries "the capacity
 arithmetic is idealised and says so" among the assumptions.
 
-C-94 restates the cheat as a constraint and names the mechanism, maximum flow
-with node capacities and the minimum cut as the bottleneck set (AD-0007), and
-asks for the assumptions, the limits of validity and an uncertainty statement
-to be written in the manner NASA-STD-7009B asks of any model used near its
-limits. The research behind that constraint found the standard's reporting
-clauses the clearest public authority for what a systems engineering reader
-expects from a computed result: explicit caveats where assumptions are
-violated, an uncertainty estimate or a clear statement that none is
-available, and a remark on whether the result is credible enough for its
-use. It also recorded the cost, that a page for arithmetic may look
-disproportionate and that hedging can spread to the rest of the documents.
+The mechanism is maximum flow with node capacities and the minimum cut as the
+bottleneck set (AD-0007), and the assumptions, the limits of validity and an
+uncertainty statement are written in the manner NASA-STD-7009B asks of any
+model used near its limits. The standard's reporting clauses are the clearest
+public authority for what a systems engineering reader expects from a
+computed result: explicit caveats where assumptions are violated, an
+uncertainty estimate or a clear statement that none is available, and a
+remark on whether the result is credible enough for its use.
 
 The capacity model page written at gate 2 is where the statement lives. Its
 assumptions are that every query traverses exactly one path from an entry
@@ -98,13 +95,11 @@ so. The service cannot detect a violated assumption, since it sees only
 throughputs and connections, so the warning lives in prose that a reader can
 skip. A visitor who takes the verdict as an engineering result has been told
 otherwise in the document and on the page, and nowhere else. The page is a
-page about arithmetic, which is more than the arithmetic deserves on its own,
-and the research warns that hedging written for it can leak into documents
-that do not need it.
+page about arithmetic, which is more than the arithmetic deserves on its own.
 
-No spike in the constraints list is attached to C-94. The spike that decides
-how the wiring reaches the service, nested-list `@requires` under Cosmo and
-gqlgen (C-15), belongs to AD-0007.
+No spike belongs to this record. The spike that decides how the wiring
+reaches the service, nested-list `@requires` under Cosmo and gqlgen, belongs
+to AD-0007.
 
 ## Requirements affected
 
@@ -112,4 +107,4 @@ SR-28, SR-30
 
 ## Sources
 
-README "The pipeline example" and "Placeholders". The design brief D12, the shipped document, assumptions and non-goals. The constraints list C-15, C-94. The capacity model page "Assumptions" and "Limits of validity and uncertainty". The research notes on requirements practice, the capacity model page option and the NASA-STD-7009B entry. The requirements list SR-28, SR-30.
+The repository README, "The pipeline example" and "Placeholders". NASA-STD-7009B on reporting a computed result and its uncertainty. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md), which publishes the capacity model page in full, its assumptions and its limits of validity.

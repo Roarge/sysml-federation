@@ -13,22 +13,18 @@ mix-up has to be visible from the shape of the identifier alone. The README
 says nothing about how the repository's own requirements are written or
 numbered.
 
-The owner works elsewhere with a fuller systems engineering methodology that
-carries its own identifier shapes, `US_042_Name` and `SYS_142_Name`, and its
-own file rules. The research listed as an open question whether the working
-notes follow that scheme or a lighter public one, and warned that two schemes
-in one repository drift. The repository is public and meant to be read in an
-afternoon (SC-06), and `docs/` is written for someone deciding whether the
-approach fits their organisation (C-67), which argues against a page of
+A heavier systems engineering methodology, with its own identifier shapes and
+file rules, was the alternative. The repository is public and meant to be read
+in an afternoon (SC-06), and `docs/` is written for someone deciding whether
+the approach fits their organisation, which argues against a page of
 conventions before the first requirement.
 
 The research recommended persona-first stories with Given/When/Then
 criteria, EARS statements for behaviour with a plain shall form for
 constraints, shape-distinct identifiers plus the fixed phrase "model
 requirement", decision records with four-digit numbers and Nygard sections,
-and hand-maintained one-hop Markdown traceability tables. The plan put the
-scheme to the owner as D11. Gate 2 added that the `SC-nn` prefix for design
-constraints stays and that D11 names it, after the requirements document
+and hand-maintained one-hop Markdown traceability tables. Gate 2 added the
+`SC-nn` prefix for design constraints, after the requirements document
 had separated design constraints, which take a plain statement, from
 behaviour, which takes EARS.
 
@@ -45,15 +41,13 @@ retired, and a withdrawn constraint keeps its number with a note saying why.
 
 ## Alternatives considered
 
-The fuller methodology throughout, in the working notes and in `docs/`.
-It carries its own identifier shapes, file rules and tooling. It lost
-because the public repository should not carry a methodology's conventions.
-The reader is judging a SysML adapter and not a way of working, and the
-methodology's identifier and file rules would show on every page.
+The heavier methodology throughout, with its own identifier shapes, file
+rules and tooling. It lost because a reader judging a SysML adapter is not
+judging a way of working, and the methodology's conventions would show on
+every page.
 
-The fuller methodology privately and the light scheme publicly. This keeps
-that methodology's tooling for the working notes and shows the reader the
-light form. It lost because two schemes drift, and the mapping between them
+The heavier methodology behind the scenes with the light scheme in `docs/`.
+It lost because two schemes drift, and the mapping between them
 would be one more thing to maintain and one more place for a number to be
 wrong.
 
@@ -69,27 +63,22 @@ The question returns only if the requirement count outgrows one screen.
 
 ## Consequences
 
-The scheme needs no explanation beyond the one paragraph in the requirements
-list, and the identifier's shape tells the reader which system a requirement
+The scheme needs no explanation beyond one paragraph, and the identifier's
+shape tells the reader which system a requirement
 belongs to. Every SR carries an EARS statement with one system name, a
-rationale citing D, P and C ids, a verification method, the stories
-it traces to and its allocation, which is what the gate 2 review checked.
+rationale, a verification method, the stories
+it traces to and its allocation, which is what the reading at gate 2 checked.
 Splitting the statements that named two obligations took the count from
 thirty-one to forty-five, above the plan's target of twenty to twenty-five,
-and the engineering log records that as accepted for that reason.
+and that was accepted for the reason the split gives.
 
-The `C-nn` list stays local. A public SR that cites a C id therefore cites
-something the reader cannot open, and the public phase has to carry the
-cited facts into the rationale or publish the list. Traceability is
-hand-maintained Markdown, generated at gate 2 by a script that checks
-coverage both ways. The research suggested a Go unit test that parses the
-documents and fails on a dangling id, which the unit-tests-only CI rule
-(SC-07) allows, and the plan turns the script into that test, reading
-`docs/`, in the public phase.
+Traceability is hand-maintained Markdown, generated at gate 2 by a script
+that checks coverage both ways. The research suggested a Go unit test that
+parses the documents and fails on a dangling identifier, which the
+unit-tests-only CI rule (SC-07) allows, and the plan turns the script into
+that test, reading `docs/`.
 
-That methodology's tooling expects its own identifier shapes, so it cannot be
-run against the working notes or `docs/` without a mapping that this decision
-chose not to maintain. No implementation spike depends on this decision.
+No implementation spike depends on this decision.
 
 ## Requirements affected
 
@@ -97,8 +86,4 @@ none
 
 ## Sources
 
-The design brief D11, the engineering log's planning entry D11 and gate 2
-"Smaller decisions", the research notes on requirements practice, options
-(story format, requirement syntax, naming convention, traceability, document
-set) and open questions, the requirements list "Scope and conventions", the
-constraints list preamble and C-67.
+Mavin's EARS patterns and ISO/IEC/IEEE 29148:2018 on traceability, which fix the requirement syntax and the shape of the tables. [What the research overturned](../articles/03-what-the-research-overturned.md) for the practice this scheme is drawn from, and [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for the forty-five requirements and the traceability as published.

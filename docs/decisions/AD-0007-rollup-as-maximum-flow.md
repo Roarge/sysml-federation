@@ -5,39 +5,36 @@ Status: accepted. Date: 2026-08-27.
 ## Context
 
 The README describes the rollup as a minimum over serial stages and a sum
-over parallel ones. On the first rejection of the plan the owner clarified
-D12: the pipeline is a set of servers wired in a combination of serial and
-parallel connections, and the throughput the requirement checks is a rollup
-over the servers computed from that wiring. The plan had modelled abstract
-stages with serial and parallel container parts, in which the two rules
-apply by construction. With wiring instead of containers, whether a given
-server is serial or parallel to another is a property of the graph, and the
-rollup needs an algorithm that reads it.
+over parallel ones. The example fixes the pipeline as a set of servers wired
+in a combination of serial and parallel connections, with the throughput the
+requirement checks a rollup over the servers computed from that wiring. An
+earlier shape had modelled abstract stages with serial and parallel container
+parts, in which the two rules apply by construction. With wiring instead of
+containers, whether a given server is serial or parallel to another is a
+property of the graph, and the rollup needs an algorithm that reads it.
 
-On the second rejection the owner asked how the rollup would shape the
-architecture, and the answer became a section of the plan. The rollup is the
-only global function in the system, its value depends on every server and
-every connection, and any edit can change it, so where it runs and what it
-needs decides more than the arithmetic. Its inputs fix the minimum
-projection (AD-0005). If it runs on read from fields the router carries
-through `@requires`, the service that computes it holds no copy of the model
-and cannot be stale, which is the README's "live view, no export" in
-mechanism form, and both apps become pure federated clients that compute
+The rollup is the only global function in the system. Its value depends on
+every server and every connection, and any edit can change it, so where it
+runs and what it needs decides more than the arithmetic. Its inputs fix the
+minimum projection (AD-0005). If it runs on read from fields the router
+carries through `@requires`, the service that computes it holds no copy of
+the model and cannot be stale, which is the README's "live view, no export"
+in mechanism form, and both apps become pure federated clients that compute
 nothing. That places one unverified federation feature on the critical path,
-`@requires` over nested lists of objects (C-15).
+`@requires` over nested lists of objects.
 
-The bottleneck has to be a defined set. The gate 1 review found that with
-parse raised to 1600 and indexA to 900, parse and the index pair tie at 1600,
-so the minimum cut is not unique and the highlighted bottleneck would be
-implementation-defined. The story now raises parse to 1700 so the demo never
+The bottleneck has to be a defined set. Reading the use cases at gate 1 found
+that with parse raised to 1600 and indexA to 900, parse and the index pair tie
+at 1600, so the minimum cut is not unique and the highlighted bottleneck would
+be implementation-defined. The story now raises parse to 1700 so the demo never
 shows a tie, and gate 2 was left to define which cut is reported when several
 exist. The capacity model page settled it as the source-side canonical cut,
 the servers whose in-node is reachable from the super-source in the residual
 network of a maximum flow and whose out-node is not, a set that is the same
 for every maximum flow and so does not depend on the order in which
-augmenting paths were found. C-94 records the mechanism as the constraint
-behind the idealised model (AD-0006), and P16 gives each connection its
-direction from the order of the ends of its `connect` statement (AD-0009).
+augmenting paths were found. The arithmetic around it is idealised and says
+so (AD-0006), and each connection takes its direction from the order of the
+ends of its `connect` statement (AD-0009).
 
 ## Decision
 
@@ -94,12 +91,12 @@ tests over the wirings SR-28 lists and by the differential test. Dinic's
 algorithm is a few dozen lines of Go.
 
 The design leans on one thing nobody has run. Whether Cosmo composition and
-gqlgen accept the nested-list `@requires` in the capacity schema is C-15's
-spike, the first of the implementation phase, and its fallback is
+gqlgen accept the nested-list `@requires` in the capacity schema is the first
+spike of the implementation phase, and its fallback is
 `Part.wiring: String`, the same children and connections as one JSON scalar.
-gqlgen's `explicit_requires` also hands the populate function a
-`map[string]interface{}`, the one foreseeable `//nointerface:allow` in
-hand-written code (C-72). The service recomputes on every query, and a cache
+gqlgen's `explicit_requires` also hands the populate function an empty-interface
+map, the one foreseeable allowance in
+hand-written code. The service recomputes on every query, and a cache
 keyed on the model version is the scaling story if it ever matters.
 
 The source-side rule is correct and can surprise. Had the story kept parse at
@@ -116,4 +113,4 @@ SR-28, SR-29
 
 ## Sources
 
-README "The pipeline example". The design brief D12, P8, P16 and the assumptions. The capacity model page "The rollup as a maximum flow", "Why this equals the README's arithmetic" and "The bottleneck". The design-phase plan, section "How the rollup shapes the architecture". The engineering log "The rollup evaluation", the gate 1 review findings and the gate 2 decisions. The constraints list C-15, C-72, C-94. The requirements list SR-28, SR-29, SR-32.
+The repository README, "The pipeline example". [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md), which publishes the capacity model in full: the flow network, why it equals the README's arithmetic, the source-side cut and the worked example. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the tie that made the cut definition necessary. The max-flow min-cut theorem and Dinic's algorithm.

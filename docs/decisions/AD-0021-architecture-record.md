@@ -5,17 +5,14 @@ Status: accepted. Date: 2026-08-27.
 ## Context
 
 The repository publishes its design documentation under `docs/`, written for
-someone deciding whether the approach fits their organisation, while a local
-working directory holds notes and drafts. C-67 states the rule that joins the
-two: a decision worth publishing moves from the working notes to `docs/`,
-after which the working copy stops being the record. The README argues for
+someone deciding whether the approach fits their organisation. The README argues for
 federation as the missing integration layer for open MBSE and says nothing
 about where the architecture is written down. The plan closes the design
 phase with public A3 architecture overviews at gate 4, so two documents about
 the same architecture will exist, a Markdown description with views and
 decision records, and a set of A3 sheets. One of them has to be the record.
 
-An A3 architecture overview (Borches 2010, the research notes on A3 sheets)
+An A3 architecture overview (Borches 2010)
 is a two-sided sheet that captures one system aspect so that a group can
 reason about change after reading it for ten to fifteen minutes. The research
 recommends four sheets on three levels for this repository, L0, L1, L2a and
@@ -25,7 +22,7 @@ this A3, so do not try",
 and a link to another sheet instead of cramming. The same report records
 that every published case ran a review loop of two to four weeks with several
 stakeholders, that a small content change can restructure a sheet, and that a
-single-maintainer public repository has none of that machinery.
+public repository maintained by one person has none of that machinery.
 
 The report also names what the format is not for: a decision log, code-level
 detail, normative or contractual description, and content that changes faster
@@ -39,9 +36,7 @@ each with a text form, the draft subgraph schemas, the process tree, the
 Dockerfile, the exact allowlist and Makefile additions the implementation
 phase makes, and an index of these decision records. That is the material a
 contributor or an evaluating organisation needs verbatim, and it changes at
-every gate. P12 in the design brief is where the plan took its position, and
-the design-phase plan's decision 12 states it in two sentences with Borches'
-own scope as the ground.
+every gate. The plan took its position on Borches' own scope for the format.
 
 ## Decision
 
@@ -51,9 +46,7 @@ architecture, and we will treat the A3 sheets designed at gate 4 as the
 overview for a newcomer, and each sheet points back to the record. Every view
 keeps a text form in the description, every decision has an AD record with
 context and consequences,
-and a sheet carries neither a decision log nor normative detail. When
-material moves to `docs/`, the published copy becomes the record and the
-working copy stops being one (C-67).
+and a sheet carries neither a decision log nor normative detail.
 
 ## Alternatives considered
 
@@ -96,10 +89,7 @@ README's afternoon suggests. That cost is accepted because the alternative
 was rationale spread across sheets or lost with the conversation that
 produced it.
 
-Publication is a rename plus a rewrite under C-67, with the log entry that
-produced the material cited in the pull request, and the public copy says
-what the design contains rather than what was left out. No implementation
-spike depends on this decision.
+No implementation spike depends on this decision.
 
 ## Requirements affected
 
@@ -107,8 +97,4 @@ none
 
 ## Sources
 
-The design brief P12, the design-phase plan decision 12 and gate 4, the
-research notes on A3 sheets, options (the recommended sheet set, two-sided
-versus one-sided layout, when to prefer C4 or arc42) and open questions, the
-constraints list C-67, the architecture description preamble and decision
-index, the engineering log's planning entry.
+Borches and Bonnema, A3 architecture overviews (INCOSE 2010), and Borches' 2009 cookbook, for the format's scope and what it is not for. The arc42 template and the C4 model, for the two alternatives weighed against it. [An A3 sheet for a fifteen-minute reader](../articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md) for the sheets themselves, and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the description they condense.

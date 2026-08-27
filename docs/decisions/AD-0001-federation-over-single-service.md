@@ -33,18 +33,19 @@ OSLC carried and the reason those answers stayed the preserve of
 organisations that could staff them. A central component every team
 changes together fails the same test.
 
-The decisions the brief records on top of this are P1, that every read and
-write goes through the router, P7, that the adapter's projection is generic
-and the capacity service's whole agreement with it is the entity key, the
-field set it declares in its `@requires` and two configured names, and P9,
-that entity keys are SysML short names. One federation feature the design
-leans on is unverified. Whether Cosmo composition and gqlgen accept
-`@requires` over nested lists of objects is C-15's spike, with a flat
-`Part.wiring` scalar as the fallback. C-14 records that Cosmo's gRPC and
-plugin subgraph routes carry no subscriptions, which is why all three
-services stay standard GraphQL subgraphs. The README names Cosmo and says
-nothing of how three services are packaged. The platform is AD-0002's
-subject and the packaging AD-0011's.
+Three further decisions sit on top of that. Every read, write and
+subscription from the two apps goes through the router. The adapter's
+projection is generic, and the capacity service's whole agreement with it
+is the entity key, the field set it declares in its `@requires` and two
+configured names. Entity keys are SysML short names. One federation feature
+the design leans on is unverified: whether Cosmo composition and gqlgen
+accept `@requires` over nested lists of objects, which the first
+implementation spike settles, with a flat `Part.wiring` scalar as the
+fallback. Cosmo's gRPC and extension-module subgraph routes carry no
+subscriptions, which is why all three services stay standard GraphQL
+subgraphs. The README names Cosmo and says nothing of how three services
+are packaged. The platform is AD-0002's subject and the packaging
+AD-0011's.
 
 ## Decision
 
@@ -52,7 +53,7 @@ We will publish the SysML model, the capacity analysis and the document
 structure as three independently owned federated subgraphs behind one
 router, with no service importing, calling or reading the data of another,
 and with every query, mutation and subscription from the two apps sent to
-the router (P1). The adapter declares `Part`, `Requirement` and
+the router. The adapter declares `Part`, `Requirement` and
 `VerificationCase` as entities keyed on `id`, the capacity service
 contributes `capacity`, `bottleneck`, `verdict` and `verdictReason` to
 those entities from the fields its `@requires` names, the document service
@@ -69,7 +70,7 @@ has to change together, which is what federation exists to avoid.
 A central integration platform in the service bus tradition, with adapters,
 a canonical data model and transformation logic owned by an integration
 team. It lost on the audience. The canonical model has to be negotiated and
-owned, and the owner is a person the target organisations do not employ.
+owned, and owning it is a full-time job the target organisations do not staff.
 
 OSLC's linked data approach, identifying resources by URI and describing
 them with shapes so that tools reference each other's objects without
@@ -108,8 +109,8 @@ larger than the word "keys" suggests. The field set in the service's
 `@requires` is a structural dependency on the generic projection, and SR-31
 states it as such so nobody mistakes the contract for smaller than it is.
 The nested-list `@requires` the capacity service needs is the one
-federation feature the design leans on that has not been exercised, and
-C-15's spike runs first in the implementation phase. Three services and a
+federation feature the design leans on that has not been exercised, and the
+spike that settles it runs first in the implementation phase. Three services and a
 router are four servers where a single service would be one, which is
 what forces the single-image supervisor of AD-0011, and a router that is
 absent takes both apps down with it, which SR-40's test relies on.
@@ -118,4 +119,4 @@ absent takes both apps down with it, which SR-40's test relies on.
 SR-40, SR-41, SR-43
 
 ## Sources
-README "Nobody outside systems engineering should need to know what SysML is", "Federation, for the systems engineers" and "Why Cosmo, and not simply GraphQL", the design brief's purpose and P1, P7, P9, the constraints list C-14, C-15, the requirements list SR-31, SR-40, SR-41, SR-43, the engineering log's 2026-08-26 planning entry (the rollup evaluation), the design-phase plan's section "How the rollup shapes the architecture", the architecture description V2.
+The repository README, "Nobody outside systems engineering should need to know what SysML is", "Federation, for the systems engineers" and "Why Cosmo, and not simply GraphQL". [Why federate a systems model](../articles/00-why-federate-a-systems-model.md) for the argument and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the composition view this record describes. The Cosmo documentation on entity keys, `@requires` and subscription support per subgraph transport, at router 0.343.1.
