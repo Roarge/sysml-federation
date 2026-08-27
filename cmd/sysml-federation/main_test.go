@@ -29,6 +29,22 @@ import (
 
 const testModel = "../../examples/pipeline/model.sysml"
 
+// containerGrace is what a container stop allows: the runtime sends SIGTERM
+// and kills the process ten seconds later, so the whole tree has to be down
+// inside that.
+const containerGrace = 10 * time.Second
+
+// TestStopBudgetFitsAContainerGrace reads the timeout constants rather than
+// any behaviour. The stop is strictly sequential and each step can run its
+// full timeout: the UI server drains, the router is asked and then killed,
+// and the three subgraphs drain one after another. Four servers and one
+// router child, so the budget is the sum, and it has to fit the grace.
+func TestStopBudgetFitsAContainerGrace(t *testing.T) {
+	const servers = 4 // the UI server and the three subgraphs
+	budget := servers*serverStopTimeout + routerStopTimeout
+	assert.True(t, budget <= containerGrace, "the stop budget is "+budget.String()+" against a grace of "+containerGrace.String())
+}
+
 // TestHelperRouter is not a test. It is the body of the child process that
 // TestRouterRunsAsAChildProcess starts from this binary in place of
 // /router: it listens where LISTEN_ADDR says, answers /health/ready and
