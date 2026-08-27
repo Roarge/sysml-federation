@@ -32,6 +32,8 @@
 !/examples/**/
 !/docs/
 !/docs/**/
+!/internal/
+!/internal/**/
 
 
 # ------------------------------------------------------------ source files --
@@ -44,6 +46,9 @@
 !*.graphql
 !*.graphqls
 !*.proto
+
+# gqlgen configuration, one per subgraph package.
+!gqlgen.yml
 
 
 # -------------------------------- prose and config inside the source tree --
@@ -58,6 +63,20 @@
 !/examples/*/*.yaml
 !/examples/*/*.json
 !/examples/*/Dockerfile
+
+# The two web apps: HTML, CSS and JavaScript at any depth under examples/,
+# the MIT text beside the one vendored file (AD-0017), and the document
+# service's shipped tree. Anchored to examples/, so an HTML file dropped into
+# docs/ stays outside the depth-bounded rules above. The hard re-exclusions
+# below still win, so a vendor/ or node_modules/ directory is never swept in.
+!/examples/**/*.html
+!/examples/**/*.css
+!/examples/**/*.js
+!/examples/*/ui/shared/LICENSE.*
+!/examples/*/*/*.json
+
+# The A3 sheets are exported as PDF beside their SVG.
+!/docs/a3/*.pdf
 
 
 # ------------------------------------------------------------- fixtures ---
@@ -99,7 +118,9 @@ __pycache__/
 # swept in with them.
 !/.gitignore
 !/.gitattributes
+!/.dockerignore
 !/LICENSE
+!/NOTICE
 !/README.md
 !/CONTRIBUTING.md
 !/SECURITY.md
