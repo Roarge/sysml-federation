@@ -89,6 +89,22 @@ must move together. The licence obligation is explicit: the image
 carries the router's LICENSE next to `/router` (SR-07), and `NOTICE` names
 the router with its version (SR-08).
 
+The bump has a second obligation. `SUBGRAPH_ERROR_PROPAGATION_MODE` is a name
+the vendor documents nowhere: the binary's help lists no environment variables
+at all, and the name is readable only in the struct tags compiled into the
+router's own configuration. Should a release rename or drop it, the router
+returns to its default and puts `Failed to fetch from Subgraph` at the top of
+the errors array with the subgraph's own message two levels below, which is
+where SR-24 and SR-25 came from. Both would then be met on paper and not in
+the answer a client reads, the statement in the example README that a refusal
+arrives unwrapped would be false, and no test would fail, because the tests
+assert the environment the supervisor builds and not what the router makes of
+it. A router bump therefore means driving one refused edit through the composed
+stack and reading `errors[0].message` before the image is tagged.
+`PROMETHEUS_ENABLED` is undocumented on the same terms and is checked in the
+same pass, where losing it reopens a listener rather than breaking a
+requirement (AD-0013).
+
 The cost is a second process to start, watch and stop. The supervisor is
 the parent of a child it cannot inspect from the inside, so readiness is
 read from `/health/ready` and the `healthcheck` subcommand of

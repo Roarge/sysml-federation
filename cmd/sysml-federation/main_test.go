@@ -428,6 +428,21 @@ func TestAddressesMatchTheComposedConfiguration(t *testing.T) {
 	assert.MapEqual(t, dialled, want)
 }
 
+// TestHealthcheckProbesThePublishedPort ties uiProbeAddr to uiAddr. The UI
+// server binds the one and the healthcheck subcommand dials the other, and
+// the image's HEALTHCHECK is that subcommand, so moving the published port
+// and leaving the probe behind would report an unhealthy container while
+// both apps answered (AD-0011). Only the ports are compared: the server
+// binds the wildcard address because the port is published, and the probe
+// dials loopback because it runs inside the container.
+func TestHealthcheckProbesThePublishedPort(t *testing.T) {
+	_, served, err := net.SplitHostPort(uiAddr)
+	servedPort := assert.Must(t, served, err)
+	_, probed, err := net.SplitHostPort(uiProbeAddr)
+	probedPort := assert.Must(t, probed, err)
+	assert.Equal(t, probedPort, servedPort)
+}
+
 func newUI(t *testing.T, assets fs.FS, upstream http.Handler) string {
 	t.Helper()
 	router := httptest.NewServer(upstream)

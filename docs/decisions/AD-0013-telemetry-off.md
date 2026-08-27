@@ -82,11 +82,22 @@ in the child's environment with `PROMETHEUS_ENABLED=false` because nothing here
 reads it, and a port with no reader is one more thing a port table has to
 explain.
 
-The cost is a dependency on two variable names the vendor does not document.
-A later release could rename them, add a second tracker or change the default,
-and nothing in the vendor's documentation would announce it. The router version
-is pinned together with wgc, and every bump means checking the two names
-again, maintenance the demo would not otherwise carry.
+The cost is a dependency on variable names the vendor does not document, and
+there are three of them: `DO_NOT_TRACK`, `COSMO_TELEMETRY_DISABLED` and the
+`PROMETHEUS_ENABLED` above. No documentation page names any of the three, and
+the router binary's help lists no environment variables at all, so a release
+that renames one, changes a default or adds a second tracker would announce it
+nowhere. Nor would anything here notice. The test that guards SR-03 asserts the
+environment the supervisor builds for the child, not what the router does with
+it, so a name the router has stopped reading passes it unchanged while the
+container goes back to reporting usage or to opening a scrape port. The router
+version is pinned together with wgc, and every bump means reading the release
+notes and `router/.env.example` for all three names, then starting the
+container at debug level and confirming from its log that usage tracking is
+off and that nothing listens on `127.0.0.1:8088`. AD-0010 sets a fourth
+undocumented name for a purpose of its own and carries the same obligation, so
+the two are checked in one pass. This is maintenance the demo would not
+otherwise carry.
 
 The claim is only as good as its verification, and readiness is not it. SR-03
 therefore has three parts: a test that the router process's environment
