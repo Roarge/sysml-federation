@@ -51,7 +51,7 @@ most visual, the furthest from a SysML viewer, and the most drawing work.
 
 The viewer carries two renderers, a tokeniser of roughly forty lines and a
 layered left-to-right layout of a small graph, both hand-written and both
-within SC-06's budget. The text pane and the projection can never disagree,
+within SC-06's expected scale. The text pane and the projection can never disagree,
 because the adapter patches edited literals into the served text (SR-22)
 and the viewer renders that text. The sketch shows the capacity and the
 bottleneck exactly as the capacity service returns them, so the viewer is a
