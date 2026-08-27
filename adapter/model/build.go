@@ -96,7 +96,7 @@ func build(f *syntax.File) *Model {
 	b.requirements(pkg)
 	b.verifications(pkg)
 	b.link(pkg)     // subjects, connections, satisfies, derivations, verifications
-	b.constraints() // Task 1.9
+	b.constraints() // quantity, comparison and limit
 	b.project()     // attribute values, literal index
 	return b.m
 }
@@ -350,6 +350,3 @@ func (b *builder) link(pkg *syntax.Package) {
 		}
 	}
 }
-
-// Filled in Task 1.9.
-func (b *builder) constraints() {}
