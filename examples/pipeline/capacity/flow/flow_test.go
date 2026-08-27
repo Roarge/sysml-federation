@@ -115,7 +115,7 @@ func parallel(a, b sp) sp {
 }
 
 func generate(r *rand.Rand, depth int, next *int) sp {
-	if depth == 0 || r.IntN(3) == 0 {
+	if depth == 0 || (depth < 4 && r.IntN(3) == 0) {
 		return leaf(r, next)
 	}
 	a, b := generate(r, depth-1, next), generate(r, depth-1, next)
@@ -139,6 +139,17 @@ func TestSR28_FlowAgreesWithMinAndSum(t *testing.T) {
 		got := assert.Must(t, result, err)
 		if math.Abs(got.Capacity-w.want) > 1e-9 {
 			t.Fatalf("case %d: flow %v, min/sum %v, wiring %v", i, got.Capacity, w.want, w.edges)
+		}
+		sum := 0.0
+		for _, name := range got.Cut {
+			for _, n := range w.nodes {
+				if n.ID == name {
+					sum += *n.Value
+				}
+			}
+		}
+		if math.Abs(sum-got.Capacity) > 1e-9 {
+			t.Fatalf("case %d: cut %v sums to %v, capacity %v, wiring %v", i, got.Cut, sum, got.Capacity, w.edges)
 		}
 	}
 }
