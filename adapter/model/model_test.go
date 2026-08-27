@@ -212,11 +212,10 @@ func TestRelationships(t *testing.T) {
 	assert.SliceEqual(t, pipe.Satisfies, []string{"PIPE-R1", "PIPE-R2"})
 	assert.SliceEqual(t, pipe.Parts[0].Satisfies, []string{"PIPE-R1.1"})
 
-	// A requirement without a bound subject projects an empty subject and a
-	// usage's doc falls back to its definition's.
-	n := parse(t, "package P { requirement def R { doc /* from def */ subject s : X; attribute l : Real; require constraint { s.q <= l } }\n"+
-		"  requirement <'r'> r : R { attribute :>> l = 1; } }")
-	assert.Equal(t, n.Requirements[0].Subject, "")
+	// A usage's doc falls back to its definition's.
+	n := parse(t, "package P { part def D { attribute q : Real; } part <'d'> d : D;\n"+
+		"  requirement def R { doc /* from def */ subject s : D; attribute l : Real; require constraint { s.q <= l } }\n"+
+		"  requirement <'r'> r : R { subject :>> s = d; attribute :>> l = 1; } }")
 	assert.Equal(t, n.Requirements[0].Text, "from def")
 }
 

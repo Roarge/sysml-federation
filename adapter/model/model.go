@@ -71,7 +71,7 @@ type Part struct {
 type Requirement struct {
 	ID, ShortName, Name string
 	Text                string
-	Subject             string // part ID, "" when the usage binds no subject
+	Subject             string // part ID of the part that declares Quantity
 	Quantity            string
 	Comparison          Comparison
 	Limit               float64
