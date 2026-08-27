@@ -365,12 +365,80 @@ func (p *parser) attributeRest(start int) AttributeUsage {
 	return a
 }
 
-// --- stubs replaced in Tasks 1.4 and 1.5 ------------------------------------
+// --- ports and connections ----------------------------------------------------
 
-func (p *parser) parsePortDef() PortDef     { p.unsupported("package"); return PortDef{} }
-func (p *parser) parsePortUsage() PortUsage { p.unsupported("part definition"); return PortUsage{} }
-func (p *parser) parseConnect() Connect     { p.unsupported("part"); return Connect{} }
-func (p *parser) parseSatisfy() Satisfy     { p.unsupported("part"); return Satisfy{} }
+func (p *parser) parsePortDef() PortDef {
+	start := p.expect("port").Span.Start
+	p.expect("def")
+	d := PortDef{ShortName: p.shortName(), Name: p.name()}
+	if !p.accept(";") {
+		p.expect("{")
+		for !p.is("}") {
+			switch {
+			case p.skipComment():
+			case p.is("doc"):
+				p.once(d.Doc != nil, "doc", "port definition")
+				d.Doc = p.doc()
+			case p.is("in") || p.is("out") || p.is("inout"):
+				d.Items = append(d.Items, p.parseDirectedItem())
+			default:
+				p.unsupported("port definition")
+			}
+		}
+		p.expect("}")
+	}
+	d.Span = p.end(start)
+	return d
+}
+
+func (p *parser) parseDirectedItem() DirectedItem {
+	t := p.next()
+	dir := map[string]Direction{"in": DirectionIn, "out": DirectionOut, "inout": DirectionInOut}[t.Text]
+	p.expect("item")
+	it := DirectedItem{Direction: dir, Name: p.name()}
+	if p.accept(":") {
+		it.Type = p.qualifiedName()
+	}
+	p.expect(";")
+	it.Span = p.end(t.Span.Start)
+	return it
+}
+
+func (p *parser) parsePortUsage() PortUsage {
+	start := p.expect("port").Span.Start
+	u := PortUsage{ShortName: p.shortName(), Name: p.name()}
+	p.expect(":")
+	u.Type = p.qualifiedName()
+	p.expect(";")
+	u.Span = p.end(start)
+	return u
+}
+
+func (p *parser) parseConnect() Connect {
+	start := p.expect("connect").Span.Start
+	from := p.parseChain()
+	p.expect("to")
+	to := p.parseChain()
+	for _, c := range []FeatureChain{from, to} {
+		if len(c.Names) != 2 {
+			p.fail(c.Span, "connect ends must be written as part.port")
+		}
+	}
+	p.expect(";")
+	return Connect{From: from, To: to, Span: p.end(start)}
+}
+
+func (p *parser) parseSatisfy() Satisfy {
+	start := p.expect("satisfy").Span.Start
+	req := p.parseChain()
+	p.expect("by")
+	by := p.parseChain()
+	p.expect(";")
+	return Satisfy{Requirement: req, By: by, Span: p.end(start)}
+}
+
+// --- stubs replaced in Task 1.5 ---------------------------------------------
+
 func (p *parser) parseRequirementDef() RequirementDef {
 	p.unsupported("package")
 	return RequirementDef{}

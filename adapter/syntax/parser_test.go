@@ -156,3 +156,90 @@ func TestSR18_StructuralRejections(t *testing.T) {
 		return rejection{e.Line, e.Column, e.Message}
 	})
 }
+
+func TestParseExpressionPrecedenceAndSpans(t *testing.T) {
+	src := "package P { part a { attribute :>> x = (g.r + 1) * 2 - 3 / y; } }"
+	f := parse(t, src)
+	one := syntax.Literal{Number: 1, Span: at(src, "1")}
+	two := syntax.Literal{Number: 2, Span: at(src, "2")}
+	three := syntax.Literal{Number: 3, Span: at(src, "3")}
+	gr := syntax.FeatureChain{Names: []string{"g", "r"}, Span: at(src, "g.r")}
+	y := syntax.FeatureChain{Names: []string{"y"}, Span: within(src, "3 / y", "y")}
+	want := syntax.Expr(syntax.Binary{Op: syntax.Sub,
+		Left: syntax.Binary{Op: syntax.Mul,
+			Left:  syntax.Binary{Op: syntax.Add, Left: gr, Right: one, Span: at(src, "g.r + 1")},
+			Right: two, Span: at(src, "(g.r + 1) * 2")},
+		Right: syntax.Binary{Op: syntax.Div, Left: three, Right: y, Span: at(src, "3 / y")},
+		Span:  at(src, "(g.r + 1) * 2 - 3 / y")})
+	assert.DeepEqual(t, f.Package.Parts[0].Attributes[0].Value, want)
+}
+
+func TestParseNegativeLiteralSpanIncludesTheSign(t *testing.T) {
+	src := "package P { part a { attribute :>> x = -5[ms]; } }"
+	f := parse(t, src)
+	assert.DeepEqual(t, f.Package.Parts[0].Attributes[0].Value,
+		syntax.Expr(syntax.Literal{Number: -5, Unit: "ms", Span: at(src, "-5")}))
+}
+
+func TestParsePortsConnectAndSatisfy(t *testing.T) {
+	src := "package P {\n" +
+		"  port def In { doc /* d */ in item q : Query; }\n" +
+		"  port def Out { out item q : Query; inout item r; }\n" +
+		"  port def Bare;\n" +
+		"  part def S { port input : In; port <'o'> output : Out; }\n" +
+		"  part box { part a : S; part b : S; connect a.output to b.input; satisfy req1 by a; }\n" +
+		"}\n"
+	f := parse(t, src)
+	p := f.Package
+	assert.Len(t, p.PortDefs, 3)
+	assert.Equal(t, p.PortDefs[0].Doc.Text, "d")
+	assert.DeepEqual(t, p.PortDefs[0].Items, []syntax.DirectedItem{
+		{Direction: syntax.DirectionIn, Name: "q", Type: "Query", Span: at(src, "in item q : Query;")}})
+	assert.DeepEqual(t, p.PortDefs[1].Items, []syntax.DirectedItem{
+		{Direction: syntax.DirectionOut, Name: "q", Type: "Query", Span: at(src, "out item q : Query;")},
+		{Direction: syntax.DirectionInOut, Name: "r", Span: at(src, "inout item r;")}})
+	assert.Len(t, p.PortDefs[2].Items, 0)
+	assert.DeepEqual(t, p.PartDefs[0].Ports, []syntax.PortUsage{
+		{Name: "input", Type: "In", Span: at(src, "port input : In;")},
+		{ShortName: "o", Name: "output", Type: "Out", Span: at(src, "port <'o'> output : Out;")}})
+	box := p.Parts[0]
+	assert.DeepEqual(t, box.Connects, []syntax.Connect{{
+		From: syntax.FeatureChain{Names: []string{"a", "output"}, Span: at(src, "a.output")},
+		To:   syntax.FeatureChain{Names: []string{"b", "input"}, Span: at(src, "b.input")},
+		Span: at(src, "connect a.output to b.input;")}})
+	assert.DeepEqual(t, box.Satisfies, []syntax.Satisfy{{
+		Requirement: syntax.FeatureChain{Names: []string{"req1"}, Span: at(src, "req1")},
+		By:          syntax.FeatureChain{Names: []string{"a"}, Span: within(src, "by a;", "a")},
+		Span:        at(src, "satisfy req1 by a;")}})
+}
+
+func TestSR18_ExpressionAndPortRejections(t *testing.T) {
+	tabletest.Run(t, []tabletest.Case[string, rejection]{
+		{Name: "minus before a chain", In: "package P { part a { attribute :>> x = -y; } }",
+			Want: rejection{1, 41, "expected a number after '-', found identifier 'y'"}},
+		{Name: "function call", In: "package P { part a { attribute :>> x = sum(y); } }",
+			Want: rejection{1, 43, "expected ';', found '('"}},
+		{Name: "reduce idiom", In: "package P { part a { attribute :>> x = y->reduce min; } }",
+			Want: rejection{1, 41, "expected ';', found '-'"}},
+		{Name: "unit expression", In: "package P { part a { attribute :>> x = 10[km / L]; } }",
+			Want: rejection{1, 46, "expected ']', found '/'"}},
+		{Name: "unbalanced parenthesis", In: "package P { part a { attribute :>> x = (1 + 2; } }",
+			Want: rejection{1, 46, "expected ')', found ';'"}},
+		{Name: "port with a body", In: "package P { part def S { port p : In { attribute t : Real; } } }",
+			Want: rejection{1, 38, "expected ';', found '{'"}},
+		{Name: "untyped port", In: "package P { part def S { port p; } }",
+			Want: rejection{1, 32, "expected ':', found ';'"}},
+		{Name: "conjugated port", In: "package P { part def S { port p : ~In; } }",
+			Want: rejection{1, 35, "unexpected character '~'"}},
+		{Name: "attribute in a port definition", In: "package P { port def In { attribute t : Real; } }",
+			Want: rejection{1, 27, "keyword 'attribute' is not supported in a port definition body"}},
+		{Name: "connect with a bare part", In: "package P { part box { connect a to b; } }",
+			Want: rejection{1, 32, "connect ends must be written as part.port"}},
+		{Name: "satisfy without by", In: "package P { part box { satisfy r; } }",
+			Want: rejection{1, 33, "expected keyword 'by', found ';'"}},
+	}, func(t *testing.T, in string) rejection {
+		_, err := syntax.Parse("m.sysml", in)
+		e := assert.ErrorAs[*syntax.Error](t, err)
+		return rejection{e.Line, e.Column, e.Message}
+	})
+}
