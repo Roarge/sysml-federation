@@ -26,9 +26,14 @@ models:
   Part:
     model: github.com/Roarge/sysml-federation/adapter/model.Part
     fields:
+      shortName: { resolver: true }
+      doc: { resolver: true }
       satisfies: { resolver: true }
   Attribute:
     model: github.com/Roarge/sysml-federation/adapter/model.Attribute
+    fields:
+      unit: { resolver: true }
+      expression: { resolver: true }
   Port:
     model: github.com/Roarge/sysml-federation/adapter/model.Port
     fields:
@@ -38,8 +43,11 @@ models:
   Requirement:
     model: github.com/Roarge/sysml-federation/adapter/model.Requirement
     fields:
+      shortName: { resolver: true }
+      text: { resolver: true }
       subject: { resolver: true }
       comparison: { resolver: true }
+      limitUnit: { resolver: true }
       derivedFrom: { resolver: true }
       derives: { resolver: true }
       satisfiedBy: { resolver: true }
@@ -47,4 +55,5 @@ models:
   VerificationCase:
     model: github.com/Roarge/sysml-federation/adapter/model.VerificationCase
     fields:
+      shortName: { resolver: true }
       verifies: { resolver: true }

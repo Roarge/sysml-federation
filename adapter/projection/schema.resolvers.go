@@ -12,6 +12,16 @@ import (
 	"github.com/Roarge/sysml-federation/adapter/model"
 )
 
+// Unit is the resolver for the unit field.
+func (r *attributeResolver) Unit(ctx context.Context, obj *model.Attribute) (*string, error) {
+	return optional(obj.Unit), nil
+}
+
+// Expression is the resolver for the expression field.
+func (r *attributeResolver) Expression(ctx context.Context, obj *model.Attribute) (*string, error) {
+	return optional(obj.Expression), nil
+}
+
 // SetAttribute is the resolver for the setAttribute field.
 func (r *mutationResolver) SetAttribute(ctx context.Context, partID string, name string, value float64) (*model.Part, error) {
 	p, m, err := r.Store.SetAttribute(partID, name, value)
@@ -37,6 +47,16 @@ func (r *mutationResolver) ResetModel(ctx context.Context) (*model.Model, error)
 	m := r.Store.Reset()
 	advance(ctx, m)
 	return m, nil
+}
+
+// ShortName is the resolver for the shortName field.
+func (r *partResolver) ShortName(ctx context.Context, obj *model.Part) (*string, error) {
+	return optional(obj.ShortName), nil
+}
+
+// Doc is the resolver for the doc field.
+func (r *partResolver) Doc(ctx context.Context, obj *model.Part) (*string, error) {
+	return optional(obj.Doc), nil
 }
 
 // Satisfies is the resolver for the satisfies field.
@@ -66,6 +86,16 @@ func (r *queryResolver) Requirement(ctx context.Context, id string) (*model.Requ
 	return req, nil
 }
 
+// ShortName is the resolver for the shortName field.
+func (r *requirementResolver) ShortName(ctx context.Context, obj *model.Requirement) (*string, error) {
+	return optional(obj.ShortName), nil
+}
+
+// Text is the resolver for the text field.
+func (r *requirementResolver) Text(ctx context.Context, obj *model.Requirement) (*string, error) {
+	return optional(obj.Text), nil
+}
+
 // Subject is the resolver for the subject field.
 func (r *requirementResolver) Subject(ctx context.Context, obj *model.Requirement) (*model.Part, error) {
 	if obj.Subject == "" {
@@ -82,6 +112,11 @@ func (r *requirementResolver) Subject(ctx context.Context, obj *model.Requiremen
 func (r *requirementResolver) Comparison(ctx context.Context, obj *model.Requirement) (*Comparison, error) {
 	c := Comparison(obj.Comparison.String())
 	return &c, nil
+}
+
+// LimitUnit is the resolver for the limitUnit field.
+func (r *requirementResolver) LimitUnit(ctx context.Context, obj *model.Requirement) (*string, error) {
+	return optional(obj.LimitUnit), nil
 }
 
 // DerivedFrom is the resolver for the derivedFrom field.
@@ -109,10 +144,18 @@ func (r *subscriptionResolver) ModelChanged(ctx context.Context) (<-chan int, er
 	return r.Store.Subscribe(ctx), nil
 }
 
+// ShortName is the resolver for the shortName field.
+func (r *verificationCaseResolver) ShortName(ctx context.Context, obj *model.VerificationCase) (*string, error) {
+	return optional(obj.ShortName), nil
+}
+
 // Verifies is the resolver for the verifies field.
 func (r *verificationCaseResolver) Verifies(ctx context.Context, obj *model.VerificationCase) ([]*model.Requirement, error) {
 	return requirements(r.current(ctx), obj.Verifies)
 }
+
+// Attribute returns AttributeResolver implementation.
+func (r *Resolver) Attribute() AttributeResolver { return &attributeResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -136,6 +179,7 @@ func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionRes
 func (r *Resolver) VerificationCase() VerificationCaseResolver { return &verificationCaseResolver{r} }
 
 type (
+	attributeResolver        struct{ *Resolver }
 	mutationResolver         struct{ *Resolver }
 	partResolver             struct{ *Resolver }
 	portResolver             struct{ *Resolver }

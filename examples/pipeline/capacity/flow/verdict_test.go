@@ -29,6 +29,10 @@ type verdictOut struct{ Kind, Reason string }
 func TestSR30_Verdict(t *testing.T) {
 	shipped := subject(pipeline(2000, 1200, 700, 700, 1800), wiring)
 	cases := []tabletest.Case[verdictIn, verdictOut]{
+		{Name: "no quantity", In: verdictIn{"", "GE", v(1500), shipped, ""},
+			Want: verdictOut{KindInconclusive, "no quantity to compute"}},
+		{Name: "no quantity with a verification case", In: verdictIn{"", "GE", v(1500), shipped, "PIPE-VC1"},
+			Want: verdictOut{KindInconclusive, "no quantity to compute"}},
 		{Name: "other quantity with a verification case", In: verdictIn{"latency", "LE", v(200), shipped, "PIPE-VC1"},
 			Want: verdictOut{KindInconclusive, "PIPE-VC1 is declared and no service runs it"}},
 		{Name: "other quantity without one", In: verdictIn{"latency", "LE", v(200), shipped, ""},

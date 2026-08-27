@@ -128,10 +128,10 @@ func escaped(s string) string {
 }
 
 const partsAnswer = `{"model":{"version":1,"text":"part root","roots":[{"id":"P1","shortName":"P1","name":"root","definition":"Box","doc":"the root",` +
-	`"attributes":[{"name":"total","value":10,"unit":"","editable":false,"expression":"child.rate * 2"}],"ports":[],` +
+	`"attributes":[{"name":"total","value":10,"unit":null,"editable":false,"expression":"child.rate * 2"}],"ports":[],` +
 	`"connections":[{"id":"C1.drain->C1.feed","from":"C1","fromPort":"drain","to":"C1","toPort":"feed"}],"satisfies":[{"id":"R1"}],` +
-	`"parts":[{"id":"C1","shortName":"C1","name":"child","definition":"Box","doc":"",` +
-	`"attributes":[{"name":"rate","value":5,"unit":"Hz","editable":true,"expression":""},{"name":"size","value":null,"unit":"","editable":false,"expression":""}],` +
+	`"parts":[{"id":"C1","shortName":"C1","name":"child","definition":"Box","doc":null,` +
+	`"attributes":[{"name":"rate","value":5,"unit":"Hz","editable":true,"expression":null},{"name":"size","value":null,"unit":null,"editable":false,"expression":null}],` +
 	`"ports":[{"name":"feed","direction":"IN"},{"name":"drain","direction":"OUT"}],"parts":[],"connections":[],"satisfies":[{"id":"R2"}]}]}]}}`
 
 const requirementsQuery = `{ model { requirements { id shortName name text subject { id } quantity comparison limit limitUnit limitEditable
@@ -141,8 +141,8 @@ const requirementsQuery = `{ model { requirements { id shortName name text subje
 
 const requirementsAnswer = `{"model":{"requirements":[` +
 	`{"id":"R1","shortName":"R1","name":"total","text":"the root shall keep up","subject":{"id":"P1"},"quantity":"total","comparison":"GE","limit":8,"limitUnit":"Hz","limitEditable":true,"derivedFrom":[],"derives":[{"id":"R2"}],"satisfiedBy":[{"id":"P1"}],"verifiedBy":[{"id":"V1"}]},` +
-	`{"id":"R2","shortName":"","name":"rate","text":"","subject":{"id":"C1"},"quantity":"rate","comparison":"LT","limit":9,"limitUnit":"","limitEditable":false,"derivedFrom":[{"id":"R1"}],"derives":[],"satisfiedBy":[{"id":"C1"}],"verifiedBy":[]},` +
-	`{"id":"R3","shortName":"","name":"free","text":"","subject":null,"quantity":"x","comparison":"EQ","limit":1,"limitUnit":"","limitEditable":false,"derivedFrom":[],"derives":[],"satisfiedBy":[],"verifiedBy":[]}],` +
+	`{"id":"R2","shortName":null,"name":"rate","text":null,"subject":{"id":"C1"},"quantity":"rate","comparison":"LT","limit":9,"limitUnit":null,"limitEditable":false,"derivedFrom":[{"id":"R1"}],"derives":[],"satisfiedBy":[{"id":"C1"}],"verifiedBy":[]},` +
+	`{"id":"R3","shortName":null,"name":"free","text":null,"subject":null,"quantity":"x","comparison":"EQ","limit":1,"limitUnit":null,"limitEditable":false,"derivedFrom":[],"derives":[],"satisfiedBy":[],"verifiedBy":[]}],` +
 	`"verificationCases":[{"id":"V1","shortName":"V1","name":"check","verifies":[{"id":"R1"}]}]},"part":{"name":"child"},"requirement":{"subject":{"name":"child"}}}`
 
 func TestQueriesServeEveryFieldOfTheProjection(t *testing.T) {
