@@ -1,8 +1,12 @@
-# Federating a systems model
+# The missing integration layer for open MBSE
 
 *Roar Georgsen, 27 August 2026*
 
-An adapter publishes a SysML v2 model as a federated service, and a worked example joins it to a throughput analysis and a requirements document that know nothing about SysML. In the example, a query pipeline of five servers rolls its capacity up from their throughputs, and a requirement passes or fails as the numbers change. These articles describe the design from the problem through to the version being built, and they are written to be read by someone deciding whether the approach fits their organisation.
+One system, four descriptions. A requirements file, an interface sheet, a power budget spreadsheet, a hazard analysis a third team owns. Every copy starts drifting the moment it is made. Model based systems engineering was supposed to end that, and has been five years from mainstream adoption for about a quarter of a century. The industry tried a central integration platform, then a linked data layer. Both assumed somebody employed to do integration full time. Firms with fewer than 25 engineers have no such person, and they are where most engineering happens. This is for them.
+
+SysML v2 dropped the UML profile and came with a standard API. What it returns is the metamodel, so every downstream tool must learn SysML before it can read a requirement. I would rather the model's owners published a small, plainly typed projection, joined by federation to whatever else describes the same system. Nobody outside systems engineering should need to know what SysML is.
+
+A demo is being built. A query pipeline of five servers, an analysis that has never parsed a model file, a requirements document that has never computed anything, and a requirement that fails until the right server changes. What the demo has to prove is that the connecting layer can exist with nobody employed to maintain it. The design is written up below in the present tense, and it runs from the first tagged release.
 
 1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
    The integration problem MBSE never solved, what SysML v2 changes, and the claim this repository makes.
