@@ -32,21 +32,17 @@ type Token struct {
 	Span Span
 }
 
-// SyntaxError is a construct the adapter refuses, with its position. Line and
+// Error is a construct the adapter refuses, with its position. Line and
 // Column are 1-based; Column counts bytes from the start of the line.
-//
-// revive reads syntax.SyntaxError as stuttering and would have it called Error.
-// The name stays: it is the shape the standard library gives the same type in
-// encoding/json, and every refusal from this package and from the model package
-// is a *syntax.SyntaxError, named as such wherever it is asserted.
-type SyntaxError struct { //nolint:revive // named for the reason above
+type Error struct {
 	File    string
 	Line    int
 	Column  int
 	Message string
 }
 
-func (e *SyntaxError) Error() string {
+// Error formats the refusal as "<file>:<line>:<column>: <message>".
+func (e *Error) Error() string {
 	return fmt.Sprintf("%s:%d:%d: %s", e.File, e.Line, e.Column, e.Message)
 }
 
@@ -62,10 +58,10 @@ func Position(src string, offset int) (line, column int) {
 	return line, offset - lineStart + 1
 }
 
-// ErrorAt builds a SyntaxError for the start of span.
-func ErrorAt(file, src string, at Span, message string) *SyntaxError {
+// ErrorAt builds an Error for the start of span.
+func ErrorAt(file, src string, at Span, message string) *Error {
 	line, col := Position(src, at.Start)
-	return &SyntaxError{File: file, Line: line, Column: col, Message: message}
+	return &Error{File: file, Line: line, Column: col, Message: message}
 }
 
 // keywords is the reserved-word list of OMG SysML v2 Part 1 Language

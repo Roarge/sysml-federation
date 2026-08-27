@@ -86,16 +86,16 @@ func TestLexSpansAreByteOffsets(t *testing.T) {
 }
 
 func TestLexErrorsCarryFileLineAndColumn(t *testing.T) {
-	tabletest.Run(t, []tabletest.Case[string, syntax.SyntaxError]{
+	tabletest.Run(t, []tabletest.Case[string, syntax.Error]{
 		{Name: "first line", In: "part ~",
-			Want: syntax.SyntaxError{File: "m.sysml", Line: 1, Column: 6, Message: "unexpected character '~'"}},
+			Want: syntax.Error{File: "m.sysml", Line: 1, Column: 6, Message: "unexpected character '~'"}},
 		{Name: "third line", In: "a\nb\n  '", // the quote opens on line 3, column 3
-			Want: syntax.SyntaxError{File: "m.sysml", Line: 3, Column: 3, Message: "unterminated quoted name"}},
+			Want: syntax.Error{File: "m.sysml", Line: 3, Column: 3, Message: "unterminated quoted name"}},
 		{Name: "unreadable number", In: "x = 1e999;",
-			Want: syntax.SyntaxError{File: "m.sysml", Line: 1, Column: 5, Message: `cannot read "1e999" as a number`}},
-	}, func(t *testing.T, in string) syntax.SyntaxError {
+			Want: syntax.Error{File: "m.sysml", Line: 1, Column: 5, Message: `cannot read "1e999" as a number`}},
+	}, func(t *testing.T, in string) syntax.Error {
 		_, err := syntax.Lex("m.sysml", in)
-		return *assert.ErrorAs[*syntax.SyntaxError](t, err)
+		return *assert.ErrorAs[*syntax.Error](t, err)
 	})
 }
 
