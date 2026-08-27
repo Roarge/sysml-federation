@@ -148,7 +148,7 @@ The plan is to replace the adapter's two stand-ins with a more complete mapping 
 
 ## Reading further
 
-The design is written up as a series of articles under [docs/](docs/README.md). They start with the motivation and an overview of the architecture, then follow the design from the first research through to the version now being built, and they link the decision records behind every choice. The same articles are published at https://roarge.github.io/sysml-federation/.
+The design is written up as a series of articles under [docs/](docs/README.md). They start with the motivation and an overview of the architecture, then follow the design from the first research through to the version now being built, and they link the decision records behind every choice. The same articles are published at https://sysml-federation.org/.
 
 ## What this is not
 

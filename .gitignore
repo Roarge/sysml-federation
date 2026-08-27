@@ -89,6 +89,12 @@
 !/docs/_includes/*.html
 !/docs/assets/*.css
 
+# The custom domain. GitHub writes this file itself when the domain is set in
+# the repository settings, and that commit does not consult this allowlist, so
+# without a rule here the file is tracked and excluded at the same time and
+# `make check-tracked` fails.
+!/docs/CNAME
+
 
 # ------------------------------------------------------------- fixtures ---
 # Test fixtures are data of whatever shape the test needs, so a testdata

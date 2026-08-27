@@ -1,7 +1,10 @@
 title: Federating a systems model
 description: An adapter that publishes a SysML v2 model as a federated service, and the record of how it was designed
-url: https://roarge.github.io
-baseurl: /sysml-federation
+# The site is served from the root of its own domain, so there is no path
+# prefix. A non-empty baseurl here sends every stylesheet, image and internal
+# link one directory too deep and the pages arrive unstyled.
+url: https://sysml-federation.org
+baseurl: ""
 repository: Roarge/sysml-federation
 lang: en-GB
 author: Roar Georgsen
