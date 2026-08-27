@@ -46,7 +46,7 @@ function's result is a compile error rather than a run-time report, and a
 fresh clone and CI run the same tests the maintainer runs. The helpers become
 public code under Apache 2.0 and are read by the visitor who reads the
 repository in an afternoon, so they count towards the impression the code
-makes, though not towards SC-06's line budgets, which name no component
+makes, though not towards SC-06's figures, which name no component
 under `internal/`.
 
 The tracking policy loses its clean shape. `internal/` was one line in the

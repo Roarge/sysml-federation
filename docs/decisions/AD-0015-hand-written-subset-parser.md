@@ -36,7 +36,7 @@ tree, which is not the OMG JSON and whose API is pre-1.0.
 
 The repository's own rules bear on the choice. Product code is Go with no empty
 interface in a value position, it is test-first, and it has to
-be readable in an afternoon within a line budget per component (SC-06).
+be readable in an afternoon within an expected scale per component (SC-06).
 Edits through the projection patch a literal at its recorded source span
 (AD-0004), so whatever reads the text has to keep byte ranges. And the example
 has to be accepted by the reference tools in any case, since a subset parser
@@ -93,9 +93,9 @@ conformant and never will be. Expressions need a real grammar even for the
 subset, which is why the adapter evaluates only a literal with an optional
 unit, feature reference chains, the four arithmetic operators and parentheses
 (SR-23). Name resolution, imports and redefinition are reimplemented in
-miniature. Every new language feature is adapter work, and SC-06's line budget
-for hand-written code under `adapter/` bounds how far that goes before a
-decision record has to raise it.
+miniature. Every new language feature is adapter work, and SC-06's expected
+scale for hand-written code under `adapter/` is the signal for how far that
+goes, though it is a figure to revise rather than a limit to obey.
 
 A silent mis-parse is the main risk and strictness is the mitigation. The
 parser fails on an unknown token rather than skipping it, and one fixture per
