@@ -39,6 +39,15 @@ type vcNode struct {
 	out *VerificationCase
 }
 
+// binding names one evaluation: the syntax that binds a value, and the part
+// or requirement whose attributes its names resolve against. A definition's
+// binding is shared by every usage, so the scope is part of the key.
+type binding struct {
+	bind *syntax.AttributeUsage
+	part *partNode
+	req  *reqNode
+}
+
 type builder struct {
 	f         *syntax.File
 	m         *Model
@@ -53,8 +62,8 @@ type builder struct {
 	reqs      []*reqNode
 	reqByName map[string]*reqNode
 	vcs       []*vcNode
-	values    map[*syntax.AttributeUsage]quantity
-	busy      map[*syntax.AttributeUsage]bool
+	values    map[binding]quantity
+	busy      map[binding]bool
 }
 
 // fail refuses the model at a span. Callers format the message themselves,
@@ -70,7 +79,7 @@ func build(f *syntax.File) *Model {
 		partDefs: map[string]*syntax.PartDef{}, portDefs: map[string]*syntax.PortDef{},
 		reqDefs: map[string]*syntax.RequirementDef{}, vcDefs: map[string]*syntax.VerificationDef{},
 		ids: map[string]bool{}, byName: map[string]*partNode{}, reqByName: map[string]*reqNode{},
-		values: map[*syntax.AttributeUsage]quantity{}, busy: map[*syntax.AttributeUsage]bool{}}
+		values: map[binding]quantity{}, busy: map[binding]bool{}}
 	pkg := &f.Package
 	for i := range pkg.PartDefs {
 		b.partDefs[pkg.PartDefs[i].Name] = &pkg.PartDefs[i]
@@ -150,16 +159,16 @@ func (b *builder) part(u *syntax.PartUsage, parent *partNode, owner string) *par
 		}
 	}
 	for j := range u.Attributes {
-		b.slot(&n.attrs, &u.Attributes[j], u.Type)
+		b.slot(&n.attrs, &u.Attributes[j], declaredBy(u.Type, u.Name))
 	}
 	// Ports: from the definitions, base first, then the usage's own.
 	for i := len(n.defs) - 1; i >= 0; i-- {
 		for _, p := range n.defs[i].Ports {
-			n.out.Ports = append(n.out.Ports, Port{Name: p.Name, Direction: b.portDirection(p)})
+			b.port(n, p)
 		}
 	}
 	for _, p := range u.Ports {
-		n.out.Ports = append(n.out.Ports, Port{Name: p.Name, Direction: b.portDirection(p)})
+		b.port(n, p)
 	}
 	b.parts = append(b.parts, n)
 	b.m.Parts = append(b.m.Parts, n.out)
@@ -170,6 +179,16 @@ func (b *builder) part(u *syntax.PartUsage, parent *partNode, owner string) *par
 		n.out.Parts = append(n.out.Parts, c.out)
 	}
 	return n
+}
+
+// declaredBy names the scope a redefinition must find its declaration in: the
+// usage's definition, or the usage itself when it declares no type, so the
+// refusal names something either way.
+func declaredBy(typ, name string) string {
+	if typ == "" {
+		return name
+	}
+	return typ
 }
 
 // slot adds a declaration or binds a redefinition. owner names the definition
@@ -186,11 +205,26 @@ func (b *builder) slot(slots *[]attrSlot, a *syntax.AttributeUsage, owner string
 		}
 		b.fail(a.Span, fmt.Sprintf("redefined attribute %q is not declared by %q", a.Name, owner))
 	}
+	if findSlot(*slots, a.Name) != nil {
+		b.fail(a.Span, fmt.Sprintf("attribute %q is declared twice", a.Name))
+	}
 	s := attrSlot{name: a.Name}
 	if a.Value != nil {
 		s.bind = a
 	}
 	*slots = append(*slots, s)
+}
+
+// port projects one port of a part, refusing a name a declaration already used.
+// Two ports of one name would give the part two entries the wiring cannot tell
+// apart.
+func (b *builder) port(n *partNode, p syntax.PortUsage) {
+	for _, existing := range n.out.Ports {
+		if existing.Name == p.Name {
+			b.fail(p.Span, fmt.Sprintf("port %q is declared twice", p.Name))
+		}
+	}
+	n.out.Ports = append(n.out.Ports, Port{Name: p.Name, Direction: b.portDirection(p)})
 }
 
 // portDirection derives a port's direction from its definition's items.
@@ -291,7 +325,7 @@ func (b *builder) requirements(pkg *syntax.Package) {
 			}
 		}
 		for j := range u.Attributes {
-			b.slot(&n.attrs, &u.Attributes[j], u.Type)
+			b.slot(&n.attrs, &u.Attributes[j], declaredBy(u.Type, u.Name))
 		}
 		text := docText(u.Doc)
 		if text == "" && n.def != nil {

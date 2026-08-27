@@ -133,12 +133,24 @@ func TestBuildRefusals(t *testing.T) {
 			Want: refusal{1, 47, `cyclic specialization of "A"`}},
 		{Name: "redefining an undeclared attribute", In: "package P { part def S; part a : S { attribute :>> x = 1; } }",
 			Want: refusal{1, 38, `redefined attribute "x" is not declared by "S"`}},
+		{Name: "redefining an undeclared attribute on an untyped usage", In: "package P { part a { attribute :>> x = 1; } }",
+			Want: refusal{1, 22, `redefined attribute "x" is not declared by "a"`}},
+		{Name: "redefining an undeclared attribute on an untyped requirement", In: "package P { requirement r { attribute :>> x = 1; } }",
+			Want: refusal{1, 29, `redefined attribute "x" is not declared by "r"`}},
 		{Name: "unknown port definition", In: "package P { part def S { port p : Nope; } part a : S; }",
 			Want: refusal{1, 26, `unresolved definition "Nope"`}},
 		{Name: "duplicate part name", In: "package P { part def S; part <'A'> x : S; part <'B'> x : S; }",
 			Want: refusal{1, 43, `part "x" is declared twice`}},
 		{Name: "duplicate requirement name", In: head + "  requirement <'q'> r : R { subject :>> s = a; attribute :>> l = 1; } }",
 			Want: refusal{3, 3, `requirement "r" is declared twice`}},
+		{Name: "attribute declared twice in one body", In: "package P { part def S { attribute x : Real; attribute x : Real; } part a : S; }",
+			Want: refusal{1, 46, `attribute "x" is declared twice`}},
+		{Name: "attribute redeclared by a subtype", In: "package P { part def B { attribute x : Real; } part def S :> B { attribute x : Real; } part a : S; }",
+			Want: refusal{1, 66, `attribute "x" is declared twice`}},
+		{Name: "port declared twice", In: "package P { port def Q; part def S { port p : Q; port p : Q; } part a : S; }",
+			Want: refusal{1, 50, `port "p" is declared twice`}},
+		{Name: "attribute declared twice in a requirement definition", In: "package P { requirement def R { attribute l : Real; attribute l : Real; } requirement r : R { } }",
+			Want: refusal{1, 53, `attribute "l" is declared twice`}},
 	}, refuse)
 }
 
@@ -212,11 +224,10 @@ func TestRelationships(t *testing.T) {
 	assert.SliceEqual(t, pipe.Satisfies, []string{"PIPE-R1", "PIPE-R2"})
 	assert.SliceEqual(t, pipe.Parts[0].Satisfies, []string{"PIPE-R1.1"})
 
-	// A requirement without a bound subject projects an empty subject and a
-	// usage's doc falls back to its definition's.
-	n := parse(t, "package P { requirement def R { doc /* from def */ subject s : X; attribute l : Real; require constraint { s.q <= l } }\n"+
-		"  requirement <'r'> r : R { attribute :>> l = 1; } }")
-	assert.Equal(t, n.Requirements[0].Subject, "")
+	// A usage's doc falls back to its definition's.
+	n := parse(t, "package P { part def D { attribute q : Real; } part <'d'> d : D;\n"+
+		"  requirement def R { doc /* from def */ subject s : D; attribute l : Real; require constraint { s.q <= l } }\n"+
+		"  requirement <'r'> r : R { subject :>> s = d; attribute :>> l = 1; } }")
 	assert.Equal(t, n.Requirements[0].Text, "from def")
 }
 

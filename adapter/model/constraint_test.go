@@ -3,6 +3,7 @@ package model_test
 import (
 	"testing"
 
+	"github.com/Roarge/sysml-federation/adapter/model"
 	"github.com/Roarge/sysml-federation/adapter/syntax"
 	"github.com/Roarge/sysml-federation/internal/assert"
 	"github.com/Roarge/sysml-federation/internal/tabletest"
@@ -69,6 +70,26 @@ func TestSR19_ConstraintShapes(t *testing.T) {
 		r := m.Requirements[0]
 		return shape{r.Quantity, r.Comparison, r.Limit, r.LimitUnit, r.LimitEditable}
 	})
+}
+
+func TestSR19_AWalkedChainProjectsThePartThatOwnsTheAttribute(t *testing.T) {
+	m := parse(t, "package P { part def D { attribute q : Real; }\n"+
+		"  part <'p'> p : D { part <'c'> c : D; }\n"+
+		"  requirement def R { subject s : D; attribute l : Real; require constraint { s.c.q >= l } }\n"+
+		"  requirement <'r'> r : R { subject :>> s = p; attribute :>> l = 1; } }")
+	got, err := req(m, "r")
+	r := assert.Must(t, got, err)
+	assert.Equal(t, r.Quantity, "q")
+	assert.Equal(t, r.Subject, "c")
+}
+
+func TestSR19_ARequirementThatBindsNoSubjectIsRefused(t *testing.T) {
+	_, err := model.Parse("t.sysml", "package P { part def D { attribute q : Real; }\n"+
+		"  part <'p'> p : D;\n"+
+		"  requirement def R { subject s : D; attribute l : Real; require constraint { s.q >= l } }\n"+
+		"  requirement <'r'> r : R { attribute :>> l = 1; } }")
+	se := assert.ErrorAs[*syntax.Error](t, err)
+	assert.Equal(t, se.Message, `requirement "r" binds no subject`)
 }
 
 func TestSR19_OtherShapesAreRefused(t *testing.T) {

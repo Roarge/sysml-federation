@@ -46,9 +46,10 @@ func (b *builder) constraint(r *reqNode) {
 	chain := side.(syntax.FeatureChain) // rooted has proved the type
 	r.out.Quantity = chain.Names[len(chain.Names)-1]
 	r.out.Comparison = op
-	if r.subject != nil {
-		b.checkQuantity(r.subject, chain)
+	if r.subject == nil {
+		b.fail(r.ast.Span, fmt.Sprintf("requirement %q binds no subject", r.ast.Name))
 	}
+	r.out.Subject = b.checkQuantity(r.subject, chain).out.ID
 	switch o := other.(type) {
 	case syntax.Literal:
 		b.setLimit(r, quantity{o.Number, o.Unit}, &o)
@@ -101,9 +102,11 @@ func flip(c syntax.Comparison) syntax.Comparison {
 	return c
 }
 
-// checkQuantity confirms the subject declares the quantity the chain names,
-// walking child parts for the middle segments.
-func (b *builder) checkQuantity(subject *partNode, chain syntax.FeatureChain) {
+// checkQuantity confirms the part the chain names declares the quantity,
+// walking child parts for the middle segments. It returns the part it walked
+// to, which owns the attribute and is therefore the subject the projection
+// reports.
+func (b *builder) checkQuantity(subject *partNode, chain syntax.FeatureChain) *partNode {
 	cur := subject
 	middle, last := chain.Names[1:len(chain.Names)-1], chain.Names[len(chain.Names)-1]
 	for _, name := range middle {
@@ -116,4 +119,5 @@ func (b *builder) checkQuantity(subject *partNode, chain syntax.FeatureChain) {
 	if findSlot(cur.attrs, last) == nil {
 		b.fail(chain.Span, fmt.Sprintf("subject %q declares no attribute %q", cur.out.ID, last))
 	}
+	return cur
 }
