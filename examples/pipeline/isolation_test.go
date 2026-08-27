@@ -22,10 +22,15 @@ type mutationOut map[string]struct {
 	Version int `json:"version"`
 }
 
-// TestSR36_DocumentOperationsLeaveTheModelVersion runs every editorial
-// operation against the document service and reads back the version the
-// service reports, which advances once per accepted operation.
-func TestSR36_DocumentOperationsLeaveTheModelVersion(t *testing.T) {
+// TestEveryEditorialOperationIsAcceptedThroughTheGraph posts each of the
+// eight editorial operations to the served handler and checks that the
+// document's own version advances once per operation. It carries no
+// requirement identifier because it looks no further than acceptance: what
+// each operation does to the tree, the restore as last child and the
+// renumbering are checked by the document package's own tests, and the
+// change notice reaching every subscriber by the test that drives the
+// subscription.
+func TestEveryEditorialOperationIsAcceptedThroughTheGraph(t *testing.T) {
 	created, err := document.New()
 	svc := assert.Must(t, created, err)
 	c := client.New(document.Handler(svc), client.Path("/graphql"))
