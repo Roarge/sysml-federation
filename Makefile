@@ -163,13 +163,13 @@ cover: ## Run the suite with coverage and enforce the floor
 
 # ---------------------------------------------------- empty-interface rule ---
 .PHONY: any-audit
-any-audit: ## List every suppression of the empty-interface rule
-	@grep -rn --include='*.go' -E '//[[:space:]]*nointerface:allow' . 2>/dev/null \
+any-audit: ## List every suppression of the empty-interface rule in tracked Go files
+	@git ls-files -z -- '*.go' | xargs -0 grep -n -E '//[[:space:]]*nointerface:allow' 2>/dev/null \
 	  | grep -v '/testdata/' || printf 'no suppressions\n'
 
 .PHONY: any-baseline
-any-baseline: ## Fail if suppressions have grown since the baseline
-	@n=$$(grep -rn --include='*.go' -E '//[[:space:]]*nointerface:allow' . 2>/dev/null \
+any-baseline: ## Fail if suppressions in tracked Go files have grown since the baseline
+	@n=$$(git ls-files -z -- '*.go' | xargs -0 grep -n -E '//[[:space:]]*nointerface:allow' 2>/dev/null \
 	      | grep -vc '/testdata/' || true); n=$${n:-0}; \
 	 b=$$(cat .nointerface-baseline 2>/dev/null || echo 0); \
 	 printf 'suppressions: %s (baseline %s)\n' "$$n" "$$b"; \
@@ -206,7 +206,7 @@ modules: ## List every Go module, so none escapes the gate
 
 # ------------------------------------------------------------- generation --
 # The three subgraphs carry a //go:generate line that runs gqlgen through the
-# module's tool directive (Phase 2). Generated files are committed, so CI
+# module's tool directive. Generated files are committed, so CI
 # never runs this.
 .PHONY: generate
 generate: ## Regenerate the gqlgen code of the subgraphs

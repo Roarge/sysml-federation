@@ -83,6 +83,28 @@ func TestSliceEqual(t *testing.T) {
 	}
 }
 
+func TestMapEqual(t *testing.T) {
+	r := &recorder{TB: t}
+	assert.MapEqual(r, map[string]int{"a": 1, "b": 2}, map[string]int{"b": 2, "a": 1})
+	if r.failed {
+		t.Fatalf("MapEqual reported a failure for identical maps: %v", r.msgs)
+	}
+
+	for name, tc := range map[string]struct{ got, want map[string]int }{
+		"differing size":  {map[string]int{"a": 1}, map[string]int{"a": 1, "b": 2}},
+		"missing key":     {map[string]int{"a": 1, "c": 2}, map[string]int{"a": 1, "b": 2}},
+		"differing value": {map[string]int{"a": 1, "b": 9}, map[string]int{"a": 1, "b": 2}},
+	} {
+		t.Run(name, func(t *testing.T) {
+			r := &recorder{TB: t}
+			assert.MapEqual(r, tc.got, tc.want)
+			if !r.failed {
+				t.Fatalf("MapEqual accepted %v == %v", tc.got, tc.want)
+			}
+		})
+	}
+}
+
 func TestLen(t *testing.T) {
 	r := &recorder{TB: t}
 	assert.Len(r, []string{"a", "b"}, 2)
@@ -124,6 +146,19 @@ func TestNoError(t *testing.T) {
 	}
 }
 
+func TestError(t *testing.T) {
+	r := &recorder{TB: t}
+	assert.Error(r, errSentinel)
+	if r.failed {
+		t.Fatalf("Error reported a failure for a non-nil error: %v", r.msgs)
+	}
+	r2 := &recorder{TB: t}
+	assert.Error(r2, nil)
+	if !r2.failed {
+		t.Fatal("Error accepted nil as a failure")
+	}
+}
+
 func TestErrorIs(t *testing.T) {
 	wrapped := fmt.Errorf("reading model: %w", errSentinel)
 	r := &recorder{TB: t}
@@ -152,6 +187,17 @@ func TestErrorAs(t *testing.T) {
 	if got == nil || got.id != "R-1" {
 		t.Fatalf("ErrorAs returned %#v, want the *notFoundError carrying R-1", got)
 	}
+
+	// An error of another type. The real *testing.T would stop the test here,
+	// but the recorder's Fatalf only records, so the zero value comes back.
+	r2 := &recorder{TB: t}
+	other := assert.ErrorAs[*notFoundError](r2, errSentinel)
+	if !r2.failed {
+		t.Fatal("ErrorAs matched an error of another type")
+	}
+	if other != nil {
+		t.Fatalf("ErrorAs returned %#v after failing, want the zero value", other)
+	}
 }
 
 func TestMust(t *testing.T) {
@@ -164,6 +210,22 @@ func TestMust(t *testing.T) {
 	assert.Must(r2, 0, errSentinel)
 	if !r2.failed {
 		t.Fatal("Must accepted a non-nil error")
+	}
+}
+
+func TestTrue(t *testing.T) {
+	r := &recorder{TB: t}
+	assert.True(r, true, "the model has a root")
+	if r.failed {
+		t.Fatalf("True reported a failure for a condition that holds: %v", r.msgs)
+	}
+	r2 := &recorder{TB: t}
+	assert.True(r2, false, "the model has a root")
+	if !r2.failed {
+		t.Fatal("True accepted a condition that does not hold")
+	}
+	if len(r2.msgs) != 1 || r2.msgs[0] != "expected the model has a root" {
+		t.Fatalf("True reported %v, want the message it was given", r2.msgs)
 	}
 }
 
