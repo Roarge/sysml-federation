@@ -10,7 +10,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/coder/websocket"
 
 	"github.com/Roarge/sysml-federation/examples/pipeline/document/tree"
 )
@@ -147,7 +146,7 @@ func Handler(s *Service) http.Handler {
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,
-		Implementation:        transport.CoderWebsocketImplementation{AcceptOptions: websocket.AcceptOptions{InsecureSkipVerify: true}},
+		Implementation:        transport.CoderWebsocketImplementation{},
 	})
 	srv.Use(extension.Introspection{})
 	mux := http.NewServeMux()
