@@ -1,0 +1,26 @@
+# Compose input for wgc (AD-0012). The routing URLs are the loopback ports
+# of the supervisor's process tree. The two subgraphs that push version events
+# are reached over WebSocket with graphql-transport-ws, the subprotocol gqlgen
+# serves. The key is the camelCase websocketSubprotocol of the wgc CLI type:
+# wgc 0.130.1 ignores the documented websocket_subprotocol, and the output
+# then reads GRAPHQL_WEBSOCKET_SUBPROTOCOL_AUTO.
+version: 1
+subgraphs:
+  - name: model
+    routing_url: http://127.0.0.1:3011/graphql
+    schema:
+      file: ../../adapter/schema.graphql
+    subscription:
+      protocol: ws
+      websocketSubprotocol: graphql-transport-ws
+  - name: capacity
+    routing_url: http://127.0.0.1:3012/graphql
+    schema:
+      file: capacity/schema.graphql
+  - name: document
+    routing_url: http://127.0.0.1:3013/graphql
+    schema:
+      file: document/schema.graphql
+    subscription:
+      protocol: ws
+      websocketSubprotocol: graphql-transport-ws

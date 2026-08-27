@@ -1,0 +1,90 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3",
+        import: ["@key", "@shareable"])
+
+type Query {
+  model: Model!
+  part(id: ID!): Part
+  requirement(id: ID!): Requirement
+}
+
+type Model {
+  version: Int!
+  text: String!
+  roots: [Part!]!
+  parts: [Part!]!
+  requirements: [Requirement!]!
+  verificationCases: [VerificationCase!]!
+}
+
+type Part @key(fields: "id") {
+  id: ID!
+  shortName: String
+  name: String!
+  definition: String
+  doc: String
+  attributes: [Attribute!]!
+  ports: [Port!]!
+  parts: [Part!]!
+  connections: [Connection!]!
+  satisfies: [Requirement!]!
+}
+
+type Attribute @shareable {
+  name: String!
+  value: Float
+  unit: String
+  editable: Boolean!
+  expression: String
+}
+
+type Port @shareable {
+  name: String!
+  direction: Direction!
+}
+
+enum Direction { IN OUT INOUT }
+
+type Connection @shareable {
+  id: ID!
+  from: ID!
+  fromPort: String!
+  to: ID!
+  toPort: String!
+}
+
+type Requirement @key(fields: "id") {
+  id: ID!
+  shortName: String
+  name: String!
+  text: String
+  subject: Part
+  quantity: String
+  comparison: Comparison
+  limit: Float
+  limitUnit: String
+  limitEditable: Boolean!
+  derivedFrom: [Requirement!]!
+  derives: [Requirement!]!
+  satisfiedBy: [Part!]!
+  verifiedBy: [VerificationCase!]!
+}
+
+enum Comparison { GE GT LE LT EQ }
+
+type VerificationCase @key(fields: "id") {
+  id: ID!
+  shortName: String
+  name: String!
+  verifies: [Requirement!]!
+}
+
+type Mutation {
+  setAttribute(partId: ID!, name: String!, value: Float!): Part!
+  setLimit(requirementId: ID!, value: Float!): Requirement!
+  resetModel: Model!
+}
+
+type Subscription {
+  modelChanged: Int!
+}

@@ -1,0 +1,60 @@
+schema:
+  - ../schema.graphql
+exec:
+  layout: single-file
+  filename: generated.go
+  package: projection
+federation:
+  filename: federation.go
+  package: projection
+  version: 2
+model:
+  filename: models_gen.go
+  package: projection
+resolver:
+  layout: follow-schema
+  dir: .
+  package: projection
+  filename_template: "{name}.resolvers.go"
+omit_getters: true
+omit_gqlgen_version_in_file_notice: true
+local_prefix: github.com/Roarge/sysml-federation
+skip_mod_tidy: true
+models:
+  Model:
+    model: github.com/Roarge/sysml-federation/adapter/model.Model
+  Part:
+    model: github.com/Roarge/sysml-federation/adapter/model.Part
+    fields:
+      shortName: { resolver: true }
+      definition: { resolver: true }
+      doc: { resolver: true }
+      satisfies: { resolver: true }
+  Attribute:
+    model: github.com/Roarge/sysml-federation/adapter/model.Attribute
+    fields:
+      unit: { resolver: true }
+      expression: { resolver: true }
+  Port:
+    model: github.com/Roarge/sysml-federation/adapter/model.Port
+    fields:
+      direction: { resolver: true }
+  Connection:
+    model: github.com/Roarge/sysml-federation/adapter/model.Connection
+  Requirement:
+    model: github.com/Roarge/sysml-federation/adapter/model.Requirement
+    fields:
+      shortName: { resolver: true }
+      text: { resolver: true }
+      subject: { resolver: true }
+      comparison: { resolver: true }
+      limitUnit: { resolver: true }
+      derivedFrom: { resolver: true }
+      derives: { resolver: true }
+      satisfiedBy: { resolver: true }
+      verifiedBy: { resolver: true }
+  VerificationCase:
+    model: github.com/Roarge/sysml-federation/adapter/model.VerificationCase
+    fields:
+      shortName: { resolver: true }
+      verifies: { resolver: true }

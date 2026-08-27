@@ -10,7 +10,7 @@ The demo takes a SysML v2 model, a capacity analysis and a requirements document
 
 An engineering manager, or a systems engineer new to federation, deciding in a quarter of an hour whether the approach deserves a closer look. That reader is not going to open an architecture description with [five views and twenty-six decision records](06-five-views-and-twenty-six-decisions.md). What they need fits on one sheet of paper, which is why the design phase made [the Markdown description the record and the A3 sheets the overview](../decisions/AD-0021-architecture-record.md). When the design changes, the description changes first and the sheet at its next re-issue, so a sheet may lag and its status says so.
 
-The top sheet condenses the README's argument, and the decision accepts that overlap on purpose. The README is prose for a reader at a desk. The sheet is for a meeting.
+The top sheet condenses the argument the project makes for itself, which [Why federate a systems model](00-why-federate-a-systems-model.md) sets out at length, and the decision accepts that overlap on purpose. The article is prose for a reader at a desk. The sheet is for a meeting.
 
 ## The method, its rules and its recommendations
 
@@ -48,7 +48,7 @@ Text in the cookbook's order, eleven sections in two columns: definitions, intro
 
 *The L0 model side: the argument as eight numbered boxes on the left, the agreement and the box's contents top right, the container bottom right. The whole sheet is [L0, Federating a systems model](../a3/L0-federating-a-systems-model.pdf).*
 
-The reading path is the README's argument in eight boxes. Author the model as text, in Git. Publish a projection of it, plain types and no metamodel (a projection is the curated set of GraphQL types the adapter derives from the model). Attach an analysis that knows nothing about SysML. Attach editorial structure that knows nothing about it either. Compose the three into one graph, checked before deployment. Serve two apps from the one graph. Change a number in either app. Watch the verdict and the document follow. The visual aid is the overview sketch: two apps, one router, three services that never meet.
+The reading path is [the argument for federating a systems model](00-why-federate-a-systems-model.md) in eight boxes. Author the model as text, in Git. Publish a projection of it, plain types and no metamodel (a projection is the curated set of GraphQL types the adapter derives from the model). Attach an analysis that knows nothing about SysML. Attach editorial structure that knows nothing about it either. Compose the three into one graph, checked before deployment. Serve two apps from the one graph. Change a number in either app. Watch the verdict and the document follow. The visual aid is the overview sketch: two apps, one router, three services that never meet.
 
 Quantification marks every value's confidence. The agreement between the services is one entity key (the field by which the router recognises the same element across subgraphs), one declared field set and two configured names, all known. The demo is one image, one command, one port, about 40 MB compressed for the router and under 80 MB in all, the latter amber until measured. The example is five servers, seven requirements and one verification case, and the two seconds from an edit to both apps rendering is a requirement in ink with a question mark beside it.
 
@@ -80,7 +80,7 @@ Each sheet is drawn as one SVG with a `viewBox` of 0 0 1587 1123 and literal col
 
 Numbers on a sheet are of three kinds, and the summary side says which each is. A requirement or a constraint, such as the two seconds or the 80 MB, cites its id, and so does a fact about the vendor, such as the 40 MB router image. Numbers from the running example are guarded by a unit test that reads the shipped model through the adapter, runs the rollup and checks every number in the L2b table against the SVG, so a change to the example fails a test before it silently dates the sheet. The capacity service's own tests would not catch it: they build their representations by hand and never read the model file.
 
-The sheets reuse the cookbook's layout rules and none of its artwork, whose licence is unverified, and the [sheet index](../a3/README.md) says as much.
+The sheets reuse the cookbook's layout rules and none of its artwork, whose licence is unverified, which the [sheet index](../a3/README.md) records against each sheet.
 
 Reading the design back against the research and the record is where most of what reads above as a careful distinction comes from. The method paragraph had presented the cookbook's placements and the L0, L1, L2 hierarchy as rules, where the research records the first as guidance and the second as later practice, and had missed that the cookbook's template calls the summary side the front. L2b's worked example gained its fourth row, the ingest-to-3000 state that box 6 needs, and its derived verdicts. L0 gained the demo's answer beside the vendor's quote. The safeguard on the numbers had been left to the capacity service's tests.
 

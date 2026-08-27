@@ -61,9 +61,10 @@ func TestSR17_NoExampleIdentifiersInTheAdapter(t *testing.T) {
 		return nil
 	})
 	assert.NoError(t, err)
-	// The adapter's eleven source files are the floor. A walk that finds
-	// fewer is looking in the wrong place and would pass for the wrong reason.
-	assert.True(t, checked >= 11, "at least eleven adapter source files were checked")
+	// The adapter's twenty-two source files are the floor. A walk that finds
+	// fewer is looking in the wrong place, or has skipped a whole package,
+	// and would pass for the wrong reason.
+	assert.True(t, checked >= 22, "at least twenty-two adapter source files were checked")
 }
 
 // The second fixture is SR-17's other verification: a model that shares no

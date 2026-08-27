@@ -1,0 +1,43 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3",
+        import: ["@key"])
+
+type Query {
+  document: Document!
+}
+
+type Document {
+  version: Int!
+  nodes: [Node!]!
+}
+
+type Node {
+  id: ID!
+  kind: NodeKind!
+  number: String
+  text: String
+  requirement: Requirement
+  children: [Node!]!
+}
+
+enum NodeKind { HEADING PROSE REQUIREMENT }
+
+type Requirement @key(fields: "id") {
+  id: ID!
+  documentNumber: String
+  included: Boolean!
+}
+
+type Mutation {
+  moveNode(id: ID!, parentId: ID, index: Int!): Document!
+  insertHeading(aboveId: ID!, text: String!): Document!
+  addProse(parentId: ID, index: Int!, text: String!): Document!
+  editText(id: ID!, text: String!): Document!
+  excludeRequirement(requirementId: ID!): Document!
+  includeRequirement(requirementId: ID!): Document!
+  resetDocument: Document!
+}
+
+type Subscription {
+  documentChanged: Int!
+}
