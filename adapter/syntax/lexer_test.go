@@ -70,7 +70,7 @@ func TestLexSpansAreByteOffsets(t *testing.T) {
 	src := "part <'S1'> a : B {\n  attribute :>> x = 12.5;\n}"
 	lexed, err := syntax.Lex("m.sysml", src)
 	ts := assert.Must(t, lexed, err)
-	// The number sits on line 2; its span must select exactly "12.5".
+	// The number sits on line 2, and its span must select exactly "12.5".
 	var num syntax.Token
 	for _, tk := range ts {
 		if tk.Kind == syntax.Number {
@@ -78,7 +78,7 @@ func TestLexSpansAreByteOffsets(t *testing.T) {
 		}
 	}
 	assert.Equal(t, src[num.Span.Start:num.Span.End], "12.5")
-	// The quoted name's span covers the quotes; its text does not.
+	// The quoted name's span covers the quotes. Its text does not.
 	assert.Equal(t, src[ts[2].Span.Start:ts[2].Span.End], "'S1'")
 	assert.Equal(t, ts[2].Text, "S1")
 	// EOF sits at len(src).

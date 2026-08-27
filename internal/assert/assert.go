@@ -135,8 +135,10 @@ func ErrorAs[T error](t testing.TB, err error) T {
 	return target
 }
 
-// Must fails the test if err is non-nil, and otherwise returns v. It turns the
-// two-value call that dominates Go into a one-line setup step.
+// Must fails the test if err is non-nil, and otherwise returns v. Go cannot
+// spread a two-value call beside another argument, so Must takes the value and
+// the error separately and the call site reads as two statements,
+// `v, err := f()` and then `x := assert.Must(t, v, err)`.
 func Must[T any](t testing.TB, v T, err error) T {
 	t.Helper()
 	if err != nil {

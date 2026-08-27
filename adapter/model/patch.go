@@ -15,7 +15,7 @@ import (
 // plain decimal number.
 func (m *Model) patch(at syntax.Span, literal string) (*Model, error) {
 	if m.literals[at] != 1 {
-		return nil, fmt.Errorf("%w: no literal at %d..%d", ErrNotEditable, at.Start, at.End)
+		return nil, fmt.Errorf("%w: no editable literal at %d..%d", ErrNotEditable, at.Start, at.End)
 	}
 	if _, err := strconv.ParseFloat(literal, 64); err != nil ||
 		strings.Trim(literal, "-0123456789.") != "" || strings.Count(literal, "-") > 1 {

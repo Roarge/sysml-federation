@@ -1,11 +1,15 @@
 package tabletest_test
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/Roarge/sysml-federation/internal/tabletest"
 )
+
+var errNegative = errors.New("negative")
 
 func TestRunExercisesEveryCase(t *testing.T) {
 	seen := map[string]bool{}
@@ -40,5 +44,22 @@ func TestRunErrExercisesEveryCase(t *testing.T) {
 
 	if count != 2 {
 		t.Fatalf("ran %d cases, want 2", count)
+	}
+}
+
+func TestRunErrMatchesTheNamedSentinel(t *testing.T) {
+	// ErrIs is the stricter expectation. WantErr accepts any failure, while
+	// ErrIs names the sentinel and finds it through the wrapping.
+	ran := false
+
+	tabletest.RunErr(t, []tabletest.ErrCase[int, string]{
+		{Name: "negative", In: -1, ErrIs: errNegative},
+	}, func(t *testing.T, in int) (string, error) {
+		ran = true
+		return "", fmt.Errorf("counting %d: %w", in, errNegative)
+	})
+
+	if !ran {
+		t.Fatal("the ErrIs case was never run")
 	}
 }

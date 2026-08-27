@@ -33,7 +33,7 @@ type Token struct {
 }
 
 // Error is a construct the adapter refuses, with its position. Line and
-// Column are 1-based; Column counts bytes from the start of the line.
+// Column are 1-based, and Column counts bytes from the start of the line.
 type Error struct {
 	File    string
 	Line    int

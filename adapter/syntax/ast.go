@@ -173,7 +173,7 @@ func (c Comparison) String() string {
 }
 
 // RequireConstraint is `require constraint { left op right }`. Each operand is
-// a FeatureChain or a Literal; the parser refuses anything else.
+// a FeatureChain or a Literal, and the parser refuses anything else.
 type RequireConstraint struct {
 	Left  Expr
 	Op    Comparison

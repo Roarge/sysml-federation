@@ -1,10 +1,10 @@
 // Package model resolves a parsed SysML v2 file into the elements the adapter
-// projects: parts with attributes, ports, children and connections;
-// requirements with the quantity, comparison and limit read from their
-// constraint; verification cases; and the relationships between them. It
-// evaluates bound expressions, checks port directions against connection end
-// order, and patches numeric literals in the source so the served text and the
-// projection are rebuilt together.
+// projects. A part carries its attributes, ports, children and connections. A
+// requirement carries the quantity, comparison and limit read from its
+// constraint. Verification cases and the relationships between the elements
+// are resolved as well. The package evaluates bound expressions, checks port
+// directions against connection end order, and patches numeric literals in the
+// source so the served text and the projection are rebuilt together.
 package model
 
 import (
@@ -14,7 +14,7 @@ import (
 	"github.com/Roarge/sysml-federation/adapter/syntax"
 )
 
-// Direction and Comparison are the syntax package's enums; their String forms
+// Direction and Comparison are the syntax package's enums. Their String forms
 // are the projection's enum values.
 type (
 	// Direction is a feature direction.
@@ -37,7 +37,7 @@ type Attribute struct {
 	Name       string
 	Value      *float64
 	Unit       string
-	Editable   bool        // true when the bound value is a literal in the source
+	Editable   bool        // true when the bound value is a literal no other value shares
 	Expression string      // source text of a bound expression; "" otherwise
 	Span       syntax.Span // the literal's span when Editable; zero otherwise
 }
@@ -92,7 +92,7 @@ type VerificationCase struct {
 }
 
 // Model is the resolved projection of one source file. A Model is never
-// modified after Parse returns; every mutation returns a new one.
+// modified after Parse returns, and every mutation returns a new one.
 type Model struct {
 	Version           int
 	Text              string

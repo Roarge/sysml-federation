@@ -143,7 +143,7 @@ func (b *builder) part(u *syntax.PartUsage, parent *partNode, owner string) *par
 		n.defs = b.defChain(u.Type, u.Span)
 	}
 	// Attributes: declarations from the base definition down, then the usage's
-	// own; a redefinition binds a slot that must already exist.
+	// own. A redefinition binds a slot that must already exist.
 	for i := len(n.defs) - 1; i >= 0; i-- {
 		for j := range n.defs[i].Attributes {
 			b.slot(&n.attrs, &n.defs[i].Attributes[j], n.defs[i].Name)

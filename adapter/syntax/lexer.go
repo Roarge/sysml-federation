@@ -10,8 +10,8 @@ import (
 var operators = []string{"::>", ":>>", ":>", "::", ">=", "<=", "==",
 	"{", "}", "(", ")", "[", "]", ";", ":", "=", ".", ",", "<", ">", "+", "-", "*", "/", "#"}
 
-// Lex turns src into tokens. Line comments and //* */ notes are dropped; /* */
-// comments are tokens because doc bodies are made of them.
+// Lex turns src into tokens. Line comments and //* */ notes are dropped, while
+// /* */ comments are tokens because doc bodies are made of them.
 func Lex(file, src string) ([]Token, error) {
 	var toks []Token
 	fail := func(at int, msg string) error {

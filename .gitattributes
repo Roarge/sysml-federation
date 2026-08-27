@@ -7,4 +7,5 @@
 *.graphqls  text
 go.sum      text -diff
 *.png       binary
+*.pdf       binary
 *.svg       text

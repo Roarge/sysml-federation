@@ -32,14 +32,18 @@ OpenSysML v0.2.1 (Go 1.25 or later):
     go install github.com/Open-MBEE/OpenSysML/cmd/sysml@v0.2.1
     sysml -validate -strict model.sysml
 
-The pilot accepts the file when its output carries no `ERROR:` or `WARNING:`
-diagnostic, the first of which follows the `1> ` prompt on the same line, and prints the root element line `1> Package <PIPE> QueryPipeline (<uuid>)`. OpenSysML accepts it when the command exits 0, printing `✓ package QueryPipeline` and `✓ model.sysml: no errors`.
+The pilot accepts the file when its output carries no `ERROR:` or
+`WARNING:` diagnostic and prints the root element line
+`1> Package <PIPE> QueryPipeline (<uuid>)`. A diagnostic follows the
+`1> ` prompt on the same line. OpenSysML accepts it when the command
+exits 0, printing `✓ package QueryPipeline` and
+`✓ model.sysml: no errors`.
 
 ## Verification record
 
 | Date | Tool | Versions | Command | Result |
 |---|---|---|---|---|
-| 2026-08-27 | OMG pilot implementation | release 2026-07, kernel 0.61.0, OpenJDK 21.0.12 | the pilot command above | accepted, no errors, no warnings |
+| 2026-08-27 | OMG pilot implementation | release 2026-07, kernel 0.61.0, OpenJDK 21.0.12 | `PILOT=$HOME/.local/share/sysml-pilot/sysml` then `{ printf '%%\n'; cat examples/pipeline/model.sysml; printf '\n%%\n%%exit\n'; } \| java -cp "$PILOT/jupyter-sysml-kernel-0.61.0-all.jar" org.omg.sysml.interactive.SysMLInteractive "$PILOT/sysml.library"` | accepted, no errors, no warnings |
 | 2026-08-27 | OpenSysML | v0.2.1, built with Go 1.27.0 | `sysml -validate -strict model.sysml` | accepted, exit 0 |
 
 The adapter's second fixture, `adapter/model/testdata/warehouse.sysml`,

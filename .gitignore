@@ -119,6 +119,7 @@ __pycache__/
 !/.gitignore
 !/.gitattributes
 !/.dockerignore
+!/.nointerface-baseline
 !/LICENSE
 !/NOTICE
 !/README.md
