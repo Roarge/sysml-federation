@@ -48,7 +48,9 @@ guard the committed output with a Go test that parses it and compares each
 embedded subgraph schema with the schema file it came from (SR-42). The
 compose input names the three subgraphs with
 loopback routing URLs on ports 3011 to 3013, a schema file for each, and
-`ws` with subprotocol `auto` for the two that carry subscriptions.
+`ws` with subprotocol `graphql-transport-ws` for the two that carry
+subscriptions, which is the subprotocol the subgraphs serve. The third is
+left to the tool's default, since it has no subscriptions to negotiate.
 
 ## Alternatives considered
 
