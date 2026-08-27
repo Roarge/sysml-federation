@@ -40,6 +40,11 @@ func refuse(t *testing.T, src string) refusal {
 	return refusal{e.Line, e.Column, e.Message}
 }
 
+// head is a package whose line 2 declares the requirement usage r, shared by
+// the tables that refuse a second declaration and by the link refusals.
+const head = "package P { part def S; part <'a'> a : S; requirement def R { subject s : S; attribute l : Real; require constraint { s.x >= l } }\n" +
+	"  requirement <'r'> r : R { subject :>> s = a; attribute :>> l = 1; }\n"
+
 func TestSR21_PartIdentifiersAreShortNamesWithQualifiedFallback(t *testing.T) {
 	m := loadExample(t)
 	var ids []string
@@ -130,6 +135,10 @@ func TestBuildRefusals(t *testing.T) {
 			Want: refusal{1, 38, `redefined attribute "x" is not declared by "S"`}},
 		{Name: "unknown port definition", In: "package P { part def S { port p : Nope; } part a : S; }",
 			Want: refusal{1, 26, `unresolved definition "Nope"`}},
+		{Name: "duplicate part name", In: "package P { part def S; part <'A'> x : S; part <'B'> x : S; }",
+			Want: refusal{1, 43, `part "x" is declared twice`}},
+		{Name: "duplicate requirement name", In: head + "  requirement <'q'> r : R { subject :>> s = a; attribute :>> l = 1; } }",
+			Want: refusal{3, 3, `requirement "r" is declared twice`}},
 	}, refuse)
 }
 
@@ -220,8 +229,6 @@ func req(m *model.Model, id string) (*model.Requirement, error) {
 }
 
 func TestLinkRefusals(t *testing.T) {
-	const head = "package P { part def S; part <'a'> a : S; requirement def R { subject s : S; attribute l : Real; require constraint { s.x >= l } }\n" +
-		"  requirement <'r'> r : R { subject :>> s = a; attribute :>> l = 1; }\n"
 	tabletest.Run(t, []tabletest.Case[string, refusal]{
 		{Name: "subject is not a part", In: head + "  requirement <'q'> q : R { subject :>> s = r; attribute :>> l = 1; } }",
 			Want: refusal{3, 45, `"r" is not a part`}},

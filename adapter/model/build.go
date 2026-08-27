@@ -94,6 +94,9 @@ func build(f *syntax.File) *Model {
 	for i := range pkg.Parts {
 		n := b.part(&pkg.Parts[i], nil, pkg.Name)
 		b.roots = append(b.roots, n)
+		if _, dup := b.byName[n.ast.Name]; dup {
+			b.fail(n.ast.Span, fmt.Sprintf("part %q is declared twice", n.ast.Name))
+		}
 		b.byName[n.ast.Name] = n
 		b.m.Roots = append(b.m.Roots, n.out)
 	}
@@ -292,6 +295,9 @@ func (b *builder) requirements(pkg *syntax.Package) {
 		n.out = &Requirement{ID: b.id(u.ShortName, pkg.Name+"::"+u.Name, u.Span), ShortName: u.ShortName,
 			Name: u.Name, Text: text}
 		b.reqs = append(b.reqs, n)
+		if _, dup := b.reqByName[u.Name]; dup {
+			b.fail(u.Span, fmt.Sprintf("requirement %q is declared twice", u.Name))
+		}
 		b.reqByName[u.Name] = n
 		b.m.Requirements = append(b.m.Requirements, n.out)
 		b.m.reqs[n.out.ID] = n.out
