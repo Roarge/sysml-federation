@@ -118,26 +118,6 @@ img {
   padding: 20px var(--gutter);
 }
 
-/* Above the phone breakpoint the disclosure is not a menu. The summary box
-   disappears but its contents stay, so the masthead keeps its place on the
-   bar, and the navigation is shown whether the element is open or not. */
-.menu > .menu-bar {
-  display: contents;
-}
-
-.menu > .menu-bar::-webkit-details-marker {
-  display: none;
-}
-
-.menu-label {
-  display: none;
-}
-
-.menu::details-content {
-  content-visibility: visible;
-  block-size: auto;
-}
-
 .site-title {
   font-family: var(--serif);
   font-size: 21px;
@@ -687,73 +667,29 @@ pre code {
     line-height: 1.53;
   }
 
-  /* The masthead and the menu share one row, and the navigation opens
-     beneath them. */
+  /* The masthead and the one repository link share the row, and the title
+     gives up width first so the link is never pushed off the edge. */
   .menu {
-    display: block;
-    padding: 8px 20px 12px;
-  }
-
-  .menu > .menu-bar {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 16px;
     min-height: 44px;
-    list-style: none;
-    cursor: pointer;
-  }
-
-  /* On the phone the disclosure is a menu again, so the closed state has to
-     hide its contents. The desktop rule above forces them visible, and that
-     override is undone here rather than repeated. */
-  .menu::details-content {
-    content-visibility: hidden;
-    block-size: 0;
-  }
-
-  .menu[open]::details-content {
-    content-visibility: visible;
-    block-size: auto;
+    padding: 8px 20px;
   }
 
   .site-title {
     font-size: 19px;
-  }
-
-  .menu-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--pencil);
-  }
-
-  .chev {
-    transition: transform 120ms ease;
-  }
-
-  .menu[open] .chev {
-    transform: rotate(180deg);
+    min-width: 0;
   }
 
   .site-nav {
-    flex-direction: column;
-    gap: 0;
-    margin-top: 4px;
+    flex-shrink: 0;
     font-size: 17px;
   }
 
   .site-nav a {
-    display: block;
-    padding: 12px 0;
-    line-height: 1.2;
-  }
-
-  .site-nav .external {
     display: flex;
+    padding: 10px 0;
+    line-height: 1.2;
   }
 
   main {
