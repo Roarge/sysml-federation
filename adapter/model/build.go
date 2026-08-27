@@ -23,16 +23,17 @@ type partNode struct {
 	out      *Part
 }
 
-// reqNode is a requirement usage during building. Task 1.7 writes every field.
+// reqNode is a requirement usage during building.
 type reqNode struct {
-	ast     *syntax.RequirementUsage //nolint:unused // written by Task 1.7.
-	def     *syntax.RequirementDef   //nolint:unused
-	attrs   []attrSlot               //nolint:unused
-	subject *partNode                //nolint:unused
-	out     *Requirement             //nolint:unused
+	ast     *syntax.RequirementUsage
+	def     *syntax.RequirementDef
+	attrs   []attrSlot
+	subject *partNode
+	out     *Requirement
 }
 
-type vcNode struct { //nolint:unused // the type is populated by Task 1.7.
+// vcNode is a verification usage during building.
+type vcNode struct {
 	ast *syntax.VerificationUsage
 	def *syntax.VerificationDef
 	out *VerificationCase
@@ -56,9 +57,9 @@ type builder struct {
 	parts     []*partNode // every part, depth first
 	roots     []*partNode
 	byName    map[string]*partNode // package-level parts
-	reqs      []*reqNode           //nolint:unused // filled by Task 1.7.
+	reqs      []*reqNode
 	reqByName map[string]*reqNode
-	vcs       []*vcNode //nolint:unused // filled by Task 1.7.
+	vcs       []*vcNode
 	values    map[*syntax.AttributeUsage]quantity
 	busy      map[*syntax.AttributeUsage]bool
 }
@@ -96,11 +97,11 @@ func build(f *syntax.File) *Model {
 		b.byName[n.ast.Name] = n
 		b.m.Roots = append(b.m.Roots, n.out)
 	}
-	b.requirements(pkg)  // Task 1.7
-	b.verifications(pkg) // Task 1.7
-	b.link(pkg)          // Task 1.7: subjects, connections, satisfies, derivations
-	b.constraints()      // Task 1.9
-	b.project()          // attribute values, literal index
+	b.requirements(pkg)
+	b.verifications(pkg)
+	b.link(pkg)     // subjects, connections, satisfies, derivations, verifications
+	b.constraints() // Task 1.9
+	b.project()     // attribute values, literal index
 	return b.m
 }
 
@@ -267,10 +268,97 @@ func (b *builder) eval(_ *partNode, _ *reqNode, a *syntax.AttributeUsage) quanti
 	return quantity{lit.Number, lit.Unit}
 }
 
-// Filled in Task 1.7.
-func (b *builder) requirements(_ *syntax.Package)  {}
-func (b *builder) verifications(_ *syntax.Package) {}
-func (b *builder) link(_ *syntax.Package)          {}
+func (b *builder) requirements(pkg *syntax.Package) {
+	for i := range pkg.Requirements {
+		u := &pkg.Requirements[i]
+		n := &reqNode{ast: u}
+		if u.Type != "" {
+			d, ok := b.reqDefs[u.Type]
+			if !ok {
+				b.fail(u.Span, fmt.Sprintf("unresolved definition %q", u.Type))
+			}
+			n.def = d
+			for j := range d.Attributes {
+				b.slot(&n.attrs, &d.Attributes[j], d.Name)
+			}
+		}
+		for j := range u.Attributes {
+			b.slot(&n.attrs, &u.Attributes[j], u.Type)
+		}
+		text := docText(u.Doc)
+		if text == "" && n.def != nil {
+			text = docText(n.def.Doc)
+		}
+		n.out = &Requirement{ID: b.id(u.ShortName, pkg.Name+"::"+u.Name, u.Span), ShortName: u.ShortName,
+			Name: u.Name, Text: text}
+		b.reqs = append(b.reqs, n)
+		b.reqByName[u.Name] = n
+		b.m.Requirements = append(b.m.Requirements, n.out)
+		b.m.reqs[n.out.ID] = n.out
+	}
+}
+
+func (b *builder) verifications(pkg *syntax.Package) {
+	for i := range pkg.Verifications {
+		u := &pkg.Verifications[i]
+		n := &vcNode{ast: u}
+		if u.Type != "" {
+			d, ok := b.vcDefs[u.Type]
+			if !ok {
+				b.fail(u.Span, fmt.Sprintf("unresolved definition %q", u.Type))
+			}
+			n.def = d
+		}
+		n.out = &VerificationCase{ID: b.id(u.ShortName, pkg.Name+"::"+u.Name, u.Span), ShortName: u.ShortName, Name: u.Name}
+		b.vcs = append(b.vcs, n)
+		b.m.VerificationCases = append(b.m.VerificationCases, n.out)
+		b.m.vcs[n.out.ID] = n.out
+	}
+}
+
+// link wires subjects, connections, satisfies, derivations and verifications
+// once every element exists.
+func (b *builder) link(pkg *syntax.Package) {
+	for _, r := range b.reqs {
+		if s := r.ast.Subject; s != nil && s.Value != nil {
+			r.subject = b.findPart(*s.Value, nil)
+			r.out.Subject = r.subject.out.ID
+		}
+	}
+	for _, n := range b.parts {
+		for _, c := range n.ast.Connects {
+			b.connect(n, c)
+		}
+		for _, s := range n.ast.Satisfies {
+			r := b.findReq(s.Requirement)
+			by := b.findPart(s.By, n)
+			r.out.SatisfiedBy = append(r.out.SatisfiedBy, by.out.ID)
+			by.out.Satisfies = append(by.out.Satisfies, r.out.ID)
+		}
+	}
+	for _, d := range pkg.Derivations {
+		orig := b.findReq(d.Original)
+		for _, c := range d.Derives {
+			der := b.findReq(c)
+			orig.out.Derives = append(orig.out.Derives, der.out.ID)
+			der.out.DerivedFrom = append(der.out.DerivedFrom, orig.out.ID)
+		}
+	}
+	for _, v := range b.vcs {
+		var objectives []*syntax.Objective
+		if v.def != nil && v.def.Objective != nil {
+			objectives = append(objectives, v.def.Objective)
+		}
+		if v.ast.Objective != nil {
+			objectives = append(objectives, v.ast.Objective)
+		}
+		for _, o := range objectives {
+			r := b.findReq(o.Verify)
+			v.out.Verifies = append(v.out.Verifies, r.out.ID)
+			r.out.VerifiedBy = append(r.out.VerifiedBy, v.out.ID)
+		}
+	}
+}
 
 // Filled in Task 1.9.
 func (b *builder) constraints() {}

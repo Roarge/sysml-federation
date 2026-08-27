@@ -1,6 +1,7 @@
 package model_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/Roarge/sysml-federation/adapter/model"
@@ -129,5 +130,110 @@ func TestBuildRefusals(t *testing.T) {
 			Want: refusal{1, 38, `redefined attribute "x" is not declared by "S"`}},
 		{Name: "unknown port definition", In: "package P { part def S { port p : Nope; } part a : S; }",
 			Want: refusal{1, 26, `unresolved definition "Nope"`}},
+	}, refuse)
+}
+
+func TestSR21_RequirementAndVerificationIdentifiers(t *testing.T) {
+	m := loadExample(t)
+	var rids []string
+	for _, r := range m.Requirements {
+		rids = append(rids, r.ID)
+	}
+	assert.SliceEqual(t, rids, []string{"PIPE-R1", "PIPE-R1.1", "PIPE-R1.2", "PIPE-R1.3", "PIPE-R1.4", "PIPE-R1.5", "PIPE-R2"})
+	assert.Equal(t, m.VerificationCases[0].ID, "PIPE-VC1")
+}
+
+func TestSR20_ConnectionsFollowEndOrderAndPortDirections(t *testing.T) {
+	m := loadExample(t)
+	pipe := m.Roots[0]
+	assert.DeepEqual(t, pipe.Connections, []model.Connection{
+		{ID: "PIPE-S1.output->PIPE-S2.input", From: "PIPE-S1", FromPort: "output", To: "PIPE-S2", ToPort: "input"},
+		{ID: "PIPE-S2.output->PIPE-S3.input", From: "PIPE-S2", FromPort: "output", To: "PIPE-S3", ToPort: "input"},
+		{ID: "PIPE-S2.output->PIPE-S4.input", From: "PIPE-S2", FromPort: "output", To: "PIPE-S4", ToPort: "input"},
+		{ID: "PIPE-S3.output->PIPE-S5.input", From: "PIPE-S3", FromPort: "output", To: "PIPE-S5", ToPort: "input"},
+		{ID: "PIPE-S4.output->PIPE-S5.input", From: "PIPE-S4", FromPort: "output", To: "PIPE-S5", ToPort: "input"},
+	})
+	for _, child := range pipe.Parts {
+		assert.Len(t, child.Connections, 0)
+	}
+
+	const head = "package P { port def I { in item q; } port def O { out item q; } port def B { inout item q; }\n" +
+		"  part def S { port i : I; port o : O; port b : B; }\n"
+	tabletest.Run(t, []tabletest.Case[string, refusal]{
+		{Name: "reversed", In: head + "  part box { part a : S; part b : S; connect b.i to a.o; } }",
+			Want: refusal{3, 46, `first end "b.i" is not an out port`}},
+		{Name: "second end not in", In: head + "  part box { part a : S; part b : S; connect a.o to b.o; } }",
+			Want: refusal{3, 53, `second end "b.o" is not an in port`}},
+		{Name: "inout at an end", In: head + "  part box { part a : S; part b : S; connect a.b to b.i; } }",
+			Want: refusal{3, 46, `first end "a.b" is not an out port`}},
+		{Name: "unknown child", In: head + "  part box { part a : S; connect a.o to c.i; } }",
+			Want: refusal{3, 41, `unresolved name "c"`}},
+		{Name: "unknown port", In: head + "  part box { part a : S; part b : S; connect a.o to b.x; } }",
+			Want: refusal{3, 53, `"b" has no port "x"`}},
+		{Name: "duplicate connection", In: head + "  part box { part a : S; part b : S; connect a.o to b.i; connect a.o to b.i; } }",
+			Want: refusal{3, 58, `duplicate connection "P::box::a.o->P::box::b.i"`}},
+	}, refuse)
+}
+
+func TestRelationships(t *testing.T) {
+	m := loadExample(t)
+	got, err := req(m, "PIPE-R1")
+	r1 := assert.Must(t, got, err)
+	assert.Equal(t, r1.Name, "globalThroughput")
+	assert.Equal(t, r1.ShortName, "PIPE-R1")
+	assert.Equal(t, r1.Text, "The pipeline shall sustain the required query rate")
+	assert.Equal(t, r1.Subject, "PIPE-P1")
+	assert.SliceEqual(t, r1.Derives, []string{"PIPE-R1.1", "PIPE-R1.2", "PIPE-R1.3", "PIPE-R1.4", "PIPE-R1.5"})
+	assert.Len(t, r1.DerivedFrom, 0)
+	assert.SliceEqual(t, r1.SatisfiedBy, []string{"PIPE-P1"})
+	assert.Len(t, r1.VerifiedBy, 0)
+	got, err = req(m, "PIPE-R1.3")
+	r13 := assert.Must(t, got, err)
+	assert.Equal(t, r13.Subject, "PIPE-S3")
+	assert.SliceEqual(t, r13.DerivedFrom, []string{"PIPE-R1"})
+	assert.SliceEqual(t, r13.SatisfiedBy, []string{"PIPE-S3"})
+	got, err = req(m, "PIPE-R2")
+	r2 := assert.Must(t, got, err)
+	assert.SliceEqual(t, r2.VerifiedBy, []string{"PIPE-VC1"})
+	assert.SliceEqual(t, r2.SatisfiedBy, []string{"PIPE-P1"})
+	vc := m.VerificationCases[0]
+	assert.Equal(t, vc.Name, "latencyTest")
+	assert.SliceEqual(t, vc.Verifies, []string{"PIPE-R2"})
+	pipe := m.Roots[0]
+	assert.SliceEqual(t, pipe.Satisfies, []string{"PIPE-R1", "PIPE-R2"})
+	assert.SliceEqual(t, pipe.Parts[0].Satisfies, []string{"PIPE-R1.1"})
+
+	// A requirement without a bound subject projects an empty subject and a
+	// usage's doc falls back to its definition's.
+	n := parse(t, "package P { requirement def R { doc /* from def */ subject s : X; attribute l : Real; require constraint { s.q <= l } }\n"+
+		"  requirement <'r'> r : R { attribute :>> l = 1; } }")
+	assert.Equal(t, n.Requirements[0].Subject, "")
+	assert.Equal(t, n.Requirements[0].Text, "from def")
+}
+
+func req(m *model.Model, id string) (*model.Requirement, error) {
+	r, ok := m.Requirement(id)
+	if !ok {
+		return nil, fmt.Errorf("%w: %s", model.ErrNotFound, id)
+	}
+	return r, nil
+}
+
+func TestLinkRefusals(t *testing.T) {
+	const head = "package P { part def S; part <'a'> a : S; requirement def R { subject s : S; attribute l : Real; require constraint { s.x >= l } }\n" +
+		"  requirement <'r'> r : R { subject :>> s = a; attribute :>> l = 1; }\n"
+	tabletest.Run(t, []tabletest.Case[string, refusal]{
+		{Name: "subject is not a part", In: head + "  requirement <'q'> q : R { subject :>> s = r; attribute :>> l = 1; } }",
+			Want: refusal{3, 45, `"r" is not a part`}},
+		{Name: "unknown requirement definition", In: head + "  requirement <'q'> q : Nope { } }",
+			Want: refusal{3, 3, `unresolved definition "Nope"`}},
+		{Name: "satisfy names a part", In: head + "  part box { satisfy a by a; } }",
+			Want: refusal{3, 22, `"a" is not a requirement`}},
+		{Name: "satisfy by an unknown part", In: head + "  part box { satisfy r by zz; } }",
+			Want: refusal{3, 27, `unresolved name "zz"`}},
+		{Name: "derivation end is not a requirement", In: head + "  #derivation connection { end #original ::> r; end #derive ::> a; } }",
+			Want: refusal{3, 65, `"a" is not a requirement`}},
+		{Name: "verify names a part", In: head + "  verification def T { objective { verify a; } } verification <'v'> v : T { } }",
+			Want: refusal{3, 43, `"a" is not a requirement`}},
 	}, refuse)
 }
