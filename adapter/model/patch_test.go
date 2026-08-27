@@ -77,6 +77,42 @@ func TestSR22_ConcurrentReadsDuringPatches(t *testing.T) {
 	assert.Equal(t, cur.Version, 21)
 }
 
+func TestSR22_ASharedLiteralIsNotEditable(t *testing.T) {
+	attrs := parse(t, "package P { part def D { attribute x = 5; }\n"+
+		"  part <'u1'> u1 : D;\n"+
+		"  part <'u2'> u2 : D; }")
+	for _, id := range []string{"u1", "u2"} {
+		found, ok := attrs.Part(id)
+		assert.True(t, ok, "part "+id)
+		assert.Equal(t, found.Attributes[0].Editable, false)
+	}
+	_, err := attrs.SetAttribute("u1", "x", 9)
+	assert.ErrorIs(t, err, model.ErrNotEditable)
+
+	alone := parse(t, "package P { part def D { attribute x = 5; } part <'u1'> u1 : D; }")
+	one, ok := alone.Part("u1")
+	assert.True(t, ok, "part u1")
+	assert.Equal(t, one.Attributes[0].Editable, true)
+	edited, err := alone.SetAttribute("u1", "x", 9)
+	m2 := assert.Must(t, edited, err)
+	after, ok := m2.Part("u1")
+	assert.True(t, ok, "part u1 after the edit")
+	assert.Equal(t, *after.Attributes[0].Value, 9)
+
+	limits := parse(t, "package P { part def D { attribute q : Real; }\n"+
+		"  part <'p'> p : D { attribute :>> q = 1; }\n"+
+		"  requirement def R { subject s : D; require constraint { s.q <= 30[s] } }\n"+
+		"  requirement <'r1'> r1 : R { subject :>> s = p; }\n"+
+		"  requirement <'r2'> r2 : R { subject :>> s = p; } }")
+	for _, id := range []string{"r1", "r2"} {
+		found, ok := limits.Requirement(id)
+		assert.True(t, ok, "requirement "+id)
+		assert.Equal(t, found.LimitEditable, false)
+	}
+	_, err = limits.SetLimit("r1", 45)
+	assert.ErrorIs(t, err, model.ErrNotEditable)
+}
+
 func TestSR23_DerivedLimitsFollowTheGlobalLimit(t *testing.T) {
 	m := loadExample(t)
 	patched, err := m.SetLimit("PIPE-R1", 2000)

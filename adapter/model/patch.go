@@ -10,10 +10,10 @@ import (
 )
 
 // Patch replaces the literal at a span with new text and re-parses, returning
-// a new model with the version incremented. The span must be one the literal
-// index knows, and the text must be a plain decimal number.
+// a new model with the version incremented. The span must be one that exactly
+// one projected value carries, and the text must be a plain decimal number.
 func (m *Model) Patch(at syntax.Span, literal string) (*Model, error) {
-	if !m.literals[at] {
+	if m.literals[at] != 1 {
 		return nil, fmt.Errorf("%w: no literal at %d..%d", ErrNotEditable, at.Start, at.End)
 	}
 	if _, err := strconv.ParseFloat(literal, 64); err != nil ||

@@ -105,7 +105,7 @@ type Model struct {
 	parts    map[string]*Part
 	reqs     map[string]*Requirement
 	vcs      map[string]*VerificationCase
-	literals map[syntax.Span]bool // every numeric literal's span
+	literals map[syntax.Span]int // how many projected values each literal's span carries
 }
 
 // Load reads and parses a file. Errors carry the path as given.

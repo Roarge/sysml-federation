@@ -66,7 +66,7 @@ func (b *builder) fail(at syntax.Span, msg string) {
 func build(f *syntax.File) *Model {
 	b := &builder{f: f, m: &Model{Version: 1, Text: f.Src, file: f,
 		parts: map[string]*Part{}, reqs: map[string]*Requirement{}, vcs: map[string]*VerificationCase{},
-		literals: map[syntax.Span]bool{}},
+		literals: map[syntax.Span]int{}},
 		partDefs: map[string]*syntax.PartDef{}, portDefs: map[string]*syntax.PortDef{},
 		reqDefs: map[string]*syntax.RequirementDef{}, vcDefs: map[string]*syntax.VerificationDef{},
 		ids: map[string]bool{}, byName: map[string]*partNode{}, reqByName: map[string]*reqNode{},
@@ -98,6 +98,7 @@ func build(f *syntax.File) *Model {
 	b.link(pkg)     // subjects, connections, satisfies, derivations, verifications
 	b.constraints() // quantity, comparison and limit
 	b.project()     // attribute values, literal index
+	b.exclusive()   // an edit may not move a literal a second value carries
 	return b.m
 }
 
@@ -249,11 +250,30 @@ func (b *builder) attribute(ctx *partNode, s attrSlot) Attribute {
 	a.Value, a.Unit = &q.num, q.unit
 	if lit, ok := s.bind.Value.(syntax.Literal); ok {
 		a.Editable, a.Span = true, lit.Span
-		b.m.literals[lit.Span] = true
+		b.m.literals[lit.Span]++
 	} else {
 		a.Expression = b.f.Text(exprSpan(s.bind.Value))
 	}
 	return a
+}
+
+// exclusive clears the editable flag of every value whose literal another
+// projected value shares. A definition may bind an attribute or hold a
+// requirement's limit, and each of its usages then points at the same bytes,
+// so an edit through one would silently move the others.
+func (b *builder) exclusive() {
+	for _, n := range b.parts {
+		for i := range n.out.Attributes {
+			if a := &n.out.Attributes[i]; a.Editable && b.m.literals[a.Span] > 1 {
+				a.Editable, a.Span = false, syntax.Span{}
+			}
+		}
+	}
+	for _, n := range b.reqs {
+		if n.out.LimitEditable && b.m.literals[n.out.limitSpan] > 1 {
+			n.out.LimitEditable, n.out.limitSpan = false, syntax.Span{}
+		}
+	}
 }
 
 func (b *builder) requirements(pkg *syntax.Package) {

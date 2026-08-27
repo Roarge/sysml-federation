@@ -76,7 +76,7 @@ func (b *builder) setLimit(r *reqNode, q quantity, lit *syntax.Literal) {
 	r.out.Limit, r.out.LimitUnit = q.num, q.unit
 	if lit != nil {
 		r.out.LimitEditable, r.out.limitSpan = true, lit.Span
-		b.m.literals[lit.Span] = true
+		b.m.literals[lit.Span]++
 	}
 }
 
