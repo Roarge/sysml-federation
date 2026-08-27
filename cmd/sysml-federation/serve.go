@@ -24,9 +24,19 @@ const (
 	// readyTimeout bounds each wait for a component's health endpoint. The
 	// whole start is SR-02's ten seconds, measured by the supervisor test.
 	readyTimeout = 10 * time.Second
-	// stopTimeout bounds a graceful stop of a server and of the router.
-	stopTimeout  = 5 * time.Second
-	pollInterval = 100 * time.Millisecond
+	// serverStopTimeout is the drain each HTTP server gets before it is
+	// closed. It is one second, not five, because the drain is the cost of
+	// every stop rather than a rare one: Shutdown holds a freshly accepted
+	// connection for five seconds before it counts as idle, and it never
+	// releases a response still being written, so one pre-connected browser
+	// or one open subscription buys the whole wait. A second finishes a
+	// request in flight, and a subscription is cut rather than waited on,
+	// which is what a stop means.
+	serverStopTimeout = 1 * time.Second
+	// routerStopTimeout is how long the router child has after SIGTERM
+	// before it is killed.
+	routerStopTimeout = 5 * time.Second
+	pollInterval      = 100 * time.Millisecond
 )
 
 // errExited reports that the component being waited for ended first.
@@ -93,7 +103,7 @@ func (s *supervisor) run(ctx context.Context) error {
 	go func() { exited <- router.Wait() }()
 	if err := waitFor(ctx, "http://"+s.addrs.router+"/health/ready", exited); err != nil {
 		if !errors.Is(err, errExited) {
-			stopRouter(router, exited)
+			stopRouter(router, exited, routerStopTimeout)
 		}
 		return fmt.Errorf("router: %w", err)
 	}
@@ -101,17 +111,17 @@ func (s *supervisor) run(ctx context.Context) error {
 
 	target, err := url.Parse("http://" + s.addrs.router)
 	if err != nil {
-		stopRouter(router, exited)
+		stopRouter(router, exited, routerStopTimeout)
 		return err
 	}
 	h, err := uiHandler(s.assets, target)
 	if err != nil {
-		stopRouter(router, exited)
+		stopRouter(router, exited, routerStopTimeout)
 		return err
 	}
 	web, err := listen("ui", s.addrs.ui, h, failed)
 	if err != nil {
-		stopRouter(router, exited)
+		stopRouter(router, exited, routerStopTimeout)
 		return err
 	}
 	_, _ = fmt.Fprintf(s.stdout, "ready on http://%s/\n", web.addr)
@@ -129,7 +139,7 @@ func (s *supervisor) run(ctx context.Context) error {
 	}
 	web.stop()
 	if !routerGone {
-		stopRouter(router, exited)
+		stopRouter(router, exited, routerStopTimeout)
 	}
 	return failure // the deferred loop stops the subgraphs last
 }
@@ -156,11 +166,11 @@ func listen(name, addr string, h http.Handler, failed chan<- error) (*server, er
 	return s, nil
 }
 
-// stop drains the server within stopTimeout, then closes what is left. A
-// subscription over SSE is a response that never ends, so the close is
-// what actually ends it.
+// stop drains the server within serverStopTimeout, then closes what is
+// left. A subscription over SSE is a response that never ends, so the close
+// is what actually ends it.
 func (s *server) stop() {
-	ctx, cancel := context.WithTimeout(context.Background(), stopTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), serverStopTimeout)
 	defer cancel()
 	if err := s.srv.Shutdown(ctx); err != nil {
 		_ = s.srv.Close()
@@ -205,12 +215,14 @@ func answers(ctx context.Context, client *http.Client, url string) bool {
 	return resp.StatusCode == http.StatusOK
 }
 
-// stopRouter asks the child to stop and gives it stopTimeout before killing it.
-func stopRouter(p process, exited <-chan error) {
+// stopRouter asks the child to stop and gives it grace before killing it.
+// The caller passes the grace so the escalation can be exercised in a test
+// without waiting out the real routerStopTimeout.
+func stopRouter(p process, exited <-chan error, grace time.Duration) {
 	_ = p.Signal(syscall.SIGTERM)
 	select {
 	case <-exited:
-	case <-time.After(stopTimeout):
+	case <-time.After(grace):
 		_ = p.Signal(os.Kill)
 		<-exited
 	}

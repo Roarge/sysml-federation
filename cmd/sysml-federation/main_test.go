@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -17,6 +19,7 @@ import (
 	"strings"
 	"syscall"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"github.com/Roarge/sysml-federation/examples/pipeline/capacity/flow"
@@ -110,16 +113,19 @@ func waitHTTP(t *testing.T, url string) {
 
 // fakeRouter stands in for /router inside the test process. It listens on
 // the LISTEN_ADDR of the environment it is launched with, answers what the
-// UI server proxies, and ends on the first signal or when told to die.
+// UI server proxies, and ends on the first signal or when told to die. With
+// ignoreTerm set it records SIGTERM and stays up, which is the child the
+// escalation to SIGKILL exists for.
 type fakeRouter struct {
-	env     []string
-	srv     *http.Server
-	exited  chan error
-	signals chan os.Signal
+	env        []string
+	srv        *http.Server
+	exited     chan error
+	signals    chan os.Signal
+	ignoreTerm bool
 }
 
 func newFakeRouter() *fakeRouter {
-	return &fakeRouter{exited: make(chan error, 1), signals: make(chan os.Signal, 1)}
+	return &fakeRouter{exited: make(chan error, 1), signals: make(chan os.Signal, 2)}
 }
 
 func (f *fakeRouter) launch(env []string) process {
@@ -151,6 +157,9 @@ func (f *fakeRouter) Wait() error { return <-f.exited }
 
 func (f *fakeRouter) Signal(sig os.Signal) error {
 	f.signals <- sig
+	if f.ignoreTerm && sig == syscall.SIGTERM {
+		return nil
+	}
 	_ = f.srv.Close()
 	f.exited <- nil
 	return nil
@@ -259,13 +268,88 @@ func TestRouterRunsAsAChildProcess(t *testing.T) {
 	assert.True(t, strings.Contains(out.String(), "helper router stopping"), "SIGTERM reached the child")
 }
 
-func newUI(t *testing.T, upstream http.Handler) string {
+// TestStopRouterKillsAChildThatIgnoresSIGTERM exercises the escalation:
+// SIGTERM first, then SIGKILL once the grace has run out.
+func TestStopRouterKillsAChildThatIgnoresSIGTERM(t *testing.T) {
+	fake := newFakeRouter()
+	fake.ignoreTerm = true
+	p := fake.launch(routerEnv(freeAddr(t), "config.json", ""))
+	assert.NoError(t, p.Start())
+	exited := make(chan error, 1)
+	go func() { exited <- p.Wait() }()
+	returned := make(chan struct{})
+	go func() {
+		stopRouter(p, exited, 50*time.Millisecond)
+		close(returned)
+	}()
+	select {
+	case <-returned:
+	case <-time.After(5 * time.Second):
+		t.Fatal("stopRouter never returned: a child ignoring SIGTERM is never killed")
+	}
+	assert.Equal(t, <-fake.signals, os.Signal(syscall.SIGTERM))
+	assert.Equal(t, <-fake.signals, os.Kill)
+}
+
+// TestRouterFromEnvReadsTheTwoPaths covers each variable set and unset.
+func TestRouterFromEnvReadsTheTwoPaths(t *testing.T) {
+	// t.Setenv is called for the restore it registers, and the variable is
+	// then removed so the unset case is genuinely unset.
+	for _, key := range []string{"SYSML_FEDERATION_ROUTER", "SYSML_FEDERATION_CONFIG", "LOG_LEVEL"} {
+		t.Setenv(key, "")
+		assert.NoError(t, os.Unsetenv(key))
+	}
+	unset := routerFromEnv(io.Discard, io.Discard)
+	assert.Equal(t, unset.Binary, defaultRouterBinary)
+	assert.Equal(t, unset.Config, defaultRouterConfig)
+	assert.Equal(t, unset.LogLevel, "")
+
+	t.Setenv("SYSML_FEDERATION_ROUTER", "/tmp/router")
+	t.Setenv("SYSML_FEDERATION_CONFIG", "/src/examples/pipeline/config.json")
+	t.Setenv("LOG_LEVEL", "debug")
+	set := routerFromEnv(io.Discard, io.Discard)
+	assert.Equal(t, set.Binary, "/tmp/router")
+	assert.Equal(t, set.Config, "/src/examples/pipeline/config.json")
+	assert.Equal(t, set.LogLevel, "debug")
+}
+
+// composedConfig is the part of the committed router configuration this
+// test reads. encoding/json ignores every other key.
+type composedConfig struct {
+	Subgraphs []composedSubgraph `json:"subgraphs"`
+}
+
+type composedSubgraph struct {
+	Name       string `json:"name"`
+	RoutingURL string `json:"routingUrl"`
+}
+
+// TestAddressesMatchTheComposedConfiguration ties the supervisor's port
+// constants to the configuration the router is handed, so editing one of
+// the two alone fails here rather than at run time (AD-0012).
+func TestAddressesMatchTheComposedConfiguration(t *testing.T) {
+	read, err := os.ReadFile("../../examples/pipeline/config.json")
+	raw := assert.Must(t, read, err)
+	var cfg composedConfig
+	assert.NoError(t, json.Unmarshal(raw, &cfg))
+	got := make(map[string]string, len(cfg.Subgraphs))
+	for _, s := range cfg.Subgraphs {
+		got[s.Name] = s.RoutingURL
+	}
+	assert.MapEqual(t, got, map[string]string{
+		"model":    "http://" + adapterAddr + "/graphql",
+		"capacity": "http://" + capacityAddr + "/graphql",
+		"document": "http://" + documentAddr + "/graphql",
+	})
+}
+
+func newUI(t *testing.T, assets fs.FS, upstream http.Handler) string {
 	t.Helper()
 	router := httptest.NewServer(upstream)
 	t.Cleanup(router.Close)
 	parsed, err := url.Parse(router.URL)
 	target := assert.Must(t, parsed, err)
-	handler, err := uiHandler(ui.Files, target)
+	handler, err := uiHandler(assets, target)
 	h := assert.Must(t, handler, err)
 	srv := httptest.NewServer(h)
 	t.Cleanup(srv.Close)
@@ -275,8 +359,12 @@ func newUI(t *testing.T, upstream http.Handler) string {
 // TestSR04_FourPathsOnOnePort: the two apps, /graphql and /playground on
 // one origin, / redirected, nothing else (SR-40: the router's other paths
 // are not reachable).
+//
+// The upstream answers 200 on both health paths, as the real router does,
+// so the 404 asserted below is the UI server declining to proxy them and
+// not merely the stub having nothing to serve.
 func TestSR04_FourPathsOnOnePort(t *testing.T) {
-	base := newUI(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	base := newUI(t, ui.Files, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/graphql":
 			w.Header().Set("Content-Type", "application/json")
@@ -284,6 +372,8 @@ func TestSR04_FourPathsOnOnePort(t *testing.T) {
 		case "/playground":
 			w.Header().Set("Content-Type", "text/html")
 			fmt.Fprint(w, "<html>playground</html>")
+		case "/health", "/health/ready":
+			w.WriteHeader(http.StatusOK)
 		default:
 			http.NotFound(w, r)
 		}
@@ -309,11 +399,31 @@ func TestSR04_FourPathsOnOnePort(t *testing.T) {
 	}
 }
 
+// TestUIRefusesToListASubdirectory pins the guard of the UI server against
+// an app that has one. The embedded files are flat today, so the case is
+// built on a map file system carrying a subdirectory: /viewer/ is the app's
+// root and answers, while /viewer/sub/ would be a listing and is a 404.
+// panel.js is there because a named file under the subdirectory is still
+// served, which is what tells a fired guard from an empty directory. The
+// index.html beside it cannot make that point, since the file server sends
+// any path ending in index.html back to the directory.
+func TestUIRefusesToListASubdirectory(t *testing.T) {
+	assets := fstest.MapFS{
+		"viewer/index.html":     &fstest.MapFile{Data: []byte("<html>viewer</html>")},
+		"viewer/sub/index.html": &fstest.MapFile{Data: []byte("<html>sub</html>")},
+		"viewer/sub/panel.js":   &fstest.MapFile{Data: []byte("export const panel = 1\n")},
+	}
+	base := newUI(t, assets, http.NotFoundHandler())
+	assert.Equal(t, get(t, base+"/viewer/").StatusCode, http.StatusOK)
+	assert.Equal(t, get(t, base+"/viewer/sub/panel.js").StatusCode, http.StatusOK)
+	assert.Equal(t, get(t, base+"/viewer/sub/").StatusCode, http.StatusNotFound)
+}
+
 // TestSR04_ProxyStreamsServerSentEvents: the first event reaches the client
 // while the upstream is still holding the response open.
 func TestSR04_ProxyStreamsServerSentEvents(t *testing.T) {
 	release := make(chan struct{})
-	base := newUI(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	base := newUI(t, ui.Files, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
 		rc := http.NewResponseController(w)
 		fmt.Fprint(w, "event: next\ndata: {\"data\":{\"modelChanged\":2}}\n\n")
