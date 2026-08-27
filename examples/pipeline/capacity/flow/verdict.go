@@ -26,16 +26,23 @@ const (
 	KindError        = "ERROR"
 )
 
-// Verdict applies the precedence of the capacity model: another quantity or no
-// limit is INCONCLUSIVE before anything is looked at, then ERROR for a bad
-// child, then the remaining INCONCLUSIVE cases, then PASS or FAIL. Every reason
-// is one of the model's templates.
+// Verdict applies the precedence of the capacity model: another quantity is
+// INCONCLUSIVE before anything is looked at, then a limit or a comparison the
+// wire did not carry, then ERROR for a bad child, then the remaining
+// INCONCLUSIVE cases, then PASS or FAIL. Every reason is one of the model's
+// templates.
 func Verdict(names Names, quantity, comparison string, limit *float64, subject Subject, verificationCase string) (kind, reason string) {
-	if quantity != names.Quantity || limit == nil {
+	if quantity != names.Quantity {
 		if verificationCase != "" {
 			return KindInconclusive, verificationCase + " is declared and no service runs it"
 		}
 		return KindInconclusive, "no service computes " + quantity
+	}
+	if limit == nil {
+		return KindInconclusive, "no limit to compare against"
+	}
+	if comparison == "" {
+		return KindInconclusive, "no comparison to apply"
 	}
 	if len(subject.Children) > 0 {
 		res, err := Rollup(subject.Children, subject.Edges)
@@ -48,8 +55,13 @@ func Verdict(names Names, quantity, comparison string, limit *float64, subject S
 		case errors.Is(err, ErrNoExit):
 			return KindInconclusive, "no exit part"
 		}
-		return judge(res.Capacity, comparison, *limit),
-			names.Quantity + " " + num(res.Capacity) + " against " + num(*limit) + ", limited by " + strings.Join(cutNames(subject.Children, res.Cut), ", ")
+		reason := names.Quantity + " " + num(res.Capacity) + " against " + num(*limit)
+		if cut := cutNames(subject.Children, res.Cut); len(cut) > 0 {
+			reason += ", limited by " + strings.Join(cut, ", ")
+		} else {
+			reason += ", no path from entry to exit"
+		}
+		return judge(res.Capacity, comparison, *limit), reason
 	}
 	if !subject.HasAttribute {
 		return KindInconclusive, "no children to analyse"

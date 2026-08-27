@@ -37,7 +37,20 @@ func TestSR30_Verdict(t *testing.T) {
 			subject([]Node{{ID: "a", Name: "a"}, node("b", 1)}, []Edge{{"a", "b"}}), ""},
 			Want: verdictOut{KindInconclusive, "no service computes latency"}},
 		{Name: "no limit", In: verdictIn{"capacity", "GE", nil, shipped, ""},
-			Want: verdictOut{KindInconclusive, "no service computes capacity"}},
+			Want: verdictOut{KindInconclusive, "no limit to compare against"}},
+		{Name: "no comparison", In: verdictIn{"capacity", "", v(1500), shipped, ""},
+			Want: verdictOut{KindInconclusive, "no comparison to apply"}},
+		// An entry needs no incoming connection and an exit no outgoing one, and a
+		// child with neither is left out of the network, so the two must be
+		// different children and the smallest wiring that separates them puts each
+		// in its own group of three.
+		{Name: "an entry and an exit with no path between them", In: verdictIn{"capacity", "GE", v(1500),
+			subject([]Node{node("a", 1), node("b", 1), node("c", 1), node("d", 1), node("e", 1), node("f", 1)},
+				[]Edge{{"a", "b"}, {"b", "c"}, {"c", "b"}, {"d", "e"}, {"e", "d"}, {"e", "f"}}), ""},
+			Want: verdictOut{KindFail, "capacity 0 against 1500, no path from entry to exit"}},
+		{Name: "children win over the subject's own attribute", In: verdictIn{"capacity", "GE", v(1500),
+			Subject{Name: "pipeline", HasAttribute: true, Attribute: v(9000), Children: pipeline(2000, 1200, 700, 700, 1800), Edges: wiring}, ""},
+			Want: verdictOut{KindFail, "capacity 1200 against 1500, limited by parse"}},
 		{Name: "missing child value", In: verdictIn{"capacity", "GE", v(1500),
 			subject([]Node{node("ingest", 2000), {ID: "s3", Name: "indexA"}}, []Edge{{"ingest", "s3"}}), ""},
 			Want: verdictOut{KindError, "indexA has missing throughput"}},
@@ -86,7 +99,7 @@ func TestSR30_Verdict(t *testing.T) {
 	})
 }
 
-func TestAnalyse(t *testing.T) {
+func TestSR29_Analyse(t *testing.T) {
 	c, cut := Analyse(subject(pipeline(2000, 1700, 700, 700, 1800), wiring))
 	assert.Equal(t, *c, 1400)
 	assert.SliceEqual(t, cut, []string{"indexA", "indexB"})
