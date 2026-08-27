@@ -39,13 +39,6 @@ type vcNode struct {
 	out *VerificationCase
 }
 
-// quantity is an evaluated value with the unit it carries. Task 1.8 moves it
-// to eval.go together with the real evaluator.
-type quantity struct {
-	num  float64
-	unit string
-}
-
 type builder struct {
 	f         *syntax.File
 	m         *Model
@@ -259,16 +252,6 @@ func (b *builder) attribute(ctx *partNode, s attrSlot) Attribute {
 		a.Expression = b.f.Text(exprSpan(s.bind.Value))
 	}
 	return a
-}
-
-// eval is replaced by the real evaluator in Task 1.8. Until then only a
-// literal has a value.
-func (b *builder) eval(_ *partNode, _ *reqNode, a *syntax.AttributeUsage) quantity {
-	lit, ok := a.Value.(syntax.Literal)
-	if !ok {
-		b.fail(a.Span, "expressions are evaluated in a later task")
-	}
-	return quantity{lit.Number, lit.Unit}
 }
 
 func (b *builder) requirements(pkg *syntax.Package) {
