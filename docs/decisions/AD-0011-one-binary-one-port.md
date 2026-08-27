@@ -38,7 +38,7 @@ The reading at gate 2 settled where the UI server
 lives. The single UI server that serves both apps and proxies
 the router belongs to the image element, so the two apps are HTML, CSS and
 JavaScript and nothing else. The supervisor, with its UI server and command
-dispatch, has a budget of 700 lines.
+dispatch, is expected to run to about 700 lines.
 
 ## Decision
 

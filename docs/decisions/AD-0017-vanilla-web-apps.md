@@ -79,9 +79,9 @@ recommends it only if no third-party JavaScript becomes a rule.
 
 No Node, no bundler and no node_modules anywhere in the repository, which
 SC-05 states as a design constraint. A reader opens `examples/pipeline/ui/`
-and reads the files the browser runs. The budgets in SC-06, 900 lines of
-JavaScript and 300 of CSS per app with a shared module counted once, bound
-what that reading costs, and the vendored file is not hand-written and
+and reads the files the browser runs. The figures in SC-06, 900 lines of
+JavaScript and 300 of CSS per app with a shared module counted once, say
+what that reading should cost, and the vendored file is not hand-written and
 sits outside them.
 
 The tokeniser is a tokeniser and not a parser, and it owns its
