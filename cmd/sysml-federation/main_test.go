@@ -45,6 +45,36 @@ func TestStopBudgetFitsAContainerGrace(t *testing.T) {
 	assert.True(t, budget <= containerGrace, "the stop budget is "+budget.String()+" against a grace of "+containerGrace.String())
 }
 
+// TestServerDrainIsBoundedByItsTimeout is the behavioural half of the
+// budget above, which reads the constants and cannot tell whether the stop
+// path uses them. A handler that never returns leaves a response in flight,
+// and Shutdown never releases one, so the drain runs its whole timeout: the
+// stop has to come back in about a second, and a drain that reached for the
+// router's five seconds instead would fail here.
+func TestServerDrainIsBoundedByItsTimeout(t *testing.T) {
+	release := make(chan struct{})
+	defer close(release)
+	inFlight := make(chan struct{})
+	failed := make(chan error, 1)
+	listened, err := listen("probe", "127.0.0.1:0", http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
+		close(inFlight)
+		<-release
+	}), failed)
+	srv := assert.Must(t, listened, err)
+	go func() {
+		resp, err := http.Get("http://" + srv.addr + "/slow")
+		if err == nil {
+			_ = resp.Body.Close()
+		}
+	}()
+	<-inFlight
+	started := time.Now()
+	srv.stop()
+	elapsed := time.Since(started)
+	assert.True(t, elapsed >= serverStopTimeout, "the response was not in flight, so nothing was drained: "+elapsed.String())
+	assert.True(t, elapsed < 2*time.Second, "the drain took "+elapsed.String()+", so it is not bounded by serverStopTimeout")
+}
+
 // TestHelperRouter is not a test. It is the body of the child process that
 // TestRouterRunsAsAChildProcess starts from this binary in place of
 // /router: it listens where LISTEN_ADDR says, answers /health/ready and
@@ -332,31 +362,69 @@ func TestRouterFromEnvReadsTheTwoPaths(t *testing.T) {
 // composedConfig is the part of the committed router configuration this
 // test reads. encoding/json ignores every other key.
 type composedConfig struct {
-	Subgraphs []composedSubgraph `json:"subgraphs"`
+	Subgraphs    []composedSubgraph `json:"subgraphs"`
+	EngineConfig composedEngine     `json:"engineConfig"`
 }
 
 type composedSubgraph struct {
+	ID         string `json:"id"`
 	Name       string `json:"name"`
 	RoutingURL string `json:"routingUrl"`
 }
 
+type composedEngine struct {
+	Datasources []composedDatasource `json:"datasourceConfigurations"`
+}
+
+// composedDatasource carries the URL the router dials. The subgraph entry
+// beside it is metadata, and the two are joined by id.
+type composedDatasource struct {
+	ID            string                `json:"id"`
+	CustomGraphql composedCustomGraphql `json:"customGraphql"`
+}
+
+type composedCustomGraphql struct {
+	Fetch composedFetch `json:"fetch"`
+}
+
+type composedFetch struct {
+	URL composedStaticURL `json:"url"`
+}
+
+type composedStaticURL struct {
+	Static string `json:"staticVariableContent"`
+}
+
 // TestAddressesMatchTheComposedConfiguration ties the supervisor's port
 // constants to the configuration the router is handed, so editing one of
-// the two alone fails here rather than at run time (AD-0012).
+// the two alone fails here rather than at run time (AD-0012). Both places a
+// subgraph's address appears are checked: routingUrl, which is metadata,
+// and the fetch URL of the matching datasource, which is what the router
+// actually dials.
 func TestAddressesMatchTheComposedConfiguration(t *testing.T) {
 	read, err := os.ReadFile("../../examples/pipeline/config.json")
 	raw := assert.Must(t, read, err)
 	var cfg composedConfig
 	assert.NoError(t, json.Unmarshal(raw, &cfg))
-	got := make(map[string]string, len(cfg.Subgraphs))
-	for _, s := range cfg.Subgraphs {
-		got[s.Name] = s.RoutingURL
-	}
-	assert.MapEqual(t, got, map[string]string{
+	want := map[string]string{
 		"model":    "http://" + adapterAddr + "/graphql",
 		"capacity": "http://" + capacityAddr + "/graphql",
 		"document": "http://" + documentAddr + "/graphql",
-	})
+	}
+	routing := make(map[string]string, len(cfg.Subgraphs))
+	nameOf := make(map[string]string, len(cfg.Subgraphs))
+	for _, s := range cfg.Subgraphs {
+		routing[s.Name] = s.RoutingURL
+		nameOf[s.ID] = s.Name
+	}
+	assert.MapEqual(t, routing, want)
+	// An id with no subgraph beside it lands under the empty name, which is
+	// in neither map and fails the comparison rather than passing quietly.
+	dialled := make(map[string]string, len(cfg.EngineConfig.Datasources))
+	for _, d := range cfg.EngineConfig.Datasources {
+		dialled[nameOf[d.ID]] = d.CustomGraphql.Fetch.URL.Static
+	}
+	assert.MapEqual(t, dialled, want)
 }
 
 func newUI(t *testing.T, assets fs.FS, upstream http.Handler) string {

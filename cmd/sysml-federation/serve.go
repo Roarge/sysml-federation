@@ -32,6 +32,11 @@ const (
 	// or one open subscription buys the whole wait. A second finishes a
 	// request in flight, and a subscription is cut rather than waited on,
 	// which is what a stop means.
+	//
+	// TestStopBudgetFitsAContainerGrace holds this against the ten seconds a
+	// container stop allows, on the assumption that four servers are stopped
+	// one after another with the router in between. Change the stop order or
+	// the number of servers and that sum has to change with it.
 	serverStopTimeout = 1 * time.Second
 	// routerStopTimeout is how long the router child has after SIGTERM
 	// before it is killed.
