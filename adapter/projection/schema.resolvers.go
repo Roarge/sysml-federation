@@ -54,6 +54,11 @@ func (r *partResolver) ShortName(ctx context.Context, obj *model.Part) (*string,
 	return optional(obj.ShortName), nil
 }
 
+// Definition is the resolver for the definition field.
+func (r *partResolver) Definition(ctx context.Context, obj *model.Part) (*string, error) {
+	return optional(obj.Definition), nil
+}
+
 // Doc is the resolver for the doc field.
 func (r *partResolver) Doc(ctx context.Context, obj *model.Part) (*string, error) {
 	return optional(obj.Doc), nil

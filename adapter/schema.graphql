@@ -21,7 +21,7 @@ type Part @key(fields: "id") {
   id: ID!
   shortName: String
   name: String!
-  definition: String!
+  definition: String
   doc: String
   attributes: [Attribute!]!
   ports: [Port!]!

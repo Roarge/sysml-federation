@@ -152,6 +152,17 @@ func TestQueriesServeEveryFieldOfTheProjection(t *testing.T) {
 	assert.Equal(t, raw(t, c, `{ part(id: "nope") { id } requirement(id: "nope") { id } }`), `{"part":null,"requirement":null}`)
 }
 
+// TestAnUntypedPartPublishesNoDefinition parses the case the hand-built model
+// above cannot reach. A part usage that names no type carries the empty string
+// in the model, and the graph publishes null rather than an empty word, so a
+// reader can tell an untyped usage from one typed by something unnameable.
+func TestAnUntypedPartPublishesNoDefinition(t *testing.T) {
+	m, err := model.Parse("untyped.sysml", "package P { part def S; part a; part b : S; }")
+	c, _ := newClient(t, assert.Must(t, m, err))
+	assert.Equal(t, raw(t, c, `{ model { parts { name definition } } }`),
+		`{"model":{"parts":[{"name":"a","definition":null},{"name":"b","definition":"S"}]}}`)
+}
+
 const entities = `query($reps: [_Any!]!) { _entities(representations: $reps) {
   ... on Part { id name } ... on Requirement { id limit } ... on VerificationCase { id name } } }`
 

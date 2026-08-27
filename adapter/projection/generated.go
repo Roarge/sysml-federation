@@ -163,6 +163,7 @@ type MutationResolver interface {
 type PartResolver interface {
 	ShortName(ctx context.Context, obj *model.Part) (*string, error)
 
+	Definition(ctx context.Context, obj *model.Part) (*string, error)
 	Doc(ctx context.Context, obj *model.Part) (*string, error)
 
 	Satisfies(ctx context.Context, obj *model.Part) ([]*model.Requirement, error)
@@ -745,7 +746,7 @@ type Part @key(fields: "id") {
   id: ID!
   shortName: String
   name: String!
-  definition: String!
+  definition: String
   doc: String
   attributes: [Attribute!]!
   ports: [Port!]!
@@ -2094,18 +2095,18 @@ func (ec *executionContext) _Part_definition(ctx context.Context, field graphql.
 			return ec.fieldContext_Part_definition(ctx, field)
 		},
 		func(ctx context.Context) (any, error) {
-			return obj.Definition, nil
+			return ec.Resolvers.Part().Definition(ctx, obj)
 		},
 		nil,
-		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
-			return ec.marshalNString2string(ctx, selections, v)
+		func(ctx context.Context, selections ast.SelectionSet, v *string) graphql.Marshaler {
+			return ec.marshalOString2ᚖstring(ctx, selections, v)
 		},
 		true,
-		true,
+		false,
 	)
 }
 func (ec *executionContext) fieldContext_Part_definition(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	return graphql.NewScalarFieldContext("Part", field, false, false, errors.New("field of type String does not have child fields"))
+	return graphql.NewScalarFieldContext("Part", field, true, true, errors.New("field of type String does not have child fields"))
 }
 
 func (ec *executionContext) _Part_doc(ctx context.Context, field graphql.CollectedField, obj *model.Part) (ret graphql.Marshaler) {
@@ -4693,10 +4694,43 @@ func (ec *executionContext) _Part(ctx context.Context, sel ast.SelectionSet, obj
 				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "definition":
-			out.Values[i] = ec._Part_definition(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Part_definition(ctx, field, obj)
+				if res == graphql.RequiredNull {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.IsDeferred() {
+				deferredFieldSet.AddField(field)
+				fieldIndex := len(deferredFieldSet.Values) - 1
+				deferredFieldSet.Concurrently(fieldIndex, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, deferredFieldSet)
+				})
+
+				for _, deferrable := range field.Deferrables {
+					view, ok := deferLabelToView[deferrable.Label]
+					if !ok {
+						view = deferredFieldSet.NewView()
+						deferLabelToView[deferrable.Label] = view
+					}
+					view.AddIndices(fieldIndex)
+				}
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "doc":
 			field := field
 

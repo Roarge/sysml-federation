@@ -27,6 +27,7 @@ models:
     model: github.com/Roarge/sysml-federation/adapter/model.Part
     fields:
       shortName: { resolver: true }
+      definition: { resolver: true }
       doc: { resolver: true }
       satisfies: { resolver: true }
   Attribute:
