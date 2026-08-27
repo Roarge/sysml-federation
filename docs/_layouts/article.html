@@ -7,10 +7,6 @@ layout: default
 {%- for item in site.series %}{% if item.path == page.path %}{% assign idx = forloop.index0 %}{% endif %}{% endfor %}
 <div class="with-sidebar">
   <article class="prose">
-    {%- if idx >= 0 %}
-    {%- assign number = idx | plus: 1 %}
-    <p class="eyebrow">Article {{ number }} of {{ total }}</p>
-    {%- endif %}
     <h1>{{ page.title }}</h1>
     {{ content }}
     {%- if idx >= 0 %}
