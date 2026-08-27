@@ -9,10 +9,11 @@ import (
 	"github.com/Roarge/sysml-federation/adapter/syntax"
 )
 
-// Patch replaces the literal at a span with new text and re-parses, returning
-// a new model with the version incremented. The span must be one that exactly
-// one projected value carries, and the text must be a plain decimal number.
-func (m *Model) Patch(at syntax.Span, literal string) (*Model, error) {
+// patch is the internal write: it replaces the literal at a span with new text
+// and re-parses, returning a new model with the version incremented. The span
+// must be one that exactly one projected value carries, and the text must be a
+// plain decimal number.
+func (m *Model) patch(at syntax.Span, literal string) (*Model, error) {
 	if m.literals[at] != 1 {
 		return nil, fmt.Errorf("%w: no literal at %d..%d", ErrNotEditable, at.Start, at.End)
 	}
@@ -66,5 +67,5 @@ func (m *Model) setLiteral(at syntax.Span, value float64) (*Model, error) {
 		return nil, fmt.Errorf("%w: got %v", ErrInvalidValue, value)
 	}
 	value += 0 // a negative zero becomes zero
-	return m.Patch(at, strconv.FormatFloat(value, 'f', -1, 64))
+	return m.patch(at, strconv.FormatFloat(value, 'f', -1, 64))
 }

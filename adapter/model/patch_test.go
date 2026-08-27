@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/Roarge/sysml-federation/adapter/model"
-	"github.com/Roarge/sysml-federation/adapter/syntax"
 	"github.com/Roarge/sysml-federation/internal/assert"
 	"github.com/Roarge/sysml-federation/internal/tabletest"
 )
@@ -174,23 +173,4 @@ func TestSR25_InvalidValuesAreRefused(t *testing.T) {
 	assert.ErrorIs(t, err, model.ErrNotFound)
 	_, err = m.SetLimit("nope", 1)
 	assert.ErrorIs(t, err, model.ErrNotFound)
-}
-
-func TestPatchGuardsItsInputs(t *testing.T) {
-	m := loadExample(t)
-	_, err := m.Patch(syntax.Span{Start: 0, End: 7}, "1") // "package" is not a literal
-	assert.ErrorIs(t, err, model.ErrNotEditable)
-	found, err := part(m, "PIPE-S1")
-	p := assert.Must(t, found, err)
-	span := p.Attributes[1].Span
-	_, err = m.Patch(span, "12 + 3")
-	assert.ErrorIs(t, err, model.ErrInvalidValue)
-	_, err = m.Patch(span, "abc")
-	assert.ErrorIs(t, err, model.ErrInvalidValue)
-	patched, err := m.Patch(span, "-5")
-	m2 := assert.Must(t, patched, err)
-	negative, err := part(m2, "PIPE-S1")
-	np := assert.Must(t, negative, err)
-	assert.Equal(t, *np.Attributes[1].Value, -5.0)
-	assert.Equal(t, m2.Version, 2)
 }
