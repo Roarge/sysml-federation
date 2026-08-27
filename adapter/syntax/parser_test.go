@@ -1,6 +1,7 @@
 package syntax_test
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -242,4 +243,126 @@ func TestSR18_ExpressionAndPortRejections(t *testing.T) {
 		e := assert.ErrorAs[*syntax.Error](t, err)
 		return rejection{e.Line, e.Column, e.Message}
 	})
+}
+
+func TestParseRequirements(t *testing.T) {
+	src := "package P {\n" +
+		"  requirement def R :> Base {\n" +
+		"    doc /* d */\n" +
+		"    subject target : Component;\n" +
+		"    attribute requiredRate : Real;\n" +
+		"    require constraint { target.capacity >= requiredRate }\n" +
+		"  }\n" +
+		"  requirement <'R1'> global : R {\n" +
+		"    subject :>> target = pipeline;\n" +
+		"    attribute :>> requiredRate = 1500;\n" +
+		"    require constraint { 3 == target.x }\n" +
+		"  }\n" +
+		"}\n"
+	f := parse(t, src)
+	d := f.Package.RequirementDefs[0]
+	assert.Equal(t, d.Name, "R")
+	assert.Equal(t, d.Specializes, "Base")
+	assert.Equal(t, d.Doc.Text, "d")
+	assert.DeepEqual(t, d.Subject, &syntax.Subject{Name: "target", Type: "Component", Span: at(src, "subject target : Component;")})
+	assert.Len(t, d.Attributes, 1)
+	assert.DeepEqual(t, d.Constraint, &syntax.RequireConstraint{
+		Left:  syntax.FeatureChain{Names: []string{"target", "capacity"}, Span: at(src, "target.capacity")},
+		Op:    syntax.GE,
+		Right: syntax.FeatureChain{Names: []string{"requiredRate"}, Span: within(src, ">= requiredRate }", "requiredRate")},
+		Span:  at(src, "require constraint { target.capacity >= requiredRate }")})
+	u := f.Package.Requirements[0]
+	assert.Equal(t, u.ShortName, "R1")
+	assert.Equal(t, u.Type, "R")
+	assert.DeepEqual(t, u.Subject, &syntax.Subject{Name: "target",
+		Value: &syntax.FeatureChain{Names: []string{"pipeline"}, Span: at(src, "pipeline")},
+		Span:  at(src, "subject :>> target = pipeline;")})
+	assert.Equal(t, u.Constraint.Op, syntax.EQ)
+	_, isLit := u.Constraint.Left.(syntax.Literal)
+	assert.True(t, isLit, "a literal on the left")
+}
+
+func TestParseDerivationAndVerification(t *testing.T) {
+	src := "package P {\n" +
+		"  #derivation connection {\n" +
+		"    end #original ::> r0;\n" +
+		"    end #derive ::> r1;\n" +
+		"    end #derive ::> r2;\n" +
+		"  }\n" +
+		"  verification def T { doc /* v */ subject target : Pipeline; objective { verify r0; } }\n" +
+		"  verification <'VC1'> t : T { subject target :> pipeline; }\n" +
+		"}\n"
+	f := parse(t, src)
+	d := f.Package.Derivations[0]
+	assert.SliceEqual(t, d.Original.Names, []string{"r0"})
+	assert.Len(t, d.Derives, 2)
+	assert.SliceEqual(t, d.Derives[1].Names, []string{"r2"})
+	assert.Equal(t, d.Span, at(src, "#derivation connection {\n    end #original ::> r0;\n    end #derive ::> r1;\n    end #derive ::> r2;\n  }"))
+	vd := f.Package.VerificationDefs[0]
+	assert.Equal(t, vd.Doc.Text, "v")
+	assert.DeepEqual(t, vd.Objective, &syntax.Objective{
+		Verify: syntax.FeatureChain{Names: []string{"r0"}, Span: within(src, "verify r0;", "r0")}, Span: at(src, "objective { verify r0; }")})
+	vu := f.Package.Verifications[0]
+	assert.Equal(t, vu.ShortName, "VC1")
+	assert.Equal(t, vu.Type, "T")
+	assert.DeepEqual(t, vu.Subject.Value, &syntax.FeatureChain{Names: []string{"pipeline"}, Span: within(src, ":> pipeline;", "pipeline")})
+}
+
+func TestSR18_RequirementRejections(t *testing.T) {
+	tabletest.Run(t, []tabletest.Case[string, rejection]{
+		{Name: "compound constraint", In: "package P { requirement def R { require constraint { a.b >= c + 1 } } }",
+			Want: rejection{1, 63, "expected '}', found '+'"}},
+		{Name: "constraint without an operator", In: "package P { requirement def R { require constraint { a.b } } }",
+			Want: rejection{1, 58, "expected a comparison operator, found '}'"}},
+		{Name: "assume constraint", In: "package P { requirement def R { assume constraint { a > 0 } } }",
+			Want: rejection{1, 33, "keyword 'assume' is not supported in a requirement body"}},
+		{Name: "require shorthand", In: "package P { requirement r { require other; } }",
+			Want: rejection{1, 37, "expected keyword 'constraint', found identifier 'other'"}},
+		{Name: "second constraint", In: "package P { requirement def R { require constraint { a > 1 } require constraint { a > 2 } } }",
+			Want: rejection{1, 62, "only one require constraint is allowed in a requirement body"}},
+		{Name: "unknown metadata", In: "package P { #trace connection { } }",
+			Want: rejection{1, 13, "unknown metadata #trace"}},
+		{Name: "derivation without original", In: "package P { #derivation connection { end #derive ::> r1; } }",
+			Want: rejection{1, 13, "a derivation connection needs exactly one #original end"}},
+		{Name: "derivation with two originals", In: "package P { #derivation connection { end #original ::> a; end #original ::> b; end #derive ::> c; } }",
+			Want: rejection{1, 13, "a derivation connection needs exactly one #original end"}},
+		{Name: "derivation without derive", In: "package P { #derivation connection { end #original ::> a; } }",
+			Want: rejection{1, 13, "a derivation connection needs at least one #derive end"}},
+		{Name: "typed derivation", In: "package P { #derivation connection : D { end a ::> x; } }",
+			Want: rejection{1, 36, "expected '{', found ':'"}},
+		{Name: "named objective", In: "package P { verification def T { objective o { verify r; } } }",
+			Want: rejection{1, 44, "expected '{', found identifier 'o'"}},
+		{Name: "return in a verification", In: "package P { verification def T { return verdict : VerdictKind; } }",
+			Want: rejection{1, 34, "keyword 'return' is not supported in a verification body"}},
+	}, func(t *testing.T, in string) rejection {
+		_, err := syntax.Parse("m.sysml", in)
+		e := assert.ErrorAs[*syntax.Error](t, err)
+		return rejection{e.Line, e.Column, e.Message}
+	})
+}
+
+func TestExampleModelParses(t *testing.T) {
+	raw, err := os.ReadFile("../../examples/pipeline/model.sysml")
+	src := string(assert.Must(t, raw, err))
+	parsed, err := syntax.Parse("model.sysml", src)
+	f := assert.Must(t, parsed, err)
+	p := f.Package
+	assert.Equal(t, p.ShortName, "PIPE")
+	assert.Len(t, p.Imports, 6)
+	assert.Len(t, p.Attributes, 1) // the millisecond
+	assert.Len(t, p.PartDefs, 3)
+	assert.Len(t, p.PortDefs, 2)
+	assert.Len(t, p.RequirementDefs, 2)
+	assert.Len(t, p.Parts, 1)
+	assert.Len(t, p.Parts[0].Parts, 5)
+	assert.Len(t, p.Parts[0].Connects, 5)
+	assert.Len(t, p.Parts[0].Satisfies, 7)
+	assert.Len(t, p.Requirements, 7)
+	assert.Len(t, p.Derivations, 1)
+	assert.Len(t, p.Derivations[0].Derives, 5)
+	assert.Len(t, p.VerificationDefs, 1)
+	assert.Len(t, p.Verifications, 1)
+	// Every span indexes real text: the literal 1500 is where it says it is.
+	lit := p.Requirements[0].Attributes[0].Value.(syntax.Literal)
+	assert.Equal(t, f.Text(lit.Span), "1500")
 }

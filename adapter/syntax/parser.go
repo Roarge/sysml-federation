@@ -437,25 +437,196 @@ func (p *parser) parseSatisfy() Satisfy {
 	return Satisfy{Requirement: req, By: by, Span: p.end(start)}
 }
 
-// --- stubs replaced in Task 1.5 ---------------------------------------------
+// --- requirements -------------------------------------------------------------
 
 func (p *parser) parseRequirementDef() RequirementDef {
-	p.unsupported("package")
-	return RequirementDef{}
+	start := p.expect("requirement").Span.Start
+	p.expect("def")
+	d := RequirementDef{ShortName: p.shortName(), Name: p.name()}
+	if p.accept(":>") {
+		d.Specializes = p.qualifiedName()
+	}
+	d.RequirementBody = p.requirementBody()
+	d.Span = p.end(start)
+	return d
 }
+
 func (p *parser) parseRequirementUsage() RequirementUsage {
-	p.unsupported("package")
-	return RequirementUsage{}
+	start := p.expect("requirement").Span.Start
+	u := RequirementUsage{ShortName: p.shortName(), Name: p.name()}
+	if p.accept(":") {
+		u.Type = p.qualifiedName()
+	}
+	u.RequirementBody = p.requirementBody()
+	u.Span = p.end(start)
+	return u
 }
+
+func (p *parser) requirementBody() RequirementBody {
+	var b RequirementBody
+	p.expect("{")
+	for !p.is("}") {
+		switch {
+		case p.skipComment():
+		case p.is("doc"):
+			p.once(b.Doc != nil, "doc", "requirement")
+			b.Doc = p.doc()
+		case p.is("subject"):
+			p.once(b.Subject != nil, "subject", "requirement")
+			b.Subject = p.parseSubject()
+		case p.is("attribute"):
+			b.Attributes = append(b.Attributes, p.parseAttribute())
+		case p.is("require"):
+			p.once(b.Constraint != nil, "require constraint", "requirement")
+			b.Constraint = p.parseConstraint()
+		default:
+			p.unsupported("requirement")
+		}
+	}
+	p.expect("}")
+	return b
+}
+
+// parseSubject reads `subject name : Type;`, `subject :>> name = chain;` or
+// `subject name :> chain;`.
+func (p *parser) parseSubject() *Subject {
+	start := p.expect("subject").Span.Start
+	s := &Subject{}
+	if p.accept(":>>") {
+		s.Name = p.name()
+		p.expect("=")
+		c := p.parseChain()
+		s.Value = &c
+	} else {
+		s.Name = p.name()
+		if p.accept(":>") {
+			c := p.parseChain()
+			s.Value = &c
+		} else {
+			p.expect(":")
+			s.Type = p.qualifiedName()
+		}
+	}
+	p.expect(";")
+	s.Span = p.end(start)
+	return s
+}
+
+func (p *parser) parseConstraint() *RequireConstraint {
+	start := p.expect("require").Span.Start
+	p.expect("constraint")
+	p.expect("{")
+	c := &RequireConstraint{Left: p.parseOperand()}
+	c.Op = p.parseComparison()
+	c.Right = p.parseOperand()
+	p.expect("}")
+	c.Span = p.end(start)
+	return c
+}
+
+// --- verification -------------------------------------------------------------
+
 func (p *parser) parseVerificationDef() VerificationDef {
-	p.unsupported("package")
-	return VerificationDef{}
+	start := p.expect("verification").Span.Start
+	p.expect("def")
+	d := VerificationDef{ShortName: p.shortName(), Name: p.name()}
+	d.VerificationBody = p.verificationBody()
+	d.Span = p.end(start)
+	return d
 }
+
 func (p *parser) parseVerificationUsage() VerificationUsage {
-	p.unsupported("package")
-	return VerificationUsage{}
+	start := p.expect("verification").Span.Start
+	u := VerificationUsage{ShortName: p.shortName(), Name: p.name()}
+	if p.accept(":") {
+		u.Type = p.qualifiedName()
+	}
+	u.VerificationBody = p.verificationBody()
+	u.Span = p.end(start)
+	return u
 }
+
+func (p *parser) verificationBody() VerificationBody {
+	var b VerificationBody
+	p.expect("{")
+	for !p.is("}") {
+		switch {
+		case p.skipComment():
+		case p.is("doc"):
+			p.once(b.Doc != nil, "doc", "verification")
+			b.Doc = p.doc()
+		case p.is("subject"):
+			p.once(b.Subject != nil, "subject", "verification")
+			b.Subject = p.parseSubject()
+		case p.is("objective"):
+			p.once(b.Objective != nil, "objective", "verification")
+			b.Objective = p.parseObjective()
+		default:
+			p.unsupported("verification")
+		}
+	}
+	p.expect("}")
+	return b
+}
+
+func (p *parser) parseObjective() *Objective {
+	start := p.expect("objective").Span.Start
+	p.expect("{")
+	p.expect("verify")
+	o := &Objective{Verify: p.parseChain()}
+	p.expect(";")
+	p.expect("}")
+	o.Span = p.end(start)
+	return o
+}
+
+// --- derivation ---------------------------------------------------------------
+
+func (p *parser) metadata() (Token, string) {
+	hash := p.expect("#")
+	t := p.peek()
+	if t.Kind != Ident {
+		p.failExpected("a metadata name after '#'")
+	}
+	p.next()
+	return hash, t.Text
+}
+
 func (p *parser) parseDerivation() DerivationConnection {
-	p.unsupported("package")
-	return DerivationConnection{}
+	hash, kind := p.metadata()
+	if kind != "derivation" {
+		p.fail(Span{hash.Span.Start, p.toks[p.pos-1].Span.End}, "unknown metadata #"+kind)
+	}
+	p.expect("connection")
+	p.expect("{")
+	var d DerivationConnection
+	originals := 0
+	for !p.is("}") {
+		if p.skipComment() {
+			continue
+		}
+		p.expect("end")
+		endHash, endKind := p.metadata()
+		p.expect("::>")
+		c := p.parseChain()
+		p.expect(";")
+		switch endKind {
+		case "original":
+			originals++
+			d.Original = c
+		case "derive":
+			d.Derives = append(d.Derives, c)
+		default:
+			p.fail(Span{endHash.Span.Start, c.Span.End}, "unknown metadata #"+endKind)
+		}
+	}
+	p.expect("}")
+	d.Span = p.end(hash.Span.Start)
+	if originals != 1 {
+		p.fail(d.Span, "a derivation connection needs exactly one #original end")
+	}
+	if len(d.Derives) == 0 {
+		p.fail(d.Span, "a derivation connection needs at least one #derive end")
+	}
+	return d
 }

@@ -93,3 +93,29 @@ func (p *parser) parseChain() FeatureChain {
 	c.Span = p.end(start)
 	return c
 }
+
+// parseOperand reads a constraint operand: a feature chain or a literal.
+func (p *parser) parseOperand() Expr {
+	t := p.peek()
+	switch {
+	case t.Kind == Number || (t.Kind == Punct && t.Text == "-"):
+		return p.parseLiteral()
+	case t.Kind == Ident || t.Kind == Name:
+		return p.parseChain()
+	default:
+		p.failExpected("a feature chain or a number")
+		return nil
+	}
+}
+
+var comparisons = map[string]Comparison{">=": GE, ">": GT, "<=": LE, "<": LT, "==": EQ}
+
+func (p *parser) parseComparison() Comparison {
+	t := p.peek()
+	c, ok := comparisons[t.Text]
+	if t.Kind != Punct || !ok {
+		p.failExpected("a comparison operator")
+	}
+	p.next()
+	return c
+}
