@@ -1,11 +1,16 @@
 package pipeline
 
 import (
+	"go/parser"
+	"go/token"
+	"io/fs"
+	"path/filepath"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/99designs/gqlgen/client"
 
-	"github.com/Roarge/sysml-federation/adapter/projection"
 	"github.com/Roarge/sysml-federation/examples/pipeline/document"
 	"github.com/Roarge/sysml-federation/internal/assert"
 )
@@ -18,11 +23,9 @@ type mutationOut map[string]struct {
 }
 
 // TestSR36_DocumentOperationsLeaveTheModelVersion runs every editorial
-// operation against the document service beside a live adapter store and
-// reads the model version after each one.
+// operation against the document service and reads back the version the
+// service reports, which advances once per accepted operation.
 func TestSR36_DocumentOperationsLeaveTheModelVersion(t *testing.T) {
-	loaded, err := projection.Load("model.sysml")
-	store := assert.Must(t, loaded, err)
 	created, err := document.New()
 	svc := assert.Must(t, created, err)
 	c := client.New(document.Handler(svc), client.Path("/graphql"))
@@ -40,6 +43,44 @@ func TestSR36_DocumentOperationsLeaveTheModelVersion(t *testing.T) {
 		var out mutationOut
 		c.MustPost(op, &out)
 		assert.Equal(t, svc.Version(), i+2)
-		assert.Equal(t, store.Version(), 1)
 	}
+}
+
+// TestSR36_TheDocumentServiceReachesNoAdapterPackage parses the imports of
+// every non-test Go source of the document service, its tree sub-package
+// included, and fails on any import that leads into the adapter. The model
+// version cannot move under a document operation because the state holding
+// it is not reachable from here, not because nothing happened to write to
+// it, and this test fails the moment the two are wired together.
+func TestSR36_TheDocumentServiceReachesNoAdapterPackage(t *testing.T) {
+	fset := token.NewFileSet()
+	parsed := 0
+	err := filepath.WalkDir("document", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() || filepath.Ext(path) != ".go" || strings.HasSuffix(path, "_test.go") {
+			return nil
+		}
+		file, err := parser.ParseFile(fset, path, nil, parser.ImportsOnly)
+		if err != nil {
+			return err
+		}
+		parsed++
+		for _, spec := range file.Imports {
+			imported, err := strconv.Unquote(spec.Path.Value)
+			if err != nil {
+				return err
+			}
+			if strings.Contains(imported, "/adapter/") || strings.HasSuffix(imported, "/adapter") {
+				t.Errorf("%s: imports %q", path, imported)
+			}
+		}
+		return nil
+	})
+	assert.NoError(t, err)
+	// The document service's eight non-test sources are the floor. A walk that
+	// parses fewer is looking in the wrong place, or has skipped the tree
+	// sub-package, and would report a clean result it never earned.
+	assert.True(t, parsed >= 8, "at least eight document service sources were parsed")
 }
