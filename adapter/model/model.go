@@ -67,9 +67,8 @@ type Part struct {
 }
 
 // IsEntity marks a part as an element other services may look up by its
-// identifier. The subgraph serves these types as they are rather than
-// copying them into a second set of structures, and the code generator asks
-// a type it serves that way to carry the marker.
+// identifier. Elements addressable that way are served as they are rather
+// than copied into a second set of structures.
 func (*Part) IsEntity() {}
 
 // Requirement is one requirement usage with its constraint read into a

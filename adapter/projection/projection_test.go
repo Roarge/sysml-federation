@@ -258,7 +258,7 @@ func TestSR44_ResetRestoresTheShippedValuesAndGrowsTheVersion(t *testing.T) {
 func TestSR09_AFreshStoreIsTheShippedState(t *testing.T) {
 	loaded, err := Load(fixture)
 	first := assert.Must(t, loaded, err)
-	_, err = first.SetAttribute("WH-A", "rate", 45)
+	_, _, err = first.SetAttribute("WH-A", "rate", 45)
 	assert.NoError(t, err)
 	reloaded, err := Load(fixture)
 	second := assert.Must(t, reloaded, err)
@@ -285,7 +285,7 @@ func TestSR22_TextAndProjectionAgreeUnderConcurrentEdits(t *testing.T) {
 					return
 				default:
 				}
-				if _, err := store.SetLimit("WH-R1", float64(100+i*1000+j)); err != nil {
+				if _, _, err := store.SetLimit("WH-R1", float64(100+i*1000+j)); err != nil {
 					failures.Add(1)
 					return
 				}
@@ -305,4 +305,46 @@ func TestSR22_TextAndProjectionAgreeUnderConcurrentEdits(t *testing.T) {
 	wg.Wait()
 	assert.Equal(t, failures.Load(), int32(0))
 	assert.True(t, store.Version() > 1, "edits landed while reading")
+}
+
+// TestSR22_AMutationAnswersFromTheModelItProduced: the answer of a mutation
+// carries the value it set beside the values derived from it, and both come
+// from the model the mutation installed. A second writer resets the store in
+// a loop, so a resolver that asked the store for its current model after
+// installing would pair the new limit with the shipped model's derivations.
+func TestSR22_AMutationAnswersFromTheModelItProduced(t *testing.T) {
+	c, store := loadClient(t)
+	stop := make(chan struct{})
+	var wg sync.WaitGroup
+	for range 4 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for {
+				select {
+				case <-stop:
+					return
+				default:
+				}
+				store.Reset()
+			}
+		}()
+	}
+	for i := range 200 {
+		limit := float64(100 + i)
+		var resp struct {
+			SetLimit struct {
+				Limit   float64
+				Derives []struct{ Limit float64 }
+			}
+		}
+		c.MustPost(`mutation($v: Float!) { setLimit(requirementId: "WH-R1", value: $v) { limit derives { limit } } }`,
+			&resp, client.Var("v", limit))
+		assert.Equal(t, resp.SetLimit.Limit, limit)
+		assert.Len(t, resp.SetLimit.Derives, 2)
+		assert.Equal(t, resp.SetLimit.Derives[0].Limit, (limit+20)/2)
+		assert.Equal(t, resp.SetLimit.Derives[1].Limit, limit-30)
+	}
+	close(stop)
+	wg.Wait()
 }

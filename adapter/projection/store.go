@@ -46,32 +46,35 @@ func (s *Store) Version() int {
 	return s.version
 }
 
-// SetAttribute patches a part's literal attribute and returns the part of
-// the new model. Refusals are the model package's (SR-24, SR-25).
-func (s *Store) SetAttribute(partID, name string, value float64) (*model.Part, error) {
+// SetAttribute patches a part's literal attribute and returns the part of the
+// new model together with the model itself, so the caller answers from the
+// model this call installed rather than from whatever is current by the time
+// it asks again. Refusals are the model package's (SR-24, SR-25).
+func (s *Store) SetAttribute(partID, name string, value float64) (*model.Part, *model.Model, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	next, err := s.current.SetAttribute(partID, name, value)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	s.install(next)
 	p, _ := partByID(next, partID)
-	return p, nil
+	return p, next, nil
 }
 
 // SetLimit patches a requirement's literal limit and returns the requirement
-// of the new model.
-func (s *Store) SetLimit(requirementID string, value float64) (*model.Requirement, error) {
+// of the new model together with the model itself, on the same terms as
+// SetAttribute.
+func (s *Store) SetLimit(requirementID string, value float64) (*model.Requirement, *model.Model, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	next, err := s.current.SetLimit(requirementID, value)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	s.install(next)
 	r, _ := requirementByID(next, requirementID)
-	return r, nil
+	return r, next, nil
 }
 
 // Reset serves the shipped model again under the next version. The copy is

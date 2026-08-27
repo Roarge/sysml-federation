@@ -14,21 +14,21 @@ import (
 
 // SetAttribute is the resolver for the setAttribute field.
 func (r *mutationResolver) SetAttribute(ctx context.Context, partID string, name string, value float64) (*model.Part, error) {
-	p, err := r.Store.SetAttribute(partID, name, value)
+	p, m, err := r.Store.SetAttribute(partID, name, value)
 	if err != nil {
 		return nil, err
 	}
-	advance(ctx, r.Store.Current())
+	advance(ctx, m)
 	return p, nil
 }
 
 // SetLimit is the resolver for the setLimit field.
 func (r *mutationResolver) SetLimit(ctx context.Context, requirementID string, value float64) (*model.Requirement, error) {
-	req, err := r.Store.SetLimit(requirementID, value)
+	req, m, err := r.Store.SetLimit(requirementID, value)
 	if err != nil {
 		return nil, err
 	}
-	advance(ctx, r.Store.Current())
+	advance(ctx, m)
 	return req, nil
 }
 
