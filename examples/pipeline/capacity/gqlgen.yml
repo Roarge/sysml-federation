@@ -1,0 +1,33 @@
+schema:
+  - schema.graphql
+exec:
+  layout: single-file
+  filename: generated.go
+  package: capacity
+federation:
+  filename: federation.go
+  package: capacity
+  version: 2
+  options:
+    explicit_requires: true
+model:
+  filename: models_gen.go
+  package: capacity
+resolver:
+  layout: follow-schema
+  dir: .
+  package: capacity
+  filename_template: "{name}.resolvers.go"
+omit_getters: true
+omit_gqlgen_version_in_file_notice: true
+local_prefix: github.com/Roarge/sysml-federation
+skip_mod_tidy: true
+models:
+  Part:
+    fields:
+      capacity: { resolver: true }
+      bottleneck: { resolver: true }
+  Requirement:
+    fields:
+      verdict: { resolver: true }
+      verdictReason: { resolver: true }

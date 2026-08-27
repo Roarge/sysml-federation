@@ -1,0 +1,46 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3",
+        import: ["@key", "@external", "@requires"])
+
+type Part @key(fields: "id") {
+  id: ID!
+  name: String! @external
+  attributes: [Attribute!]! @external
+  parts: [Part!]! @external
+  connections: [Connection!]! @external
+  capacity: Float
+    @requires(fields: "attributes { name value } parts { id name attributes { name value } } connections { from to }")
+  bottleneck: [Part!]!
+    @requires(fields: "parts { id name attributes { name value } } connections { from to }")
+}
+
+type Attribute {
+  name: String! @external
+  value: Float @external
+}
+
+type Connection {
+  from: ID! @external
+  to: ID! @external
+}
+
+type VerificationCase @key(fields: "id", resolvable: false) {
+  id: ID!
+  shortName: String @external
+}
+
+type Requirement @key(fields: "id") {
+  id: ID!
+  quantity: String @external
+  comparison: Comparison @external
+  limit: Float @external
+  subject: Part @external
+  verifiedBy: [VerificationCase!]! @external
+  verdict: Verdict!
+    @requires(fields: "quantity comparison limit verifiedBy { shortName } subject { id name attributes { name value } parts { id name attributes { name value } } connections { from to } }")
+  verdictReason: String!
+    @requires(fields: "quantity comparison limit verifiedBy { shortName } subject { id name attributes { name value } parts { id name attributes { name value } } connections { from to } }")
+}
+
+enum Comparison { GE GT LE LT EQ }
+enum Verdict { PASS FAIL INCONCLUSIVE ERROR }

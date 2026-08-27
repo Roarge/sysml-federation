@@ -211,6 +211,13 @@ modules: ## List every Go module, so none escapes the gate
 .PHONY: generate
 generate: ## Regenerate the gqlgen code of the subgraphs
 	$(GO) generate ./...
+	@# gqlgen moves a trailing comment off the two signature lines it rewrites
+	@# in the capacity subgraph, so the reviewed exceptions are put back here.
+	@# The doc comment above each of those two functions stays on one line for
+	@# the same reason: the rewrite drops the slashes from a second line and
+	@# leaves the file unparseable.
+	sed -i '/^[[:space:]]*\/\/nointerface:allow[[:space:]]*$$/d' examples/pipeline/capacity/federation.requires.go
+	sed -i 's|^\(func (ec \*executionContext) Populate[A-Za-z]*Requires(.*) error {\)$$|\1 //nointerface:allow|' examples/pipeline/capacity/federation.requires.go
 
 # ------------------------------------------------------------ composition --
 # Composition runs on the maintainer's machine and its output is committed.
