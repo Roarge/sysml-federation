@@ -38,8 +38,8 @@ type Attribute struct {
 	Value      *float64
 	Unit       string
 	Editable   bool        // true when the bound value is a literal no other value shares
-	Expression string      // source text of a bound expression; "" otherwise
-	Span       syntax.Span // the literal's span when Editable; zero otherwise
+	Expression string      // source text of a bound expression, otherwise ""
+	Span       syntax.Span // the literal's span when Editable, otherwise zero
 }
 
 // Port is a port usage with the direction its definition's items give it.

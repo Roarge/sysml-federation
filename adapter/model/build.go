@@ -10,7 +10,7 @@ import (
 // which usage, if any, binds its value.
 type attrSlot struct {
 	name string
-	bind *syntax.AttributeUsage // carries Value; nil when unbound
+	bind *syntax.AttributeUsage // carries Value, or nil when unbound
 }
 
 // partNode is a part usage during building.
