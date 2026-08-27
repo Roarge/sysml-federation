@@ -149,6 +149,8 @@ func TestBuildRefusals(t *testing.T) {
 			Want: refusal{1, 66, `attribute "x" is declared twice`}},
 		{Name: "port declared twice", In: "package P { port def Q; part def S { port p : Q; port p : Q; } part a : S; }",
 			Want: refusal{1, 50, `port "p" is declared twice`}},
+		{Name: "attribute declared twice in a requirement definition", In: "package P { requirement def R { attribute l : Real; attribute l : Real; } requirement r : R { } }",
+			Want: refusal{1, 53, `attribute "l" is declared twice`}},
 	}, refuse)
 }
 
