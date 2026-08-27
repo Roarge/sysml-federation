@@ -36,7 +36,7 @@ tree, which is not the OMG JSON and whose API is pre-1.0.
 
 The repository's own rules bear on the choice. Product code is Go with no empty
 interface in a value position, it is test-first, and it has to
-be readable in an afternoon within an expected scale per component (SC-06).
+be readable in an afternoon, at the scale per component SC-06 expects.
 Edits through the projection patch a literal at its recorded source span
 (AD-0004), so whatever reads the text has to keep byte ranges. And the example
 has to be accepted by the reference tools in any case, since a subset parser
