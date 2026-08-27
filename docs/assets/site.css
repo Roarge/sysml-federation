@@ -1,23 +1,41 @@
-/* Stage 1 placeholder stylesheet. The tokens are the project's own; the
-   typography, spacing and the series-nav treatment are replaced from the
-   design canvas in Stage 2. */
+/* Federating a systems model — site theme.
+
+   Every colour, size, weight, line-height, letter-spacing, measure, gap and
+   rule below is taken from the approved design canvas: Main, Article,
+   Decisions and ArticleMobile. Nothing here is rounded to a grid. The
+   desktop artboards are drawn at 1440 and the phone artboard at 390. */
 
 :root {
+  /* Colour */
   --paper: oklch(98% 0.005 90);
   --ink: oklch(25% 0.01 260);
   --pencil: oklch(58% 0.01 260);
   --shade: oklch(93% 0.006 90);
   --blue: oklch(52% 0.12 250);
-  --red: oklch(55% 0.19 25);
 
-  --body: "Source Sans 3", ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-    "Liberation Mono", monospace;
+  /* Type */
+  --sans: "Source Sans 3", "Source Sans Pro", ui-sans-serif, system-ui,
+    "Segoe UI", sans-serif;
+  --serif: "Source Serif 4", Charter, "Bitstream Charter", Cambria, Georgia,
+    serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --measure: 72ch;
-  --gutter: 1.5rem;
-  --rule: 1px solid var(--shade);
+  /* Measures */
+  --container: 1168px;
+  --gutter: 24px;
+  --measure: 680px;
+  --sidebar: 300px;
+  --sidebar-gap: 140px;
+  --list-measure: 896px;
+
+  /* The hanging identifier column: 80px of right-aligned numeral, then a
+     16px gap, so a list indented by 96px puts its text on the page's own
+     left edge. */
+  --hang-col: 80px;
+  --hang-gap: 16px;
+  --hang: 96px;
+
+  --rule: 1px solid var(--pencil);
 }
 
 *,
@@ -30,28 +48,42 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+html,
 body {
   margin: 0;
   background: var(--paper);
+}
+
+body {
   color: var(--ink);
-  font-family: var(--body);
-  font-size: 1.0625rem;
-  line-height: 1.65;
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 a {
   color: var(--blue);
+  text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
 }
 
 a:hover {
-  color: var(--red);
+  color: var(--ink);
 }
 
 :focus-visible {
-  outline: 3px solid var(--blue);
-  outline-offset: 2px;
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
 .skip-link {
@@ -63,310 +95,839 @@ a:hover {
 .skip-link:focus {
   left: 0;
   z-index: 10;
-  padding: 0.5rem 0.75rem;
+  padding: 12px 20px;
   background: var(--paper);
-  border: var(--rule);
+  border-bottom: var(--rule);
+  border-right: var(--rule);
+  color: var(--ink);
 }
 
-/* Header */
+/* ------------------------------------------------------------------ header */
 
 .site-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem var(--gutter);
-  max-width: 78rem;
-  margin: 0 auto;
-  padding: 1rem var(--gutter);
   border-bottom: var(--rule);
 }
 
+.menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 20px var(--gutter);
+}
+
+/* Above the phone breakpoint the disclosure is not a menu. The summary box
+   disappears but its contents stay, so the masthead keeps its place on the
+   bar, and the navigation is shown whether the element is open or not. */
+.menu > .menu-bar {
+  display: contents;
+}
+
+.menu > .menu-bar::-webkit-details-marker {
+  display: none;
+}
+
+.menu-label {
+  display: none;
+}
+
+.menu::details-content {
+  content-visibility: visible;
+  block-size: auto;
+}
+
 .site-title {
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.2;
   color: var(--ink);
   text-decoration: none;
 }
 
-.site-nav ul {
+.site-nav {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem 1.25rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.menu > summary {
-  cursor: pointer;
-  list-style: none;
+  gap: 32px;
+  font-size: 17px;
   font-weight: 600;
+  line-height: 1.2;
+}
+
+.site-nav a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-title:hover,
+.site-nav a:hover {
   color: var(--blue);
+  text-decoration: underline;
 }
 
-.menu > summary::-webkit-details-marker {
-  display: none;
+.external {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.menu > summary::after {
-  content: " \25BE";
-}
-
-.menu[open] > summary::after {
-  content: " \25B4";
-}
-
-.menu[open] > .site-nav {
-  padding-top: 0.5rem;
-}
-
-.menu[open] > .site-nav ul {
-  flex-direction: column;
-}
-
-/* Above 720 px the disclosure is not a menu: the navigation is always
-   visible and the summary is removed. */
-@media (min-width: 720px) {
-  .menu > summary {
-    display: none;
-  }
-
-  .menu::details-content {
-    content-visibility: visible;
-    block-size: auto;
-  }
-
-  .menu[open] > .site-nav ul {
-    flex-direction: row;
-  }
-
-  .menu[open] > .site-nav {
-    padding-top: 0;
-  }
-
-  /* Where ::details-content is not understood the closed disclosure cannot
-     be forced open, so keep the summary as the way in. */
-  @supports not selector(::details-content) {
-    .menu > summary {
-      display: block;
-    }
-  }
-}
-
-/* Main */
+/* -------------------------------------------------------------------- main */
 
 main {
-  max-width: 78rem;
+  max-width: var(--container);
   margin: 0 auto;
-  padding: 2rem var(--gutter) 3rem;
+  padding: 56px var(--gutter) 72px;
 }
 
 .with-sidebar {
   display: grid;
-  gap: 2.5rem var(--gutter);
   grid-template-columns: minmax(0, 1fr);
+  gap: 56px;
 }
 
-@media (min-width: 960px) {
-  .with-sidebar {
-    grid-template-columns: minmax(0, 1fr) 18rem;
-    align-items: start;
-  }
-
-  .sidebar {
-    position: sticky;
-    top: 2rem;
-  }
+.sidebar {
+  min-width: 0;
 }
+
+/* ------------------------------------------------------------------- prose */
 
 .prose {
   max-width: var(--measure);
+  min-width: 0;
 }
 
-.prose > h1 {
-  font-size: 2rem;
-  line-height: 1.2;
-  margin: 0 0 1rem;
+.prose > * {
+  margin: 0 0 24px;
+}
+
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+.prose h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
 }
 
 .prose h2 {
-  font-size: 1.375rem;
-  line-height: 1.3;
-  margin: 2.25rem 0 0.75rem;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 600;
+  margin: 40px 0 24px;
 }
 
 .prose h3 {
-  font-size: 1.125rem;
-  margin: 1.75rem 0 0.5rem;
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 600;
+  margin: 24px 0 16px;
 }
 
-.prose p,
+.prose h4 {
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 600;
+  margin: 24px 0 16px;
+}
+
+.prose p {
+  text-wrap: pretty;
+}
+
+.eyebrow {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pencil);
+}
+
+/* The byline and the series line are the first two paragraphs of an
+   article's markdown, and the artboard sets them upright and grey. A
+   record's status line is the same shape. */
+.layout-article .prose > h1 + p,
+.layout-article .prose > h1 + p + p,
+.layout-home .prose > h1 + p,
+.prose.is-record > h1 + p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--pencil);
+  margin-bottom: 4px;
+}
+
+.layout-article .prose > h1 + p + p,
+.prose.is-record > h1 + p {
+  margin-bottom: 24px;
+}
+
+.layout-article .prose > h1 + p em,
+.layout-home .prose > h1 + p em {
+  font-style: normal;
+}
+
 .prose ul,
 .prose ol {
-  margin: 0 0 1rem;
+  padding-left: var(--gutter);
 }
 
 .prose li {
-  margin-bottom: 0.35rem;
+  margin-bottom: 8px;
+}
+
+.prose li:last-child {
+  margin-bottom: 0;
 }
 
 .prose blockquote {
-  margin: 1.25rem 0;
-  padding-left: 1rem;
-  border-left: 3px solid var(--shade);
+  margin: 24px 0;
+  padding-left: 20px;
+  border-left: var(--rule);
   color: var(--pencil);
 }
 
 .prose hr {
   height: 1px;
-  margin: 2.5rem 0;
+  margin: 40px 0;
   border: 0;
-  background: var(--shade);
+  background: var(--pencil);
 }
 
-.eyebrow {
-  margin: 0 0 0.25rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+/* An image paragraph and the italic sentence beneath it are the figure and
+   its caption. */
+.prose > p:has(> img) {
+  margin: 40px 0 12px;
+}
+
+.prose > p:has(> img) + p {
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--pencil);
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-figure {
-  margin: 1.5rem 0;
-}
-
-figcaption {
-  font-size: 0.9375rem;
-  color: var(--pencil);
-}
-
-code,
-pre {
-  font-family: var(--mono);
-  font-size: 0.9375em;
+  margin-bottom: 40px;
 }
 
 code {
-  padding: 0.1em 0.3em;
+  font-family: var(--mono);
+  font-size: 0.88em;
   background: var(--shade);
   border-radius: 3px;
+  padding: 1px 5px;
 }
 
 pre {
-  overflow-x: auto;
-  padding: 0.85rem 1rem;
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.88em;
   background: var(--shade);
-  border-radius: 4px;
+  border-radius: 3px;
+  padding: 16px 20px;
+  overflow-x: auto;
 }
 
 pre code {
-  padding: 0;
+  font-size: inherit;
   background: none;
+  border-radius: 0;
+  padding: 0;
 }
 
-table {
+/* A wide table scrolls inside its own box rather than widening the page. */
+.prose table {
   display: block;
-  overflow-x: auto;
   max-width: 100%;
-  margin: 1.25rem 0;
+  overflow-x: auto;
   border-collapse: collapse;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
-th,
-td {
-  padding: 0.4rem 0.75rem;
+.prose th,
+.prose td {
+  padding: 8px 16px;
   border: var(--rule);
   text-align: left;
   vertical-align: top;
 }
 
-th {
+.prose th {
   background: var(--shade);
+  font-weight: 600;
 }
 
-/* Series navigation and pagers */
+/* ------------------------------------------------- the index pages' lists */
+
+/* Both index pages hang an identifier in its own right-aligned column: the
+   article number on the home page, the record number on the decisions page.
+   Below 1312px there is no room beside the container for the column, so it
+   comes back inside and the list carries the indent instead. */
+
+.layout-home .prose,
+.prose.is-index {
+  max-width: none;
+}
+
+.layout-home .prose > h1,
+.layout-home .prose > h1 + p,
+.layout-home .prose > h1 + p + p,
+.prose.is-index > h1,
+.prose.is-index > p {
+  max-width: var(--measure);
+}
+
+.layout-home .prose > h1,
+.prose.is-index > h1 {
+  font-size: 52px;
+  margin-bottom: 20px;
+}
+
+.layout-home .prose > h1 + p {
+  margin-bottom: 20px;
+}
+
+/* The decisions index opens with two paragraphs of prose, set 20px apart. */
+.prose.is-index > h1 + p,
+.prose.is-index > h1 + p + p {
+  margin-bottom: 20px;
+}
+
+.layout-home .prose > h1 + p + p {
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin-bottom: 56px;
+}
+
+.layout-home .prose > h2 {
+  margin: 56px 0 8px;
+}
+
+.layout-home .prose > h2 + p {
+  margin-bottom: 28px;
+}
+
+.layout-home .prose > ol,
+.layout-home .prose > ul,
+.prose.is-index > ul {
+  list-style: none;
+  margin: 0 0 56px;
+  padding-left: var(--hang);
+  max-width: var(--list-measure);
+}
+
+.layout-home .prose > ol > li,
+.layout-home .prose > ul > li,
+.prose.is-index > ul > li {
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.layout-home .prose > ol {
+  counter-reset: article;
+}
+
+.layout-home .prose > ol > li {
+  counter-increment: article;
+  margin-bottom: 22px;
+}
+
+.layout-home .prose > ol > li::before,
+.layout-home .prose > ul > li::before,
+.prose.is-index .rec-id {
+  display: inline-block;
+  width: var(--hang-col);
+  margin-left: calc(0px - var(--hang));
+  margin-right: var(--hang-gap);
+  text-align: right;
+  vertical-align: baseline;
+  color: var(--pencil);
+  font-variant-numeric: tabular-nums;
+}
+
+.layout-home .prose > ol > li::before {
+  content: counter(article);
+  font-family: var(--serif);
+  font-size: 34px;
+  line-height: 1;
+}
+
+.layout-home .prose > ol > li > a {
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* The documents list marks the four PDFs and leaves the fifth entry blank. */
+.layout-home .prose > ul > li::before {
+  content: "";
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.layout-home .prose > ul > li:has(> a[href$=".pdf"])::before {
+  content: "PDF";
+}
+
+.layout-home .prose > ul > li > a {
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.layout-home .prose > ul > li > a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+.prose.is-index .rec-id {
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.prose.is-index > ul > li > a {
+  line-height: 1.5;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.layout-home .prose > ol > li > a:hover,
+.prose.is-index > ul > li > a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+.layout-home .prose > h2 + ul,
+.prose.is-index > h2 + ul {
+  margin-top: 24px;
+}
+
+.prose.is-index > h2 {
+  margin: 56px 0 20px;
+}
+
+@media (min-width: 1312px) {
+  .layout-home .prose > ol,
+  .layout-home .prose > ul,
+  .prose.is-index > ul {
+    margin-left: calc(0px - var(--hang));
+  }
+}
+
+/* --------------------------------------------------------- series and pager */
 
 .series-nav {
-  margin-top: 2.5rem;
-  padding-top: 1.25rem;
-  border-top: var(--rule);
-}
-
-.sidebar .series-nav {
-  margin-top: 0;
-  padding: 1rem 1.25rem;
-  border: var(--rule);
-  border-radius: 4px;
-  background: color-mix(in oklch, var(--shade) 45%, var(--paper));
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .series-nav-heading {
-  margin: 0 0 0.75rem;
-  font-size: 0.8125rem;
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.series-nav ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.series-nav li {
+  display: grid;
+  grid-template-columns: var(--hang-col) 1fr;
+  gap: var(--hang-gap);
+  align-items: baseline;
+  margin: 0;
+}
+
+.series-num {
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--pencil);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.series-nav a {
+  font-size: 17px;
+  line-height: 1.35;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.series-nav a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+.series-nav .is-current .series-num,
+.series-nav a[aria-current="page"] {
+  color: var(--blue);
+}
+
+.series-nav a[aria-current="page"] {
+  font-weight: 600;
+}
+
+/* Each article's markdown ends with its own rule and an index-and-next line,
+   which is how it reads on GitHub. Here the layout builds that pager from
+   the series list, so the markdown's copy is not shown a second time. */
+.prose > p:has(+ .pager),
+.prose > hr:has(+ p + .pager) {
+  display: none;
+}
+
+.pager {
+  margin: 40px 0 0;
+  padding-top: 20px;
+  border-top: var(--rule);
+}
+
+.pager ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 40px;
+}
+
+.pager li {
+  margin: 0;
+}
+
+.pager a {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.pager a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+.pager-label {
+  font-size: 14px;
+  line-height: 1.4;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--pencil);
 }
 
-.series-nav ol {
-  margin: 0;
-  padding-left: 1.5rem;
+.pager-next a {
+  align-items: flex-end;
+  text-align: right;
 }
 
-.series-nav li {
-  margin-bottom: 0.4rem;
-  line-height: 1.4;
-}
-
-.series-nav a[aria-current="page"] {
-  color: var(--ink);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.pager {
-  margin-top: 2.5rem;
-  padding-top: 1.25rem;
-  border-top: var(--rule);
-}
-
-.pager ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.pager span {
-  display: block;
-  font-size: 0.8125rem;
-  color: var(--pencil);
-}
-
-/* Footer */
+/* ------------------------------------------------------------------ footer */
 
 .site-footer {
-  max-width: 78rem;
-  margin: 0 auto;
-  padding: 1.25rem var(--gutter) 2.5rem;
   border-top: var(--rule);
-  font-size: 0.9375rem;
-  color: var(--pencil);
 }
 
 .site-footer p {
-  margin: 0;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 24px var(--gutter) 48px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--pencil);
+}
+
+/* --------------------------------------------------------- the sidebar page */
+
+@media (min-width: 960px) {
+  .with-sidebar {
+    grid-template-columns: minmax(0, var(--measure)) var(--sidebar);
+    column-gap: var(--sidebar-gap);
+    align-items: start;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 56px;
+  }
+
+  /* Beside the article the numerals hang into the gap. */
+  .series-nav ol {
+    margin-left: calc(0px - var(--hang));
+  }
+}
+
+/* -------------------------------------------------------------- the phone */
+
+@media (max-width: 719px) {
+  body {
+    font-size: 17px;
+    line-height: 1.53;
+  }
+
+  /* The masthead and the menu share one row, and the navigation opens
+     beneath them. */
+  .menu {
+    display: block;
+    padding: 8px 20px 12px;
+  }
+
+  .menu > .menu-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    min-height: 44px;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  /* On the phone the disclosure is a menu again, so the closed state has to
+     hide its contents. The desktop rule above forces them visible, and that
+     override is undone here rather than repeated. */
+  .menu::details-content {
+    content-visibility: hidden;
+    block-size: 0;
+  }
+
+  .menu[open]::details-content {
+    content-visibility: visible;
+    block-size: auto;
+  }
+
+  .site-title {
+    font-size: 19px;
+  }
+
+  .menu-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--pencil);
+  }
+
+  .chev {
+    transition: transform 120ms ease;
+  }
+
+  .menu[open] .chev {
+    transform: rotate(180deg);
+  }
+
+  .site-nav {
+    flex-direction: column;
+    gap: 0;
+    margin-top: 4px;
+    font-size: 17px;
+  }
+
+  .site-nav a {
+    display: block;
+    padding: 12px 0;
+    line-height: 1.2;
+  }
+
+  .site-nav .external {
+    display: flex;
+  }
+
+  main {
+    padding: 32px 20px 48px;
+  }
+
+  .with-sidebar {
+    gap: 32px;
+  }
+
+  .prose,
+  .layout-home .prose > h1,
+  .layout-home .prose > h1 + p,
+  .layout-home .prose > h1 + p + p,
+  .prose.is-index > h1,
+  .prose.is-index > p {
+    max-width: none;
+  }
+
+  .prose > * {
+    margin-bottom: 20px;
+  }
+
+  .prose h1,
+  .layout-home .prose > h1,
+  .prose.is-index > h1 {
+    font-size: 32px;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+
+  .prose h2,
+  .prose.is-index > h2 {
+    font-size: 22px;
+    margin: 32px 0 20px;
+  }
+
+  .layout-home .prose > h2 {
+    margin: 32px 0 8px;
+  }
+
+  .prose h3 {
+    font-size: 19px;
+  }
+
+  .eyebrow {
+    margin-bottom: 12px;
+  }
+
+  .layout-article .prose > h1 + p,
+  .layout-article .prose > h1 + p + p,
+  .layout-home .prose > h1 + p,
+  .prose.is-record > h1 + p {
+    font-size: 15px;
+  }
+
+  .layout-home .prose > h1 + p {
+    margin-bottom: 20px;
+  }
+
+  .layout-home .prose > h1 + p + p {
+    margin-bottom: 32px;
+  }
+
+  .prose > p:has(> img) {
+    margin: 32px 0 10px;
+  }
+
+  .prose > p:has(> img) + p {
+    font-size: 15px;
+    margin-bottom: 32px;
+  }
+
+  .layout-home .prose > ol,
+  .layout-home .prose > ul,
+  .prose.is-index > ul {
+    margin-bottom: 32px;
+    padding-left: 40px;
+  }
+
+  .layout-home .prose > ol > li::before {
+    width: 28px;
+    margin-left: -40px;
+    margin-right: 12px;
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .layout-home .prose > ul {
+    padding-left: 48px;
+  }
+
+  .layout-home .prose > ul > li::before {
+    width: 32px;
+    margin-left: -48px;
+  }
+
+  /* AD-0001 is too wide for a column on a phone, so it leads the line. */
+  .prose.is-index > ul {
+    padding-left: 0;
+  }
+
+  .prose.is-index .rec-id {
+    width: auto;
+    margin-left: 0;
+    margin-right: 12px;
+    text-align: left;
+  }
+
+  .layout-home .prose > ol > li > a {
+    font-size: 19px;
+  }
+
+  /* A list link on a phone is a navigation target, so its hit area is at
+     least 44px tall. Vertical padding on an inline box grows the target
+     without moving the text. */
+  .layout-home .prose > ol > li > a,
+  .layout-home .prose > ul > li > a,
+  .prose.is-index > ul > li > a {
+    padding-block: 10px;
+  }
+
+  .series-nav {
+    gap: 12px;
+  }
+
+  .series-nav-heading {
+    font-size: 22px;
+  }
+
+  .series-nav ol {
+    gap: 2px;
+  }
+
+  .series-nav li {
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+  }
+
+  .series-num {
+    font-size: 18px;
+  }
+
+  .series-nav a {
+    display: block;
+    padding: 11px 0;
+    min-height: 44px;
+  }
+
+  .pager {
+    margin-top: 32px;
+    padding-top: 12px;
+  }
+
+  .pager ul {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pager a {
+    gap: 2px;
+    padding: 10px 0;
+    min-height: 44px;
+  }
+
+  .pager-next a {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .site-footer p {
+    padding: 20px 20px 40px;
+    font-size: 15px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -5,31 +5,35 @@ layout: default
 {%- assign last = total | minus: 1 %}
 {%- assign idx = -1 %}
 {%- for item in site.series %}{% if item.path == page.path %}{% assign idx = forloop.index0 %}{% endif %}{% endfor %}
-<article class="prose">
-  {%- if idx >= 0 %}
-  {%- assign number = idx | plus: 1 %}
-  <p class="eyebrow">Article {{ number }} of {{ total }}</p>
-  {%- endif %}
-  <h1>{{ page.title }}</h1>
-  {{ content }}
-  {%- if idx >= 0 %}
-  <nav class="pager" aria-label="Series navigation">
-    <ul>
-      {%- if idx > 0 %}
-      {%- assign previous_index = idx | minus: 1 %}
-      {%- assign previous = site.series[previous_index] %}
-      {%- assign previous_href = previous.path | replace: '.md', '.html' | prepend: '/' %}
-      <li class="pager-previous"><span>Previous</span> <a href="{{ previous_href | relative_url }}">{{ previous.title }}</a></li>
-      {%- endif %}
-      <li class="pager-index"><span>Index</span> <a href="{{ '/' | relative_url }}">{{ site.title }}</a></li>
-      {%- if idx < last %}
-      {%- assign next_index = idx | plus: 1 %}
-      {%- assign next = site.series[next_index] %}
-      {%- assign next_href = next.path | replace: '.md', '.html' | prepend: '/' %}
-      <li class="pager-next"><span>Next</span> <a href="{{ next_href | relative_url }}">{{ next.title }}</a></li>
-      {%- endif %}
-    </ul>
-  </nav>
-  {%- endif %}
-  {%- include series-nav.html %}
-</article>
+<div class="with-sidebar">
+  <article class="prose">
+    {%- if idx >= 0 %}
+    {%- assign number = idx | plus: 1 %}
+    <p class="eyebrow">Article {{ number }} of {{ total }}</p>
+    {%- endif %}
+    <h1>{{ page.title }}</h1>
+    {{ content }}
+    {%- if idx >= 0 %}
+    <nav class="pager" aria-label="Series navigation">
+      <ul>
+        {%- if idx > 0 %}
+        {%- assign previous_index = idx | minus: 1 %}
+        {%- assign previous = site.series[previous_index] %}
+        {%- assign previous_href = previous.path | replace: '.md', '.html' | prepend: '/' %}
+        <li class="pager-previous"><a href="{{ previous_href | relative_url }}"><span class="pager-label">Previous</span><span class="pager-title">{{ previous.title }}</span></a></li>
+        {%- endif %}
+        <li class="pager-index"><a href="{{ '/' | relative_url }}"><span class="pager-label">Index</span><span class="pager-title">{{ site.title }}</span></a></li>
+        {%- if idx < last %}
+        {%- assign next_index = idx | plus: 1 %}
+        {%- assign next = site.series[next_index] %}
+        {%- assign next_href = next.path | replace: '.md', '.html' | prepend: '/' %}
+        <li class="pager-next"><a href="{{ next_href | relative_url }}"><span class="pager-label">Next</span><span class="pager-title">{{ next.title }}</span></a></li>
+        {%- endif %}
+      </ul>
+    </nav>
+    {%- endif %}
+  </article>
+  <aside class="sidebar">
+    {%- include series-nav.html %}
+  </aside>
+</div>

@@ -21,44 +21,44 @@ each produced.
 
 ## The shape of the system
 
-- [AD-0001 Federation over a single GraphQL service](AD-0001-federation-over-single-service.md)
-- [AD-0002 Cosmo as the federation platform](AD-0002-cosmo-as-platform.md)
-- [AD-0010 The router as a child process from the copied binary](AD-0010-router-as-child-process.md)
-- [AD-0011 One binary, one process tree, one port, one UI server](AD-0011-one-binary-one-port.md)
-- [AD-0012 Composition as a maintainer step with committed output and a drift test](AD-0012-composition-committed.md)
-- [AD-0013 Telemetry disabled by environment baked into the image](AD-0013-telemetry-off.md)
+- <span class="rec-id">AD-0001</span> [Federation over a single GraphQL service](AD-0001-federation-over-single-service.md)
+- <span class="rec-id">AD-0002</span> [Cosmo as the federation platform](AD-0002-cosmo-as-platform.md)
+- <span class="rec-id">AD-0010</span> [The router as a child process from the copied binary](AD-0010-router-as-child-process.md)
+- <span class="rec-id">AD-0011</span> [One binary, one process tree, one port, one UI server](AD-0011-one-binary-one-port.md)
+- <span class="rec-id">AD-0012</span> [Composition as a maintainer step with committed output and a drift test](AD-0012-composition-committed.md)
+- <span class="rec-id">AD-0013</span> [Telemetry disabled by environment baked into the image](AD-0013-telemetry-off.md)
 
 ## The analysis
 
-- [AD-0006 An idealised capacity model](AD-0006-idealised-capacity-model.md)
-- [AD-0007 Rollup as maximum flow with the source-side minimum cut](AD-0007-rollup-as-maximum-flow.md)
-- [AD-0008 Quantity, comparison and limit read from the constraint](AD-0008-quantity-from-constraint.md)
-- [AD-0009 Connection direction from the order of the ends](AD-0009-connection-direction.md)
-- [AD-0024 Verdict reasons built from the capacity service templates](AD-0024-reason-templates.md)
+- <span class="rec-id">AD-0006</span> [An idealised capacity model](AD-0006-idealised-capacity-model.md)
+- <span class="rec-id">AD-0007</span> [Rollup as maximum flow with the source-side minimum cut](AD-0007-rollup-as-maximum-flow.md)
+- <span class="rec-id">AD-0008</span> [Quantity, comparison and limit read from the constraint](AD-0008-quantity-from-constraint.md)
+- <span class="rec-id">AD-0009</span> [Connection direction from the order of the ends](AD-0009-connection-direction.md)
+- <span class="rec-id">AD-0024</span> [Verdict reasons built from the capacity service templates](AD-0024-reason-templates.md)
 
 ## The adapter
 
-- [AD-0003 The adapter reads files rather than fronting a repository](AD-0003-adapter-reads-files.md)
-- [AD-0004 Editing through the projection as scaffolding](AD-0004-editing-as-scaffolding.md)
-- [AD-0005 A curated generic projection rather than generated metamodel types](AD-0005-curated-generic-projection.md)
-- [AD-0015 A hand-written strict subset parser](AD-0015-hand-written-subset-parser.md)
-- [AD-0018 Short names as entity keys with the qualified name as fallback](AD-0018-short-names-as-keys.md)
-- [AD-0019 SysML 2.0 formal as the target, validated with the pilot and OpenSysML](AD-0019-sysml-2-0-target.md)
+- <span class="rec-id">AD-0003</span> [The adapter reads files rather than fronting a repository](AD-0003-adapter-reads-files.md)
+- <span class="rec-id">AD-0004</span> [Editing through the projection as scaffolding](AD-0004-editing-as-scaffolding.md)
+- <span class="rec-id">AD-0005</span> [A curated generic projection rather than generated metamodel types](AD-0005-curated-generic-projection.md)
+- <span class="rec-id">AD-0015</span> [A hand-written strict subset parser](AD-0015-hand-written-subset-parser.md)
+- <span class="rec-id">AD-0018</span> [Short names as entity keys with the qualified name as fallback](AD-0018-short-names-as-keys.md)
+- <span class="rec-id">AD-0019</span> [SysML 2.0 formal as the target, validated with the pilot and OpenSysML](AD-0019-sysml-2-0-target.md)
 
 ## The apps
 
-- [AD-0014 Subscriptions as version events with client refetch](AD-0014-version-events.md)
-- [AD-0017 Vanilla web apps with one vendored file](AD-0017-vanilla-web-apps.md)
-- [AD-0025 The document owns its structure and nothing else](AD-0025-document-owns-its-structure.md)
-- [AD-0026 The viewer shows the model's text beside a sketch of its wiring](AD-0026-viewer-shows-text-and-wiring.md)
+- <span class="rec-id">AD-0014</span> [Subscriptions as version events with client refetch](AD-0014-version-events.md)
+- <span class="rec-id">AD-0017</span> [Vanilla web apps with one vendored file](AD-0017-vanilla-web-apps.md)
+- <span class="rec-id">AD-0025</span> [The document owns its structure and nothing else](AD-0025-document-owns-its-structure.md)
+- <span class="rec-id">AD-0026</span> [The viewer shows the model's text beside a sketch of its wiring](AD-0026-viewer-shows-text-and-wiring.md)
 
 ## The repository
 
-- [AD-0016 Generated code exempt from the empty-interface rule](AD-0016-generated-code-exempt.md)
-- [AD-0020 The image published by a tag-triggered workflow to GHCR](AD-0020-publish-on-tags.md)
-- [AD-0021 The Markdown architecture description as the record, A3 sheets as the overview](AD-0021-architecture-record.md)
-- [AD-0022 Track internal/assert and internal/tabletest](AD-0022-track-internal-helpers.md)
-- [AD-0023 The light requirements scheme](AD-0023-light-requirements-scheme.md)
+- <span class="rec-id">AD-0016</span> [Generated code exempt from the empty-interface rule](AD-0016-generated-code-exempt.md)
+- <span class="rec-id">AD-0020</span> [The image published by a tag-triggered workflow to GHCR](AD-0020-publish-on-tags.md)
+- <span class="rec-id">AD-0021</span> [The Markdown architecture description as the record, A3 sheets as the overview](AD-0021-architecture-record.md)
+- <span class="rec-id">AD-0022</span> [Track internal/assert and internal/tabletest](AD-0022-track-internal-helpers.md)
+- <span class="rec-id">AD-0023</span> [The light requirements scheme](AD-0023-light-requirements-scheme.md)
 
 AD-0026 is due for amendment when the apps ship, because the editable numbers
 moved to a panel above the text.
