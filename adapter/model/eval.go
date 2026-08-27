@@ -14,18 +14,21 @@ type quantity struct {
 }
 
 // eval evaluates the value bound by a, in the scope of the part or requirement
-// that owns it, with a guard against cycles. Results are memoised per binding.
+// that owns it, with a guard against cycles. Results are memoised per binding
+// and scope, so a definition's expression is evaluated once for each usage
+// whose own values it reads.
 func (b *builder) eval(part *partNode, req *reqNode, a *syntax.AttributeUsage) quantity {
-	if q, ok := b.values[a]; ok {
+	k := binding{a, part, req}
+	if q, ok := b.values[k]; ok {
 		return q
 	}
-	if b.busy[a] {
+	if b.busy[k] {
 		b.fail(exprSpan(a.Value), fmt.Sprintf("cyclic binding of %q", a.Name))
 	}
-	b.busy[a] = true
+	b.busy[k] = true
 	q := b.expr(part, req, a.Value)
-	delete(b.busy, a)
-	b.values[a] = q
+	delete(b.busy, k)
+	b.values[k] = q
 	return q
 }
 

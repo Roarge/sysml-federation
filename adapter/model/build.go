@@ -39,6 +39,15 @@ type vcNode struct {
 	out *VerificationCase
 }
 
+// binding names one evaluation: the syntax that binds a value, and the part
+// or requirement whose attributes its names resolve against. A definition's
+// binding is shared by every usage, so the scope is part of the key.
+type binding struct {
+	bind *syntax.AttributeUsage
+	part *partNode
+	req  *reqNode
+}
+
 type builder struct {
 	f         *syntax.File
 	m         *Model
@@ -53,8 +62,8 @@ type builder struct {
 	reqs      []*reqNode
 	reqByName map[string]*reqNode
 	vcs       []*vcNode
-	values    map[*syntax.AttributeUsage]quantity
-	busy      map[*syntax.AttributeUsage]bool
+	values    map[binding]quantity
+	busy      map[binding]bool
 }
 
 // fail refuses the model at a span. Callers format the message themselves,
@@ -70,7 +79,7 @@ func build(f *syntax.File) *Model {
 		partDefs: map[string]*syntax.PartDef{}, portDefs: map[string]*syntax.PortDef{},
 		reqDefs: map[string]*syntax.RequirementDef{}, vcDefs: map[string]*syntax.VerificationDef{},
 		ids: map[string]bool{}, byName: map[string]*partNode{}, reqByName: map[string]*reqNode{},
-		values: map[*syntax.AttributeUsage]quantity{}, busy: map[*syntax.AttributeUsage]bool{}}
+		values: map[binding]quantity{}, busy: map[binding]bool{}}
 	pkg := &f.Package
 	for i := range pkg.PartDefs {
 		b.partDefs[pkg.PartDefs[i].Name] = &pkg.PartDefs[i]

@@ -67,6 +67,38 @@ func TestSR23_RedefinitionWithoutAValue(t *testing.T) {
 	assert.True(t, unbound.Value == nil, "an attribute no declaration binds reports no value")
 }
 
+// findAttribute returns the projected attribute called name on p, failing the
+// test when the part declares no attribute of that name.
+func findAttribute(t *testing.T, p *model.Part, name string) model.Attribute {
+	t.Helper()
+	for _, a := range p.Attributes {
+		if a.Name == name {
+			return a
+		}
+	}
+	t.Fatalf("part %q declares no attribute %q", p.ID, name)
+	return model.Attribute{}
+}
+
+func TestSR23_ADefinitionsExpressionUsesEachUsagesOwnValues(t *testing.T) {
+	m := parse(t, "package P { part def D { attribute base : Real; attribute scaled = base * 2; }\n"+
+		"  part <'u1'> u1 : D { attribute :>> base = 10; }\n"+
+		"  part <'u2'> u2 : D { attribute :>> base = 100; } }")
+	for _, want := range []struct {
+		id     string
+		scaled float64
+	}{{"u1", 20}, {"u2", 200}} {
+		p, ok := m.Part(want.id)
+		assert.True(t, ok, "part "+want.id)
+		got := findAttribute(t, p, "scaled")
+		if got.Value == nil {
+			t.Fatalf("%s.scaled has no value", want.id)
+		}
+		assert.Equal(t, *got.Value, want.scaled)
+		assert.Equal(t, got.Expression, "base * 2")
+	}
+}
+
 func TestEvalRefusals(t *testing.T) {
 	const head = "package P { part def D { attribute a : Real; attribute b : Real; }\n"
 	tabletest.Run(t, []tabletest.Case[string, refusal]{
