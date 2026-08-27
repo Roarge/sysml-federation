@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-The goal of this project is to make SysML v2 models easier to integrate with the domain models of the organisation's other tools. The proposal is to adopt federation. The model's owners publish a small projection of it, and other services attach their own data to its objects by agreeing on an identifier.
+The goal of this project is to make SysML v2 models easier to integrate with the domain models of the organisation's other tools. The proposal is to adopt federation. The model's owners publish a small projection of it (SysML Views and Viewpoints), and other services attach their own data to its objects by agreeing on an identifier.
 
 So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with one worked example. Next is a larger example and an adapter driven by SysML v2's own views and viewpoints.
 
