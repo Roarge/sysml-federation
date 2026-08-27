@@ -125,9 +125,10 @@ func TestSR32_NoStore(t *testing.T) {
 }
 
 // selfImport is where this service keeps its pure code in this repository. A
-// file that reads flow.Names has to name that path, which is an address rather
-// than a word the service speaks, so the scan below takes it out first. Every
-// other occurrence still counts, in the import block as much as anywhere else.
+// file that reads flow.Names has to import that path, which is an address
+// rather than a word the service speaks, so the scan below removes the import
+// line and nothing besides. The same path in a string constant or in a comment
+// still counts.
 const selfImport = "github.com/Roarge/sysml-federation/examples/pipeline/capacity/flow"
 
 // TestSR31_NoExampleWordsInTheService: the hand-written sources of the
@@ -135,6 +136,7 @@ const selfImport = "github.com/Roarge/sysml-federation/examples/pipeline/capacit
 // flow.Names, never as literals, and no other word of the example.
 func TestSR31_NoExampleWordsInTheService(t *testing.T) {
 	words := []string{"PIPE", "pipeline", "ingest", "indexA", "indexB", "throughput", "Server", "latency"}
+	checked := 0
 	for _, dir := range []string{".", "flow"} {
 		listing, err := os.ReadDir(dir)
 		for _, e := range assert.Must(t, listing, err) {
@@ -147,7 +149,8 @@ func TestSR31_NoExampleWordsInTheService(t *testing.T) {
 			if bytes.HasPrefix(data, []byte("// Code generated")) {
 				continue
 			}
-			data = bytes.ReplaceAll(data, []byte(selfImport), nil)
+			checked++
+			data = bytes.ReplaceAll(data, []byte("\t\""+selfImport+"\"\n"), nil)
 			for _, w := range words {
 				if bytes.Contains(data, []byte(w)) {
 					t.Errorf("%s/%s mentions %q", dir, name, w)
@@ -155,6 +158,9 @@ func TestSR31_NoExampleWordsInTheService(t *testing.T) {
 			}
 		}
 	}
+	// The six hand-written sources are the floor. A listing that yields fewer
+	// is reading the wrong place and would pass for the wrong reason.
+	assert.True(t, checked >= 6, "at least six hand-written service files were scanned")
 }
 
 func TestHealth(t *testing.T) {

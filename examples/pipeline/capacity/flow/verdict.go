@@ -27,22 +27,16 @@ const (
 )
 
 // Verdict applies the precedence of the capacity model: another quantity is
-// INCONCLUSIVE before anything is looked at, then a limit or a comparison the
-// wire did not carry, then ERROR for a bad child, then the remaining
-// INCONCLUSIVE cases, then PASS or FAIL. Every reason is one of the model's
-// templates.
+// INCONCLUSIVE before anything is looked at, then ERROR for a child whose value
+// is missing or negative, then the remaining INCONCLUSIVE cases, among them a
+// limit or a comparison the wire did not carry, then PASS or FAIL. Every reason
+// is one of the model's templates.
 func Verdict(names Names, quantity, comparison string, limit *float64, subject Subject, verificationCase string) (kind, reason string) {
 	if quantity != names.Quantity {
 		if verificationCase != "" {
 			return KindInconclusive, verificationCase + " is declared and no service runs it"
 		}
 		return KindInconclusive, "no service computes " + quantity
-	}
-	if limit == nil {
-		return KindInconclusive, "no limit to compare against"
-	}
-	if comparison == "" {
-		return KindInconclusive, "no comparison to apply"
 	}
 	if len(subject.Children) > 0 {
 		res, err := Rollup(subject.Children, subject.Edges)
@@ -54,6 +48,10 @@ func Verdict(names Names, quantity, comparison string, limit *float64, subject S
 			return KindInconclusive, "no entry part"
 		case errors.Is(err, ErrNoExit):
 			return KindInconclusive, "no exit part"
+		case limit == nil:
+			return KindInconclusive, "no limit to compare against"
+		case comparison == "":
+			return KindInconclusive, "no comparison to apply"
 		}
 		reason := names.Quantity + " " + num(res.Capacity) + " against " + num(*limit)
 		if cut := cutNames(subject.Children, res.Cut); len(cut) > 0 {
@@ -71,6 +69,12 @@ func Verdict(names Names, quantity, comparison string, limit *float64, subject S
 	}
 	if *subject.Attribute < 0 {
 		return KindError, subject.Name + " has negative " + names.Attribute
+	}
+	if limit == nil {
+		return KindInconclusive, "no limit to compare against"
+	}
+	if comparison == "" {
+		return KindInconclusive, "no comparison to apply"
 	}
 	return judge(*subject.Attribute, comparison, *limit), names.Attribute + " " + num(*subject.Attribute) + " against " + num(*limit)
 }
