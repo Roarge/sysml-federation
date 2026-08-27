@@ -81,8 +81,8 @@ type Requirement struct {
 	Derives             []string // requirement IDs
 	SatisfiedBy         []string // part IDs
 	VerifiedBy          []string // verification case IDs
-	//nolint:unused // the limit's span is read by SetLimit, Task 1.10.
-	limitSpan syntax.Span
+
+	limitSpan syntax.Span // the limit literal's span when LimitEditable
 }
 
 // VerificationCase is one verification usage.
