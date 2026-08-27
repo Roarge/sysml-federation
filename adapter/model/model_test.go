@@ -139,6 +139,12 @@ func TestBuildRefusals(t *testing.T) {
 			Want: refusal{1, 43, `part "x" is declared twice`}},
 		{Name: "duplicate requirement name", In: head + "  requirement <'q'> r : R { subject :>> s = a; attribute :>> l = 1; } }",
 			Want: refusal{3, 3, `requirement "r" is declared twice`}},
+		{Name: "attribute declared twice in one body", In: "package P { part def S { attribute x : Real; attribute x : Real; } part a : S; }",
+			Want: refusal{1, 46, `attribute "x" is declared twice`}},
+		{Name: "attribute redeclared by a subtype", In: "package P { part def B { attribute x : Real; } part def S :> B { attribute x : Real; } part a : S; }",
+			Want: refusal{1, 66, `attribute "x" is declared twice`}},
+		{Name: "port declared twice", In: "package P { port def Q; part def S { port p : Q; port p : Q; } part a : S; }",
+			Want: refusal{1, 50, `port "p" is declared twice`}},
 	}, refuse)
 }
 

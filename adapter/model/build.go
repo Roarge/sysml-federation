@@ -164,11 +164,11 @@ func (b *builder) part(u *syntax.PartUsage, parent *partNode, owner string) *par
 	// Ports: from the definitions, base first, then the usage's own.
 	for i := len(n.defs) - 1; i >= 0; i-- {
 		for _, p := range n.defs[i].Ports {
-			n.out.Ports = append(n.out.Ports, Port{Name: p.Name, Direction: b.portDirection(p)})
+			b.port(n, p)
 		}
 	}
 	for _, p := range u.Ports {
-		n.out.Ports = append(n.out.Ports, Port{Name: p.Name, Direction: b.portDirection(p)})
+		b.port(n, p)
 	}
 	b.parts = append(b.parts, n)
 	b.m.Parts = append(b.m.Parts, n.out)
@@ -195,11 +195,26 @@ func (b *builder) slot(slots *[]attrSlot, a *syntax.AttributeUsage, owner string
 		}
 		b.fail(a.Span, fmt.Sprintf("redefined attribute %q is not declared by %q", a.Name, owner))
 	}
+	if findSlot(*slots, a.Name) != nil {
+		b.fail(a.Span, fmt.Sprintf("attribute %q is declared twice", a.Name))
+	}
 	s := attrSlot{name: a.Name}
 	if a.Value != nil {
 		s.bind = a
 	}
 	*slots = append(*slots, s)
+}
+
+// port projects one port of a part, refusing a name a declaration already used.
+// Two ports of one name would give the part two entries the wiring cannot tell
+// apart.
+func (b *builder) port(n *partNode, p syntax.PortUsage) {
+	for _, existing := range n.out.Ports {
+		if existing.Name == p.Name {
+			b.fail(p.Span, fmt.Sprintf("port %q is declared twice", p.Name))
+		}
+	}
+	n.out.Ports = append(n.out.Ports, Port{Name: p.Name, Direction: b.portDirection(p)})
 }
 
 // portDirection derives a port's direction from its definition's items.
