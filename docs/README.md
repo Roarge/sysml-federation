@@ -4,10 +4,6 @@
 
 An adapter publishes a SysML v2 model as a federated service, and a worked example joins it to a throughput analysis and a requirements document that know nothing about SysML. In the example, a query pipeline of five servers rolls its capacity up from their throughputs, and a requirement passes or fails as the numbers change. These articles describe the design from the problem through to the version being built, and they are written to be read by someone deciding whether the approach fits their organisation.
 
-## The articles
-
-Read in order, or start with the overview and come back.
-
 1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
    The integration problem MBSE never solved, what SysML v2 changes, and the claim this repository makes.
 2. [The architecture in one sitting](articles/01-the-architecture-in-one-sitting.md)  
