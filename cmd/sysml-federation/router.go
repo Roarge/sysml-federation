@@ -47,8 +47,17 @@ func routerFromEnv(stdout, stderr io.Writer) routerConfig {
 
 // routerEnv is the child's whole environment (AD-0010, SR-03): the listen
 // address, the static configuration, the playground path, the four
-// variables that keep the router off the network, and LOG_LEVEL when set.
-// Nothing of the supervisor's environment is inherited.
+// variables that keep the router off the network, the error propagation
+// mode, the Prometheus switch, and LOG_LEVEL when set. Nothing of the
+// supervisor's environment is inherited.
+//
+// pass-through puts a subgraph's own message at the top of the errors
+// array, where a client reads it, rather than nesting it under the
+// router's "Failed to fetch from Subgraph" text (SR-24, SR-25). A
+// transport failure reads the same in either mode, so nothing about the
+// inside of the container is disclosed. PROMETHEUS_ENABLED=false closes
+// the scrape endpoint the router opens on 127.0.0.1:8088 by default and
+// which nothing here reads.
 func routerEnv(listen, config, logLevel string) []string {
 	env := []string{
 		"LISTEN_ADDR=" + listen,
@@ -58,6 +67,8 @@ func routerEnv(listen, config, logLevel string) []string {
 		"COSMO_TELEMETRY_DISABLED=true",
 		"TRACING_ENABLED=false",
 		"METRICS_OTLP_ENABLED=false",
+		"SUBGRAPH_ERROR_PROPAGATION_MODE=pass-through",
+		"PROMETHEUS_ENABLED=false",
 	}
 	if logLevel != "" {
 		env = append(env, "LOG_LEVEL="+logLevel)

@@ -82,12 +82,15 @@ the pinned image `ghcr.io/wundergraph/cosmo/router:0.343.1`, image id
 composed configuration came from `wgc@0.130.1`, which printed no warning of any
 kind when it composed it.
 
-The router started from its seven environment variables with no configuration
+The router started from its nine environment variables with no configuration
 file beside the composed one, and named no host outside loopback in its log. It
-bound `127.0.0.1:3002` for the graph and `127.0.0.1:8088` for its Prometheus
-listener, both confirmed with `ss` against the running process. The three
-subgraphs bound `127.0.0.1:3011`, `:3012` and `:3013`. Only the user interface
-port, 8080, was bound on a wildcard address.
+bound `127.0.0.1:3002` for the graph and nothing else. Left to its defaults it
+also opens a Prometheus scrape endpoint on `127.0.0.1:8088`, which nothing here
+reads, and `PROMETHEUS_ENABLED=false` closes it. With the variable set, the log
+line announcing the endpoint is absent and `ss` finds no listener on that port.
+Without it, both come back. The three subgraphs bound `127.0.0.1:3011`, `:3012` and
+`:3013`. Only the user interface port, 8080, was bound on a wildcard address,
+so the running tree has five listeners.
 
 | Date | Requirement | What was run | What was observed |
 |---|---|---|---|
@@ -96,8 +99,8 @@ port, 8080, was bound on a wildcard address.
 | 2026-08-27 | SR-26 | A subscription on `subscription { modelChanged }` over server-sent events, then `setAttribute(partId: "PIPE-S2", name: "throughput", value: 1700)` | `:heartbeat` while idle, then `event: next` with `data: {"data":{"modelChanged":2}}` within a second of the mutation. A second edit gave `data: {"data":{"modelChanged":3}}`, and the verdict moved to `PASS` with reason `capacity 1600 against 1500, limited by indexA, indexB` |
 | 2026-08-27 | SR-36 | `{ model { version } }`, then `moveNode`, `excludeRequirement` and `insertHeading` through the router, then `{ model { version } }` again | The document version rose 2, 3, 4, 5 while the model version read 4 before and 4 after. As a control, one model edit then moved the model version from 4 to 5 and left the document version at 5, so the reading is capable of changing |
 | 2026-08-27 | SR-44 | `mutation { resetModel { version } resetDocument { version } }` | A further `modelChanged` event, and the shipped verdict again: `FAIL`, `capacity 1200 against 1500, limited by parse`, document number `1`. A restart of the whole stack gave model version `1`, document version `1` and the same verdict |
-| 2026-08-27 | SR-24 | `mutation { setLimit(requirementId: "PIPE-R1.3", value: 900) { id } }` | An `errors` array whose top-level message reads `Failed to fetch from Subgraph 'model'.`, with the refusal itself at `errors[0].extensions.errors[0].message`: `the value is not a literal in the source: limit of requirement "PIPE-R1.3"`. No change to the model version and no event on the subscription |
-| 2026-08-27 | SR-25 | `mutation { setAttribute(partId: "PIPE-S1", name: "throughput", value: -5) { id } }` | The same shape, top-level message `Failed to fetch from Subgraph 'model'.` and the refusal at `errors[0].extensions.errors[0].message`: `the value must be a finite, non-negative number: got -5`. No change to the model version and no event on the subscription |
+| 2026-08-27 | SR-24 | `mutation { setLimit(requirementId: "PIPE-R1.3", value: 900) { id } }` | `{"errors":[{"message":"the value is not a literal in the source: limit of requirement \"PIPE-R1.3\"","path":["setLimit"],"extensions":{"code":"DOWNSTREAM_SERVICE_ERROR","serviceName":"model"}}],"data":null}`, so the refusal is the whole of `errors[0].message`. No change to the model version and no event on the subscription |
+| 2026-08-27 | SR-25 | `mutation { setAttribute(partId: "PIPE-S1", name: "throughput", value: -5) { id } }` | `{"errors":[{"message":"the value must be a finite, non-negative number: got -5","path":["setAttribute"],"extensions":{"code":"DOWNSTREAM_SERVICE_ERROR","serviceName":"model"}}],"data":null}`, the same shape. No change to the model version and no event on the subscription |
 | 2026-08-27 | SR-09 | `SIGTERM` to the supervisor while a subscription was held open | `stopping`, the router's own shutdown lines, exit status 0 after 2.00 seconds, an empty `ss` table on all five ports and no router process left. The held subscription was cut rather than waited on |
 | 2026-08-27 | SR-41 | An import sweep over `adapter`, `examples/pipeline/capacity` and `examples/pipeline/document`, test files excluded | Each package imports only its own subpackages: `capacity` to `capacity/flow`, `document` to `document/tree`, `serve` to `projection`, `projection` to `model` and `model` to `syntax`. No service imports another |
 
@@ -106,23 +109,29 @@ configuration is loaded, whether or not the subgraphs are reachable, so a
 readiness probe against it proves that the router process is listening with its
 configuration loaded and proves nothing about the graph answering.
 
-A refusal from a service reaches the client wrapped. The router puts its own
-`Failed to fetch from Subgraph 'model'.` at the top of the `errors` array and
-nests the service's message one level down, under
-`errors[0].extensions.errors[0]`, with `code` set to `DOWNSTREAM_SERVICE_ERROR`.
-The reason an edit was refused is therefore present but not where a reader of
-the top-level message would look for it.
+A refusal from a service reaches the client unwrapped, because the router is
+configured with `SUBGRAPH_ERROR_PROPAGATION_MODE=pass-through` to pass a
+subgraph's own error through. The service's message is `errors[0].message`, the
+field it names is at `errors[0].path`, and `errors[0].extensions` carries `code`
+as `DOWNSTREAM_SERVICE_ERROR` and the name of the service that refused. Left to
+its default the router puts `Failed to fetch from Subgraph 'model'.` at the top
+instead and nests the service's message under `errors[0].extensions.errors[0]`,
+two levels below where a client reads a message. Passing the error through
+changes nothing about a subgraph that cannot be reached at all. Pointed at a
+dead port the router answers `{"errors":[{"message":"Failed to fetch from
+Subgraph 'model'."}],"data":null}` in either mode, so no address, port or
+internal error text is disclosed.
 
 Two of the three services serve subscriptions and so register a WebSocket
 transport, the model service and the document service. The capacity service
 registers only `POST` and has no WebSocket transport to check. Both of the two
-keep the library's same-origin check, and the model service is the one that was
-probed. The handshake the router sends it was captured on the wire and carries
-no `Origin` header, so the check never fires on the router's own connection, and
-the service answered `101 Switching Protocols`. The check is live all the same:
-the same handshake sent by hand with `Origin: http://evil.example` was refused
-with `403 Forbidden` and `request Origin "evil.example" is not authorized for
-Host "127.0.0.1:3011"`.
+keep the library's same-origin check, and both were probed. The handshake the
+router sends carries no `Origin` header, on either service, so the check never
+fires on the router's own connection and both answered `101 Switching
+Protocols`. The check is live all the same: the same handshake sent by hand with
+`Origin: http://evil.example` was refused with `403 Forbidden` and `request
+Origin "evil.example" is not authorized for Host "127.0.0.1:3011"`, and the
+document service refused it the same way naming its own port.
 
 ## Limits
 

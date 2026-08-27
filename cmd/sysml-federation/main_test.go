@@ -279,12 +279,13 @@ func TestServeRefusesAModelItCannotRead(t *testing.T) {
 }
 
 // TestSR03_RouterEnvironmentDisablesTelemetry: the child's environment is
-// the seven variables of AD-0010 and nothing inherited.
+// the nine variables of AD-0010 and nothing inherited.
 func TestSR03_RouterEnvironmentDisablesTelemetry(t *testing.T) {
 	env := routerEnv("127.0.0.1:3002", "/app/config.json", "")
 	assert.SliceEqual(t, env, []string{
 		"LISTEN_ADDR=127.0.0.1:3002", "EXECUTION_CONFIG_FILE_PATH=/app/config.json", "PLAYGROUND_PATH=/playground",
 		"DO_NOT_TRACK=1", "COSMO_TELEMETRY_DISABLED=true", "TRACING_ENABLED=false", "METRICS_OTLP_ENABLED=false",
+		"SUBGRAPH_ERROR_PROPAGATION_MODE=pass-through", "PROMETHEUS_ENABLED=false",
 	})
 	assert.Contains(t, routerEnv("127.0.0.1:3002", "/app/config.json", "debug"), "LOG_LEVEL=debug")
 	cfg := routerConfig{Binary: "/router", Config: "/app/config.json", Stdout: io.Discard, Stderr: io.Discard}
