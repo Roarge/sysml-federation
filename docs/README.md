@@ -2,15 +2,9 @@
 
 *Roar Georgsen, 27 August 2026*
 
-The goal is to make a SysML v2 model usable by software that knows nothing about SysML, without anyone taking a copy of it.
+The goal is to make a SysML v2 model easy to integrate, so that other tools can use what is in it without exporting a copy and without learning SysML. The proposal is federation. The model's owners publish a small projection of it, and other services attach their own data to its objects by agreeing on an identifier.
 
-The problem is that engineering organisations describe one system in several places at once. A requirements file, an interface sheet, a power budget in a spreadsheet, a hazard analysis another team owns. Model based systems engineering was meant to replace those with a single model that everything else reads from, and it has not, largely because models sit inside tools that make getting data out awkward. SysML v2 improves that. It has a textual notation that lives in Git and a standard API. What the API hands back is the metamodel, so any tool that wants to read a requirement has to learn SysML first, and an organisation with fewer than 25 engineers has nobody to do that work.
-
-The proposed solution is federation. The people who own the model publish a small projection of it, plainly typed, and other services attach their own data to the model's objects by agreeing on an identifier. No service imports or calls another. A build step merges the schemas and fails if they contradict each other, so the contract is checked before anything is deployed.
-
-The project is at proof of concept stage and is being built now. It is a SysML v2 adapter that serves a projection as a subgraph, a WunderGraph Cosmo router in front of it, and one worked example, a query pipeline of five servers whose capacity is rolled up by a second service and reported by a requirements document held by a third. Neither of those two has parsed a model file.
-
-What comes next is a larger example and an adapter that covers more of the language. The likely route is SysML v2's own views and viewpoints, so that a systems engineer decides what to federate by writing a view in the model rather than by configuring the adapter.
+So far this is a proof of concept, a SysML v2 adapter behind a WunderGraph Cosmo router with one worked example. Next is a larger example and an adapter driven by SysML v2's own views and viewpoints.
 
 1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
    The integration problem MBSE never solved, what SysML v2 changes, and the claim this repository makes.
