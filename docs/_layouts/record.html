@@ -1,0 +1,34 @@
+---
+layout: default
+---
+{%- assign records = site.pages | where_exp: "p", "p.path contains 'decisions/AD-'" | sort: "path" %}
+{%- assign total = records | size %}
+{%- assign last = total | minus: 1 %}
+{%- assign idx = -1 %}
+{%- for record in records %}{% if record.path == page.path %}{% assign idx = forloop.index0 %}{% endif %}{% endfor %}
+<article class="prose">
+  {%- if idx >= 0 %}
+  <p class="eyebrow">Decision record</p>
+  {%- else %}
+  <p class="eyebrow">Decision records</p>
+  {%- endif %}
+  <h1>{{ page.title }}</h1>
+  {{ content }}
+  {%- if idx >= 0 %}
+  <nav class="pager" aria-label="Decision record navigation">
+    <ul>
+      {%- if idx > 0 %}
+      {%- assign previous_index = idx | minus: 1 %}
+      {%- assign previous = records[previous_index] %}
+      <li class="pager-previous"><span>Previous</span> <a href="{{ previous.url | relative_url }}">{{ previous.title }}</a></li>
+      {%- endif %}
+      <li class="pager-index"><span>Index</span> <a href="{{ '/decisions/' | relative_url }}">All decision records</a></li>
+      {%- if idx < last %}
+      {%- assign next_index = idx | plus: 1 %}
+      {%- assign next = records[next_index] %}
+      <li class="pager-next"><span>Next</span> <a href="{{ next.url | relative_url }}">{{ next.title }}</a></li>
+      {%- endif %}
+    </ul>
+  </nav>
+  {%- endif %}
+</article>

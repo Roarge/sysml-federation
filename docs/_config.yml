@@ -1,0 +1,46 @@
+title: Federating a systems model
+description: An adapter that publishes a SysML v2 model as a federated service, and the record of how it was designed
+url: https://roarge.github.io
+baseurl: /sysml-federation
+repository: Roarge/sysml-federation
+lang: en-GB
+author: Roar Georgsen
+github_url: https://github.com/Roarge/sysml-federation
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter: rouge
+
+titles_from_headings:
+  enabled: true
+  strip_title: true
+relative_links:
+  enabled: true
+  collections: false
+readme_index:
+  with_frontmatter: true
+
+defaults:
+  - scope: { path: "" }
+    values: { layout: default }
+  - scope: { path: "README.md" }
+    values: { layout: home }
+  - scope: { path: "articles" }
+    values: { layout: article }
+  - scope: { path: "decisions" }
+    values: { layout: record }
+
+series:
+  - { path: articles/00-why-federate-a-systems-model.md, title: "Why federate a systems model", date: 2026-08-27 }
+  - { path: articles/01-the-architecture-in-one-sitting.md, title: "The architecture in one sitting", date: 2026-08-27 }
+  - { path: articles/02-how-the-design-was-run.md, title: "How the design was run", date: 2026-08-27 }
+  - { path: articles/03-what-the-research-overturned.md, title: "What the research overturned", date: 2026-08-27 }
+  - { path: articles/04-twelve-use-cases-and-one-moving-bottleneck.md, title: "Twelve use cases and one moving bottleneck", date: 2026-08-27 }
+  - { path: articles/05-from-use-cases-to-requirements.md, title: "From use cases to requirements", date: 2026-08-27 }
+  - { path: articles/06-five-views-and-twenty-six-decisions.md, title: "Five views and twenty-six decisions", date: 2026-08-27 }
+  - { path: articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md, title: "An A3 sheet for a fifteen-minute reader", date: 2026-08-27 }
+  - { path: articles/08-planning-the-build.md, title: "Planning the build", date: 2026-08-27 }
+  - { path: articles/09-five-spikes-before-the-first-line.md, title: "Five spikes before the first line", date: 2026-08-27 }
+  - { path: articles/10-the-demo-being-built.md, title: "The demo being built", date: 2026-08-27 }

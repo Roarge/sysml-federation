@@ -1,0 +1,381 @@
+/* Stage 1 placeholder stylesheet. The tokens are the project's own; the
+   typography, spacing and the series-nav treatment are replaced from the
+   design canvas in Stage 2. */
+
+:root {
+  --paper: oklch(98% 0.005 90);
+  --ink: oklch(25% 0.01 260);
+  --pencil: oklch(58% 0.01 260);
+  --shade: oklch(93% 0.006 90);
+  --blue: oklch(52% 0.12 250);
+  --red: oklch(55% 0.19 25);
+
+  --body: "Source Sans 3", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --measure: 72ch;
+  --gutter: 1.5rem;
+  --rule: 1px solid var(--shade);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+a {
+  color: var(--blue);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+a:hover {
+  color: var(--red);
+}
+
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+}
+
+.skip-link:focus {
+  left: 0;
+  z-index: 10;
+  padding: 0.5rem 0.75rem;
+  background: var(--paper);
+  border: var(--rule);
+}
+
+/* Header */
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem var(--gutter);
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: 1rem var(--gutter);
+  border-bottom: var(--rule);
+}
+
+.site-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu > summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.menu > summary::after {
+  content: " \25BE";
+}
+
+.menu[open] > summary::after {
+  content: " \25B4";
+}
+
+.menu[open] > .site-nav {
+  padding-top: 0.5rem;
+}
+
+.menu[open] > .site-nav ul {
+  flex-direction: column;
+}
+
+/* Above 720 px the disclosure is not a menu: the navigation is always
+   visible and the summary is removed. */
+@media (min-width: 720px) {
+  .menu > summary {
+    display: none;
+  }
+
+  .menu::details-content {
+    content-visibility: visible;
+    block-size: auto;
+  }
+
+  .menu[open] > .site-nav ul {
+    flex-direction: row;
+  }
+
+  .menu[open] > .site-nav {
+    padding-top: 0;
+  }
+
+  /* Where ::details-content is not understood the closed disclosure cannot
+     be forced open, so keep the summary as the way in. */
+  @supports not selector(::details-content) {
+    .menu > summary {
+      display: block;
+    }
+  }
+}
+
+/* Main */
+
+main {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: 2rem var(--gutter) 3rem;
+}
+
+.with-sidebar {
+  display: grid;
+  gap: 2.5rem var(--gutter);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 960px) {
+  .with-sidebar {
+    grid-template-columns: minmax(0, 1fr) 18rem;
+    align-items: start;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 2rem;
+  }
+}
+
+.prose {
+  max-width: var(--measure);
+}
+
+.prose > h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0 0 1rem;
+}
+
+.prose h2 {
+  font-size: 1.375rem;
+  line-height: 1.3;
+  margin: 2.25rem 0 0.75rem;
+}
+
+.prose h3 {
+  font-size: 1.125rem;
+  margin: 1.75rem 0 0.5rem;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin: 0 0 1rem;
+}
+
+.prose li {
+  margin-bottom: 0.35rem;
+}
+
+.prose blockquote {
+  margin: 1.25rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--shade);
+  color: var(--pencil);
+}
+
+.prose hr {
+  height: 1px;
+  margin: 2.5rem 0;
+  border: 0;
+  background: var(--shade);
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pencil);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+figure {
+  margin: 1.5rem 0;
+}
+
+figcaption {
+  font-size: 0.9375rem;
+  color: var(--pencil);
+}
+
+code,
+pre {
+  font-family: var(--mono);
+  font-size: 0.9375em;
+}
+
+code {
+  padding: 0.1em 0.3em;
+  background: var(--shade);
+  border-radius: 3px;
+}
+
+pre {
+  overflow-x: auto;
+  padding: 0.85rem 1rem;
+  background: var(--shade);
+  border-radius: 4px;
+}
+
+pre code {
+  padding: 0;
+  background: none;
+}
+
+table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 1.25rem 0;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.4rem 0.75rem;
+  border: var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--shade);
+}
+
+/* Series navigation and pagers */
+
+.series-nav {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: var(--rule);
+}
+
+.sidebar .series-nav {
+  margin-top: 0;
+  padding: 1rem 1.25rem;
+  border: var(--rule);
+  border-radius: 4px;
+  background: color-mix(in oklch, var(--shade) 45%, var(--paper));
+}
+
+.series-nav-heading {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--pencil);
+}
+
+.series-nav ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.series-nav li {
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+}
+
+.series-nav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pager {
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: var(--rule);
+}
+
+.pager ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pager span {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--pencil);
+}
+
+/* Footer */
+
+.site-footer {
+  max-width: 78rem;
+  margin: 0 auto;
+  padding: 1.25rem var(--gutter) 2.5rem;
+  border-top: var(--rule);
+  font-size: 0.9375rem;
+  color: var(--pencil);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
