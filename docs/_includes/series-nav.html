@@ -1,0 +1,9 @@
+<nav class="series-nav" aria-label="The series">
+  <h2 class="series-nav-heading">The series</h2>
+  <ol>
+    {%- for item in site.series %}
+    {%- assign href = item.path | replace: '.md', '.html' | prepend: '/' %}
+    <li><a href="{{ href | relative_url }}"{% if item.path == page.path %} aria-current="page"{% endif %}>{{ item.title }}</a></li>
+    {%- endfor %}
+  </ol>
+</nav>

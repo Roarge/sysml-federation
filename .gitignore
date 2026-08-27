@@ -75,8 +75,19 @@
 !/examples/*/ui/shared/LICENSE.*
 !/examples/*/*/*.json
 
-# The A3 sheets are exported as PDF beside their SVG.
-!/docs/a3/*.pdf
+# Exports of the design canvases, one PDF per set and one directory level
+# down: the A3 sheets, the architecture views and the use-case boards.
+!/docs/*/*.pdf
+
+# The documentation site. GitHub Pages builds docs/ with Jekyll, which needs
+# its configuration, its layouts, its includes and one stylesheet, each named
+# exactly. Anchored and depth-bounded, so no other HTML, CSS or YAML under
+# docs/ is swept in. The directories themselves are opened by the two docs/
+# lines in the "Source tree" section.
+!/docs/_config.yml
+!/docs/_layouts/*.html
+!/docs/_includes/*.html
+!/docs/assets/*.css
 
 
 # ------------------------------------------------------------- fixtures ---

@@ -8,7 +8,7 @@ Engineering organisations have always described their systems in documents. A re
 
 [Model based systems engineering](https://www.sebokwiki.org/wiki/Model-Based_Systems_Engineering_(MBSE)) replaces the documents with a model. One structured description holding the system's parts, the properties they carry, the requirements they have to meet and the relationships between all of it. Documents become views onto the model rather than the place information lives. The promise is that consistency stops being a review activity. Change a component's power draw and everything downstream can be recomputed, including which requirements now fail and which tests need rerunning.
 
-That promise has been five years from mainstream adoption for about twenty five years. There are several explanations. The least disputed is tooling.
+That promise has been five years from mainstream adoption for about 25 years. There are several explanations. The least disputed is tooling.
 
 Models live inside proprietary environments. They are stored in binary formats, or in a vendor flavour of [XMI](https://en.wikipedia.org/wiki/XML_Metadata_Interchange) that only the vendor round-trips reliably, reachable through an API that is absent or shaped differently in every product. A model that only its author tool can read is a document with extra ceremony, and it gets treated accordingly.
 
@@ -24,7 +24,7 @@ Every one of those copies starts drifting the moment it is made.
 
 The industry has attacked this before. The [service bus](https://en.wikipedia.org/wiki/Enterprise_service_bus) generation put a central integration platform in the middle, with adapters, canonical data models and transformation logic owned by an integration team. [OSLC](https://en.wikipedia.org/wiki/Open_Services_for_Lifecycle_Collaboration) took a linked data approach, identifying resources by URI and describing them with shapes, so tools could reference each other's objects without importing them. Both improved on nothing, and both carried an assumption that turns out to be the binding constraint: someone employed to do integration full time.
 
-Organisations with fewer than twenty five engineers do not have that person. They are where most engineering actually happens, and they are the ones for whom the existing answers are unaffordable. That is the audience this repository is aimed at.
+Organisations with fewer than 25 engineers do not have that person. They are where most engineering actually happens, and they are the ones for whom the existing answers are unaffordable. That is the audience this repository is aimed at.
 
 ## What SysML v2 fixes, and what it leaves open
 
@@ -32,7 +32,7 @@ Organisations with fewer than twenty five engineers do not have that person. The
 
 Semantics defined by a profile are semantics defined by convention. Two tools could apply the same profile differently and both remain valid, so interchange was unreliable even in principle, which is part of why the export habit described above outlasted every attempt to standardise around it.
 
-Version 2 is not a profile. It sits on a foundation of its own called [KerML](https://www.omg.org/spec/KerML/), with semantics defined formally at the base rather than inherited from a place they were never meant to reach, and the [OMG](https://en.wikipedia.org/wiki/Object_Management_Group) approved it for final adoption in July 2025. Cutting the UML dependency is what makes the rest of this possible. It removes two further lock-ins, and they are worth keeping apart because they are usually run together.
+Version 2 is not a profile. It sits on a foundation of its own called [KerML](https://www.omg.org/spec/KerML/), with semantics defined formally at the base rather than inherited from a place they were never meant to reach, and the [OMG](https://en.wikipedia.org/wiki/Object_Management_Group) announced its adoption on 21 July 2025 ([press release](https://www.omg.org/news/releases/pr2025/07-21-25.htm)), with the specification published as formal/26-03-02. Cutting the UML dependency is what makes the rest of this possible. It removes two further lock-ins, and they are worth keeping apart because they are usually run together.
 
 The first is authoring. The language has a textual notation, so a model is a set of text files that live in [Git](https://en.wikipedia.org/wiki/Git), diff in a pull request, and can be written in any editor. Tool choice becomes a preference rather than a commitment. This is the change everyone talks about, and it is genuinely large.
 
@@ -108,7 +108,9 @@ A plain GraphQL server publishes one schema owned by one team. To get the projec
 
 Among the platforms that do this, [Cosmo](https://github.com/wundergraph/cosmo) is chosen here for reasons that are mostly not about GraphQL.
 
-It is [Apache 2.0](https://en.wikipedia.org/wiki/Apache_License), where the main alternative is under a licence the [OSI](https://en.wikipedia.org/wiki/Open_Source_Initiative) does not recognise as open source. For an argument aimed at small organisations, that is not a footnote. Composition runs locally with no connection to any control plane, and the router can be started from a pre-built configuration file with no network dependency at all, which makes the whole stack air-gappable. Defence, rail, energy and medical device work all need that, and those are the industries most likely to be modelling in SysML in the first place.
+It is [Apache 2.0](https://en.wikipedia.org/wiki/Apache_License), where the main alternative is under a licence the [OSI](https://en.wikipedia.org/wiki/Open_Source_Initiative) does not recognise as open source. For an argument aimed at small organisations, that is not a footnote. Composition runs locally with no connection to any control plane, and the router can be started from a pre-built configuration file. As the vendor ships it the router still sends anonymous usage data, so the image bakes in the two variables that disable the usage tracker, `DO_NOT_TRACK=1` and `COSMO_TELEMETRY_DISABLED=true`, alongside `TRACING_ENABLED=false` and `METRICS_OTLP_ENABLED=false` for the tracing and metrics exporters. With those set nothing leaves the container, which makes the whole stack air-gappable. Defence, rail, energy and medical device work all need that, and those are the industries most likely to be modelling in SysML in the first place.
+
+The vendor is candid that the static path is not the one it recommends. The composition page says "it is recommended to not use this for production", and the router logs "Not recommended for Production" when it starts from a file. The demo takes the warning at face value and answers it in its own terms. There is no control plane to fetch from, the composed configuration is committed to the repository, and a test fails when it drifts from the schemas it was built from.
 
 The deeper reason is that Cosmo is itself moving away from GraphQL as the transport. Its subgraphs can now be compiled to [protobuf](https://en.wikipedia.org/wiki/Protocol_Buffers) and served over [gRPC](https://en.wikipedia.org/wiki/GRPC), with GraphQL kept only as the schema language and the edge protocol. That is an admission that the valuable part was never the wire format. It is the composition algebra, the entity key, and the query planner.
 
@@ -118,7 +120,7 @@ Which is the position this project takes as well. I am agnostic about protocols.
 
 The repository is laid out the usual way. A reusable adapter, and examples that use it. Both start as proof of concept and both will keep evolving.
 
-The adapter reads a SysML v2 model and publishes it as a subgraph, with model elements identified so that anything else in the graph can attach to them. Nothing in it is specific to any one example. The goal is coverage of the language, so that any conforming model can be served without the adapter knowing what it is modelling. What exists today is a fraction of that. Requirements, parts, the properties they carry, and the satisfy and derive relationships between them, which is enough to prove the shape works and nowhere near enough for a real model.
+The adapter reads a SysML v2 model and publishes it as a subgraph, with model elements identified so that anything else in the graph can attach to them. Nothing in it is specific to any one example. The goal is coverage of the language, so that any conforming model can be served without the adapter knowing what it is modelling. What exists today is a fraction of that. Parts with the properties, ports and connections they carry, requirements with the satisfy and derive relationships between them, and the verification cases that reference them, which is enough to prove the shape works and nowhere near enough for a real model.
 
 There is an unresolved design question underneath that goal. A projection is valuable because it is small, and the consumer of a requirement should meet five fields rather than the metamodel. Full language coverage pulls the other way, towards generating a few hundred types mechanically from KerML and landing the consumer back in the abstract syntax they were being spared. My current view is that coverage should grow as curated domain projections, one at a time, rather than as a generated whole, and that a generic escape hatch for elements nobody has projected yet is the compromise. I am not certain of that, and it is the part of the design most likely to change.
 
@@ -128,21 +130,25 @@ Pull requests are welcome on both parts. Extending the projection to cover more 
 
 ## The pipeline example
 
-The model is a query processing pipeline built from serial and parallel stages. A serial stage's capacity is the minimum of its children. A parallel stage's is the sum. A global requirement states the query rate the pipeline must sustain, and per-stage requirements are derived from it.
+The model is a query processing pipeline of five servers, wired as stages in series and in parallel. Each server carries a throughput. Where stages follow one another the capacity is the smallest of them, and where a stage is split across parallel servers it is their sum. A global requirement states the query rate the pipeline must sustain, and a requirement for each server is derived from it.
 
-Change one stage's throughput and the requirements document responds at once. The rolled-up capacity moves, the requirement passes or fails, and a failing requirement is marked as failing with the stage responsible named. No export, no regeneration step, no waiting for someone to rerun an analysis and reissue a document.
+Change one server's throughput and the requirements document responds at once. The rolled-up capacity moves, the requirement passes or fails, and a failing requirement is marked as failing with the server responsible named. No export, no regeneration step, no waiting for someone to rerun an analysis and reissue a document.
 
-Three services stand behind that. One serves the model. One computes the rollup and returns a verdict. One holds the document's structure. The interface for making the change is not settled yet and does not matter to the argument.
+Three services stand behind that. One serves the model. One computes the rollup and returns a verdict. One holds the document's structure. The change is made in either of two small web apps, a model viewer and a requirements document, and the argument does not depend on which.
 
-The instructive part is what does not happen. Raise the throughput of a stage that is not the bottleneck and nothing moves, because a serial chain is governed by its worst link. Raise the bottleneck instead and the requirement passes, at which point the bottleneck migrates somewhere else. That behaviour is obvious once seen and reliably surprising before.
+The instructive part is what does not happen. Raise the throughput of a server that is not the bottleneck and nothing moves, because a serial chain is governed by its worst link. Raise the bottleneck instead and the capacity rises, but the requirement still fails, because the bottleneck has moved to the next weakest stage in the wiring. Raise one of the servers there and the requirement passes. That behaviour is obvious once seen and reliably surprising before.
 
 None of the three services knows about the other two. The verdict a reader sees against a requirement comes from a service that has never parsed a model file, sitting beside text from a service that has never computed anything.
 
-## Where it cheats
+## Placeholders
 
-Two of these belong to the adapter. There is no model repository behind it, so versioning is stood in for rather than taken from a conforming SysML v2 repository. Editing the model through the projection is scaffolding as well, and it contradicts the position that a projection should be read-only, so a real deployment would write through the SysML v2 API instead.
+Three parts of the demo are stand-ins, kept deliberately small so that the argument can be seen before the full mapping exists. Two belong to the adapter. There is no model repository behind it, so versioning is a counter rather than the commits of a conforming SysML v2 repository. Editing the model through the projection is a stand-in as well. It contradicts the position that a projection should be read-only, and a real deployment would write through the SysML v2 API instead. The third belongs to the example. Its capacity model is idealised, with parallel branches assuming evenly partitionable work and perfect load balancing, and no queueing effects represented anywhere. It is arithmetic chosen to make a point about federation rather than a performance model anyone should plan capacity with.
 
-The third belongs to the example. Its capacity model is idealised, with parallel branches assuming evenly partitionable work and perfect load balancing, and no queueing effects represented anywhere. It is arithmetic chosen to make a point about federation rather than a performance model anyone should plan capacity with.
+The plan is to replace the adapter's two stand-ins with a more complete mapping from the model to the graph. SysML v2 has views and viewpoints of its own, and my intention is to use them as the way a systems engineer chooses which parts of a model to federate and how those parts appear to the services outside. That will almost certainly need a full parser for the language rather than the strict subset the adapter reads today, and it is the largest piece of work on the horizon.
+
+## Reading further
+
+The design is written up as a series of articles under [docs/](docs/README.md). They start with the motivation and an overview of the architecture, then follow the design from the first research through to the version now being built, and they link the decision records behind every choice. The same articles are published at https://roarge.github.io/sysml-federation/.
 
 ## What this is not
 
