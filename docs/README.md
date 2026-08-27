@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-The goal is to make a SysML v2 model easy to integrate, so that other tools can use what is in it without exporting a copy and without learning SysML. The proposal is federation. The model's owners publish a small projection of it, and other services attach their own data to its objects by agreeing on an identifier.
+The goal is to make a SysML v2 model easy to integrate. The proposal is federation. The model's owners publish a small projection of it, and other services attach their own data to its objects by agreeing on an identifier.
 
 So far this is a proof of concept, a SysML v2 adapter behind a WunderGraph Cosmo router with one worked example. Next is a larger example and an adapter driven by SysML v2's own views and viewpoints.
 
