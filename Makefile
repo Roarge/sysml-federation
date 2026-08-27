@@ -11,6 +11,11 @@ SHELL := /usr/bin/env bash
 MODULE  := github.com/Roarge/sysml-federation
 BIN     := $(CURDIR)/bin
 COVER   := $(CURDIR)/coverage.out
+# The floor exists to keep hand-written code tested, so it measures hand-written
+# code. Generated files are filtered out of the profile before the percentage is
+# computed, and the derived copy sits beside the profile it comes from. Both are
+# untracked.
+COVERHAND := $(CURDIR)/coverage-hand.out
 
 # ---------------------------------------------------------------- toolchain --
 # Resolve go once, explicitly. Hooks and IDEs run with a PATH that does not
@@ -156,8 +161,25 @@ cover: ## Run the suite with coverage and enforce the floor
 	 printf 'tools coverage: %s%% (floor %s%%)\n' "$$pct" "$(MIN_COVER)"; \
 	 awk -v p="$$pct" -v m="$(MIN_COVER)" 'BEGIN{exit !(p+0 >= m+0)}' \
 	   || { printf 'tools coverage %s%% is below the floor of %s%%\n' "$$pct" "$(MIN_COVER)"; exit 1; }
-	@pct=$$($(GO) tool cover -func=$(COVER) | awk '/^total:/{gsub("%","",$$3); print $$3}'); \
-	 printf 'coverage: %s%% (floor %s%%)\n' "$$pct" "$(MIN_COVER)"; \
+	@# A file counts as generated when its first line carries the header the
+	@# analyzer recognises, so a new generated file drops out of the measurement
+	@# without this rule being touched. The tools module is measured as it is: it
+	@# has no generated files.
+	@pat=$(COVER).generated; \
+	 find . -name '*.go' -not -path './bin/*' | while IFS= read -r f; do \
+	   case "$$(sed -n '1p' "$$f")" in \
+	     '// Code generated '*' DO NOT EDIT.') printf '%s/%s:\n' '$(MODULE)' "$${f#./}";; \
+	   esac; \
+	 done > $$pat; \
+	 sed -n '1p' $(COVER) > $(COVERHAND); \
+	 if [ -s $$pat ]; then \
+	   sed -n '2,$$p' $(COVER) | { grep -v -F -f $$pat || true; } >> $(COVERHAND); \
+	 else \
+	   sed -n '2,$$p' $(COVER) >> $(COVERHAND); \
+	 fi; \
+	 rm -f $$pat
+	@pct=$$($(GO) tool cover -func=$(COVERHAND) | awk '/^total:/{gsub("%","",$$3); print $$3}'); \
+	 printf 'coverage: %s%% of hand-written code (floor %s%%)\n' "$$pct" "$(MIN_COVER)"; \
 	 awk -v p="$$pct" -v m="$(MIN_COVER)" 'BEGIN{exit !(p+0 >= m+0)}' \
 	   || { printf 'coverage %s%% is below the floor of %s%%\n' "$$pct" "$(MIN_COVER)"; exit 1; }
 
@@ -252,6 +274,6 @@ preflight: check check-allowlist cover ## Everything, as run before a push
 
 .PHONY: clean
 clean: ## Remove build output only (never touches untracked working files)
-	@rm -rf $(BIN) $(COVER) $(CURDIR)/coverage-tools.out
+	@rm -rf $(BIN) $(COVER) $(COVERHAND) $(CURDIR)/coverage-tools.out
 	@$(GO) clean -testcache 2>/dev/null || true
 	@printf 'clean: ok\n'

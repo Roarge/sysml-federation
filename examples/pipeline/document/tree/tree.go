@@ -50,7 +50,10 @@ type excluded struct {
 	parent string
 }
 
-// Load reads {"nodes": [...]} and checks ids are unique and requirement nodes name a requirement.
+// Load reads {"nodes": [...]} and checks ids are unique and requirement nodes
+// name a requirement. It returns a nil tree with any error, so a caller may
+// bind the value before checking the error only once the error is known to be
+// nil.
 func Load(data []byte) (*Tree, error) {
 	var doc struct {
 		Nodes []*Node `json:"nodes"`
@@ -79,7 +82,10 @@ func Load(data []byte) (*Tree, error) {
 		}
 		return nil
 	}
-	return t, check(t.root)
+	if err := check(t.root); err != nil {
+		return nil, err
+	}
+	return t, nil
 }
 
 // Roots are the top-level nodes in order.
