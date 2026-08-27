@@ -6,11 +6,9 @@ layout: default
 {%- assign last = total | minus: 1 %}
 {%- assign idx = -1 %}
 {%- for record in records %}{% if record.path == page.path %}{% assign idx = forloop.index0 %}{% endif %}{% endfor %}
-<article class="prose">
+<article class="prose {% if idx >= 0 %}is-record{% else %}is-index{% endif %}">
   {%- if idx >= 0 %}
   <p class="eyebrow">Decision record</p>
-  {%- else %}
-  <p class="eyebrow">Decision records</p>
   {%- endif %}
   <h1>{{ page.title }}</h1>
   {{ content }}
@@ -20,13 +18,13 @@ layout: default
       {%- if idx > 0 %}
       {%- assign previous_index = idx | minus: 1 %}
       {%- assign previous = records[previous_index] %}
-      <li class="pager-previous"><span>Previous</span> <a href="{{ previous.url | relative_url }}">{{ previous.title }}</a></li>
+      <li class="pager-previous"><a href="{{ previous.url | relative_url }}"><span class="pager-label">Previous</span><span class="pager-title">{{ previous.title }}</span></a></li>
       {%- endif %}
-      <li class="pager-index"><span>Index</span> <a href="{{ '/decisions/' | relative_url }}">All decision records</a></li>
+      <li class="pager-index"><a href="{{ '/decisions/' | relative_url }}"><span class="pager-label">Index</span><span class="pager-title">All decision records</span></a></li>
       {%- if idx < last %}
       {%- assign next_index = idx | plus: 1 %}
       {%- assign next = records[next_index] %}
-      <li class="pager-next"><span>Next</span> <a href="{{ next.url | relative_url }}">{{ next.title }}</a></li>
+      <li class="pager-next"><a href="{{ next.url | relative_url }}"><span class="pager-label">Next</span><span class="pager-title">{{ next.title }}</span></a></li>
       {%- endif %}
     </ul>
   </nav>

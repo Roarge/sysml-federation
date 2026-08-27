@@ -3,7 +3,10 @@
   <ol>
     {%- for item in site.series %}
     {%- assign href = item.path | replace: '.md', '.html' | prepend: '/' %}
-    <li><a href="{{ href | relative_url }}"{% if item.path == page.path %} aria-current="page"{% endif %}>{{ item.title }}</a></li>
+    <li{% if item.path == page.path %} class="is-current"{% endif %}>
+      <span class="series-num" aria-hidden="true">{{ forloop.index }}</span>
+      <a href="{{ href | relative_url }}"{% if item.path == page.path %} aria-current="page"{% endif %}>{{ item.title }}</a>
+    </li>
     {%- endfor %}
   </ol>
 </nav>
