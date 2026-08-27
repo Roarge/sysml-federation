@@ -133,13 +133,23 @@ func (p *parser) shortName() string {
 // end returns the span from start to the end of the last consumed token.
 func (p *parser) end(start int) Span { return Span{start, p.toks[p.pos-1].Span.End} }
 
+// article is the indefinite article for a body name, so the refusal reads
+// "an attribute body" rather than "a attribute body".
+func article(body string) string {
+	switch body[0] {
+	case 'a', 'e', 'i', 'o', 'u':
+		return "an"
+	}
+	return "a"
+}
+
 // unsupported refuses the next token as a member of the named body.
 func (p *parser) unsupported(body string) {
 	t := p.peek()
 	if t.Kind == Keyword {
-		p.fail(t.Span, fmt.Sprintf("keyword '%s' is not supported in a %s body", t.Text, body))
+		p.fail(t.Span, fmt.Sprintf("keyword '%s' is not supported in %s %s body", t.Text, article(body), body))
 	}
-	p.failExpected(fmt.Sprintf("a member of a %s body", body))
+	p.failExpected(fmt.Sprintf("a member of %s %s body", article(body), body))
 }
 
 // once refuses a second occurrence of a singular member.

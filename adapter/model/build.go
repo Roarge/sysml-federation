@@ -159,7 +159,7 @@ func (b *builder) part(u *syntax.PartUsage, parent *partNode, owner string) *par
 		}
 	}
 	for j := range u.Attributes {
-		b.slot(&n.attrs, &u.Attributes[j], u.Type)
+		b.slot(&n.attrs, &u.Attributes[j], declaredBy(u.Type, u.Name))
 	}
 	// Ports: from the definitions, base first, then the usage's own.
 	for i := len(n.defs) - 1; i >= 0; i-- {
@@ -179,6 +179,16 @@ func (b *builder) part(u *syntax.PartUsage, parent *partNode, owner string) *par
 		n.out.Parts = append(n.out.Parts, c.out)
 	}
 	return n
+}
+
+// declaredBy names the scope a redefinition must find its declaration in: the
+// usage's definition, or the usage itself when it declares no type, so the
+// refusal names something either way.
+func declaredBy(typ, name string) string {
+	if typ == "" {
+		return name
+	}
+	return typ
 }
 
 // slot adds a declaration or binds a redefinition. owner names the definition
@@ -315,7 +325,7 @@ func (b *builder) requirements(pkg *syntax.Package) {
 			}
 		}
 		for j := range u.Attributes {
-			b.slot(&n.attrs, &u.Attributes[j], u.Type)
+			b.slot(&n.attrs, &u.Attributes[j], declaredBy(u.Type, u.Name))
 		}
 		text := docText(u.Doc)
 		if text == "" && n.def != nil {
