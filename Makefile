@@ -46,7 +46,7 @@ NOINTERFACE := $(BIN)/nointerface
 # Only the directories .gitignore actually allowlists. Support trees are
 # deliberately untracked, so finding source in them is the intended state, not a
 # forgotten allowlist entry.
-override ALLOWLIST_ROOTS := adapter cmd examples docs
+override ALLOWLIST_ROOTS := adapter cmd examples docs internal
 override TEST_FLAGS := -race -shuffle=on -count=1 -timeout=120s
 
 # A floor, not a decoration. 'override' for the same reason as the rest: an
@@ -120,12 +120,14 @@ ifeq ($(strip $(HAVE_TOOLS)),)
 else
 	@# Present but unbuilt is a hard error, never a skip.
 	@$(MAKE) --no-print-directory $(NOINTERFACE)
-	$(GO) vet -vettool=$(NOINTERFACE) ./...
-	GOOS=windows $(GO) vet -vettool=$(NOINTERFACE) ./...
-	GOOS=darwin  $(GO) vet -vettool=$(NOINTERFACE) ./...
-	GOARCH=arm64 $(GO) vet -vettool=$(NOINTERFACE) ./...
-	GOOS=windows GOARCH=arm64 $(GO) vet -vettool=$(NOINTERFACE) ./...
-	cd tools && $(GO) vet ./... && $(GO) vet -vettool=$(NOINTERFACE) ./...
+	@# Generated files are exempt from the empty-interface rule (D9): the rule
+	@# governs what this code declares, not what a generator emits.
+	$(GO) vet -vettool=$(NOINTERFACE) -generated=false ./...
+	GOOS=windows $(GO) vet -vettool=$(NOINTERFACE) -generated=false ./...
+	GOOS=darwin  $(GO) vet -vettool=$(NOINTERFACE) -generated=false ./...
+	GOARCH=arm64 $(GO) vet -vettool=$(NOINTERFACE) -generated=false ./...
+	GOOS=windows GOARCH=arm64 $(GO) vet -vettool=$(NOINTERFACE) -generated=false ./...
+	cd tools && $(GO) vet ./... && $(GO) vet -vettool=$(NOINTERFACE) -generated=false ./...
 endif
 
 .PHONY: lint
@@ -190,7 +192,7 @@ check-tracked: ## No tracked path may be excluded by .gitignore (catches git add
 check-allowlist: ## Warn about source files on disk that .gitignore would not track
 	@missing="$$(git ls-files --others --ignored --exclude-standard -z -- \
 	   $(addsuffix /,$(ALLOWLIST_ROOTS)) 2>/dev/null \
-	   | tr '\0' '\n' | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto)$$' || true)"; \
+	   | tr '\0' '\n' | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js)$$' || true)"; \
 	 if [ -n "$$missing" ]; then \
 	   printf 'source files on disk that .gitignore does not track:\n'; \
 	   printf '%s\n' "$$missing" | sed 's/^/    /'; \
@@ -201,6 +203,36 @@ check-allowlist: ## Warn about source files on disk that .gitignore would not tr
 .PHONY: modules
 modules: ## List every Go module, so none escapes the gate
 	@find . -name go.mod -not -path './bin/*' -not -path '*/node_modules/*' | sed 's/^/    /'
+
+# ------------------------------------------------------------- generation --
+# The three subgraphs carry a //go:generate line that runs gqlgen through the
+# module's tool directive (Phase 2). Generated files are committed, so CI
+# never runs this.
+.PHONY: generate
+generate: ## Regenerate the gqlgen code of the subgraphs
+	$(GO) generate ./...
+
+# ------------------------------------------------------------ composition --
+# Composition runs on the maintainer's machine and its output is committed.
+# CI never needs Node: a unit test guards the committed configuration
+# against the schema files (SR-42).
+WGC_VERSION := 0.130.1
+
+.PHONY: compose
+compose: ## Compose the router configuration from the subgraph schemas
+	cd examples/pipeline && DO_NOT_TRACK=1 COSMO_TELEMETRY_DISABLED=true \
+	  npx --yes wgc@$(WGC_VERSION) router compose -i graph.yaml -o config.json
+
+# ------------------------------------------------------------------ image --
+IMAGE := sysml-federation:dev
+
+.PHONY: image
+image: ## Build the demo image from the repository root
+	docker build -f examples/pipeline/Dockerfile -t $(IMAGE) .
+
+.PHONY: run
+run: ## Run the locally built image on port 8080
+	docker run --rm -p 8080:8080 $(IMAGE)
 
 # ------------------------------------------------------------------ gates ---
 .PHONY: check
