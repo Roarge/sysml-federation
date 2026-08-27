@@ -41,4 +41,4 @@ An adapter publishes a SysML v2 model as a federated service, and a worked examp
 
 ## The repository
 
-The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence. The command that starts the demo arrives when the first release is tagged. The same articles are rendered as a site at https://roarge.github.io/sysml-federation/.
+The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence. The command that starts the demo arrives when the first release is tagged. The same articles are rendered as a site at https://sysml-federation.org/.
