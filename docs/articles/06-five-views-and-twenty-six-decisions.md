@@ -53,7 +53,7 @@ capacity: Float
 
 The value types carry `@external` on the fields the selections read and no `@shareable`, the shape the vendor documents for nested requires, and `VerificationCase` is keyed `resolvable: false` because the capacity service only reads it. Whether Cosmo composition and gqlgen accept this exact shape is the first implementation spike, covered in [article 09](09-five-spikes-before-the-first-line.md), and the description carries a fallback, `Part.wiring: String`, a JSON document of the children and connections that the capacity service would require instead.
 
-The document service's shipped tree names the example's requirement ids in a configuration file, the one place the example's identifiers enter a service. It never reads the model. A requirement not in its tree is not in the document, and for an id it has never heard of its entity resolver answers `included: false` and `documentNumber: null`. The description states this limit in the field table, beside the playground query and in the example README.
+The document service's shipped tree names the example's requirement ids in a configuration file, the one place the example's identifiers enter a service. It never reads the model. A requirement not in its tree is not in the document, and for an id it has never heard of its entity resolver answers `included: false` and `documentNumber: null`.
 
 Composition merges the three into one schema in which `Requirement` carries text and limit from the adapter, verdict and reason from the capacity service, and number and inclusion from the document service. A verdict is the capacity service's judgement of one requirement, `PASS`, `FAIL`, `INCONCLUSIVE` or `ERROR`, with a reason string beside it. The query the visitor runs in the playground, against the model requirement `PIPE-R1`, is
 
@@ -127,7 +127,7 @@ files --> lexer --> parser --> AST with spans --> resolver --> projection --> gq
 
 `projection` maps resolved elements to the schema's types and holds nothing the schema does not show. `serve` is the gqlgen server with WebSocket subscriptions, the entity resolvers, the store that hands each operation one snapshot of the current model, and the version counter that store increments on every accepted mutation and on reset.
 
-A second fixture model with other names and wiring is part of the adapter's tests. The escape hatch the README leaves open, a generic type for elements nobody has projected, is not built in this phase, and a construct outside the subset is refused rather than served generically, which is the smaller first cut. A subset parser cannot prove that a file is valid SysML, so the example model is checked with the OMG pilot and the OpenSysML command line before it becomes a fixture, locally and never in CI, and the releases used are recorded in the example's README.
+A second fixture model with other names and wiring is part of the adapter's tests. The escape hatch left open for coverage to grow into, a generic type for elements nobody has projected yet, is not built in this phase, and a construct outside the subset is refused rather than served generically, which is the smaller first cut. A subset parser cannot prove that a file is valid SysML, so the example model is checked before it becomes a fixture, locally and never in CI, against the OMG pilot release 2026-07 and the OpenSysML command line at 0.2.1.
 
 ## Twenty-six decisions
 
