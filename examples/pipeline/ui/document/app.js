@@ -152,8 +152,8 @@ function renderRequirement(r) {
 // sight. Offering either would contradict the sentence beside it.
 //
 // Dragging is already honest here: no child list is rendered at that level,
-// so there is nothing to drop into. Prose is a leaf wherever it sits
-// (phase decision 6).
+// so there is nothing to drop into. Prose is a leaf wherever it sits, because
+// a paragraph holds no items of its own.
 function renderNode(node, depth) {
   const req = node.requirement;
   const failed = req !== null && req !== undefined && req.verdict === "FAIL";
