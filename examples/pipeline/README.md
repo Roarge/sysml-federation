@@ -187,6 +187,22 @@ than the subscription failing.
 Neither app logged anything to the console over the whole session, and no
 JavaScript error was raised.
 
+### The container image
+
+The image was built from `examples/pipeline/Dockerfile` with the repository
+root as the build context and run on x86-64 Linux on 2026-08-28, with Docker
+29.7.2 and buildx 0.36.0. The two cross-architecture builds came from the same
+buildx on the same host. Nothing was pushed, so every figure below is read from
+a local build.
+
+| Date | Requirement | What was run | What was observed |
+|---|---|---|---|
+| 2026-08-28 | SR-04 | `GET /`, `/viewer/`, `/document/` and `/playground` on port 8080 of the running container, a `{ model { version } }` query on `/graphql`, and `subscription { modelChanged }` held open over server-sent events | `302` with `Location: /viewer/`, which resolves to `http://localhost:8080/viewer/` on the same port, then `200`, `200` and `200`, and `{"data":{"model":{"version":1}}}` from the query. The subscription was held to the client's own twelve-second limit and carried repeated `:heartbeat` lines, three in one run and two in another. The one published port answers all of it |
+| 2026-08-28 | SR-02 | A container started detached from the built image and polled every 200 ms by the same command that started it, both for `/viewer/` and for a real `{ model { version } }` query through the router | The viewer answered `200` after 0.75 s and the query after 0.77 s, well inside the ten-second budget. The query figure covers the whole stack coming up rather than the user interface server alone. A first attempt was discarded because the poller was started separately from the container and so began reading a container that had been up for several seconds |
+| 2026-08-28 | SR-07 | `/router.LICENSE` read from inside a container running the image and as the user the image runs as, then `/router -version` from the same image | The licence is the Apache License version 2.0 text, mode 644 owned by root, which uid 65532 can read and did. The binary reports version 0.343.1, Go 1.25.14, linux/amd64, built 2026-08-26 from revision `6a8da18`, so the certificate and the binary name one release |
+| 2026-08-28 | SR-06 | `docker buildx build --platform linux/amd64,linux/arm64` exported as an OCI layout, then the per-platform manifests read out of it | One image manifest per platform under a manifest list, with an attestation manifest for each. Compressed layers come to 44,845,388 bytes on amd64 and 41,470,306 on arm64, or 44,850,223 and 41,475,142 with the configuration blob added. The OCI exporter gzips as a registry push does, so these are what a registry manifest would report, and the router binary is 39,987,546 of the amd64 total |
+| 2026-08-28 | C-53 | `docker buildx build --platform linux/arm64` exported to a local directory, with the router image pinned by digest as well as by tag | `/router` and `/sysml-federation` are both `ELF 64-bit LSB executable, ARM aarch64`. The digest names the multi-platform index rather than one architecture, so the arm64 router still resolves from it |
+
 ## Limits
 
 The adapter reads the subset its `adapter/syntax` package documents and
