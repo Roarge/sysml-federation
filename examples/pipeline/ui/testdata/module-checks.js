@@ -71,7 +71,10 @@ same(texts("// note\nx"), ["// note", "\n", "x"], "a line note stops at the newl
 same(kinds("doc /* body */"), ["doc"], "doc and its body are one token");
 same(kinds("doc d /* body */"), ["doc"], "a named doc and its body are one token");
 same(kinds("doc"), ["keyword"], "doc on its own is a keyword");
-same(kinds("docking"), ["identifier"], "docking is an identifier, not a doc");
+// The comment has to be there, or there is no doc token for the word to be
+// mistaken for and the case passes on nothing.
+same(kinds("docking /* b */"), ["identifier", "space", "comment"],
+  "docking before a comment is an identifier and the comment stays its own token");
 ok(KEYWORDS.has("doc"), "the keyword table carries doc");
 ok(KEYWORDS.has("requirement"), "the keyword table carries requirement");
 ok(!KEYWORDS.has("Server"), "a type name is not a keyword");
@@ -142,6 +145,21 @@ same(fanInLayers.get("a"), 0, "a part nobody feeds is in the first column");
 same(fanInLayers.get("b"), 0, "a second unfed part shares the first column");
 same(fanInLayers.get("c"), 1, "a part behind one other is in the second column");
 same(fanInLayers.get("d"), 2, "fan-in puts a part behind its deepest feeder");
+
+// The fan-in fixture's edges happen to be in topological order, so one pass
+// settles it and it says nothing about the loop repeating. This chain lists
+// its edges back to front: a single pass leaves b, c and d all in column 1,
+// and only iterating to a fixpoint pushes them apart.
+const backwards = {
+  name: "t", capacity: null, bottleneck: [],
+  parts: [part("a", 1), part("b", 2), part("c", 3), part("d", 4)],
+  connections: [edge("c", "d"), edge("b", "c"), edge("a", "b")],
+};
+const chain = layers(backwards.parts, backwards.connections);
+same(chain.get("a"), 0, "the head of a backwards-listed chain stays in the first column");
+same(chain.get("b"), 1, "the second link settles one column along");
+same(chain.get("c"), 2, "the third link needs a second pass to reach its column");
+same(chain.get("d"), 3, "the fourth link needs a third pass to reach its column");
 
 const placed = positions(fanIn.parts, fanInLayers);
 ok(placed.pos.get("a").x === placed.pos.get("b").x, "one column shares one x");

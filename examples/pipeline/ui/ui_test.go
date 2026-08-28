@@ -83,6 +83,8 @@ func TestSC06_LineBudgets(t *testing.T) {
 	}{
 		{"viewer JavaScript", []string{"viewer/app.js", "viewer/tokeniser.js", "viewer/sketch.js"}, 900},
 		{"viewer CSS", []string{"viewer/style.css"}, 300},
+		{"document JavaScript", []string{"document/app.js", "shared/graphql.js"}, 900},
+		{"document CSS", []string{"document/style.css"}, 300},
 	}
 	for _, c := range cases {
 		t.Run(c.app, func(t *testing.T) {

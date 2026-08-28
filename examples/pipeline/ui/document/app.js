@@ -8,29 +8,31 @@ import { query, subscribe } from "/shared/graphql.js";
 
 const Sortable = window.Sortable;
 
-// MAX_DEPTH must match the number of node levels the query below selects, and
-// the sentence renderNode shows at that level spells the same number out.
+// MAX_DEPTH is how many levels of the tree the app fetches and draws. The
+// query below is built from it, and so are the two sentences the deepest row
+// shows, so the only place the number is written is here. The README says the
+// same thing in prose and is kept true by hand.
 const MAX_DEPTH = 6;
 
-// The tree is fetched MAX_DEPTH levels deep, deeper than any of the demo's
-// own material nests. The deepest level asks for its children's ids and
-// nothing else, which costs one field and is what lets the app tell a node
-// with nothing under it from one whose children were not fetched. Without
-// that the app would have to treat both the same and would either throw on
-// the missing field or quietly drop a person's work into a level it never
-// shows again.
+// childLevels nests the children selections: MAX_DEPTH levels carrying the
+// node fields, and one more level below them asking for ids alone. That last
+// level costs one field and is what lets the app tell a node with nothing
+// under it from one whose children were not fetched. Without it the app would
+// have to treat both the same, and would either throw on the missing field or
+// quietly drop a person's work into a level it never shows again.
+function childLevels() {
+  let nesting = "children { id }";
+  for (let level = MAX_DEPTH; level > 1; level--) {
+    nesting = `children { ...NodeFields ${nesting} }`;
+  }
+  return nesting;
+}
+
 const DOCUMENT_QUERY = `query DocumentApp {
   model { version requirements { id shortName name included } }
   document {
     version
-    nodes {
-      ...NodeFields
-      children { ...NodeFields
-        children { ...NodeFields
-          children { ...NodeFields
-            children { ...NodeFields
-              children { ...NodeFields children { id } } } } } }
-    }
+    nodes { ...NodeFields ${childLevels()} }
   }
 }
 fragment NodeFields on Node {
@@ -142,9 +144,16 @@ function renderRequirement(r) {
 }
 
 // renderNode draws one node and, above the deepest fetched level, its
-// children. At that level there is no child list to draw and no place to put
-// a new paragraph, so "Add prose" is withheld and the row says what it is not
-// showing. Prose is a leaf wherever it sits (phase decision 6).
+// children. At that level nothing may be nested any deeper, so both controls
+// that would do it are withheld and the row says why. "Add prose" would put a
+// paragraph below the row. "Heading above" reads as though it works the other
+// way, but it inserts a heading where the row is and makes the row its child,
+// which pushes the row and everything under it one level down and out of
+// sight. Offering either would contradict the sentence beside it.
+//
+// Dragging is already honest here: no child list is rendered at that level,
+// so there is nothing to drop into. Prose is a leaf wherever it sits
+// (phase decision 6).
 function renderNode(node, depth) {
   const req = node.requirement;
   const failed = req !== null && req !== undefined && req.verdict === "FAIL";
@@ -161,14 +170,14 @@ function renderNode(node, depth) {
     content = `<p class="text prose" contenteditable="true" data-id="${esc(node.id)}" data-original="${esc(node.text ?? "")}">${esc(node.text ?? "")}</p>`;
   }
   const tools = [
-    `<button type="button" data-act="heading" data-id="${esc(node.id)}">Heading above</button>`,
+    deepest ? "" : `<button type="button" data-act="heading" data-id="${esc(node.id)}">Heading above</button>`,
     leaf ? "" : `<button type="button" data-act="prose" data-id="${esc(node.id)}" data-count="${kids.length}">Add prose</button>`,
     req ? `<button type="button" data-act="exclude" data-req="${esc(req.id)}">Exclude</button>` : "",
   ].join("");
   const children = leaf ? "" : `<ol class="nodes" data-parent="${esc(node.id)}">${kids.map((c) => renderNode(c, depth + 1)).join("")}</ol>`;
-  const truncated = deepest && node.kind !== "PROSE" ? `<p class="pencil deeper">${kids.length > 0
-    ? "More sits below this item than the document shows. The document is shown six levels deep."
-    : "The document is shown six levels deep, so nothing can be added below this item."}</p>` : "";
+  const truncated = deepest ? `<p class="pencil deeper">${kids.length > 0
+    ? `More sits below this item than the document shows. The document is shown ${MAX_DEPTH} levels deep.`
+    : `The document is shown ${MAX_DEPTH} levels deep, so this item cannot be nested any deeper.`}</p>` : "";
   return `<li class="node kind-${node.kind.toLowerCase()}${failed ? " fail" : ""}" data-id="${esc(node.id)}">
     <div class="row"><span class="grip" title="Drag to move">::</span>${number}<div class="content">${content}</div><span class="tools">${tools}</span></div>${children}${truncated}
   </li>`;
