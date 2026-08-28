@@ -90,7 +90,7 @@ export function subscribe(document, onEvent, onError = () => {}) {
           throw new Error(`the router answered ${response.status} ${response.statusText}`);
         }
         await readStream(response.body, onFrame);
-        if (active) onError(new Error(`the stream ended; reconnecting in ${delay / 1000} s`));
+        if (active) onError(new Error(`the stream ended, reconnecting in ${delay / 1000} s`));
       } catch (err) {
         if (active) onError(err);
       }
