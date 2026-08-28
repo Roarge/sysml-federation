@@ -1,0 +1,82 @@
+name: publish
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Cross-compilation only: every stage that runs a command is built for
+      # the build platform, so no QEMU is set up (C-49).
+      - uses: docker/setup-buildx-action@v4
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+          flavor: |
+            latest=true
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: examples/pipeline/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          # Off, so the package page lists exactly two platforms (C-52).
+          provenance: false
+          sbom: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Read the manifest back (SR-05, SR-06)
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          set -euo pipefail
+          repo="$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')"
+          index="$(docker buildx imagetools inspect --raw "$repo:$VERSION")"
+          for platform in linux/amd64 linux/arm64; do
+            os="${platform%/*}"
+            arch="${platform#*/}"
+            digest="$(printf '%s' "$index" | jq -r --arg os "$os" --arg arch "$arch" \
+              '.manifests[] | select(.platform.os == $os and .platform.architecture == $arch) | .digest')"
+            if [ -z "$digest" ]; then
+              echo "::error::$repo:$VERSION has no $platform manifest"
+              exit 1
+            fi
+            size="$(docker buildx imagetools inspect --raw "$repo@$digest" | jq '[.layers[].size, .config.size] | add')"
+            # A size that is not a run of digits would make the comparison
+            # below answer false and pass a platform nothing was measured
+            # for, so it fails here instead.
+            case "$size" in
+              '' | *[!0-9]*)
+                echo "::error::$platform reported no numeric compressed size, got '$size'"
+                exit 1
+                ;;
+            esac
+            echo "$platform: $size bytes compressed"
+            if [ "$size" -gt 80000000 ]; then
+              echo "::error::$platform is $size bytes compressed, over the 80 MB budget"
+              exit 1
+            fi
+          done
