@@ -4,7 +4,10 @@ Twenty-six records in the Nygard form, each giving the context, the decision,
 the alternatives considered, the consequences, the requirements affected and
 its sources. All twenty-six are accepted. They were written during the design
 phase, before any code, and copied here so that they can be read and
-challenged. A record's status is `accepted`, or `accepted, with` whatever
+challenged. One has been amended since, because building the viewer showed
+part of it to be unworkable. A record amended that way keeps its number and
+carries both dates in its status line, with a line at its head saying what
+changed. A record's status is `accepted`, or `accepted, with` whatever
 qualification the decision carries. A decision that replaces an earlier one
 gets its own number rather than overwriting it, and a number is never reused.
 
