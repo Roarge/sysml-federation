@@ -1,8 +1,8 @@
 // app.js: the model viewer. It renders what the router serves and computes
 // nothing (AD-0026): the text pane shows Model.text, the edit panel shows
-// the literals the projection marks editable, the sketch shows the root
-// part's children, connections, capacity and bottleneck, and each
-// requirement shows the verdict and reason the capacity service returned.
+// each editable attribute of a root's parts and a judged requirement's
+// editable limit, the sketch each root's wiring, capacity and bottleneck,
+// and each requirement the capacity service's verdict and reason.
 
 import { query, subscribe } from "/shared/graphql.js";
 import { render as renderText, esc } from "./tokeniser.js";

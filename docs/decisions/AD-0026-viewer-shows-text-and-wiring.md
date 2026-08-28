@@ -27,18 +27,18 @@ cites the specification's reserved words (SR-11). The editable set, the
 throughput of each server and the limit of the global throughput
 requirement, is offered in an edit panel inside the text pane, above the
 model text. The panel carries a control for each editable attribute of the
-parts inside a root part, and every editable throughput sits there. A
-requirement's limit gets one only when the projection marks it editable and
-the requirement has reached a verdict. Nothing computes latency, so the
-latency requirement stands inconclusive and its limit gets no control even
-though the projection publishes that limit as editable. Every other value
-is read-only and the text itself is not editable (SR-13). The sketch is
-drawn from the model's connections as a left-to-right graph showing each
-server's throughput, the pipeline's capacity and the bottleneck servers
-marked in red (SR-12). Each requirement shows its verdict and reason
-(SR-14), and a failing requirement block is red, the only colour accent in
-the viewer (SR-15). Everything the viewer shows arrives through the router,
-and it computes nothing.
+parts directly inside a root part, and every editable throughput sits
+there. A requirement's limit gets one only when the projection marks it
+editable and the requirement has reached a verdict. Nothing computes
+latency, so the latency requirement stands inconclusive and its limit gets
+no control even though the projection publishes that limit as editable.
+Every other value is read-only and the text itself is not editable (SR-13).
+The sketch is drawn from the model's connections as a left-to-right graph
+showing each server's throughput, the pipeline's capacity and the
+bottleneck servers marked in red (SR-12). Each requirement shows its
+verdict and reason (SR-14), and a failing requirement block is red, the
+only colour accent in the viewer (SR-15). Everything the viewer shows
+arrives through the router, and it computes nothing.
 
 ## Alternatives considered
 
