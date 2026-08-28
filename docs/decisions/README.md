@@ -59,6 +59,3 @@ each produced.
 - <span class="rec-id">AD-0021</span> [The Markdown architecture description as the record, A3 sheets as the overview](AD-0021-architecture-record.md)
 - <span class="rec-id">AD-0022</span> [Track internal/assert and internal/tabletest](AD-0022-track-internal-helpers.md)
 - <span class="rec-id">AD-0023</span> [The light requirements scheme](AD-0023-light-requirements-scheme.md)
-
-AD-0026 is due for amendment when the apps ship, because the editable numbers
-moved to a panel above the text.

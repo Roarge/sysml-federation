@@ -18,10 +18,11 @@ apps are plain HTML and ES modules with no build step (AD-0017).
 We will make the model viewer a text pane and a sketch side by side. The
 text pane renders the model's source with keywords, names, literals,
 strings and comments distinguished by a small tokeniser whose keyword table
-cites the specification's reserved words (SR-11), and renders the
-editable set, the throughput of each server and the limit of the global
-throughput requirement, as inline inputs at the literals' positions, with
-every other value read-only (SR-13). The sketch is drawn from the model's
+cites the specification's reserved words (SR-11). The editable set, the
+throughput of each server and the limit of the global throughput
+requirement, is offered in an edit panel above the text pane, one control
+to one editable field of the projection, with every other value read-only
+and the text itself not editable (SR-13). The sketch is drawn from the model's
 connections as a left-to-right graph showing each server's throughput, the
 pipeline's capacity and the bottleneck servers marked in red (SR-12). Each
 requirement shows its verdict and reason (SR-14), and a failing requirement
@@ -59,6 +60,15 @@ faithful client and never a second implementation of the rollup. The
 tokeniser is not a parser and is verified by demonstration and inspection
 rather than by a test (SR-11), which is the price of keeping browser
 automation out of the repository (SC-01).
+
+An input at a literal's own position stays out of reach while the projection
+carries no source spans. Placing one would mean searching the served text for
+the literal by part name and attribute name, a second and weaker reading of
+the notation the adapter has already parsed, and for a requirement's limit it
+could not be placed at all, because the name of the attribute the limit binds
+is not published. Inline inputs therefore wait on the adapter projecting a
+byte range for an attribute's value and for a requirement's limit, which is a
+change to the published schema rather than a change to the app.
 
 ## Requirements affected
 
