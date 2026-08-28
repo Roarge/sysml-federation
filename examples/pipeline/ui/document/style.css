@@ -38,6 +38,7 @@ input[type="number"]:focus, [contenteditable]:focus { outline: 2px solid var(--b
 .node.fail > .row .verdict b { color: var(--red); }
 .kind-prose > .row { border-style: dashed; border-color: var(--pencil); }
 .grip { cursor: grab; color: var(--pencil); font-family: var(--mono); font-weight: bold; user-select: none; padding-top: 2px; }
+.deeper { margin: 0 0 6px 32px; font-size: 0.9em; }
 .sortable-ghost { opacity: 0.4; }
 .sortable-chosen > .row { background: var(--shade); }
 .number { font-family: var(--display); font-size: 18px; min-width: 2.6em; padding-top: 1px; }

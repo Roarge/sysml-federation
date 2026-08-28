@@ -8,6 +8,17 @@ import { query, subscribe } from "/shared/graphql.js";
 
 const Sortable = window.Sortable;
 
+// MAX_DEPTH must match the number of node levels the query below selects, and
+// the sentence renderNode shows at that level spells the same number out.
+const MAX_DEPTH = 6;
+
+// The tree is fetched MAX_DEPTH levels deep, deeper than any of the demo's
+// own material nests. The deepest level asks for its children's ids and
+// nothing else, which costs one field and is what lets the app tell a node
+// with nothing under it from one whose children were not fetched. Without
+// that the app would have to treat both the same and would either throw on
+// the missing field or quietly drop a person's work into a level it never
+// shows again.
 const DOCUMENT_QUERY = `query DocumentApp {
   model { version requirements { id shortName name included } }
   document {
@@ -18,7 +29,7 @@ const DOCUMENT_QUERY = `query DocumentApp {
         children { ...NodeFields
           children { ...NodeFields
             children { ...NodeFields
-              children { ...NodeFields } } } } }
+              children { ...NodeFields children { id } } } } } }
     }
   }
 }
@@ -26,8 +37,8 @@ fragment NodeFields on Node {
   id kind number text
   requirement {
     id shortName name text quantity comparison limit limitUnit limitEditable
-    derivedFrom { shortName } derives { shortName }
-    satisfiedBy { name } verifiedBy { shortName }
+    derivedFrom { shortName name } derives { shortName name }
+    satisfiedBy { name } verifiedBy { shortName name }
     verdict verdictReason
     subject { id name capacity attributes { name value unit editable } }
   }
@@ -64,6 +75,23 @@ const COMPARISON = { GE: ">=", GT: ">", LE: "<=", LT: "<", EQ: "=" };
 const el = (id) => document.getElementById(id);
 let served = null; // the last data the router served, the only thing ever rendered
 
+// generation counts the refreshes. Both subscriptions call refresh, so two
+// answers can be in flight at once and the router is free to return them in
+// either order. The counter says which answer is still the latest, so a slow
+// one is dropped rather than painted over a newer one.
+let generation = 0;
+
+// dragging and pending keep a refresh out of a drag. Replacing the tree while
+// the drag library holds an element leaves that element behind, so the drop
+// puts a node the person can no longer see back into the new markup and the
+// move that follows carries an index computed against a tree that is gone.
+// A refresh that lands mid-drag is held here and rendered when the drop is
+// over. sortables holds the live drag instances, each destroyed before the
+// markup it watches is replaced.
+let dragging = false;
+let pending = null;
+let sortables = [];
+
 function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -71,6 +99,12 @@ function esc(s) {
 function status(message, isError = false) {
   el("status").textContent = message;
   el("status").classList.toggle("error", isError);
+}
+
+// refuse puts the served value back and says why the entry was not sent.
+function refuse(field, message) {
+  status(message, true);
+  field.value = field.dataset.served;
 }
 
 // evaluated says whether the analysis reached a verdict. The current value
@@ -107,10 +141,17 @@ function renderRequirement(r) {
   </div>`;
 }
 
-function renderNode(node) {
+// renderNode draws one node and, above the deepest fetched level, its
+// children. At that level there is no child list to draw and no place to put
+// a new paragraph, so "Add prose" is withheld and the row says what it is not
+// showing. Prose is a leaf wherever it sits (phase decision 6).
+function renderNode(node, depth) {
   const req = node.requirement;
   const failed = req !== null && req !== undefined && req.verdict === "FAIL";
   const number = `<span class="number">${esc(node.number ?? "")}</span>`;
+  const kids = node.children ?? [];
+  const deepest = depth >= MAX_DEPTH;
+  const leaf = node.kind === "PROSE" || deepest;
   let content;
   if (node.kind === "REQUIREMENT") {
     content = req ? renderRequirement(req) : `<p class="pencil">This requirement is not in the model.</p>`;
@@ -121,12 +162,15 @@ function renderNode(node) {
   }
   const tools = [
     `<button type="button" data-act="heading" data-id="${esc(node.id)}">Heading above</button>`,
-    node.kind === "PROSE" ? "" : `<button type="button" data-act="prose" data-id="${esc(node.id)}" data-count="${node.children.length}">Add prose</button>`,
+    leaf ? "" : `<button type="button" data-act="prose" data-id="${esc(node.id)}" data-count="${kids.length}">Add prose</button>`,
     req ? `<button type="button" data-act="exclude" data-req="${esc(req.id)}">Exclude</button>` : "",
   ].join("");
-  const children = node.kind === "PROSE" ? "" : `<ol class="nodes" data-parent="${esc(node.id)}">${node.children.map(renderNode).join("")}</ol>`;
+  const children = leaf ? "" : `<ol class="nodes" data-parent="${esc(node.id)}">${kids.map((c) => renderNode(c, depth + 1)).join("")}</ol>`;
+  const truncated = deepest && node.kind !== "PROSE" ? `<p class="pencil deeper">${kids.length > 0
+    ? "More sits below this item than the document shows. The document is shown six levels deep."
+    : "The document is shown six levels deep, so nothing can be added below this item."}</p>` : "";
   return `<li class="node kind-${node.kind.toLowerCase()}${failed ? " fail" : ""}" data-id="${esc(node.id)}">
-    <div class="row"><span class="grip" title="Drag to move">::</span>${number}<div class="content">${content}</div><span class="tools">${tools}</span></div>${children}
+    <div class="row"><span class="grip" title="Drag to move">::</span>${number}<div class="content">${content}</div><span class="tools">${tools}</span></div>${children}${truncated}
   </li>`;
 }
 
@@ -139,22 +183,44 @@ function renderExcluded(requirements) {
 
 function render(data) {
   served = data;
+  // A drag owns the markup until the drop. Rendering under it would strand
+  // the element the library is holding, so the data waits.
+  if (dragging) {
+    pending = data;
+    return;
+  }
+  pending = null;
   const focused = document.activeElement?.dataset?.key ?? null;
   el("versions").textContent = `document version ${data.document.version}, model version ${data.model.version}`;
-  el("tree").innerHTML = data.document.nodes.map(renderNode).join("");
+  for (const sortable of sortables) sortable.destroy();
+  sortables = [];
+  el("tree").innerHTML = data.document.nodes.map((node) => renderNode(node, 1)).join("");
   el("add-prose").dataset.count = data.document.nodes.length;
   el("excluded").innerHTML = renderExcluded(data.model.requirements);
   for (const list of [el("tree"), ...el("tree").querySelectorAll("ol.nodes")]) {
-    new Sortable(list, { group: "nodes", handle: ".grip", animation: 150, fallbackOnBody: true, swapThreshold: 0.65, onEnd });
+    sortables.push(new Sortable(list, {
+      group: "nodes", handle: ".grip", animation: 150, fallbackOnBody: true, swapThreshold: 0.65, onStart, onEnd,
+    }));
   }
   if (focused !== null) el("tree").querySelector(`[data-key="${CSS.escape(focused)}"]`)?.focus();
 }
 
+// flush renders the answer that arrived during a drag. It runs from a timer
+// rather than from onEnd itself, so the library has finished with the element
+// before the markup holding it is replaced.
+function flush() {
+  if (pending !== null) render(pending);
+}
+
 async function refresh() {
+  const mine = ++generation;
   try {
-    render(await query(DOCUMENT_QUERY));
+    const data = await query(DOCUMENT_QUERY);
+    if (mine !== generation) return;
+    render(data);
     status("");
   } catch (err) {
+    if (mine !== generation) return;
     status(err.message, true);
   }
 }
@@ -172,12 +238,24 @@ async function mutate(operation, variables) {
   }
 }
 
+// onStart claims the markup for the drag, so that a refresh arriving before
+// the drop waits rather than pulling the dragged element out from under it.
+function onStart() {
+  dragging = true;
+}
+
 // onEnd maps one drop to one moveNode: the item's id, the list it landed in
-// (its data-parent, empty at the root) and its final index in that list.
+// (its data-parent, empty at the root) and its final index in that list. The
+// index is read from the tree the person was looking at, which is why nothing
+// was allowed to re-render underneath them.
 function onEnd(evt) {
-  if (evt.from === evt.to && evt.oldIndex === evt.newIndex) return;
+  dragging = false;
   const parent = evt.to.dataset.parent;
-  mutate(MOVE_NODE, { id: evt.item.dataset.id, parentId: parent === "" ? null : parent, index: evt.newIndex });
+  const moved = evt.from !== evt.to || evt.oldIndex !== evt.newIndex;
+  if (moved) {
+    mutate(MOVE_NODE, { id: evt.item.dataset.id, parentId: parent === "" ? null : parent, index: evt.newIndex });
+  }
+  setTimeout(flush, 0);
 }
 
 async function onClick(event) {
@@ -218,10 +296,16 @@ async function onChange(event) {
   const field = event.target;
   const key = field.dataset.key;
   if (key === undefined) return;
+  // A number input reports an entry it could not parse as an empty value and
+  // sets badInput, so the text is no longer there to be quoted. The field's
+  // own validity is what tells that apart from a field a person cleared.
+  if (field.validity.badInput) {
+    refuse(field, "the entry is not a number, the served value stands");
+    return;
+  }
   const value = Number(field.value);
   if (field.value.trim() === "" || !Number.isFinite(value) || value < 0) {
-    status(`"${field.value}" is not a finite, non-negative number, the served value stands`, true);
-    field.value = field.dataset.served;
+    refuse(field, `"${field.value}" is not a finite, non-negative number, the served value stands`);
     return;
   }
   const [kind, target, name] = key.split("|");

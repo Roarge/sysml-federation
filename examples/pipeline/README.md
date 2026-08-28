@@ -139,3 +139,7 @@ The adapter reads the subset its `adapter/syntax` package documents and
 refuses any other construct with the file, line and column of the first
 one it meets. The model is edited only through the literals the adapter
 publishes as editable.
+
+The requirements document fetches its tree six levels deep. Anything
+below that is not shown, and the deepest row visible says so rather than
+offering a place to add more.
