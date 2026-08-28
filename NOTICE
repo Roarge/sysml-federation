@@ -1,0 +1,25 @@
+sysml-federation
+Copyright 2026 Roar Georgsen
+
+Licensed under the Apache License, Version 2.0; the text is in LICENSE.
+
+This repository, and the demo image built from it, carry the following
+third-party works.
+
+Cosmo router, version 0.343.1
+    By WunderGraph (github.com/wundergraph/cosmo).
+    Licensed under the Apache License, Version 2.0.
+    The router binary is copied from the image
+    ghcr.io/wundergraph/cosmo/router:0.343.1 into the demo image at /router,
+    and the licence text from the vendor's repository at tag router@0.343.1
+    (sha256 c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4)
+    is placed beside it at /router.LICENSE. The router is not part of this
+    repository's source.
+
+SortableJS, version 1.15.7
+    Copyright (c) 2019 All contributors to Sortable.
+    Licensed under the MIT License, whose text is at
+    examples/pipeline/ui/shared/LICENSE.SortableJS beside the vendored file
+    examples/pipeline/ui/shared/Sortable.min.js, taken from the
+    SortableJS/Sortable repository at tag 1.15.7
+    (sha256 bf4241bc73fef7f11c59a283a69fe8051cdd31c6d8ff5a2b9ba219e7831fcf76).
