@@ -71,8 +71,11 @@ same(texts("// note\nx"), ["// note", "\n", "x"], "a line note stops at the newl
 same(kinds("doc /* body */"), ["doc"], "doc and its body are one token");
 same(kinds("doc d /* body */"), ["doc"], "a named doc and its body are one token");
 same(kinds("doc"), ["keyword"], "doc on its own is a keyword");
-// The comment has to be there, or there is no doc token for the word to be
-// mistaken for and the case passes on nothing.
+// The doc alternative wants whitespace or a comment opening straight after
+// doc, so a word character there fails it with or without the lookahead the
+// alternative also carries, and no input separates doc(?!\w) from doc. What
+// this case holds is the reading: docking is one identifier, and a comment
+// behind it is still its own token.
 same(kinds("docking /* b */"), ["identifier", "space", "comment"],
   "docking before a comment is an identifier and the comment stays its own token");
 ok(KEYWORDS.has("doc"), "the keyword table carries doc");
