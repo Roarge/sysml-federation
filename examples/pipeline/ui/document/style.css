@@ -1,0 +1,58 @@
+/* style.css: the requirements document. Palette and type follow the story
+   canvas. Red marks a failing requirement and nothing else (D3). Fonts are
+   named by family only and nothing is fetched (SR-10). */
+:root {
+  --paper: oklch(98% 0.005 90);
+  --ink: oklch(25% 0.01 260);
+  --pencil: oklch(58% 0.01 260);
+  --shade: oklch(93% 0.006 90);
+  --red: oklch(55% 0.19 25);
+  --blue: oklch(52% 0.12 250);
+  --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 20px 28px; max-width: 1100px; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+h1, h2 { font-family: var(--display); font-weight: normal; margin: 0 0 8px; line-height: 1.1; }
+h1 { font-size: 30px; }
+h2 { font-size: 22px; }
+a { color: var(--blue); }
+a:hover { color: var(--ink); }
+.pencil { color: var(--pencil); }
+header { margin-bottom: 16px; }
+header p { margin: 4px 0; }
+header nav { display: flex; gap: 14px; margin: 4px 0; }
+#status { min-height: 1.4em; color: var(--pencil); }
+#status.error { color: var(--red); }
+button { font: inherit; padding: 4px 12px; border: 1.5px solid var(--ink); border-radius: 3px; background: var(--paper); color: var(--ink); cursor: pointer; }
+button:hover { background: var(--shade); }
+input[type="number"] { font: inherit; font-family: var(--mono); width: 7em; padding: 2px 6px; border: 1.5px solid var(--ink); border-radius: 3px; background: var(--paper); color: var(--ink); }
+input[type="number"]:focus, [contenteditable]:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+.unit { color: var(--pencil); }
+/* the tree */
+.nodes { list-style: none; margin: 0; padding: 0; }
+.nodes .nodes { padding-left: 32px; min-height: 14px; }
+.node > .row { display: flex; gap: 10px; align-items: flex-start; border: 1.5px solid var(--ink); border-radius: 3px; padding: 8px 10px; margin: 6px 0; background: var(--paper); }
+.node.fail > .row { border-color: var(--red); border-width: 2.5px; }
+.node.fail > .row .verdict b { color: var(--red); }
+.kind-prose > .row { border-style: dashed; border-color: var(--pencil); }
+.grip { cursor: grab; color: var(--pencil); font-family: var(--mono); font-weight: bold; user-select: none; padding-top: 2px; }
+.sortable-ghost { opacity: 0.4; }
+.sortable-chosen > .row { background: var(--shade); }
+.number { font-family: var(--display); font-size: 18px; min-width: 2.6em; padding-top: 1px; }
+.content { flex: 1 1 auto; min-width: 0; }
+.tools { display: flex; flex-direction: column; gap: 4px; }
+.tools button { font-size: 12px; padding: 2px 8px; white-space: nowrap; }
+.kind-heading .text { font-family: var(--display); font-size: 22px; margin: 0; }
+.prose { margin: 0; }
+.requirement p { margin: 2px 0; }
+.requirement .head { font-weight: 600; }
+.short { color: var(--pencil); font-family: var(--mono); font-size: 14px; font-weight: normal; margin-right: 6px; }
+.requirement dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; margin: 4px 0; }
+.requirement dt { color: var(--pencil); }
+.requirement dd { margin: 0; }
+/* the excluded tray */
+#excluded-tray { border: 1.5px dashed var(--pencil); border-radius: 3px; padding: 10px 12px; margin-top: 20px; background: var(--shade); }
+#excluded-tray h2 { margin-bottom: 4px; }
+.excluded-item { margin: 4px 0; }
