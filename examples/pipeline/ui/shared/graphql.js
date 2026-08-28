@@ -45,19 +45,31 @@ async function readJSON(response) {
   }
 }
 
+// refusalIn answers the sentence a GraphQL answer carries, or null where it
+// carries none. A refusal is a sentence the adapter wrote, and that sentence
+// is what the person needs rather than the number in front of it.
+const refusalIn = (body) =>
+  body !== null && Array.isArray(body.errors) && body.errors.length > 0 ? messageOf(body.errors) : null;
+
+// failureOf names why an answer cannot be used. The body is read first and
+// the status is the fallback for an answer that carries no error of its own.
+// Both entry points below judge a refusal this way, so the same failure
+// reaches a person in the same words whichever one met it.
+async function failureOf(response) {
+  return refusalIn(await readJSON(response)) ?? `the router answered ${statusOf(response)}`;
+}
+
 export async function query(document, variables = {}) {
   const response = await fetch(ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ query: document, variables }),
   });
-  // The body is read before the status is judged. A refusal is a sentence
-  // the adapter wrote, carried in the errors array, and that sentence is
-  // what the person needs rather than the number in front of it. The status
-  // is the fallback for an answer that carries no error of its own.
+  // The body is read before the status is judged.
   const body = await readJSON(response);
-  if (body !== null && Array.isArray(body.errors) && body.errors.length > 0) {
-    throw new Error(messageOf(body.errors));
+  const refusal = refusalIn(body);
+  if (refusal !== null) {
+    throw new Error(refusal);
   }
   if (body === null) {
     throw new Error(`the router answered ${statusOf(response)} and no GraphQL body`);
@@ -123,11 +135,25 @@ export function subscribe(document, onEvent, onError = () => {}) {
     }, STALL_MS);
   };
 
+  // report hands an error to the app. The loop below is the only thing
+  // keeping the app in touch with the router, and a handler that throws must
+  // not take it down: the app would then sit on stale data with nothing left
+  // to reconnect it. There is nowhere further to report a reporter that
+  // failed, so the throw stops here and the subscription carries on.
+  const report = (err) => {
+    try {
+      onError(err);
+    } catch {
+      // deliberately dropped, see above
+    }
+  };
+
   const onFrame = ({ event, data }) => {
     if (event !== "next" || data === "") return;
     const payload = JSON.parse(data);
-    if (Array.isArray(payload.errors) && payload.errors.length > 0) {
-      onError(new Error(messageOf(payload.errors)));
+    const refusal = refusalIn(payload);
+    if (refusal !== null) {
+      report(new Error(refusal));
       return;
     }
     delay = BACKOFF_START_MS;
@@ -149,15 +175,15 @@ export function subscribe(document, onEvent, onError = () => {}) {
           signal: request.signal,
         });
         if (!response.ok || response.body === null) {
-          throw new Error(`the router answered ${statusOf(response)}`);
+          throw new Error(await failureOf(response));
         }
         await readStream(response.body, (frame) => {
           watch(request);
           onFrame(frame);
         });
-        if (active) onError(new Error(`the stream ended, reconnecting in ${delay / 1000} s`));
+        if (active) report(new Error(`the stream ended, reconnecting in ${delay / 1000} s`));
       } catch (err) {
-        if (active) onError(err);
+        if (active) report(err);
       } finally {
         // However this attempt ended, the response is finished with. A
         // refused status and a handler that threw both leave the body
