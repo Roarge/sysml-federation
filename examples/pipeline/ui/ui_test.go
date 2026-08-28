@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -86,6 +88,36 @@ func TestSR26_BothAppsRefetchWhenTheTabIsSeenAgain(t *testing.T) {
 				"the app to fetch the current state when the document becomes visible")
 		})
 	}
+}
+
+// emptyInsertReachPx is SortableJS's own default for emptyInsertThreshold: an
+// empty list claims a drop when the pointer comes within this many pixels of
+// it, on every side.
+const emptyInsertReachPx = 5
+
+var dropTail = regexp.MustCompile(`--drop-tail:\s*(\d+)px`)
+
+// SR-34: a node list keeps a strip of its own below its last row. Without one
+// the list, its last row and that row's own empty child list all end on the
+// same pixel, so a drop meant for the end of the list is taken by the last
+// row's empty child list and the item lands one level too deep. The drag
+// library reads "past the last row" as below the last row's bottom edge, and
+// it hands a drop to an empty list within emptyInsertReachPx of the pointer,
+// so the strip has to be wider than that reach to be aimed at.
+func TestSR34_ANodeListKeepsRoomPastItsLastRow(t *testing.T) {
+	css := read(t, "document/style.css")
+	found := dropTail.FindSubmatch(css)
+	assert.True(t, found != nil, "document/style.css to declare --drop-tail")
+	if found == nil {
+		return
+	}
+	tail, err := strconv.Atoi(string(found[1]))
+	assert.NoError(t, err)
+	assert.True(t, tail > emptyInsertReachPx,
+		fmt.Sprintf("--drop-tail of %d px to clear the drag library's %d px reach into an empty list",
+			tail, emptyInsertReachPx))
+	assert.True(t, bytes.Contains(css, []byte("padding: 0 0 var(--drop-tail)")),
+		"a node list to spend --drop-tail as the room below its last row")
 }
 
 // SC-06: report the size of each app, the shared module counted against the
