@@ -1,4 +1,4 @@
-# The missing integration layer for open MBSE
+# The missing integration layer for open MBSE?
 
 *Roar Georgsen, 27 August 2026*
 
