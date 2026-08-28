@@ -38,7 +38,7 @@ const MODEL_CHANGED = `subscription ModelChanged { modelChanged }`;
 
 const COMPARISON = { GE: ">=", GT: ">", LE: "<=", LT: "<", EQ: "=" };
 const el = (id) => document.getElementById(id);
-let served = null; // the last data the router served; the only thing ever rendered
+let served = null; // the last data the router served, the only thing ever rendered
 
 function status(message, isError = false) {
   el("status").textContent = message;
@@ -120,7 +120,7 @@ async function onChange(event) {
   if (key === undefined) return;
   const value = Number(field.value);
   if (field.value.trim() === "" || !Number.isFinite(value) || value < 0) {
-    status(`"${field.value}" is not a finite, non-negative number; the served value stands`, true);
+    status(`"${field.value}" is not a finite, non-negative number, the served value stands`, true);
     field.value = field.dataset.served;
     return;
   }

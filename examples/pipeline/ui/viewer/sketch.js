@@ -2,7 +2,7 @@
 //
 // Boxes are the part's child parts, arrows its connections, the caption its
 // capacity, and a box in the bottleneck set is outlined red. All of it comes
-// from the projection; the only thing computed here is where to draw it.
+// from the projection. The only thing computed here is where to draw it.
 // The markup is built as a string and inserted with innerHTML, which puts
 // the elements in the SVG namespace without naming its URL (SR-10).
 

@@ -4,7 +4,7 @@
 // tried at each position, its alternatives ordered by priority, and the
 // first alternative that matches decides the token. The keyword table is
 // the reserved-word list of OMG SysML v2 Part 1: Language, formal/26-03-02,
-// clause 8.2.2.1.2 "Lexical Structure" (C-82); nothing is copied from any
+// clause 8.2.2.1.2 "Lexical Structure" (C-82). Nothing is copied from any
 // implementation's grammar.
 
 export const KEYWORDS = new Set(`about abstract accept action actor after alias all allocate allocation analysis
@@ -20,7 +20,7 @@ specializes stakeholder standard state subject subsets succession terminate then
 timeslice to transition true until use variant variation verification verify via
 view viewpoint when while xor`.split(/\s+/));
 
-// Alternatives in priority order; each capturing group is one token type.
+// Alternatives in priority order, each capturing group is one token type.
 const TOKEN = new RegExp(
   [
     /\/\/\*[\s\S]*?\*\/|\/\/[^\n]*|\/\*[\s\S]*?\*\//.source, // 1 comment: multi-line note, line note, regular comment
