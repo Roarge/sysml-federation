@@ -71,6 +71,23 @@ func TestSR10_NoResourceFromAnotherOrigin(t *testing.T) {
 	assert.Contains(t, scanned, "viewer/app.js")
 }
 
+// visibilityRefetch matches the listener each app registers so that a page
+// which was hidden while the model moved catches up the moment it is looked at
+// again. The subscription's own liveness check is a timer, and a browser
+// throttles timers in a hidden tab, so a shorter timer would be throttled the
+// same way and nothing else in the app is bound to notice.
+var visibilityRefetch = regexp.MustCompile(
+	`(?s)addEventListener\("visibilitychange".{0,200}visibilityState === "visible".{0,80}refresh\(\)`)
+
+func TestSR26_BothAppsRefetchWhenTheTabIsSeenAgain(t *testing.T) {
+	for _, name := range []string{"viewer/app.js", "document/app.js"} {
+		t.Run(name, func(t *testing.T) {
+			assert.True(t, visibilityRefetch.Match(read(t, name)),
+				"the app to fetch the current state when the document becomes visible")
+		})
+	}
+}
+
 // SC-06: report the size of each app, the shared module counted against the
 // document app. Sortable.min.js is vendored, not hand-written, and is not
 // counted. The estimate beside each row is what the plan expected, and a

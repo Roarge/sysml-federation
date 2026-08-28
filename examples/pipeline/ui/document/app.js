@@ -328,6 +328,20 @@ async function onChange(event) {
   }
 }
 
+// A hidden tab is frozen by the browser once it has been idle for a few
+// minutes: the subscriptions' frames stop arriving and their watchdog, being a
+// timer, is throttled along with them, so a shorter timer would not help. The
+// page then shows what it last had and says nothing about it. Asking for the
+// current state the moment the page is looked at again closes that window
+// whatever the streams are doing. The subscriptions are deliberately left
+// alone: an overdue timer fires as soon as the tab runs again, so a stream
+// that died while hidden is torn down and reconnected without anything here,
+// and restarting a healthy one would cost two reconnections on every tab
+// switch.
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") refresh();
+});
+
 if (typeof Sortable !== "function") status("Sortable.min.js did not load, drag and drop is unavailable", true);
 document.addEventListener("click", onClick);
 el("tree").addEventListener("change", onChange);

@@ -164,6 +164,19 @@ async function onReset() {
   }
 }
 
+// A hidden tab is frozen by the browser once it has been idle for a few
+// minutes: the subscription's frames stop arriving and its watchdog, being a
+// timer, is throttled along with them, so a shorter timer would not help. The
+// page then shows what it last had and says nothing about it. Asking for the
+// current state the moment the page is looked at again closes that window
+// whatever the stream is doing. The subscription is deliberately left alone:
+// an overdue timer fires as soon as the tab runs again, so a stream that died
+// while hidden is torn down and reconnected without anything here, and
+// restarting a healthy one would cost a reconnection on every tab switch.
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") refresh();
+});
+
 el("inputs").addEventListener("change", onChange);
 el("reset").addEventListener("click", onReset);
 subscribe(MODEL_CHANGED, refresh, (err) => status(`live updates: ${err.message}`, true));
