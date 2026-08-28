@@ -1,3 +1,36 @@
-<!doctype html>
-<html lang="en-GB"><head><meta charset="utf-8"><title>Model viewer</title></head>
-<body><p>The model viewer is not built yet.</p></body></html>
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model viewer</title>
+<link rel="stylesheet" href="/viewer/style.css">
+</head>
+<body>
+<header>
+  <h1>Model viewer</h1>
+  <p class="lead">The SysML v2 model as served, beside a sketch drawn from its wiring. Everything shown here arrives through the router.</p>
+  <nav><a href="/document/">Requirements document</a> <a href="/playground">Playground</a></nav>
+  <button id="reset" type="button">Reset</button>
+  <p id="status" role="status"></p>
+</header>
+<main>
+  <section id="text-pane">
+    <h2>Model text <span id="version" class="pencil"></span></h2>
+    <div id="edits">
+      <h3>Editable values</h3>
+      <p class="pencil">The literals the projection marks editable. An edit is patched into the served text below.</p>
+      <div id="inputs"></div>
+    </div>
+    <pre id="text" class="source"></pre>
+  </section>
+  <section id="sketch-pane">
+    <h2>Wiring</h2>
+    <div id="sketch"></div>
+    <h2>Requirements</h2>
+    <div id="requirements"></div>
+  </section>
+</main>
+<script type="module" src="/viewer/app.js"></script>
+</body>
+</html>

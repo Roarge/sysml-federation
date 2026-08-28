@@ -59,4 +59,30 @@ func TestSR10_NoResourceFromAnotherOrigin(t *testing.T) {
 	assert.Contains(t, scanned, "shared/graphql.js")
 	assert.Contains(t, scanned, "shared/Sortable.min.js")
 	assert.Contains(t, scanned, "shared/LICENSE.SortableJS")
+	assert.Contains(t, scanned, "viewer/index.html")
+	assert.Contains(t, scanned, "viewer/app.js")
+}
+
+// SC-06: report the size of each app, the shared module counted against the
+// document app. Sortable.min.js is vendored, not hand-written, and is not
+// counted. The estimate beside each row is what the plan expected, and a
+// count above it is reported rather than failed: size never breaks a build.
+func TestSC06_LineBudgets(t *testing.T) {
+	cases := []struct {
+		app      string
+		files    []string
+		estimate int
+	}{
+		{"viewer JavaScript", []string{"viewer/app.js", "viewer/tokeniser.js", "viewer/sketch.js"}, 900},
+		{"viewer CSS", []string{"viewer/style.css"}, 300},
+	}
+	for _, c := range cases {
+		t.Run(c.app, func(t *testing.T) {
+			total := 0
+			for _, name := range c.files {
+				total += bytes.Count(read(t, name), []byte("\n"))
+			}
+			t.Logf("%s: %d lines, the plan estimated %d", c.app, total, c.estimate)
+		})
+	}
 }
