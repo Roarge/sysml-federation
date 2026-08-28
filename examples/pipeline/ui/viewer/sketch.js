@@ -82,7 +82,7 @@ export function render(part) {
       + `<text class="label" x="${x + BOX_W / 2}" y="${y + 21}">${esc(p.name)}</text>`
       + `<text class="value" x="${x + BOX_W / 2}" y="${y + 39}">${esc(values)}</text></g>`);
   }
-  const capacity = part.capacity === null ? "capacity not computed" : `capacity ${part.capacity}`;
+  const capacity = part.capacity === null ? "capacity not computed" : `capacity ${esc(part.capacity)}`;
   const bottleneck = part.bottleneck.length === 0 ? "" : `, bottleneck ${part.bottleneck.map((b) => esc(b.name)).join(", ")}`;
   out.push(`<text class="caption" x="${MARGIN}" y="${height - 10}">${capacity}${bottleneck}</text></svg>`);
   return out.join("");

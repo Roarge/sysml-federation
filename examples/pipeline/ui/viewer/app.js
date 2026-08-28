@@ -21,8 +21,8 @@ const VIEWER_QUERY = `query ViewerApp {
     requirements {
       id shortName name text quantity comparison limit limitUnit limitEditable
       subject { id name }
-      derivedFrom { shortName } derives { shortName }
-      satisfiedBy { name } verifiedBy { shortName }
+      derivedFrom { shortName name } derives { shortName name }
+      satisfiedBy { name } verifiedBy { shortName name }
       verdict verdictReason
     }
   }
@@ -38,7 +38,12 @@ const MODEL_CHANGED = `subscription ModelChanged { modelChanged }`;
 
 const COMPARISON = { GE: ">=", GT: ">", LE: "<=", LT: "<", EQ: "=" };
 const el = (id) => document.getElementById(id);
-let served = null; // the last data the router served, the only thing ever rendered
+
+// generation counts the refreshes. Two of them can be in flight at once, one
+// from a version event and one from an edit, and the router is free to answer
+// them in either order. The counter says which answer is still the latest, so
+// a slow one is dropped rather than painted over a newer one.
+let generation = 0;
 
 function status(message, isError = false) {
   el("status").textContent = message;
@@ -94,7 +99,6 @@ function renderRequirement(r) {
 }
 
 function render(data) {
-  served = data;
   const { model } = data;
   const focused = document.activeElement?.dataset?.key ?? null;
   el("version").textContent = `version ${model.version}`;
@@ -106,22 +110,38 @@ function render(data) {
 }
 
 async function refresh() {
+  const mine = ++generation;
   try {
-    render(await query(VIEWER_QUERY));
+    const data = await query(VIEWER_QUERY);
+    if (mine !== generation) return;
+    render(data);
     status("");
   } catch (err) {
+    if (mine !== generation) return;
     status(err.message, true);
   }
+}
+
+// refuse puts the served value back and says why the entry was not sent.
+function refuse(field, message) {
+  status(message, true);
+  field.value = field.dataset.served;
 }
 
 async function onChange(event) {
   const field = event.target;
   const key = field.dataset.key;
   if (key === undefined) return;
+  // A number input reports an entry it could not parse as an empty value and
+  // sets badInput, so the text is no longer there to be quoted. The field's
+  // own validity is what tells that apart from a field a person cleared.
+  if (field.validity.badInput) {
+    refuse(field, "the entry is not a number, the served value stands");
+    return;
+  }
   const value = Number(field.value);
   if (field.value.trim() === "" || !Number.isFinite(value) || value < 0) {
-    status(`"${field.value}" is not a finite, non-negative number, the served value stands`, true);
-    field.value = field.dataset.served;
+    refuse(field, `"${field.value}" is not a finite, non-negative number, the served value stands`);
     return;
   }
   const [kind, target, name] = key.split("|");

@@ -1,6 +1,6 @@
 /* style.css: the viewer. Palette and type follow the story canvas: paper,
    ink, pencil, shade, red and blue, with red the only accent (D3). Fonts
-   are named by family only; nothing is fetched (SR-10). */
+   are named by family only, so nothing is fetched (SR-10). */
 :root {
   --paper: oklch(98% 0.005 90);
   --ink: oklch(25% 0.01 260);
