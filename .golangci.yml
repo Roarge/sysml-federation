@@ -1,0 +1,56 @@
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - errorlint
+    - gocritic
+    - misspell
+    - nilerr
+    - revive
+    - unconvert
+    - usestdlibvars
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        # Reports field ordering that costs readability for a few bytes.
+        - fieldalignment
+        # Fires on `if err := f(); err != nil` inside a function that already
+        # has an `err`, which is the most common idiom in the language.
+        - shadow
+    revive:
+      rules:
+        - name: exported
+          disabled: false
+  exclusions:
+    generated: lax
+    rules:
+      - path: '_test\.go'
+        linters:
+          - errcheck
+          - gosec
+          - prealloc
+          - unparam
+      # Fixtures are deliberately malformed; they exist to be diagnosed.
+      - path: 'testdata/'
+        linters:
+          - errcheck
+          - govet
+          - revive
+          - staticcheck
+          - unused
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/Roarge/sysml-federation

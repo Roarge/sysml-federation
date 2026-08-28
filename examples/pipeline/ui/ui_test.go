@@ -131,3 +131,46 @@ func TestEveryModuleParses(t *testing.T) {
 	// Without this the test would pass on a walk that found nothing.
 	assert.Contains(t, parsed, "shared/graphql.js")
 }
+
+// TestPureModulesUnderNode holds the two viewer modules that are functions of
+// their arguments alone to what they are expected to return. The tokeniser and
+// the layout have no DOM and no network under them, which makes them the only
+// part of either app a test can reach without a browser, and
+// testdata/module-checks.js is that test: it imports both and asserts about
+// what they give back.
+//
+// The two modules are copied beside the script under their own names, with a
+// package.json that fixes the parse goal at ES module, so that the layout
+// module's own import of the tokeniser resolves the way it does in the
+// browser. node is not part of this project's toolchain, so a machine without
+// it skips rather than fails, and says what went unchecked.
+func TestPureModulesUnderNode(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node is not on the path, so the tokeniser and the layout were not exercised here")
+	}
+	dir := t.TempDir()
+	put := func(name string, data []byte) {
+		t.Helper()
+		if err := os.WriteFile(filepath.Join(dir, name), data, 0o600); err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+	}
+	put("package.json", []byte(`{"type": "module"}`))
+	put("tokeniser.js", read(t, "viewer/tokeniser.js"))
+	put("sketch.js", read(t, "viewer/sketch.js"))
+	script, err := os.ReadFile(filepath.Join("testdata", "module-checks.js"))
+	assert.NoError(t, err)
+	put("module-checks.js", script)
+
+	run := exec.Command(node, "module-checks.js")
+	run.Dir = dir
+	report, err := run.CombinedOutput()
+	t.Logf("%s", bytes.TrimSpace(report))
+	if err != nil {
+		t.Fatalf("the module checks did not pass: %v", err)
+	}
+	// Without this the test would pass on a script that asserted nothing.
+	assert.True(t, bytes.Contains(report, []byte(" checks passed")),
+		"the script to report how many checks it ran")
+}
