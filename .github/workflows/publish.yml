@@ -33,8 +33,12 @@ jobs:
           images: ${{ env.IMAGE }}
           tags: |
             type=semver,pattern={{version}}
+          # No latest tag from here, by decision rather than by omission. This
+          # step runs before the image has been measured, and latest is what an
+          # untagged pull returns, so it is moved by a later step that runs only
+          # once the size gate has passed and only for a full release.
           flavor: |
-            latest=true
+            latest=false
 
       - uses: docker/build-push-action@v7
         with:
@@ -42,7 +46,8 @@ jobs:
           file: examples/pipeline/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          # Off, so the package page lists exactly two platforms (C-52).
+          # Off, so the index holds exactly two manifests (C-52), which the next
+          # step now asserts rather than assumes.
           provenance: false
           sbom: false
           tags: ${{ steps.meta.outputs.tags }}
@@ -55,6 +60,14 @@ jobs:
           set -euo pipefail
           repo="$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')"
           index="$(docker buildx imagetools inspect --raw "$repo:$VERSION")"
+          # Provenance and SBOM are off, so the index carries one manifest per
+          # platform and nothing else. An extra entry is something to look at
+          # before anyone pulls it.
+          count="$(printf '%s' "$index" | jq '.manifests | length')"
+          if [ "$count" != "2" ]; then
+            echo "::error::$repo:$VERSION has a manifest count of $count, expected exactly 2"
+            exit 1
+          fi
           for platform in linux/amd64 linux/arm64; do
             os="${platform%/*}"
             arch="${platform#*/}"
@@ -64,7 +77,17 @@ jobs:
               echo "::error::$repo:$VERSION has no $platform manifest"
               exit 1
             fi
-            size="$(docker buildx imagetools inspect --raw "$repo@$digest" | jq '[.layers[].size, .config.size] | add')"
+            # jq's add treats an absent or null size as zero, which would
+            # under-count a platform instead of failing, so every size is
+            # checked to be a number before any of them are summed. An empty
+            # layers array is rejected here too.
+            size="$(docker buildx imagetools inspect --raw "$repo@$digest" | jq -r '
+              if (.layers | type) != "array" or (.layers | length) == 0 then
+                "no layers"
+              else
+                [.layers[].size, .config.size]
+                | if any(type != "number") then "a size is absent or not a number" else add end
+              end')"
             # A size that is not a run of digits would make the comparison
             # below answer false and pass a platform nothing was measured
             # for, so it fails here instead.
@@ -80,3 +103,30 @@ jobs:
               exit 1
             fi
           done
+
+      # Registry-counted sizes cannot be had without pushing, so the version tag
+      # goes up first and is measured there. Only now does latest move. A gate
+      # that fails takes the job down before this step, and latest keeps
+      # pointing where it pointed, so an untagged pull never returns an image
+      # the gate rejected. The version tag itself is left in the registry and
+      # has to be deleted by hand.
+      - name: Move latest to the measured image (SR-01)
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          set -euo pipefail
+          repo="$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')"
+          # A hyphen after the patch number is semver's pre-release marker and
+          # {{version}} carries it through, so v0.1.0-rc1 arrives here as
+          # 0.1.0-rc1 and is recognised rather than assumed away.
+          case "$VERSION" in
+            *-*)
+              echo "$VERSION is a pre-release, so latest stays where it is"
+              exit 0
+              ;;
+          esac
+          # A second tag over the index that is already published, so nothing is
+          # rebuilt and no blob is uploaded again: latest lands on the same
+          # bytes the step above measured.
+          docker buildx imagetools create --tag "$repo:latest" "$repo:$VERSION"
+          echo "latest now points at $repo:$VERSION"
