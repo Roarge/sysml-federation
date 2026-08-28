@@ -138,8 +138,14 @@ document service refused it the same way naming its own port.
 Both apps were driven by hand in a browser on 2026-08-28 against the stack
 described above, starting from the shipped model and the shipped document. The
 browser was Microsoft Edge 151 on Chromium 151, on x86-64 Linux reached from
-Windows. Where a row records something other than the expected result, the row
-says what happened instead.
+Windows, and the drags and the recovery of a stale page were run in Google
+Chrome 151 on the same host. Where a row records something other than the
+expected result, the row says what happened instead.
+
+A drag cannot be started from injected pointer input in this browser family, so
+the drag rows were driven by dispatching the drag events the library reads,
+three pixels at a time along the path a pointer would take. What the library
+decides from those events is what a pointer gives it, only sampled more finely.
 
 | Date | Requirement | What was run | What was observed |
 |---|---|---|---|
@@ -152,20 +158,22 @@ says what happened instead.
 | 2026-08-28 | SR-25 | `abc`, then `-5`, then an emptied field, each followed by Tab, in the viewer and again in the document | This browser refuses the letters. With the caret in the field and nothing selected, `abc` produced three `beforeinput` events, no `input` event, no change to the value and no change event on Tab, so the app said nothing and nothing moved. With the value selected first, the refused keystroke still cleared the selection, the field reported an empty value with `badInput` false and the app answered as it does for an emptied field. `-5` gave `"-5" is not a finite, non-negative number, the served value stands` and `-1` in the document gave the same sentence, and an emptied field gave it with an empty value quoted. Every refusal put the served value back and changed nothing else |
 | 2026-08-28 | US-12 | Reset pressed in each app | The shipped values came back in both apps within two seconds, and a Reset in one app was picked up by the other. A reset raises both counters rather than returning them to 1, so the header reads `version 1` only on a stack that has just started |
 | 2026-08-28 | SR-26 | The stack stopped under an open viewer, then started again | The status line read `live updates: network error` and then `live updates: Failed to fetch`, and the retries went out about 1, 2, 4, 8 and 8 seconds apart, each attempt taking about 2.4 seconds to fail against the closed port. After the restart the next attempt succeeded, and an edit made in the playground reached the viewer with no reload. With a control focused, an edit from the playground redrew the page and the same control kept focus |
+| 2026-08-28 | SR-26 | A viewer left in a background tab across two model changes and then read again, and the same page brought back from a stale state | The page was drawing the model as it stood two changes earlier, with an empty status line and no reconnection to make, which is the browser freezing a tab it thinks nobody is watching. Both apps ask the router for the current state whenever the page becomes visible, and a page holding a model two changes out of date redrew the served version, values, wiring caption and verdicts within a second of that, cleared its status line and went on taking live changes with no reload. Every browser reachable from here holds a page at one visibility state, so the event itself was raised in the page rather than by switching to the tab |
 | 2026-08-28 | SR-33, SR-37 | `/document/` opened on a freshly started stack | The unnumbered prose paragraph sits first, PIPE-R1 is `1` with PIPE-R1.1 to PIPE-R1.5 nested `1.1` to `1.5` in server order, PIPE-R2 is `2` and the header reads `document version 1, model version 1`. PIPE-R1's row carries its short name and text, `limit` as a control holding 1500, `derives PIPE-R1.1, PIPE-R1.2, PIPE-R1.3, PIPE-R1.4, PIPE-R1.5`, `satisfied by pipeline`, `current value capacity 1200` and a red `FAIL capacity 1200 against 1500, limited by parse`. PIPE-R1.2 carries `derived from PIPE-R1`, `satisfied by parse`, `current value capacity 1200`, `parse throughput` as a control holding 1200 and `FAIL throughput 1200 against 1500`. PIPE-R2 carries `limit latency <= 200 ms` as text, `verified by PIPE-VC1`, no current value and no control |
-| 2026-08-28 | SR-34 | PIPE-R1.5 dragged by its grip above PIPE-R1.1, then PIPE-R2 dragged into PIPE-R1's list | PIPE-R1.5 read `1.1` and the others `1.2` to `1.5` in their former order, with the prose and PIPE-R2 unchanged. PIPE-R2 moved into PIPE-R1's subtree and kept `verified by PIPE-VC1`, but it landed as a child of the last requirement in that list and read `1.5.1` rather than `1.6`. The band that would place an item after the last child of a list sits inside that child's own drop area, so the nesting is what a drop near the foot of a list gives |
+| 2026-08-28 | SR-34 | PIPE-R1.5 dragged by its grip above PIPE-R1.1, then PIPE-R2 dragged to the foot of PIPE-R1's list, then dragged again into PIPE-R1.5's own empty child list | PIPE-R1.5 read `1.1` and the others `1.2` to `1.5` in their former order, with the prose and PIPE-R2 unchanged. PIPE-R2 then landed as the last child of PIPE-R1 reading `1.6`, keeping `verified by PIPE-VC1` and its INCONCLUSIVE verdict, on one `moveNode` that raised the document counter and left the model counter alone. The third drag put the same item at `1.5.1`. A list keeps a strip below its last row, so the foot of a list and the last row's own empty child list are two places a drag can be aimed at separately |
 | 2026-08-28 | US-08 | `Heading above` on PIPE-R1, then `Add prose` on the new heading, then the heading text edited in place | The heading read `1`, PIPE-R1 read `1.1` and its children `1.1.1` to `1.1.5`. The paragraph appeared as the heading's last child, dashed and unnumbered. The heading text changed to `Performance budget` on Enter and came back from the service with that text. `Exclude` on PIPE-R1.4 took it out of the tree, moved PIPE-R1.5 to `1.1.4`, listed `PIPE-R1.4 indexBThroughput` in the tray with `Restore` and left PIPE-R1.4 in the viewer. `Restore` put it back as the last child at `1.1.5` |
 | 2026-08-28 | SR-36 | The header read through the moves, the heading, the paragraph and the exclusion above | The document counter rose through every one of them and the model counter did not move |
 | 2026-08-28 | SR-39 | PIPE-R1.2's throughput set to 1700 and PIPE-R1's limit to 1600 in the document, then parse to 1700 and indexA to 900 in the viewer | The document gave PIPE-R1.2 `PASS`, PIPE-R1 `FAIL capacity 1400 against 1500, limited by indexA, indexB`, and the viewer showed 1700 in the served text and `capacity 1400, bottleneck indexA, indexB` with no reload. The limit at 1600 put `1600` in the viewer's constraint literal. The edits made in the viewer gave the document `PASS capacity 1600 against 1500, limited by indexA, indexB`, PIPE-R1.3 `PASS` and PIPE-R1.4 `FAIL throughput 700 against 750` |
 | 2026-08-28 | Refusal text | `moveNode(id: "no-such-node", parentId: null, index: 0)` sent from the document's own client | The client threw with the message `no such node: no-such-node`, which is the whole of `errors[0].message` as the service wrote it |
 | 2026-08-28 | Depth limit | `Heading above` pressed four times on PIPE-R1, taking its children to the sixth level | Each row at the sixth level reads `The document is shown 6 levels deep, so this item cannot be nested any deeper.` and offers `Exclude` alone. Both `Add prose` and `Heading above` are withheld there, and they are present at every level above |
 
-A page left in a background tab for several minutes stops being updated,
-because the browser freezes the tab. The page shows no error when this happens,
-and a reload brings it back with the served state and live updates working
-again. A page loaded into a background tab and left there receives its updates
-normally, so the freeze is the browser's own idle handling rather than the
-subscription failing.
+A page left in a background tab for several minutes stops being updated, because
+the browser freezes the tab, and it shows no error while that lasts. Both apps
+ask the router for the current state whenever the page becomes visible, so a tab
+that missed changes while it was away is drawing the served model again by the
+time anyone reads it. A page loaded into a background tab and left there receives
+its updates normally, so the freeze is the browser's own idle handling rather
+than the subscription failing.
 
 Neither app logged anything to the console over the whole session, and no
 JavaScript error was raised.
