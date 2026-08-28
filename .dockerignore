@@ -1,18 +1,32 @@
-# The build context is the repository root. Keep it to what the Dockerfile
-# reads: go.mod, go.sum and the source trees. Everything else is local
-# tooling, planning, documentation or build output.
-.git
-.github
-.claude
-.remember
-CLAUDE.md
-planning
-docs
-tools
-scripts
-bin
-node_modules
-*.out
-*.test
-*.prof
-*.exe
+# The build context is the repository root. Everything is excluded, and only
+# what the Dockerfile reads is admitted again: go.mod, go.sum, the source
+# trees the supervisor is compiled from, and the two example files copied
+# into the image. A directory added to the repository later stays outside the
+# context until a rule below names it, so local tooling, working notes and
+# build output cannot reach a layer by being forgotten.
+*
+
+!go.mod
+!go.sum
+!adapter
+!cmd
+!examples/pipeline
+
+# Not read by the build, even inside the trees admitted above. These patterns
+# are unanchored, so they also catch a node_modules or a coverage profile
+# left inside the example by a local command.
+**/node_modules
+**/bin
+**/docs
+**/testdata
+**/*_test.go
+**/*.out
+**/*.test
+**/*.prof
+**/*.exe
+
+# Files beside the example that describe or build it rather than being read
+# by the image.
+examples/pipeline/Dockerfile
+examples/pipeline/README.md
+examples/pipeline/graph.yaml
