@@ -26,9 +26,10 @@ strings and comments distinguished by a small tokeniser whose keyword table
 cites the specification's reserved words (SR-11). The editable set, the
 throughput of each server and the limit of the global throughput
 requirement, is offered in an edit panel inside the text pane, above the
-model text. Every attribute the projection marks editable gets a control.
-A requirement's limit gets one only when the projection marks it editable
-and the requirement has reached a verdict. Nothing computes latency, so the
+model text. The panel carries a control for each editable attribute of the
+parts inside a root part, and every editable throughput sits there. A
+requirement's limit gets one only when the projection marks it editable and
+the requirement has reached a verdict. Nothing computes latency, so the
 latency requirement stands inconclusive and its limit gets no control even
 though the projection publishes that limit as editable. Every other value
 is read-only and the text itself is not editable (SR-13). The sketch is
@@ -69,9 +70,10 @@ disagree, because the adapter patches edited literals into the served text
 bottleneck exactly as the capacity service returns them, so the viewer is a
 faithful client and never a second implementation of the rollup. The
 tokeniser is not a parser. SR-11 is verified by demonstration and
-inspection, and the tokeniser is also exercised directly by checks the gate
-runs, which assert its token kinds, its byte spans, its escaping and its
-keyword table against a pure function that needs no browser.
+inspection, and the tokeniser is a pure function that needs no browser, so
+checks assert its token kinds, its byte spans, its escaping and its keyword
+table directly. The gate runs those checks where Node is present and skips
+them where it is not.
 
 An input at a literal's own position stays out of reach while the projection
 carries no source spans. Placing one would mean searching the served text for

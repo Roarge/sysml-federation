@@ -5,12 +5,13 @@ the alternatives considered, the consequences, the requirements affected and
 its sources. All twenty-six are accepted. They were written during the design
 phase, before any code, and copied here so that they can be read and
 challenged. One has been amended since, because building the viewer showed
-part of it to be unworkable. A record amended that way keeps its number and
-the original date in its status line, with a line at its head giving the date
-of the amendment and saying what changed. A record's status is `accepted`, or
-`accepted, with` whatever qualification the decision carries. A decision that
-replaces an earlier one gets its own number rather than overwriting it, and a
-number is never reused.
+that part of it could be met only by reading the notation a second time and
+less well than the adapter already reads it, which was the objection to it. A
+record amended that way keeps its number and the original date in its status
+line, with a line at its head giving the date of the amendment and saying what
+changed. A record's status is `accepted`, or `accepted` followed by whatever
+qualification the decision carries. A decision that replaces an earlier one
+gets its own number rather than overwriting it, and a number is never reused.
 
 Inside the records, `SR-nn` is a system requirement and `SC-nn` a design
 constraint, from the set of forty-five requirements and seven constraints
@@ -54,7 +55,7 @@ each produced.
 - <span class="rec-id">AD-0014</span> [Subscriptions as version events with client refetch](AD-0014-version-events.md)
 - <span class="rec-id">AD-0017</span> [Vanilla web apps with one vendored file](AD-0017-vanilla-web-apps.md)
 - <span class="rec-id">AD-0025</span> [The document owns its structure and nothing else](AD-0025-document-owns-its-structure.md)
-- <span class="rec-id">AD-0026</span> [The viewer shows the model's text beside a sketch of its wiring](AD-0026-viewer-shows-text-and-wiring.md)
+- <span class="rec-id">AD-0026</span> [The viewer shows the model's text beside a sketch of its wiring](AD-0026-viewer-shows-text-and-wiring.md) (amended)
 
 ## The repository
 

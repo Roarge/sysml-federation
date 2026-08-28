@@ -145,17 +145,16 @@ expected result, the row says what happened instead.
 A drag cannot be started from injected pointer input in this browser family, so
 the drag rows were driven by dispatching the drag events the library reads,
 along the path a pointer would take, the first drag in five moves and the later
-walk three pixels at a time. The drags are the one part of the session where no
-pointer device was used. The library cannot tell the difference, because it
+walk three pixels at a time. The library cannot tell the difference, because it
 never reads an event's `isTrusted` flag, so a dispatched event reaches the same
 handlers a pointer's would. What happens at the foot of a list was settled by
 measuring the page as well as by reading the vendored library. Its
 `emptyInsertThreshold` defaults to five pixels, so an empty child list claims a
 drop from that far outside itself on every side, and a list that ends on the
 same pixel as its last row leaves nowhere to aim past that row. The remedy is
-the strip a list keeps below its last row, 20 px against that five-pixel reach,
-which is geometry rather than event handling, and a pointer meets it the same
-way.
+the strip a list keeps below its last row, 20 pixels against that five-pixel
+reach, which is geometry rather than event handling, and a pointer meets it
+the same way.
 
 | Date | Requirement | What was run | What was observed |
 |---|---|---|---|
