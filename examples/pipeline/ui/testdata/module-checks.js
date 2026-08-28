@@ -1,15 +1,17 @@
-// module-checks.js: what the viewer's two pure modules are expected to do.
+// module-checks.js: what the pure parts of the two apps are expected to do.
 //
-// The tokeniser and the layout are the only parts of either app that are
-// functions of their arguments alone, with no DOM and no network under them,
-// so they are the only parts a test can hold to account without a browser.
-// Everything here is an assertion about a return value.
+// The viewer's tokeniser, the viewer's layout and the shared client's frame
+// parser are the only parts of either app that are functions of their
+// arguments alone, with no DOM and no network under them, so they are the only
+// parts a test can hold to account without a browser. Everything here is an
+// assertion about a return value.
 //
-// This runs under node, from a Go test that copies the two modules beside it.
-// It is not served to a browser and is not part of either app.
+// This runs under node, from a Go test that copies the three modules beside
+// it. It is not served to a browser and is not part of either app.
 
 import { KEYWORDS, tokenise, esc, render } from "./tokeniser.js";
 import { layers, positions, render as sketch } from "./sketch.js";
+import { parseFrame } from "./graphql.js";
 
 let checks = 0;
 const failures = [];
@@ -240,6 +242,60 @@ const unset = {
 };
 ok(!sketch(unset).includes("throughput"), "an unset attribute is left out of the caption");
 ok(sketch(unset).includes("rate 7"), "a set attribute is written into the caption");
+
+// ------------------------------------------------------ the shared client --
+
+// parseFrame turns the text between two blank lines of a server-sent-events
+// stream into an event name and its data. It is the one part of the module
+// both apps sit on that can be reached without a network.
+
+// payload reads the data the way the subscription does, and answers null where
+// the text is not a document JSON.parse can take, so a broken join is reported
+// as a wrong value rather than thrown out of the script.
+const payload = (text) => {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+};
+
+// The router writes ":heartbeat" while nothing is happening. It has to come
+// back as no event at all, because a frame named "next" would be handed to the
+// app as though the model had moved.
+same(parseFrame(":heartbeat"), { event: "message", data: "" },
+  "a heartbeat comment gives no event name of its own and no data");
+same(parseFrame(':heartbeat\nevent: next\ndata: {"v":1}'), { event: "next", data: '{"v":1}' },
+  "a heartbeat in front of a frame leaves the frame alone");
+
+// The event name is what decides whether a frame reaches the app.
+same(parseFrame('event: next\ndata: {"data":{"modelChanged":2}}').event, "next",
+  "the event name is read from the frame");
+same(parseFrame("event: complete\ndata: ").event, "complete",
+  "the name of a closing frame is read as it was written");
+
+// A payload arrives over as many data lines as the sender chose, and the app
+// parses the join as one document. A join that dropped a line would leave
+// JSON.parse holding a fragment.
+const split = parseFrame('event: next\ndata: {"data":\ndata: {"modelChanged":\ndata: 3}}');
+same(split.data, '{"data":\n{"modelChanged":\n3}}',
+  "data over several lines is joined with the newlines between them");
+same(payload(split.data)?.data?.modelChanged, 3,
+  "the joined data parses as the payload it carried");
+
+// One space after the colon belongs to the format. A second one is the value's.
+same(parseFrame("data:1").data, "1", "a data line written without a space keeps its value");
+same(parseFrame("data:  x").data, " x", "only the first space after the colon is dropped");
+
+// CRLF. The stream reader normalises line endings before it cuts frames, so a
+// carriage return reaches parseFrame only when it is called on its own, and
+// the event name has to survive it: "next\r" is not the name the subscription
+// tests for. A data line keeps its carriage return, which is whitespace to the
+// JSON.parse that reads it next.
+const crlf = parseFrame('event: next\r\ndata: {"data":{"modelChanged":2}}\r');
+same(crlf.event, "next", "a carriage return does not become part of the event name");
+same(payload(crlf.data)?.data?.modelChanged, 2,
+  "a frame with CRLF endings still parses as the payload it carried");
 
 // ------------------------------------------------------------------ done --
 

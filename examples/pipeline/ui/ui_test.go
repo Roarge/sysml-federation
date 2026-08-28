@@ -81,7 +81,7 @@ func TestSR10_NoResourceFromAnotherOrigin(t *testing.T) {
 var visibilityRefetch = regexp.MustCompile(
 	`(?s)addEventListener\("visibilitychange".{0,200}visibilityState === "visible".{0,80}refresh\(\)`)
 
-func TestSR26_BothAppsRefetchWhenTheTabIsSeenAgain(t *testing.T) {
+func TestBothAppsRefetchWhenTheTabIsSeenAgain(t *testing.T) {
 	for _, name := range []string{"viewer/app.js", "document/app.js"} {
 		t.Run(name, func(t *testing.T) {
 			assert.True(t, visibilityRefetch.Match(read(t, name)),
@@ -97,14 +97,14 @@ const emptyInsertReachPx = 5
 
 var dropTail = regexp.MustCompile(`--drop-tail:\s*(\d+)px`)
 
-// SR-34: a node list keeps a strip of its own below its last row. Without one
-// the list, its last row and that row's own empty child list all end on the
-// same pixel, so a drop meant for the end of the list is taken by the last
-// row's empty child list and the item lands one level too deep. The drag
-// library reads "past the last row" as below the last row's bottom edge, and
-// it hands a drop to an empty list within emptyInsertReachPx of the pointer,
-// so the strip has to be wider than that reach to be aimed at.
-func TestSR34_ANodeListKeepsRoomPastItsLastRow(t *testing.T) {
+// A node list keeps a strip of its own below its last row. Without one the
+// list, its last row and that row's own empty child list all end on the same
+// pixel, so a drop meant for the end of the list is taken by the last row's
+// empty child list and the item lands one level too deep. The drag library
+// reads "past the last row" as below the last row's bottom edge, and it hands
+// a drop to an empty list within emptyInsertReachPx of the pointer, so the
+// strip has to be wider than that reach to be aimed at.
+func TestANodeListKeepsRoomPastItsLastRow(t *testing.T) {
 	css := read(t, "document/style.css")
 	found := dropTail.FindSubmatch(css)
 	assert.True(t, found != nil, "document/style.css to declare --drop-tail")
@@ -122,8 +122,8 @@ func TestSR34_ANodeListKeepsRoomPastItsLastRow(t *testing.T) {
 
 // SC-06: report the size of each app, the shared module counted against the
 // document app. Sortable.min.js is vendored, not hand-written, and is not
-// counted. The estimate beside each row is what the plan expected, and a
-// count above it is reported rather than failed: size never breaks a build.
+// counted. The estimate beside each row is the expected scale, and a count
+// above it is reported rather than failed: size never breaks a build.
 func TestSC06_LineBudgets(t *testing.T) {
 	cases := []struct {
 		app      string
@@ -141,7 +141,7 @@ func TestSC06_LineBudgets(t *testing.T) {
 			for _, name := range c.files {
 				total += bytes.Count(read(t, name), []byte("\n"))
 			}
-			t.Logf("%s: %d lines, the plan estimated %d", c.app, total, c.estimate)
+			t.Logf("%s: %d lines, the expected scale is %d", c.app, total, c.estimate)
 		})
 	}
 }
@@ -183,14 +183,14 @@ func TestEveryModuleParses(t *testing.T) {
 	assert.Contains(t, parsed, "shared/graphql.js")
 }
 
-// TestPureModulesUnderNode holds the two viewer modules that are functions of
-// their arguments alone to what they are expected to return. The tokeniser and
-// the layout have no DOM and no network under them, which makes them the only
-// part of either app a test can reach without a browser, and
-// testdata/module-checks.js is that test: it imports both and asserts about
-// what they give back.
+// TestPureModulesUnderNode holds the parts of the apps that are functions of
+// their arguments alone to what they are expected to return. The tokeniser,
+// the layout and the shared client's frame parser have no DOM and no network
+// under them, which makes them the only parts of either app a test can reach
+// without a browser, and testdata/module-checks.js is that test: it imports
+// all three and asserts about what they give back.
 //
-// The two modules are copied beside the script under their own names, with a
+// The modules are copied beside the script under their own names, with a
 // package.json that fixes the parse goal at ES module, so that the layout
 // module's own import of the tokeniser resolves the way it does in the
 // browser. node is not part of this project's toolchain, so a machine without
@@ -210,6 +210,7 @@ func TestPureModulesUnderNode(t *testing.T) {
 	put("package.json", []byte(`{"type": "module"}`))
 	put("tokeniser.js", read(t, "viewer/tokeniser.js"))
 	put("sketch.js", read(t, "viewer/sketch.js"))
+	put("graphql.js", read(t, "shared/graphql.js"))
 	script, err := os.ReadFile(filepath.Join("testdata", "module-checks.js"))
 	assert.NoError(t, err)
 	put("module-checks.js", script)
