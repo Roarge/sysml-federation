@@ -1,7 +1,6 @@
 # AD-0026 The viewer shows the model's text beside a sketch of its wiring
 
-Status: accepted, amended once the viewer was built. Date: 2026-08-27,
-amended 2026-08-28.
+Status: accepted, amended once the viewer was built. Date: 2026-08-27.
 
 Amendment, 2026-08-28: the decision as first accepted put the editable
 numbers inline at the literals' own positions, and it was revised to the

@@ -57,7 +57,7 @@ The model never carries the rollup arithmetic. An abstract part definition share
 
 ## The two apps
 
-The model viewer shows the SysML v2 model as its own text, with the editable numbers as inline inputs, beside a sketch of the pipeline drawn from the model's connections. The sketch shows each server's throughput, the rolled-up capacity and the current bottleneck, with a failing requirement in red ([the viewer shows text beside wiring](../decisions/AD-0026-viewer-shows-text-and-wiring.md)). The inline inputs did not survive: the editable numbers later moved to a panel above the text, as [article 08](08-planning-the-build.md) describes, and the decision record has been amended to match.
+The model viewer was to show the SysML v2 model as its own text, with the editable numbers as inline inputs, beside a sketch of the pipeline drawn from the model's connections. The sketch shows each server's throughput, the rolled-up capacity and the current bottleneck, with a failing requirement in red ([the viewer shows text beside wiring](../decisions/AD-0026-viewer-shows-text-and-wiring.md)). The inline inputs did not survive: the editable numbers later moved to a panel above the text, as [article 08](08-planning-the-build.md) describes, and the decision record has been amended to match.
 
 The requirements document shows the same requirements as a numbered document whose numbering is its own. The document owner reorders, nests, adds headings and prose, hides and restores requirements. Every requirement still shows the relationships that come from the model, the verdict and reason from the analysis, and the current value it is checked against, which can be edited in place ([the document owns its structure](../decisions/AD-0025-document-owns-its-structure.md)).
 
