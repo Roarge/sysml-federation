@@ -1,3 +1,28 @@
-<!doctype html>
-<html lang="en-GB"><head><meta charset="utf-8"><title>Requirements document</title></head>
-<body><p>The requirements document is not built yet.</p></body></html>
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Requirements document</title>
+<link rel="stylesheet" href="/document/style.css">
+<script src="/shared/Sortable.min.js"></script>
+</head>
+<body>
+<header>
+  <h1>Requirements document</h1>
+  <p class="lead">The same requirements as a numbered document. The order, numbering, headings and prose are the document's own. The text, relationships, current values and verdicts arrive through the router.</p>
+  <nav><a href="/viewer/">Model viewer</a> <a href="/playground">Playground</a></nav>
+  <p id="versions" class="pencil"></p>
+  <p id="status" role="status"></p>
+  <p class="toolbar"><button type="button" id="add-prose" data-act="prose">Add prose at end</button> <button type="button" id="reset" data-act="reset">Reset</button></p>
+</header>
+<main>
+  <ol id="tree" class="nodes" data-parent=""></ol>
+  <aside id="excluded-tray">
+    <h2>Excluded requirements</h2>
+    <div id="excluded"></div>
+  </aside>
+</main>
+<script type="module" src="/document/app.js"></script>
+</body>
+</html>

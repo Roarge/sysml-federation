@@ -492,6 +492,14 @@ func TestSR04_FourPathsOnOnePort(t *testing.T) {
 		assert.True(t, strings.HasPrefix(resp.Header.Get("Content-Type"), "text/html"), p+" is HTML")
 		assert.Equal(t, resp.Header.Get("Cache-Control"), "no-cache")
 	}
+	// The shared module is served from the same origin as the apps that
+	// import it. fs.Sub does not fail on a directory that is not embedded,
+	// so nothing short of a fetch through the handler tells a served
+	// /shared/ from an embed directive that left it out.
+	shared := get(t, base+"/shared/graphql.js")
+	assert.Equal(t, shared.StatusCode, http.StatusOK)
+	assert.True(t, strings.Contains(shared.Header.Get("Content-Type"), "javascript"),
+		"/shared/graphql.js is served as JavaScript")
 	assert.Equal(t, post(t, base+"/graphql", `{"query":"{ __typename }"}`), `{"data":{"__typename":"Query"}}`)
 	assert.Equal(t, get(t, base+"/playground").StatusCode, http.StatusOK)
 	for _, p := range []string{"/health/ready", "/health", "/other", "/viewer/sub/"} {

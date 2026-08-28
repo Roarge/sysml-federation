@@ -1,19 +1,228 @@
 package ui_test
 
 import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
 	"io/fs"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
+	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/Roarge/sysml-federation/examples/pipeline/ui"
 	"github.com/Roarge/sysml-federation/internal/assert"
 )
 
-// The apps are not written yet. Until they are, each app directory holds one
-// page, so the UI server serves a document at /viewer/ and /document/.
-func TestBothAppPagesAreEmbedded(t *testing.T) {
-	for _, name := range []string{"viewer/index.html", "document/index.html"} {
-		data, err := fs.ReadFile(ui.Files, name)
-		got := assert.Must(t, data, err)
-		assert.True(t, len(got) > 0, name+" is not empty")
+// sortableSHA256 is the digest of Sortable.min.js at tag 1.15.7 of
+// SortableJS/Sortable, the same value NOTICE records.
+const sortableSHA256 = "bf4241bc73fef7f11c59a283a69fe8051cdd31c6d8ff5a2b9ba219e7831fcf76"
+
+// vendored is the one JavaScript file this repository did not write. The
+// checksum above is what holds it, so nothing here parses it.
+const vendored = "shared/Sortable.min.js"
+
+func read(t *testing.T, name string) []byte {
+	t.Helper()
+	data, err := fs.ReadFile(ui.Files, name)
+	if err != nil {
+		t.Fatalf("%s: %v", name, err)
 	}
+	return data
+}
+
+func TestSR08_VendoredSortableChecksum(t *testing.T) {
+	sum := sha256.Sum256(read(t, vendored))
+	assert.Equal(t, hex.EncodeToString(sum[:]), sortableSHA256)
+	licence := read(t, "shared/LICENSE.SortableJS")
+	assert.True(t, bytes.HasPrefix(licence, []byte("MIT License")),
+		"LICENSE.SortableJS to open with the MIT heading")
+	assert.True(t, bytes.Contains(licence, []byte("Copyright (c) 2019 All contributors to Sortable")),
+		"LICENSE.SortableJS to carry the vendor's copyright line")
+}
+
+// absoluteURL matches a scheme-qualified URL anywhere, and a protocol-relative
+// URL where one can begin: after a quote, a backtick, an opening parenthesis
+// or an equals sign. A JavaScript line comment follows none of those. There
+// is no allowlist: the apps reference nothing outside their own origin.
+var absoluteURL = regexp.MustCompile("https?://|[\"'`(=]//")
+
+func TestSR10_NoResourceFromAnotherOrigin(t *testing.T) {
+	var scanned []string
+	err := fs.WalkDir(ui.Files, ".", func(path string, entry fs.DirEntry, err error) error {
+		if err != nil || entry.IsDir() {
+			return err
+		}
+		data := read(t, path)
+		scanned = append(scanned, path)
+		for _, m := range absoluteURL.FindAllIndex(data, -1) {
+			t.Errorf("%s: reference to another origin at byte %d: %q",
+				path, m[0], data[m[0]:min(m[1]+40, len(data))])
+		}
+		return nil
+	})
+	assert.NoError(t, err)
+	assert.Contains(t, scanned, "shared/graphql.js")
+	assert.Contains(t, scanned, vendored)
+	assert.Contains(t, scanned, "shared/LICENSE.SortableJS")
+	assert.Contains(t, scanned, "viewer/index.html")
+	assert.Contains(t, scanned, "viewer/app.js")
+}
+
+// visibilityRefetch matches the listener each app registers so that a page
+// which was hidden while the model moved catches up the moment it is looked at
+// again. The subscription's own liveness check is a timer, and a browser
+// throttles timers in a hidden tab, so a shorter timer would be throttled the
+// same way and nothing else in the app is bound to notice.
+var visibilityRefetch = regexp.MustCompile(
+	`(?s)addEventListener\("visibilitychange".{0,200}visibilityState === "visible".{0,80}refresh\(\)`)
+
+func TestBothAppsRefetchWhenTheTabIsSeenAgain(t *testing.T) {
+	for _, name := range []string{"viewer/app.js", "document/app.js"} {
+		t.Run(name, func(t *testing.T) {
+			assert.True(t, visibilityRefetch.Match(read(t, name)),
+				"the app to fetch the current state when the document becomes visible")
+		})
+	}
+}
+
+// emptyInsertReachPx is SortableJS's own default for emptyInsertThreshold: an
+// empty list claims a drop when the pointer comes within this many pixels of
+// it, on every side.
+const emptyInsertReachPx = 5
+
+var dropTail = regexp.MustCompile(`--drop-tail:\s*(\d+)px`)
+
+// A node list keeps a strip of its own below its last row. Without one the
+// list, its last row and that row's own empty child list all end on the same
+// pixel, so a drop meant for the end of the list is taken by the last row's
+// empty child list and the item lands one level too deep. The drag library
+// reads "past the last row" as below the last row's bottom edge, and it hands
+// a drop to an empty list within emptyInsertReachPx of the pointer, so the
+// strip has to be wider than that reach to be aimed at.
+func TestANodeListKeepsRoomPastItsLastRow(t *testing.T) {
+	css := read(t, "document/style.css")
+	found := dropTail.FindSubmatch(css)
+	assert.True(t, found != nil, "document/style.css to declare --drop-tail")
+	if found == nil {
+		return
+	}
+	tail, err := strconv.Atoi(string(found[1]))
+	assert.NoError(t, err)
+	assert.True(t, tail > emptyInsertReachPx,
+		fmt.Sprintf("--drop-tail of %d px to clear the drag library's %d px reach into an empty list",
+			tail, emptyInsertReachPx))
+	assert.True(t, bytes.Contains(css, []byte("padding: 0 0 var(--drop-tail)")),
+		"a node list to spend --drop-tail as the room below its last row")
+}
+
+// SC-06: report the size of each app, the shared module counted against the
+// document app. Sortable.min.js is vendored, not hand-written, and is not
+// counted. The estimate beside each row is the expected scale, and a count
+// above it is reported rather than failed: size never breaks a build.
+func TestSC06_LineBudgets(t *testing.T) {
+	cases := []struct {
+		app      string
+		files    []string
+		estimate int
+	}{
+		{"viewer JavaScript", []string{"viewer/app.js", "viewer/tokeniser.js", "viewer/sketch.js"}, 900},
+		{"viewer CSS", []string{"viewer/style.css"}, 300},
+		{"document JavaScript", []string{"document/app.js", "shared/graphql.js"}, 900},
+		{"document CSS", []string{"document/style.css"}, 300},
+	}
+	for _, c := range cases {
+		t.Run(c.app, func(t *testing.T) {
+			total := 0
+			for _, name := range c.files {
+				total += bytes.Count(read(t, name), []byte("\n"))
+			}
+			t.Logf("%s: %d lines, the expected scale is %d", c.app, total, c.estimate)
+		})
+	}
+}
+
+// TestEveryModuleParses is the only thing in the toolchain that reads the
+// JavaScript at all. Nothing compiles it and no test executes it, so
+// without this a syntax error would travel as far as the first browser to
+// load a page. "node --check" parses a file and stops, so this is a syntax
+// gate rather than a browser: it says nothing about whether the code works.
+//
+// Each file is written out under a .mjs name, which fixes the parse goal at
+// ES module whatever the node version thinks of a bare .js file. Every file
+// here is loaded by the apps as a module (AD-0017). node is not part of
+// this project's toolchain, so a machine without it skips rather than
+// fails, and the gate stays honest about what it did not do.
+func TestEveryModuleParses(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node is not on the path, so the JavaScript was not parsed here")
+	}
+	dir := t.TempDir()
+	var parsed []string
+	walked := fs.WalkDir(ui.Files, ".", func(path string, entry fs.DirEntry, err error) error {
+		if err != nil || entry.IsDir() || !strings.HasSuffix(path, ".js") || path == vendored {
+			return err
+		}
+		out := filepath.Join(dir, strings.ReplaceAll(strings.TrimSuffix(path, ".js"), "/", "_")+".mjs")
+		if err := os.WriteFile(out, read(t, path), 0o600); err != nil {
+			return err
+		}
+		if report, err := exec.Command(node, "--check", out).CombinedOutput(); err != nil {
+			t.Errorf("%s does not parse: %v\n%s", path, err, report)
+		}
+		parsed = append(parsed, path)
+		return nil
+	})
+	assert.NoError(t, walked)
+	// Without this the test would pass on a walk that found nothing.
+	assert.Contains(t, parsed, "shared/graphql.js")
+}
+
+// TestPureModulesUnderNode holds the parts of the apps that are functions of
+// their arguments alone to what they are expected to return. The tokeniser,
+// the layout and the shared client's frame parser have no DOM and no network
+// under them, which makes them the only parts of either app a test can reach
+// without a browser, and testdata/module-checks.js is that test: it imports
+// all three and asserts about what they give back.
+//
+// The modules are copied beside the script under their own names, with a
+// package.json that fixes the parse goal at ES module, so that the layout
+// module's own import of the tokeniser resolves the way it does in the
+// browser. node is not part of this project's toolchain, so a machine without
+// it skips rather than fails, and says what went unchecked.
+func TestPureModulesUnderNode(t *testing.T) {
+	node, err := exec.LookPath("node")
+	if err != nil {
+		t.Skip("node is not on the path, so the tokeniser and the layout were not exercised here")
+	}
+	dir := t.TempDir()
+	put := func(name string, data []byte) {
+		t.Helper()
+		if err := os.WriteFile(filepath.Join(dir, name), data, 0o600); err != nil {
+			t.Fatalf("%s: %v", name, err)
+		}
+	}
+	put("package.json", []byte(`{"type": "module"}`))
+	put("tokeniser.js", read(t, "viewer/tokeniser.js"))
+	put("sketch.js", read(t, "viewer/sketch.js"))
+	put("graphql.js", read(t, "shared/graphql.js"))
+	script, err := os.ReadFile(filepath.Join("testdata", "module-checks.js"))
+	assert.NoError(t, err)
+	put("module-checks.js", script)
+
+	run := exec.Command(node, "module-checks.js")
+	run.Dir = dir
+	report, err := run.CombinedOutput()
+	t.Logf("%s", bytes.TrimSpace(report))
+	if err != nil {
+		t.Fatalf("the module checks did not pass: %v", err)
+	}
+	// Without this the test would pass on a script that asserted nothing.
+	assert.True(t, bytes.Contains(report, []byte(" checks passed")),
+		"the script to report how many checks it ran")
 }

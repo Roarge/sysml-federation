@@ -137,6 +137,12 @@ __pycache__/
 !/.gitattributes
 !/.dockerignore
 !/.nointerface-baseline
+# The lint and editor settings the gate reads. Without these two rules a fresh
+# clone has no .golangci.yml, so `make lint` and `make fmt-check` run against
+# the tool's own defaults and the gate means something different there than it
+# means here.
+!/.editorconfig
+!/.golangci.yml
 !/LICENSE
 !/NOTICE
 !/README.md
