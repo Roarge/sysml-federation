@@ -71,10 +71,6 @@ Each row shows what comes from the model, what comes from the analysis, and what
 
 Every row has a grip. Drag `PIPE-R1.5` above `PIPE-R1.1` and within two seconds it reads `1.1` and the others `1.2` to `1.5` in their former order. Drag `PIPE-R2` into `PIPE-R1`'s list and it reads `1.6` while still showing `verified by PIPE-VC1`, because the relationship comes from the model and the number from the document. `Heading above` on `PIPE-R1`, with the text `Performance`, takes number `1` and pushes `PIPE-R1` to `1.1` and its children to `1.1.1` to `1.1.5`, and `Add prose` on the heading appends a dashed, unnumbered paragraph. `Exclude` on `PIPE-R1.4` removes it from the tree, `PIPE-R1.5` moves up to `1.1.4`, a tray lists it with `Restore`, and the viewer still lists `PIPE-R1.4` because nothing happened to the model. Excluding a node with children promotes them.
 
-![An excluded requirement listed in the tray beside a Restore button, with its former sibling renumbered](../img/app-document-excluded.png)
-
-*An excluded requirement waits in the tray. The sibling below it has taken its number, and the viewer goes on listing it because the model never heard about any of this.*
-
 The document service holds the tree and nothing else, the decision on [document-owned structure](../decisions/AD-0025-document-owns-its-structure.md), and its shipped tree is the one place the example's identifiers enter a service. Every edit above leaves the header reading `model version 1`, because a reorder, a heading, a paragraph or an exclusion is a document mutation and touches only the document's version. The value inputs go the other way: `PIPE-R1.2`'s throughput set to 1700 goes through the adapter, the model version rises, and the document's own version has not moved. Drag and drop is SortableJS, vendored as the one third-party file the decision on [vanilla web apps](../decisions/AD-0017-vanilla-web-apps.md) allows.
 
 ![The document's numbered tree with PIPE-R1.4 gone, above the viewer's blocks that still list it](../img/app-both-exclusion.png)

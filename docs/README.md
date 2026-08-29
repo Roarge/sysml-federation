@@ -20,6 +20,14 @@ One container image holds all of it, and the two pages below are what it serves 
 
 *The requirements document. Its numbering, headings and prose belong to a service that computes nothing, and the verdict on each row comes from one that has never read a model file.*
 
+The demo starts with one command:
+
+```
+docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
+```
+
+The package is public, so a host holding no registry account pulls it, and the index behind that name carries a `linux/amd64` manifest and a `linux/arm64` one. Leave the name untagged as it stands above. The release is tagged `v0.1.0` in git and the image is tagged `0.1.0` in the registry, so a pull of `:v0.1.0` finds nothing.
+
 1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
    The integration problem MBSE never solved, what SysML v2 changes, and the claim this repository makes.
 2. [The architecture in one sitting](articles/01-the-architecture-in-one-sitting.md)  
@@ -56,11 +64,3 @@ One container image holds all of it, and the two pages below are what it serves 
 ## The repository
 
 The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence. The same articles are rendered as a site at https://sysml-federation.org/.
-
-The demo starts with one command:
-
-```
-docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
-```
-
-The package is public, so a host holding no registry account pulls it, and the index behind that name carries a `linux/amd64` manifest and a `linux/arm64` one. Leave the name untagged as it stands above. The release is tagged `v0.1.0` in git and the image is tagged `0.1.0` in the registry, so a pull of `:v0.1.0` finds nothing.

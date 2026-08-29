@@ -59,5 +59,4 @@ What is here is one command that puts a model file, an analysis that has never r
 ---
 
 Previous: [The demo as it shipped](10-the-demo-being-built.md) · Index: [Federating a systems model](../README.md)
-
 Decision records: [docs/decisions](../decisions/README.md) · Repository: https://github.com/Roarge/sysml-federation
