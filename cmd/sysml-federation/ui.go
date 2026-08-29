@@ -11,7 +11,7 @@ import (
 // uiHandler is the UI server of AD-0011: the two apps and the shared module
 // from the embedded files, /graphql and /playground proxied to the router,
 // and / redirected to /viewer/ (SR-04). The router's health paths are not
-// proxied, so the published port shows exactly the four paths.
+// proxied, so the published port shows those paths and nothing else.
 func uiHandler(assets fs.FS, router *url.URL) (http.Handler, error) {
 	proxy := httputil.NewSingleHostReverseProxy(router)
 	// Flush every write: a subscription over SSE is one response that never
