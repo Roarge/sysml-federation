@@ -460,10 +460,10 @@ JavaScript error was raised.
 ### The container image
 
 The image was built from `examples/pipeline/Dockerfile` with the repository
-root as the build context and run on x86-64 Linux on 2026-08-28, with Docker
-29.7.2 and buildx 0.36.0. The two cross-architecture builds came from the same
-buildx on the same host. Nothing was pushed, so every figure below is read from
-a local build.
+root as the build context and run on x86-64 Linux on 2026-08-28 and 2026-08-29,
+with Docker 29.7.2 and buildx 0.36.0. The two cross-architecture builds came
+from the same buildx on the same host. Nothing was pushed, so every figure below
+is read from a local build.
 
 | Date | Requirement | What was run | What was observed |
 |---|---|---|---|
@@ -472,3 +472,19 @@ a local build.
 | 2026-08-28 | SR-07 | `/router.LICENSE` read from inside a container running the image and as the user the image runs as, then `/router -version` from the same image | The licence is the Apache License version 2.0 text, mode 644 owned by root, which uid 65532 can read and did. The binary reports version 0.343.1, Go 1.25.14, linux/amd64, built 2026-08-26 from revision `6a8da18`, so the certificate and the binary name one release |
 | 2026-08-28 | SR-06 | `docker buildx build --platform linux/amd64,linux/arm64` exported as an OCI layout, then the per-platform manifests read out of it | One image manifest per platform under a manifest list, with an attestation manifest for each. Compressed layers come to 44,845,388 bytes on amd64 and 41,470,306 on arm64, or 44,850,223 and 41,475,142 with the configuration blob added. The OCI exporter gzips as a registry push does, so these are what a registry manifest would report, and the router binary is 39,987,546 of the amd64 total |
 | 2026-08-28 | C-53 | `docker buildx build --platform linux/arm64` exported to a local directory, with the router image pinned by digest as well as by tag | `/router` and `/sysml-federation` are both `ELF 64-bit LSB executable, ARM aarch64`. The digest names the multi-platform index rather than one architecture, so the arm64 router still resolves from it |
+| 2026-08-29 | C-07 | The image run detached under `docker run --network none` at `LOG_LEVEL=debug` and left alone for nine minutes, then its log searched for `posthog`, `wundergraph.com`, `otel`, `otlp`, `lookup `, `no such host`, `network is unreachable` and `i/o timeout`, and for every dotted address it names | The container reached `healthy` and the first search found nothing. The log runs to 22 lines, all of them from the start-up, and it did not grow again, so nothing was retried and nothing timed out. The only dotted address in it is `127.0.0.1`, the user interface server binding the wildcard as `http://[::]:8080/` rather than in dotted form. Inside the container the sole interface is `lo`, so the run had no route to anything outside itself while it was watched |
+| 2026-08-29 | SR-03 | The router child's environment read from `/proc` in the running container's process namespace, and the container's own environment read back from `docker inspect` | The router process carries exactly `LISTEN_ADDR=127.0.0.1:3002`, `EXECUTION_CONFIG_FILE_PATH=/app/config.json`, `PLAYGROUND_PATH=/playground`, `DO_NOT_TRACK=1`, `COSMO_TELEMETRY_DISABLED=true`, `TRACING_ENABLED=false`, `METRICS_OTLP_ENABLED=false`, `SUBGRAPH_ERROR_PROPAGATION_MODE=pass-through`, `PROMETHEUS_ENABLED=false` and `LOG_LEVEL=debug`, and it logged `Usage tracking is disabled by the environment variable`. The container's own environment is the image's five variables with `LOG_LEVEL`, `PATH` and `SSL_CERT_FILE` beside them, and the last two reach the supervisor and not the router, so the child's environment is built rather than inherited |
+
+The image's five variables are inert on that path, since the supervisor builds
+the router child's whole environment itself, and they are in the image for
+anyone who runs the router binary out of it directly. Four of them are the four
+SR-03 names. The fifth, `PROMETHEUS_ENABLED=false`, closes a scrape endpoint
+rather than an outbound path, and the run bears that out: the listeners inside
+the container are the three subgraphs on `127.0.0.1:3011`, `:3012` and `:3013`,
+the router on `127.0.0.1:3002` and the user interface server on port 8080, with
+nothing on `127.0.0.1:8088`. Every connection open at the time was loopback to
+loopback.
+
+A container started with no network interface publishes no port, so nothing in
+this run reaches a browser, and the reload with the host offline that the
+request list under SR-10 leaves open is still open.
