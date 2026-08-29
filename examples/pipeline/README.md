@@ -17,15 +17,13 @@ integration layer for open MBSE."
 
     docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
 
-Then open `http://localhost:8080/`. That line fetches nothing today. Publishing
-runs from a version tag, no version tag has been pushed, and the package a first
-tag creates stays private until it is made public, which is a step the package's
-owner takes once. Until the tag exists and the package is public, the registry
-refuses the pull rather than reporting it missing, so a `denied` from the line
-above says the image is not there for anyone yet and says nothing about the
-reader's own setup. From a checkout there is nothing to wait for: `make image &&
-make run` builds the same Dockerfile for the host's own architecture and runs the
-result on the same port.
+Then open `http://localhost:8080/`. The image is published for `linux/amd64` and
+`linux/arm64`, the package is public, and a host with no registry credentials
+pulls it. An untagged pull returns `latest`, which the publishing workflow moves
+onto a version only after reading both platforms back from the registry and
+finding each inside the size ceiling. From a checkout, `make image && make run`
+builds the same Dockerfile for the host's own architecture and runs the result on
+the same port.
 
 Port 8080 carries five paths and nothing else. `/viewer/` is the model viewer,
 `/document/` the requirements document, `/shared/` the GraphQL client both apps
@@ -195,12 +193,13 @@ they are inert, because the supervisor hands the router child a complete
 environment of its own that sets the same five. They are in the image for anyone
 who runs `/router` out of it directly.
 
-Compressed as a registry counts them, the image comes to 44,845,388 bytes for
-amd64 and 41,470,306 bytes for arm64, against a published ceiling of 80,000,000.
-Those two figures are read from a two-platform build exported as a local OCI
-layout rather than from a manifest in a registry. The publishing workflow pushes
-the version tag, reads both platforms back from the registry, fails if either is
-over the ceiling, and moves `latest` only after that.
+Compressed as the registry counts them, the published manifests come to
+44,850,689 bytes for amd64 and 41,475,216 bytes for arm64, against a published
+ceiling of 80,000,000. Those figures are read from the registry rather than from
+a local build, because the publishing workflow pushes the version tag first,
+reads both platforms back, fails if either is over the ceiling, and moves
+`latest` only after that. An untagged pull therefore returns bytes that were
+measured where they landed.
 
 ## The model
 
@@ -474,8 +473,9 @@ JavaScript error was raised.
 The image was built from `examples/pipeline/Dockerfile` with the repository
 root as the build context and run on x86-64 Linux on 2026-08-28 and 2026-08-29,
 with Docker 29.7.2 and buildx 0.36.0. The two cross-architecture builds came
-from the same buildx on the same host. Nothing was pushed, so every figure below
-is read from a local build.
+from the same buildx on the same host. Every row but the last was run before
+anything was pushed, so those figures are read from a local build. The last row
+was run against the published image.
 
 | Date | Requirement | What was run | What was observed |
 |---|---|---|---|
@@ -486,6 +486,7 @@ is read from a local build.
 | 2026-08-28 | C-53 | `docker buildx build --platform linux/arm64` exported to a local directory, with the router image pinned by digest as well as by tag | `/router` and `/sysml-federation` are both `ELF 64-bit LSB executable, ARM aarch64`. The digest names the multi-platform index rather than one architecture, so the arm64 router still resolves from it |
 | 2026-08-29 | C-07 | The image run detached under `docker run --network none` at `LOG_LEVEL=debug` and left alone for nine minutes, then its log searched for `posthog`, `wundergraph.com`, `otel`, `otlp`, `lookup `, `no such host`, `network is unreachable` and `i/o timeout`, and for every dotted address it names | The container reached `healthy` and the first search found nothing. The log runs to 22 lines, all of them from the start-up, and it did not grow again, so nothing was retried and nothing timed out. The only dotted address in it is `127.0.0.1`, the user interface server binding the wildcard as `http://[::]:8080/` rather than in dotted form. Inside the container the sole interface is `lo`, so the run had no route to anything outside itself while it was watched |
 | 2026-08-29 | SR-03 | The router child's environment read from `/proc` in the running container's process namespace, and the container's own environment read back from `docker inspect` | The router process carries exactly `LISTEN_ADDR=127.0.0.1:3002`, `EXECUTION_CONFIG_FILE_PATH=/app/config.json`, `PLAYGROUND_PATH=/playground`, `DO_NOT_TRACK=1`, `COSMO_TELEMETRY_DISABLED=true`, `TRACING_ENABLED=false`, `METRICS_OTLP_ENABLED=false`, `SUBGRAPH_ERROR_PROPAGATION_MODE=pass-through`, `PROMETHEUS_ENABLED=false` and `LOG_LEVEL=debug`, and it logged `Usage tracking is disabled by the environment variable`. The container's own environment is the image's five variables with `LOG_LEVEL`, `PATH` and `SSL_CERT_FILE` beside them, and the last two reach the supervisor and not the router, so the child's environment is built rather than inherited |
+| 2026-08-29 | SR-01 | `docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation` on x86-64 Linux, from a shell holding no registry credential | The pull succeeded unauthenticated and the one command served the demo. `latest` resolved to the index `sha256:248a8f2ce973fa7972f8d8f4af8ac52a0e2f76db4aeeebffa0472a51720d0610`, which carries one manifest for `linux/amd64` and one for `linux/arm64`. On port 8080, `GET /` answered `302`, `/viewer/`, `/document/` and `/playground` answered `200`, `/shared/graphql.js` answered `200` and `/shared/` answered `404`, and a `POST` to `/graphql` gave `{"data":{"model":{"version":1}}}`. A query drawn from all three services gave `capacity 1200`, `bottleneck parse` and PIPE-R1 `FAIL capacity 1200 against 1500, limited by parse`. The stack was answering about two seconds after the container started. This row covers a Linux host alone |
 
 The image's five variables are inert on that path, since the supervisor builds
 the router child's whole environment itself, and they are in the image for
