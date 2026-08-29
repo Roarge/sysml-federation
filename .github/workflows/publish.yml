@@ -193,4 +193,13 @@ jobs:
           # step above measured rather than the version tag, so latest lands on
           # those bytes and on no others.
           docker buildx imagetools create --tag "$repo:latest" "$repo@$DIGEST"
+          # A tag is a mutable pointer, so what latest names is read back rather
+          # than reported from the command that moved it. It has to resolve to
+          # the digest the gate above measured, and a run that finds anything
+          # else fails here with both digests in the message.
+          moved="$(docker buildx imagetools inspect --format '{{.Manifest.Digest}}' "$repo:latest")"
+          if [ "$moved" != "$DIGEST" ]; then
+            echo "::error::$repo:latest resolves to $moved, expected $DIGEST"
+            exit 1
+          fi
           echo "latest now points at $repo@$DIGEST, published as $VERSION"
