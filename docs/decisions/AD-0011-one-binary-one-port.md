@@ -108,8 +108,10 @@ reports with the subgraphs down was unverified when this record was written,
 so the subgraphs are started first and the published port is opened last,
 and a spike settles what the health check proves. Another settles whether
 the child starts from environment alone. The UI server also sets
-`Cache-Control: no-cache` and answers 404 for directory paths, because
-`embed.FS` sends no cache headers and lists directories by default.
+`Cache-Control: no-cache` and answers 404 for a directory path with no page
+to send at it, because `embed.FS` sends no cache headers and lists
+directories by default. The shared path is one of those, so the files under
+it are reachable and the path itself is not.
 
 ## Requirements affected
 SR-01, SR-02, SR-04, SR-10, SR-40
