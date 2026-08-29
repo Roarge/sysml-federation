@@ -56,7 +56,8 @@ Two smaller things read differently from how they look. A Reset raises both vers
 
 What is here is one command that puts a model file, an analysis that has never read a model file, and a document that has never computed anything behind a single endpoint, with two pages in front that work nothing out for themselves. It is not a product and not an implementation of the SysML v2 API. It reads a file rather than fronting a repository, its parser covers a fraction of the notation, it forgets every edit when it stops, and its arithmetic is exact for an idealised pipeline and must not be used to plan capacity for a real one. The claim it was built to test is narrower than any of that, and it is the one thing the running image does demonstrate: three services that share no code and know nothing of each other answer one query about one requirement, and a stranger with Docker can watch them do it.
 
+Decision records: [docs/decisions](../decisions/README.md) · Repository: https://github.com/Roarge/sysml-federation
+
 ---
 
 Previous: [The demo as it shipped](10-the-demo-as-it-shipped.md) · Index: [Federating a systems model](../README.md)
-Decision records: [docs/decisions](../decisions/README.md) · Repository: https://github.com/Roarge/sysml-federation
