@@ -126,9 +126,11 @@ pulled at runtime. The root `NOTICE` names the router at a pinned
 version that moves with each bump (SR-08). Its licence text is fetched at
 build time at the pinned tag and sits beside `/router` (SR-07).
 
-`latest` follows the newest release that passes the gate, so it can drift from
-what the README describes if the README is not updated in the same tagged
-commit, a cost the packaging research names and the design accepts. It can also
+`latest` is what the launch line pulls, since it names no tag, so what `latest`
+points at decides what a stranger gets (SR-01). It follows the newest release
+that passes the gate, so it can drift from what the README describes if the
+README is not updated in the same tagged commit, a cost the packaging
+research names and the design accepts. It can also
 lag the newest tag in the registry instead of tracking it. A failed gate
 leaves the version tag published and `latest` where it was, and a pre-release
 moves nothing, so an untagged pull returns the last full release that was
@@ -138,7 +140,7 @@ is what `latest` names.
 
 ## Requirements affected
 
-SR-05, SR-06, SR-08, SC-07
+SR-01, SR-05, SR-06, SR-08, SC-07
 
 ## Sources
 
