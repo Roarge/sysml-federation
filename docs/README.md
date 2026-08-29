@@ -6,18 +6,6 @@ The goal of this project is to make SysML v2 models easier to integrate with the
 
 So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with one worked example. Next is a larger example and an adapter driven by SysML v2's own views and viewpoints.
 
-![Two apps, one graph, three services that never meet](img/overview-sketch.png)
-
-*Two apps, one graph, three services that never meet.*
-
-The demo starts with one command:
-
-```
-docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
-```
-
-The package is public, so a host holding no registry account pulls it, and the index behind that name carries a `linux/amd64` manifest and a `linux/arm64` one. Leave the name untagged as it stands above. The release is tagged `v0.1.0` in git and the image is tagged `0.1.0` in the registry, so a pull of `:v0.1.0` finds nothing.
-
 1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
    The integration problem MBSE never solved, what SysML v2 changes, and the claim this repository makes.
 2. [The architecture in one sitting](articles/01-the-architecture-in-one-sitting.md)  
