@@ -144,4 +144,4 @@ SR-01, SR-05, SR-06, SR-08, SC-07
 
 ## Sources
 
-GitHub's documentation on package visibility for a package first published under a personal account, and on the permissions a publishing workflow needs. Docker's pages on multi-platform builds, QEMU emulation and cross-compilation, `docker/metadata-action` and `docker/build-push-action`. The distroless static base image. [The demo being built](../articles/10-the-demo-being-built.md) for the Dockerfile and the publish job as they ship.
+GitHub's documentation on package visibility for a package first published under a personal account, and on the permissions a publishing workflow needs. Docker's pages on multi-platform builds, QEMU emulation and cross-compilation, `docker/metadata-action` and `docker/build-push-action`. The distroless static base image. [The demo as it shipped](../articles/10-the-demo-being-built.md) for the Dockerfile and the publish job as they ship.

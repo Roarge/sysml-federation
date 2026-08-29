@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 2 of 11 in [Federating a systems model](../README.md).
+Part 2 of 12 in [Federating a systems model](../README.md).
 
 The demo publishes a SysML v2 model of a five-server query pipeline through a federated GraphQL router, so that a capacity analysis and a requirements document, neither of which has ever read a line of SysML, can attach their own data to the model's parts and requirements. All of it runs in one container.
 
@@ -121,7 +121,7 @@ One thing in this design had not been exercised when the architecture was writte
 
 ## Where to go next
 
-The capacity model in full, with its assumptions, edge cases and the requirements it drove, is [From use cases to requirements](05-from-use-cases-to-requirements.md). The five architecture views and all twenty-six decisions, including the fourteen not touched here, are [Five views and twenty-six decisions](06-five-views-and-twenty-six-decisions.md). What the build produced, against the design described here, is [The demo being built](10-the-demo-being-built.md).
+The capacity model in full, with its assumptions, edge cases and the requirements it drove, is [From use cases to requirements](05-from-use-cases-to-requirements.md). The five architecture views and all twenty-six decisions, including the fourteen not touched here, are [Five views and twenty-six decisions](06-five-views-and-twenty-six-decisions.md). What the build produced, against the design described here, is [The demo as it shipped](10-the-demo-being-built.md).
 
 ---
 

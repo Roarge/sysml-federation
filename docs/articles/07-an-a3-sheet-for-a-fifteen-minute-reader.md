@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 8 of 11 in [Federating a systems model](../README.md).
+Part 8 of 12 in [Federating a systems model](../README.md).
 
 The demo takes a SysML v2 model, a capacity analysis and a requirements document, publishes each as a GraphQL subgraph (a service that owns part of one shared schema), composes the three into one graph and serves two web apps from it through a router (the one endpoint that plans a query across the subgraphs and merges their answers), all from one container. [The architecture in one sitting](01-the-architecture-in-one-sitting.md) describes it for someone who will build or change it.
 

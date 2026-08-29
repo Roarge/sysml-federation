@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 7 of 11 in [Federating a systems model](../README.md).
+Part 7 of 12 in [Federating a systems model](../README.md).
 
 The demo is a SysML v2 model of a five-server query pipeline, published as one federated GraphQL graph by three services in one container, with a capacity analysis and a requirements document joined to the model by the router that merges the three schemas, and edits from either app landing in the model text. Its architecture description was written for two readers who want different things from it, and a later reading of the description against the requirements changed several mechanisms without changing any decision. [The architecture in one sitting](01-the-architecture-in-one-sitting.md) covers the same ground at one sitting's length, and [an A3 sheet for a fifteen-minute reader](07-an-a3-sheet-for-a-fifteen-minute-reader.md) is what was cut from it.
 

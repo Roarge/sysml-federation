@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 11 of 11 in [Federating a systems model](../README.md).
+Part 11 of 12 in [Federating a systems model](../README.md).
 
 The demo is a SysML v2 model of a five-server query pipeline, published as a live GraphQL projection and joined at a federation router by a capacity service and a document service. A projection, here, is the small plainly typed view a consumer meets instead of the metamodel. Two web apps sit in front, and the whole thing ships as one container image that a single `docker run` starts. What follows describes it in the present tense. An earlier version of this article was written before any of it ran, from the design [Planning the build](08-planning-the-build.md) sets out, and it promised a revision once the image shipped. This is that revision.
 
@@ -14,7 +14,7 @@ The line below is what the first release publishes. The package has been made pu
 docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
 ```
 
-Once the image is pulled, the ready line appears within ten seconds on Linux, macOS or Windows with nothing installed beyond Docker. Port 8080 carries five paths. `/viewer` is the model viewer, `/document` the requirements document, `/shared` the client module both apps import and the drag library vendored beside it, `/graphql` the router's endpoint and `/playground` the router's own query editor. A request to `/` is redirected to the viewer. Nothing is written to disk, so stopping the container and starting it again returns the shipped state, model version 1 and document version 1.
+Once the image is pulled, the ready line appears within ten seconds. That has been watched on x86-64 Linux with nothing installed beyond Docker. The registry carries an amd64 manifest and an arm64 one, and Docker on macOS and Windows runs Linux containers, so the same line should follow there, though nobody has yet watched it do so. Port 8080 carries five paths. `/viewer` is the model viewer, `/document` the requirements document, `/shared` the client module both apps import and the drag library vendored beside it, `/graphql` the router's endpoint and `/playground` the router's own query editor. A request to `/` is redirected to the viewer. Nothing is written to disk, so stopping the container and starting it again returns the shipped state, model version 1 and document version 1.
 
 Behind the port one Go binary runs three subgraphs as goroutines, the vendor's router as a child process, and a UI server that serves both apps and proxies the router. A subgraph, in federation vocabulary, is a service publishing a fragment of a schema, and the router is the process that merges the fragments and plans each query across the services that hold the fields it names. The subgraphs and the router listen on loopback ports and only 8080 is published, which is the decision on [one binary, one process tree and one port](../decisions/AD-0011-one-binary-one-port.md), with the [child-process router](../decisions/AD-0010-router-as-child-process.md) copied out of the vendor's image rather than linked as a library.
 
@@ -169,6 +169,4 @@ The capacity arithmetic is exact for the idealised pipeline it describes, one wi
 
 ---
 
-Previous: [Five spikes before the first line](09-five-spikes-before-the-first-line.md) · Index: [Federating a systems model](../README.md)
-
-Decision records: [docs/decisions](../decisions/README.md) · Repository: https://github.com/Roarge/sysml-federation
+Previous: [Five spikes before the first line](09-five-spikes-before-the-first-line.md) · Index: [Federating a systems model](../README.md) · Next: [What shipped, and what did not](11-what-shipped-and-what-did-not.md)

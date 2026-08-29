@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 4 of 11 in [Federating a systems model](../README.md).
+Part 4 of 12 in [Federating a systems model](../README.md).
 
 The demo takes a SysML v2 model of a query pipeline and serves it as a GraphQL subgraph (one service's own slice of a larger schema) beside a capacity service and a requirements document service, composes the three with the Cosmo router (which joins the slices into one graph and answers queries), and puts two browser apps in front of the result, all from one image and one `docker run`. Before any of that was designed, the plan rested on beliefs about its tools, some from memory, some from vendor pages read months earlier. The design phase began by writing them down and trying to knock them over.
 

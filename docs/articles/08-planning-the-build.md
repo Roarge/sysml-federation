@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 9 of 11 in [Federating a systems model](../README.md).
+Part 9 of 12 in [Federating a systems model](../README.md).
 
 The demo is a SysML v2 model of a five-server query pipeline, served as one subgraph of a federated GraphQL graph beside a capacity service that computes where the pipeline's bottleneck sits and a document service that owns an editorial ordering of its requirements, the whole thing shipped as one container image. A subgraph is a GraphQL service that owns part of a shared schema, and the router is the process that composes the subgraphs into one graph and answers queries against it. [The architecture in one sitting](01-the-architecture-in-one-sitting.md) walks through the parts. This article is about the plan that turns the design record into code, and the decisions the plan had to take that the record had left open.
 

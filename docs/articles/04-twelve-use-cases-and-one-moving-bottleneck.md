@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 5 of 11 in [Federating a systems model](../README.md).
+Part 5 of 12 in [Federating a systems model](../README.md).
 
 The demo is a SysML v2 model of a five-server query pipeline, published through a federated GraphQL router to a capacity service, a document service and two web apps. A requirement's verdict can then be watched changing in a requirements document served by a service that has never parsed a model file.
 
