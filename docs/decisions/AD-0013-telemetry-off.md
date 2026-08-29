@@ -47,6 +47,13 @@ environment beside `LISTEN_ADDR`, `PLAYGROUND_PATH` and
 `EXECUTION_CONFIG_FILE_PATH`, and SR-03 states them as an obligation on the
 image and the router rather than as a rationale.
 
+A fifth `ENV` line sits beside those four, so the Dockerfile carries five.
+`PROMETHEUS_ENABLED=false` closes the scrape endpoint the router opens on
+loopback by default, which the supervisor also closes in the child's
+environment. It is a listener rather than an outbound path, so it is no part
+of SR-03, and its place in the image is for anyone who runs the router binary
+out of the image directly, where nothing builds an environment on their behalf.
+
 ## Alternatives considered
 
 Relying on the empty token alone, with the vendor's defaults otherwise in
@@ -78,9 +85,9 @@ The router also serves a Prometheus scrape endpoint, on `127.0.0.1:8088` unless
 it is told otherwise. That is a different mechanism from the exporters this
 record disables, since a scrape endpoint waits to be read and opens nothing
 outbound, so the air-gap claim never rested on it either way. It is switched off
-in the child's environment with `PROMETHEUS_ENABLED=false` because nothing here
-reads it, and a port with no reader is one more thing a port table has to
-explain.
+by `PROMETHEUS_ENABLED=false` in the child's environment and again in the
+image's `ENV` block, because nothing here reads it, and a port with no reader is
+one more thing a port table has to explain.
 
 The cost is a dependency on variable names the vendor does not document, and
 there are three of them: `DO_NOT_TRACK`, `COSMO_TELEMETRY_DISABLED` and the
@@ -116,4 +123,4 @@ image, and this record does not cover it.
 SR-03
 
 ## Sources
-The vendor's `router/.env.example`, which is the one place `DO_NOT_TRACK` and `COSMO_TELEMETRY_DISABLED` are named, and the vendor's pages on tracing and metrics exporters and on running without a graph token. [What the research overturned](../articles/03-what-the-research-overturned.md) for the finding as it stands and for what remains inferred rather than run, and [The demo being built](../articles/10-the-demo-being-built.md) for the four `ENV` lines and the air-gap demonstration.
+The vendor's `router/.env.example`, which is the one place `DO_NOT_TRACK` and `COSMO_TELEMETRY_DISABLED` are named, and the vendor's pages on tracing and metrics exporters and on running without a graph token. [What the research overturned](../articles/03-what-the-research-overturned.md) for the finding as it stands and for what remains inferred rather than run, and [The demo being built](../articles/10-the-demo-being-built.md) for the five `ENV` lines and the air-gap demonstration.
