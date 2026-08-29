@@ -2,6 +2,21 @@
 
 An adapter that publishes a SysML v2 model as a federated service, and a worked example joining it to a throughput analysis and a requirements document that know nothing about SysML.
 
+## Run it
+
+One container image carries both web apps, the router and the three services behind it, and it builds and runs with Docker alone.
+
+```
+docker build -f examples/pipeline/Dockerfile -t sysml-federation:dev .
+docker run --rm -p 8080:8080 sysml-federation:dev
+```
+
+Then open `http://localhost:8080/`, which redirects to the model viewer. The requirements document is at `/document/`, the router's endpoint at `/graphql` and its query editor at `/playground`. Nothing is written to disk, so stopping the container and starting it again brings the shipped model back. From a checkout that already has the Go toolchain the rest of the Makefile wants, `make image` and `make run` are those same two commands.
+
+The image itself is not published yet. Publishing runs from a version tag, no version tag has been pushed, and the package a first tag creates stays private until somebody makes it public by hand, so `docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation` fetches nothing today. Building from a clone needs no registry at all.
+
+What to try, what each service holds and where the demo stops are in [the example's own README](examples/pipeline/README.md). The design underneath it is in [docs/](docs/README.md).
+
 ## The integration problem
 
 Engineering organisations have always described their systems in documents. A requirements specification in one file, interface definitions in another, a power budget in a spreadsheet, a hazard analysis somewhere a third team owns. Every one of those describes the same system, and keeping them consistent with each other is manual work that nobody enjoys and everybody defers.
