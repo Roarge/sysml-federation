@@ -1,6 +1,12 @@
 # AD-0013 Telemetry disabled by environment baked into the image
 
-Status: accepted. Date: 2026-08-27.
+Status: accepted, amended once the image was built. Date: 2026-08-27.
+
+Amendment, 2026-08-29: the decision as first accepted named four `ENV` lines
+for the image and left `PROMETHEUS_ENABLED=false` to the router child's
+environment alone, so the scrape endpoint stayed open for anyone who ran the
+router binary out of the image directly. The image now carries that variable
+as a fifth `ENV` line beside the four, and it is no part of SR-03.
 
 ## Context
 
