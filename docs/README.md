@@ -10,16 +10,6 @@ So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with
 
 *Two apps, one graph, three services that never meet.*
 
-One container image holds all of it, and the two pages below are what it serves on port 8080. Neither of them works anything out for itself. The wiring, the arithmetic and the document ordering come from three services that share no code, joined only by the router in front of them.
-
-![The model viewer in the shipped state, with parse outlined red and the pipeline requirement failing beneath it](img/app-viewer-shipped.png)
-
-*The model viewer. The sketch is drawn from the model's own connect statements, parse holds the pipeline to 1200, and PIPE-R1 fails against its limit of 1500.*
-
-![The same requirements as a numbered document, with five derived requirements nested under the first](img/app-document-tree.png)
-
-*The requirements document. Its numbering, headings and prose belong to a service that computes nothing, and the verdict on each row comes from one that has never read a model file.*
-
 The demo starts with one command:
 
 ```

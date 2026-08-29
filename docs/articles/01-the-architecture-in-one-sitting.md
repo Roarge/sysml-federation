@@ -24,6 +24,16 @@ Inside, one Go binary runs as PID 1 and supervises everything else. Three subgra
 
 *One container, one process tree. Cut from the [architecture views](../architecture/architecture-views.pdf).*
 
+The two web apps on that port are what a visitor meets, and neither of them works anything out for itself. The wiring, the arithmetic and the document ordering all arrive from services that share no code.
+
+![The model viewer in the shipped state, with parse outlined red and the pipeline requirement failing beneath it](../img/app-viewer-shipped.png)
+
+*The model viewer. The sketch is drawn from the model's own connect statements, parse holds the pipeline to 1200, and PIPE-R1 fails against its limit of 1500.*
+
+![The same requirements as a numbered document, with five derived requirements nested under the first](../img/app-document-tree.png)
+
+*The requirements document. Its numbering, headings and prose belong to a service that computes nothing, and the verdict on each row comes from one that has never read a model file.*
+
 The supervisor fixes the order of startup. The subgraphs come up first and are polled on their own health endpoints, the router is then started with its configuration path and telemetry variables in its environment, the supervisor waits on the router's `/health/ready`, and only after that does it open port 8080. A `healthcheck` subcommand probes the router's readiness path and `/viewer` on behalf of the image's HEALTHCHECK, because the distroless base has no shell and no curl for it to call. Four further subcommands, `adapter`, `capacity`, `document` and `ui`, run one component each on a given address for anyone who wants to see the services apart. The router is about 40 MB compressed, the demo binary a few MB and the base image 2 MB, against a budget of 80 MB.
 
 ## Three services and what each owns
