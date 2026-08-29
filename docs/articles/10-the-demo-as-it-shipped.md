@@ -1,6 +1,6 @@
 # The demo as it shipped
 
-*Roar Georgsen, 27 August 2026*
+*Roar Georgsen, 27 August 2026, revised 29 August 2026*
 
 Part 11 of 12 in [Federating a systems model](../README.md).
 

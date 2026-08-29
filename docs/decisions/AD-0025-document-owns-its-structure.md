@@ -69,4 +69,4 @@ SR-27, SR-33, SR-34, SR-35, SR-36, SR-37, SR-44
 
 ## Sources
 
-The repository README, "Requirements and relationships". [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the operations and the shipped structure, [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the document service's schema and its answer for an unknown id, and [The demo as it shipped](../articles/10-the-demo-being-built.md) for the tree as it ships.
+The repository README, "Requirements and relationships". [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the operations and the shipped structure, [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the document service's schema and its answer for an unknown id, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the tree as it ships.

@@ -201,4 +201,4 @@ No decision was reversed and no new decision record was written, but the plan th
 
 ---
 
-Previous: [Planning the build](08-planning-the-build.md) · Index: [Federating a systems model](../README.md) · Next: [The demo as it shipped](10-the-demo-being-built.md)
+Previous: [Planning the build](08-planning-the-build.md) · Index: [Federating a systems model](../README.md) · Next: [The demo as it shipped](10-the-demo-as-it-shipped.md)

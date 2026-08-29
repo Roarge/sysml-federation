@@ -92,4 +92,4 @@ SR-11, SR-12, SR-13, SR-14, SR-15
 
 ## Sources
 
-The SysML 2.0 language specification's reserved-word list, which the tokeniser's keyword table cites. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for what the viewer has to show, and [The demo as it shipped](../articles/10-the-demo-being-built.md) for the viewer as it ships, including the edit panel that replaced the inline inputs.
+The SysML 2.0 language specification's reserved-word list, which the tokeniser's keyword table cites. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for what the viewer has to show, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the viewer as it ships, including the edit panel that replaced the inline inputs.

@@ -76,4 +76,4 @@ SC-06
 
 ## Sources
 
-The measured text of `adapter/syntax`, `adapter/model`, `adapter/projection` and `adapter/serve` as specified, counted with `wc -l`. [Planning the build](../articles/08-planning-the-build.md) for the first figures and this revision, and [The demo as it shipped](../articles/10-the-demo-being-built.md) for the scale of the code as it ships.
+The measured text of `adapter/syntax`, `adapter/model`, `adapter/projection` and `adapter/serve` as specified, counted with `wc -l`. [Planning the build](../articles/08-planning-the-build.md) for the first figures and this revision, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the scale of the code as it ships.

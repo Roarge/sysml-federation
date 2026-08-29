@@ -4,7 +4,7 @@
 
 Part 12 of 12 in [Federating a systems model](../README.md).
 
-`docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation` pulls about 45 million bytes on amd64, or 41.5 million on arm64, and answers on port 8080 roughly two seconds after the container starts. The package is public, so there is no account to make and no login to run, and the index behind that name carries one manifest for `linux/amd64` and one for `linux/arm64` and nothing else. [The demo as it shipped](10-the-demo-being-built.md) walks through what the port then serves.
+`docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation` pulls about 45 million bytes on amd64, or 41.5 million on arm64, and answers on port 8080 roughly two seconds after the container starts. The package is public, so there is no account to make and no login to run, and the index behind that name carries one manifest for `linux/amd64` and one for `linux/arm64` and nothing else. [The demo as it shipped](10-the-demo-as-it-shipped.md) walks through what the port then serves.
 
 There is a trap in the tags, and it catches anyone who types a version. The release is tagged `v0.1.0` in git, the image is tagged `0.1.0` in the registry, and the two are not the same string. The metadata step turns `refs/tags/v1.2.3` into `1.2.3`, dropping the leading letter on the way, so a pull of `ghcr.io/roarge/sysml-federation:v0.1.0` finds nothing at all. The untagged form the launch line uses avoids the question, and what it returns is `latest`.
 
@@ -58,5 +58,5 @@ What is here is one command that puts a model file, an analysis that has never r
 
 ---
 
-Previous: [The demo as it shipped](10-the-demo-being-built.md) · Index: [Federating a systems model](../README.md)
+Previous: [The demo as it shipped](10-the-demo-as-it-shipped.md) · Index: [Federating a systems model](../README.md)
 Decision records: [docs/decisions](../decisions/README.md) · Repository: https://github.com/Roarge/sysml-federation

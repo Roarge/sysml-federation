@@ -121,7 +121,7 @@ One thing in this design had not been exercised when the architecture was writte
 
 ## Where to go next
 
-The capacity model in full, with its assumptions, edge cases and the requirements it drove, is [From use cases to requirements](05-from-use-cases-to-requirements.md). The five architecture views and all twenty-six decisions, including the fourteen not touched here, are [Five views and twenty-six decisions](06-five-views-and-twenty-six-decisions.md). What the build produced, against the design described here, is [The demo as it shipped](10-the-demo-being-built.md).
+The capacity model in full, with its assumptions, edge cases and the requirements it drove, is [From use cases to requirements](05-from-use-cases-to-requirements.md). The five architecture views and all twenty-six decisions, including the fourteen not touched here, are [Five views and twenty-six decisions](06-five-views-and-twenty-six-decisions.md). What the build produced, against the design described here, is [The demo as it shipped](10-the-demo-as-it-shipped.md).
 
 ---
 

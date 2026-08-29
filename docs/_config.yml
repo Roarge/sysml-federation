@@ -49,5 +49,5 @@ series:
   - { path: articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md, title: "An A3 sheet for a fifteen-minute reader", date: 2026-08-27 }
   - { path: articles/08-planning-the-build.md, title: "Planning the build", date: 2026-08-27 }
   - { path: articles/09-five-spikes-before-the-first-line.md, title: "Five spikes before the first line", date: 2026-08-27 }
-  - { path: articles/10-the-demo-being-built.md, title: "The demo as it shipped", date: 2026-08-27 }
+  - { path: articles/10-the-demo-as-it-shipped.md, title: "The demo as it shipped", date: 2026-08-27 }
   - { path: articles/11-what-shipped-and-what-did-not.md, title: "What shipped, and what did not", date: 2026-08-29 }

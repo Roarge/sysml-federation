@@ -48,7 +48,7 @@ The package is public, so a host holding no registry account pulls it, and the i
    Five phases, one pull request each, test first, and the decisions the plan had to make on its own.
 10. [Five spikes before the first line](articles/09-five-spikes-before-the-first-line.md)  
     The syntax the reference tools accept, nested requires through the router, a router with no config file whose readiness lies, and cross-platform copying.
-11. [The demo as it shipped](articles/10-the-demo-being-built.md)  
+11. [The demo as it shipped](articles/10-the-demo-as-it-shipped.md)  
     What it does once it runs, package by package and service by service, and what a visitor sees in fifteen minutes.
 12. [What shipped, and what did not](articles/11-what-shipped-and-what-did-not.md)  
     What the image weighs, the version tag that returns nothing, the checks nobody has run, and the one claim the running container does settle.

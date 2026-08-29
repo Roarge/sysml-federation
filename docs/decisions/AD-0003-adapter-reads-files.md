@@ -105,4 +105,4 @@ the validation run. The validation itself runs locally and never in CI.
 SR-22, SR-26, SR-45
 
 ## Sources
-The repository README, "Placeholders" and "What this is not". The SysML v2 API and Services specification for `elementId` and the absence of a human identifier field. The OMG pilot implementation's API server, its licence and its runtime requirements. [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the syntax the two reference tools accept, and [The demo as it shipped](../articles/10-the-demo-being-built.md) for the file as it ships.
+The repository README, "Placeholders" and "What this is not". The SysML v2 API and Services specification for `elementId` and the absence of a human identifier field. The OMG pilot implementation's API server, its licence and its runtime requirements. [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the syntax the two reference tools accept, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the file as it ships.

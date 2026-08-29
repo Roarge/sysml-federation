@@ -75,4 +75,4 @@ SC-06
 
 ## Sources
 
-[Planning the build](../articles/08-planning-the-build.md) for the figures and for what kind of number they are, and [The demo as it shipped](../articles/10-the-demo-being-built.md) for the counts as the system ships.
+[Planning the build](../articles/08-planning-the-build.md) for the figures and for what kind of number they are, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the counts as the system ships.

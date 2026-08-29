@@ -129,4 +129,4 @@ image, and this record does not cover it.
 SR-03
 
 ## Sources
-The vendor's `router/.env.example`, which is the one place `DO_NOT_TRACK` and `COSMO_TELEMETRY_DISABLED` are named, and the vendor's pages on tracing and metrics exporters and on running without a graph token. [What the research overturned](../articles/03-what-the-research-overturned.md) for the finding as it stands and for what remains inferred rather than run, and [The demo as it shipped](../articles/10-the-demo-being-built.md) for the five `ENV` lines and the air-gap demonstration.
+The vendor's `router/.env.example`, which is the one place `DO_NOT_TRACK` and `COSMO_TELEMETRY_DISABLED` are named, and the vendor's pages on tracing and metrics exporters and on running without a graph token. [What the research overturned](../articles/03-what-the-research-overturned.md) for the finding as it stands and for what remains inferred rather than run, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the five `ENV` lines and the air-gap demonstration.

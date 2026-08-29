@@ -115,4 +115,4 @@ SR-10, SR-11, SR-12, SR-34, SC-05, SC-06
 
 ## Sources
 
-SortableJS 1.15.7 and its MIT licence. The Cosmo documentation on receiving subscriptions in a browser over SSE. Go's `embed` and `net/http/httputil` documentation. The SysML 2.0 language specification's reserved-word list. [The demo as it shipped](../articles/10-the-demo-being-built.md) for the two apps as they ship.
+SortableJS 1.15.7 and its MIT licence. The Cosmo documentation on receiving subscriptions in a browser over SSE. Go's `embed` and `net/http/httputil` documentation. The SysML 2.0 language specification's reserved-word list. [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the two apps as they ship.
