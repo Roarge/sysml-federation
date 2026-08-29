@@ -1,16 +1,218 @@
 # The query pipeline example
 
-`model.sysml` is a SysML v2 model of a query processing pipeline: five
-servers wired in series and in parallel, a throughput requirement on the
-pipeline derived into one requirement per server, a latency requirement
-with a verification case, and no rollup arithmetic. Capacity is declared
-without a value and computed by the analysis service from the wiring.
-Every published element carries a short name in the `PIPE` family, which
-is the key the adapter publishes.
+## What this is
 
-How to run the demo and what to try arrive with the services.
+A SysML v2 model of a query processing pipeline of five servers, served as a
+live GraphQL projection by the adapter and joined at a federation router by two
+services that know nothing about SysML. One computes the pipeline's capacity
+from the wiring and returns a verdict for every requirement it can judge. The
+other holds the structure of a requirements document, its order, its numbering
+and what it leaves out. Two small web apps sit in front of the router, a model
+viewer and the document itself, and the whole arrangement runs from one
+container image. The repository README states the claim this example exists to
+test: "This repository is an argument that federation is the missing
+integration layer for open MBSE."
 
-## Validating the model
+## Run it
+
+    docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
+
+Then open `http://localhost:8080/`. The image is published from a version tag,
+so the line above works from the first tag onwards. From a checkout there is
+nothing to wait for: `make image && make run` builds the same Dockerfile for the
+host's own architecture and runs the result on the same port.
+
+Port 8080 carries four paths and nothing else. `/viewer/` is the model viewer,
+`/document/` the requirements document, `/graphql` the router's endpoint and
+`/playground` the router's own query editor. A request to `/` is redirected to
+`/viewer/`. The three services and the router listen on loopback inside the
+container and are not reachable from outside it, and the router's health paths
+are not proxied either.
+
+Nothing is written to disk. An edit changes the served text and a version
+counter held in memory, so stopping the container and starting it again returns
+the shipped state, model version 1 and document version 1. A Reset button in
+either app puts the shipped model and the shipped tree back without a restart,
+although the two counters go on rising rather than returning to 1.
+
+## What to try
+
+The demo is arranged around a bottleneck that moves, and four edits in the
+viewer are enough to watch it move.
+
+Open `/viewer/`. It draws the served model text with the language marked, a
+sketch built from the wiring, an edit panel of six controls, and one block per
+requirement carrying the verdict the capacity service returned for it. In the
+shipped state the caption under the sketch reads `capacity 1200, bottleneck
+parse`, the parse box is outlined red, and PIPE-R1 reads `FAIL capacity 1200
+against 1500, limited by parse`.
+
+Raise ingest from 2000 to 3000. The literal changes in the text pane and the
+derived requirement on ingest, PIPE-R1.1, goes to `PASS throughput 3000 against
+1500`. Nothing else moves. Capacity is still 1200 and parse is still the
+bottleneck, because a chain carries no more than its weakest stage and ingest
+was never it.
+
+Raise parse from 1200 to 1700. Capacity goes to 1400 and the caption names
+indexA and indexB, both now outlined red. PIPE-R1 still fails. Raising the
+bottleneck moved it rather than removed it: the two index servers at 700 each
+add to 1400, and that pair is now the cheapest place to cut the wiring.
+
+Raise indexA from 700 to 900. Capacity reaches 1600 and PIPE-R1 passes, `PASS
+capacity 1600 against 1500, limited by indexA, indexB`. PIPE-R1.4, the derived
+requirement on indexB, still fails at `throughput 700 against 750`. The pipeline
+meets its rate while one of its servers does not meet the share allocated to it,
+because indexA is now carrying more than half of the parallel stage. The
+document's first paragraph warns of exactly that before anyone reads a verdict.
+
+The other direction is the limit. Press Reset, then set PIPE-R1's limit to 1000.
+It passes at capacity 1200 with no server touched, and the constraint literal in
+the text pane reads 1000 where it read 1500.
+
+Now open `/document/` beside the viewer. The same requirements appear as a
+numbered document, an unnumbered paragraph first, then PIPE-R1 as 1 with its
+five derived requirements nested 1.1 to 1.5 in server order, then PIPE-R2 as 2.
+Each row shows what the model holds, what the analysis returned, and the one
+thing the document decides for itself, which is the number. Edit a value here
+and the viewer follows without a reload, and the reverse holds as well.
+
+Drag PIPE-R1.5 by its grip above PIPE-R1.1. It renumbers to 1.1 and the others
+follow in their former order. The header's document version rises and its model
+version does not, because order and numbering belong to the document and nothing
+about the model changed. Excluding a requirement behaves the same way: it leaves
+the tree, a tray offers to restore it, and the viewer goes on listing it.
+
+## How it is put together
+
+Three services stand behind the router. None of them imports, calls or is
+configured with the address of either of the others, and a test walks the import
+graph to keep it so.
+
+The adapter serves the model. It parses `model.sysml` and publishes parts with
+their attributes, ports, children and connections, requirements with the
+quantity, comparison and limit read from their constraints and the satisfy and
+derive relationships around them, the verification cases, the model's own text
+and a version counter. Nothing in it is named after this example, and a test
+scans its sources for the example's words.
+
+The capacity service computes the rollup. It is handed two names when it starts,
+`capacity` for the quantity it computes and `throughput` for the attribute it
+reads from each child part, and neither word appears in its own sources. What
+reaches it over the wire is a subject part with its children, their attribute
+values and the connections between them, carried across from the adapter's
+fields by the router. It keeps no copy of the model and computes afresh on every
+read.
+
+The document service holds the tree: the ordering, the numbering, the headings
+and paragraphs someone added, and the requirements someone excluded. Its shipped
+tree is the one place in a service where the example's identifiers appear,
+because a document is about particular requirements and cannot be written
+without naming them.
+
+One query shows the join. `{ requirement(id: "PIPE-R1") { text verdict
+verdictReason documentNumber } }` comes back as a single object whose text is the
+adapter's, whose verdict and reason are the capacity service's, and whose number
+is the document service's. All three declare `Requirement` with the same entity
+key, `id`. The router works out which service holds which field, calls each one
+and merges the answers on that key.
+
+### The rollup
+
+The capacity of the pipeline is the largest sustained query rate the wiring can
+carry from the servers that receive queries to the servers that deliver results.
+As arithmetic that is a minimum along a chain and a sum across parallel branches,
+which is the version a reader can check by hand. The service computes a maximum
+flow instead. Each child part becomes two nodes joined by an edge of its
+attribute value, each connection becomes an edge with no limit of its own, a
+super-source feeds every child nobody feeds and a super-sink drains every child
+that feeds nobody, and the capacity is the maximum flow between the two. The
+bottleneck is the minimum cut taken on the source side, which is the saturated
+servers nearest the entry and is the same set for every maximum flow, so the
+answer does not depend on the order the algorithm found its paths in. Flow and
+the two rules agree wherever the two rules apply, and flow still answers where
+they do not, such as a fan-in from branches that were never forked at the same
+point.
+
+The arithmetic is exact for an idealised pipeline and for nothing else. Work is
+taken to be evenly partitionable across parallel branches, load balancing to be
+perfect, load to be stationary and connections to be unlimited, and there is no
+queueing anywhere in the model. A real pipeline that neither drops nor
+duplicates queries departs from those assumptions in one direction only, so the
+number then reads as an upper bound. It must not be used for capacity planning.
+The arithmetic was chosen to make a point about federation.
+
+### The router
+
+The router is the vendor's own binary, copied unchanged out of
+`ghcr.io/wundergraph/cosmo/router:0.343.1` and run as a child process with an
+environment the supervisor builds in full and nothing inherited. Its
+configuration is composed outside the build and committed to the repository,
+which is the path the vendor advises against. The composition page says "it is
+recommended to not use this for production", and at every start without a graph
+token the router itself logs "No graph token provided. The following Cosmo Cloud
+features are disabled. Not recommended for Production."
+
+The demo takes that at face value rather than around it. There is no control
+plane here to fetch a configuration from, the composed file is committed where
+anyone can read it, and a test fails when it drifts from the subgraph schemas it
+was built from. That answers the caveat for a demo, which is what this is. It
+does not answer it for a deployment.
+
+### The image
+
+`examples/pipeline/Dockerfile` builds in three stages. Go 1.27 cross-compiles
+the binary for the target architecture with `CGO_ENABLED=0` and
+`GOTOOLCHAIN=local`, so the toolchain in the image is the toolchain that builds.
+The router stage names its source by tag and digest together, the tag saying
+which release this is and the digest being what actually gets pulled, and since
+the digest is of the multi-platform index both architectures still resolve from
+it. The last stage is `gcr.io/distroless/static-debian13:nonroot`. It receives
+the router binary, the router's Apache licence fetched from the vendor's
+repository by checksum and left readable at mode 644, the Go binary, and
+`config.json` and `model.sysml` under `/app`. No stage after the first runs a
+command, so there is no shell in the image, and the `HEALTHCHECK` runs the
+binary's own `healthcheck` subcommand rather than anything that would need one.
+One port is published.
+
+Five environment variables are set in the image, `DO_NOT_TRACK=1`,
+`COSMO_TELEMETRY_DISABLED=true`, `TRACING_ENABLED=false`,
+`METRICS_OTLP_ENABLED=false` and `PROMETHEUS_ENABLED=false`. They turn off the
+vendor's anonymous usage tracker, its tracing and metrics exporters, and the
+Prometheus scrape endpoint the router would otherwise open. On the ordinary path
+they are inert, because the supervisor hands the router child a complete
+environment of its own that sets the same five. They are in the image for anyone
+who runs `/router` out of it directly.
+
+Compressed as a registry counts them, the image comes to 44,845,388 bytes for
+amd64 and 41,470,306 bytes for arm64, against a published ceiling of 80,000,000.
+Those two figures are read from a two-platform build exported as a local OCI
+layout rather than from a manifest in a registry. The publishing workflow pushes
+the version tag, reads both platforms back from the registry, fails if either is
+over the ceiling, and moves `latest` only after that.
+
+## The model
+
+`model.sysml` is a package `PIPE` holding five servers wired in series and in
+parallel, a throughput requirement on the pipeline derived into one requirement
+per server, a latency requirement with a verification case, and no rollup
+arithmetic anywhere. Capacity is declared without a value and computed by the
+capacity service from the wiring. Every published element carries a short name in
+the `PIPE` family, which is the key the adapter publishes and the string the
+other two services join on.
+
+The file leans on a small set of constructs: an abstract part definition
+specialised by two others, an item definition, port definitions carrying a
+directed item with typed port usages joined by `connect`, plain numeric bindings
+on `Real` attributes, a division inside a bound expression, a duration written
+`200[ms]` against the model's own `<ms>` declaration, `satisfy` statements inside
+the pipeline part, a subject in a requirement usage and again in a verification
+usage, an `objective { verify latencyLimit; }`, a `#derivation connection` with
+one `#original` end and five `#derive` ends, and `doc` bodies at package level
+and across several lines. Both reference tools accepted every one of them, the
+OMG pilot implementation release 2026-07 with kernel 0.61.0 and OpenSysML
+v0.2.1. The record is at the foot of this file.
+
+### Validating the model
 
 The adapter's parser accepts a subset of the notation and cannot prove
 that the file is valid SysML v2, so the file is checked with the two
@@ -38,6 +240,74 @@ The pilot accepts the file when its output carries no `ERROR:` or
 `1> ` prompt on the same line. OpenSysML accepts it when the command
 exits 0, printing `✓ package QueryPipeline` and
 `✓ model.sysml: no errors`.
+
+### What the adapter refuses
+
+The parser accepts exactly the subset of the notation the adapter projects and
+refuses anything else with the file, the line and the column of the first
+offending token. It has no opinion about meaning: resolving names and evaluating
+expressions happen after it, and a model that parses can still be refused there,
+again at a position in the source.
+
+Editing is narrower than reading. A value is editable only where a numeric
+literal in the source binds it and no other value shares that literal. An
+expression-bound limit such as `globalThroughput.requiredRate / 2` is refused
+with `the value is not a literal in the source`, and so is a value nothing binds
+at all. A value that is not a finite, non-negative number is refused before
+anything is patched. Either refusal names the element it concerns, leaves the
+served text as it was and does not move the version counter, so nothing
+downstream is told anything happened.
+
+## Limits
+
+Expression-bound values are read-only. The five derived requirements take their
+limits from PIPE-R1 by arithmetic, so each of them follows an edit to PIPE-R1 and
+none of them can be edited on its own. Both apps offer a limit control only where
+the analysis reached a verdict, so PIPE-R2, whose latency no service computes,
+shows its limit as text.
+
+The viewer's edit panel reaches the attributes of the parts directly inside a
+root part, which here is the five servers. An editable attribute belonging to a
+root part itself gets no control in the viewer. This model has no such attribute
+and the adapter's second fixture, `adapter/model/testdata/warehouse.sysml`, does:
+its root part carries `shifts = 2`. The limit is the viewer's. The adapter
+projects such an attribute like any other and the document app offers a control
+for every editable attribute of a requirement's subject, at whatever depth the
+subject sits.
+
+The requirements document fetches its tree six levels deep. Anything
+below that is not shown, and the deepest row visible says so rather than
+offering a place to add more.
+
+A refetch redraws a page from the answer the router gave. Focus returns to the
+control it was on, but a value typed into that control and not yet sent is
+replaced by the served one, so an edit arriving from elsewhere at the wrong
+moment costs a keystroke.
+
+Neither app computes anything a service could have answered. Capacity,
+bottleneck, verdicts, document numbers and the model text all arrive over the
+wire, and the only thing either app works out for itself is where to draw a box
+in the sketch.
+
+The router is the vendor's binary, copied into the image unchanged. Nothing here
+patches it, and its behaviour under this configuration is the vendor's.
+
+## Licences
+
+This repository is under the Apache License, Version 2.0, whose text is in
+`LICENSE` at the repository root.
+
+The Cosmo router is the vendor's work under the same licence. Its binary is
+copied into the image at `/router`, and the vendor's own licence text sits beside
+it at `/router.LICENSE`, fetched at build time from the vendor's repository at
+the router's release tag and pinned by checksum.
+
+SortableJS is under the MIT License. The minified file is vendored at
+`examples/pipeline/ui/shared/Sortable.min.js` with its licence text beside it at
+`LICENSE.SortableJS`.
+
+`NOTICE` at the repository root names the copyright holder and both third-party
+works, with the tags and the checksums they were taken from.
 
 ## Verification record
 
@@ -202,14 +472,3 @@ a local build.
 | 2026-08-28 | SR-07 | `/router.LICENSE` read from inside a container running the image and as the user the image runs as, then `/router -version` from the same image | The licence is the Apache License version 2.0 text, mode 644 owned by root, which uid 65532 can read and did. The binary reports version 0.343.1, Go 1.25.14, linux/amd64, built 2026-08-26 from revision `6a8da18`, so the certificate and the binary name one release |
 | 2026-08-28 | SR-06 | `docker buildx build --platform linux/amd64,linux/arm64` exported as an OCI layout, then the per-platform manifests read out of it | One image manifest per platform under a manifest list, with an attestation manifest for each. Compressed layers come to 44,845,388 bytes on amd64 and 41,470,306 on arm64, or 44,850,223 and 41,475,142 with the configuration blob added. The OCI exporter gzips as a registry push does, so these are what a registry manifest would report, and the router binary is 39,987,546 of the amd64 total |
 | 2026-08-28 | C-53 | `docker buildx build --platform linux/arm64` exported to a local directory, with the router image pinned by digest as well as by tag | `/router` and `/sysml-federation` are both `ELF 64-bit LSB executable, ARM aarch64`. The digest names the multi-platform index rather than one architecture, so the arm64 router still resolves from it |
-
-## Limits
-
-The adapter reads the subset its `adapter/syntax` package documents and
-refuses any other construct with the file, line and column of the first
-one it meets. The model is edited only through the literals the adapter
-publishes as editable.
-
-The requirements document fetches its tree six levels deep. Anything
-below that is not shown, and the deepest row visible says so rather than
-offering a place to add more.
