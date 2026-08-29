@@ -1,6 +1,14 @@
 # AD-0010 The router as a child process from the copied binary
 
-Status: accepted. Date: 2026-08-27.
+Status: accepted, amended once the supervisor ran the router. Date: 2026-08-27.
+
+Amendment, 2026-08-27: the decision as first accepted gave the router child
+three variables of its own beside the four telemetry variables of SR-03. Two
+more were added once the composed stack ran. `SUBGRAPH_ERROR_PROPAGATION_MODE`
+is set to pass-through, without which a refused edit reached a client nested
+under the router's own fetch-failure text rather than in the words the subgraph
+wrote, and `PROMETHEUS_ENABLED=false` closes the scrape endpoint the router
+opens by default. SR-24 and SR-25 joined the requirements the record affects.
 
 ## Context
 

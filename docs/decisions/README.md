@@ -4,14 +4,13 @@ Twenty-six records in the Nygard form, each giving the context, the decision,
 the alternatives considered, the consequences, the requirements affected and
 its sources. All twenty-six are accepted. They were written during the design
 phase, before any code, and copied here so that they can be read and
-challenged. One has been amended since, because building the viewer showed
-that part of it could be met only by reading the notation a second time and
-less well than the adapter already reads it, which was the objection to it. A
-record amended that way keeps its number and the original date in its status
-line, with a line at its head giving the date of the amendment and saying what
-changed. A record's status is `accepted`, or `accepted` followed by whatever
-qualification the decision carries. A decision that replaces an earlier one
-gets its own number rather than overwriting it, and a number is never reused.
+challenged. Where building the system changed what a record decides, the
+record was amended and is marked as amended in the list below. Such a record
+keeps its number and the original date in its status line, with a line at its
+head giving the date of the amendment and saying what changed. A record's
+status is `accepted`, or `accepted` followed by whatever qualification the
+decision carries. A decision that replaces an earlier one gets its own number
+rather than overwriting it, and a number is never reused.
 
 Inside the records, `SR-nn` is a system requirement and `SC-nn` a design
 constraint, from the set of forty-five requirements and seven constraints
@@ -28,10 +27,10 @@ each produced.
 
 - <span class="rec-id">AD-0001</span> [Federation over a single GraphQL service](AD-0001-federation-over-single-service.md)
 - <span class="rec-id">AD-0002</span> [Cosmo as the federation platform](AD-0002-cosmo-as-platform.md)
-- <span class="rec-id">AD-0010</span> [The router as a child process from the copied binary](AD-0010-router-as-child-process.md)
+- <span class="rec-id">AD-0010</span> [The router as a child process from the copied binary](AD-0010-router-as-child-process.md) (amended)
 - <span class="rec-id">AD-0011</span> [One binary, one process tree, one port, one UI server](AD-0011-one-binary-one-port.md)
-- <span class="rec-id">AD-0012</span> [Composition as a maintainer step with committed output and a drift test](AD-0012-composition-committed.md)
-- <span class="rec-id">AD-0013</span> [Telemetry disabled by environment baked into the image](AD-0013-telemetry-off.md)
+- <span class="rec-id">AD-0012</span> [Composition as a maintainer step with committed output and a drift test](AD-0012-composition-committed.md) (amended)
+- <span class="rec-id">AD-0013</span> [Telemetry disabled by environment baked into the image](AD-0013-telemetry-off.md) (amended)
 
 ## The analysis
 
@@ -60,7 +59,7 @@ each produced.
 ## The repository
 
 - <span class="rec-id">AD-0016</span> [Generated code exempt from the empty-interface rule](AD-0016-generated-code-exempt.md)
-- <span class="rec-id">AD-0020</span> [The image published by a tag-triggered workflow to GHCR](AD-0020-publish-on-tags.md)
+- <span class="rec-id">AD-0020</span> [The image published by a tag-triggered workflow to GHCR](AD-0020-publish-on-tags.md) (amended)
 - <span class="rec-id">AD-0021</span> [The Markdown architecture description as the record, A3 sheets as the overview](AD-0021-architecture-record.md)
 - <span class="rec-id">AD-0022</span> [Track internal/assert and internal/tabletest](AD-0022-track-internal-helpers.md)
 - <span class="rec-id">AD-0023</span> [The light requirements scheme](AD-0023-light-requirements-scheme.md)

@@ -507,24 +507,49 @@ func TestSR04_FourPathsOnOnePort(t *testing.T) {
 	}
 }
 
-// TestUIRefusesToListASubdirectory pins the guard of the UI server against
-// an app that has one. The embedded files are flat today, so the case is
-// built on a map file system carrying a subdirectory: /viewer/ is the app's
-// root and answers, while /viewer/sub/ would be a listing and is a 404.
-// panel.js is there because a named file under the subdirectory is still
-// served, which is what tells a fired guard from an empty directory. The
-// index.html beside it cannot make that point, since the file server sends
-// any path ending in index.html back to the directory.
-func TestUIRefusesToListASubdirectory(t *testing.T) {
+// TestUIRefusesToListTheSharedDirectory pins the guard against the shipped
+// files. The shared module is mounted the way the two apps are but carries
+// no page of its own, so its bare path has nothing to send and is a 404
+// rather than a listing of whatever happens to be vendored there. The rest
+// of the case is what the guard must not cost: the file both apps import is
+// still served, and each app still answers at its own root.
+func TestUIRefusesToListTheSharedDirectory(t *testing.T) {
+	base := newUI(t, ui.Files, http.NotFoundHandler())
+	assert.Equal(t, get(t, base+"/shared/").StatusCode, http.StatusNotFound)
+	module := get(t, base+"/shared/graphql.js")
+	assert.Equal(t, module.StatusCode, http.StatusOK)
+	assert.True(t, strings.Contains(module.Header.Get("Content-Type"), "javascript"),
+		"/shared/graphql.js is served as JavaScript")
+	for _, p := range []string{"/viewer/", "/document/"} {
+		root := get(t, base+p)
+		assert.Equal(t, root.StatusCode, http.StatusOK)
+		assert.True(t, strings.HasPrefix(root.Header.Get("Content-Type"), "text/html"), p+" is HTML")
+	}
+}
+
+// TestUIRefusesADirectoryWithNoPage pins the rule the guard states: a
+// directory path is served where there is an index.html to send at it and
+// refused where there is none, since the answer would otherwise be a
+// listing and the apps never need one. The embedded files are flat today,
+// so the case is built on a map file system carrying two subdirectories.
+// /viewer/ and /viewer/sub/ each hold a page and answer, /viewer/plain/
+// holds none and is a 404, and the named file under each is still served,
+// which is what tells a fired guard from an empty directory. An index.html
+// cannot make that last point itself, since the file server sends any path
+// ending in index.html back to the directory.
+func TestUIRefusesADirectoryWithNoPage(t *testing.T) {
 	assets := fstest.MapFS{
-		"viewer/index.html":     &fstest.MapFile{Data: []byte("<html>viewer</html>")},
-		"viewer/sub/index.html": &fstest.MapFile{Data: []byte("<html>sub</html>")},
-		"viewer/sub/panel.js":   &fstest.MapFile{Data: []byte("export const panel = 1\n")},
+		"viewer/index.html":       &fstest.MapFile{Data: []byte("<html>viewer</html>")},
+		"viewer/sub/index.html":   &fstest.MapFile{Data: []byte("<html>sub</html>")},
+		"viewer/sub/panel.js":     &fstest.MapFile{Data: []byte("export const panel = 1\n")},
+		"viewer/plain/palette.js": &fstest.MapFile{Data: []byte("export const palette = 2\n")},
 	}
 	base := newUI(t, assets, http.NotFoundHandler())
 	assert.Equal(t, get(t, base+"/viewer/").StatusCode, http.StatusOK)
+	assert.Equal(t, get(t, base+"/viewer/sub/").StatusCode, http.StatusOK)
 	assert.Equal(t, get(t, base+"/viewer/sub/panel.js").StatusCode, http.StatusOK)
-	assert.Equal(t, get(t, base+"/viewer/sub/").StatusCode, http.StatusNotFound)
+	assert.Equal(t, get(t, base+"/viewer/plain/").StatusCode, http.StatusNotFound)
+	assert.Equal(t, get(t, base+"/viewer/plain/palette.js").StatusCode, http.StatusOK)
 }
 
 // TestSR04_ProxyStreamsServerSentEvents: the first event reaches the client

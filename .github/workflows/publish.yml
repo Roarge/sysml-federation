@@ -1,0 +1,205 @@
+name: publish
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  packages: write
+
+# One publish at a time. The group deliberately leaves the ref out, because two
+# version tags are two different refs and a per-ref group would let them run
+# together and race on the moving latest tag. Nothing in flight is cancelled: a
+# run stopped between the push and the tag move would leave the registry in a
+# state nobody chose, so a second tag waits instead.
+#
+# Serialising is all the group does. It does not order the runs by version, and
+# two tags pushed close together arrive as two events with no guaranteed order,
+# so latest can end up on the lower version with every step green. Only one run
+# waits per group as well, so a third tag pushed while one is running replaces
+# the run already queued and that middle version is never published. Releases
+# here are cut by hand, which is the answer to both: push one version tag, let
+# its run finish, and then push the next.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # A two-platform build that hangs would otherwise hold a runner for six
+    # hours. The build and the two read-backs take a few minutes.
+    timeout-minutes: 30
+    steps:
+      # Every action is pinned to a commit, because this job holds packages:
+      # write and a registry credential, and a re-pointed major tag would run
+      # unseen code with it. The comment names the release the commit carries.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Cross-compilation only: every stage that runs a command is built for
+      # the build platform, so no QEMU is set up (C-49).
+      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      - id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+          # No latest tag from here, by decision rather than by omission. This
+          # step runs before the image has been measured, and latest is what an
+          # untagged pull returns, so it is moved by a later step that runs only
+          # once the size gate has passed and only for a full release.
+          flavor: |
+            latest=false
+
+      # The tag filter on the trigger is v*, which is wider than semver, and a
+      # name the metadata step cannot read as a version yields no tags at all.
+      # The build would then fail several minutes later on a missing tag, with
+      # a message that never names the tag that was pushed. One string test
+      # here costs nothing on the normal path and makes the red run legible.
+      - name: Check the tag is a version
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [ -z "$VERSION" ]; then
+            echo "::error::the tag $REF_NAME is not a semantic version, so no image tag was derived from it"
+            echo "Tag a release v<major>.<minor>.<patch>, with an optional pre-release suffix such as v1.2.3-rc1."
+            exit 1
+          fi
+          echo "publishing version $VERSION from tag $REF_NAME"
+
+      - id: build
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          file: examples/pipeline/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          # Off, so the index holds exactly two manifests (C-52), which the next
+          # step now asserts rather than assumes.
+          provenance: false
+          sbom: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Read the manifest back (SR-05, SR-06)
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          repo="$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')"
+          # The build step reports the digest of the index it pushed. A tag is
+          # a mutable pointer and re-resolving one would measure whatever it
+          # names by the time this step runs, so the gate and the latest move
+          # both name the digest and are talking about the same bytes by
+          # construction. An absent digest is caught here rather than becoming
+          # a malformed reference below.
+          case "$DIGEST" in
+            sha256:*) ;;
+            *)
+              echo "::error::the build step reported no image digest, got '$DIGEST'"
+              exit 1
+              ;;
+          esac
+          index="$(docker buildx imagetools inspect --raw "$repo@$DIGEST")"
+          # Provenance and SBOM are off, so the index carries one manifest per
+          # platform and nothing else. An extra entry is something to look at
+          # before anyone pulls it.
+          count="$(printf '%s' "$index" | jq '.manifests | length')"
+          if [ "$count" != "2" ]; then
+            echo "::error::$repo@$DIGEST has a manifest count of $count, expected exactly 2"
+            exit 1
+          fi
+          for platform in linux/amd64 linux/arm64; do
+            os="${platform%/*}"
+            arch="${platform#*/}"
+            # Counted before it is read. Two manifests for one platform satisfy
+            # the count above, and taking both digests into one variable would
+            # fail further down as a malformed reference rather than as the
+            # index being wrong. A platform that is missing counts zero and is
+            # reported the same way.
+            matches="$(printf '%s' "$index" | jq --arg os "$os" --arg arch "$arch" \
+              '[.manifests[] | select(.platform.os == $os and .platform.architecture == $arch)] | length')"
+            if [ "$matches" != "1" ]; then
+              echo "::error::$repo@$DIGEST carries $matches $platform manifests, expected exactly 1"
+              exit 1
+            fi
+            manifest="$(printf '%s' "$index" | jq -r --arg os "$os" --arg arch "$arch" \
+              '.manifests[] | select(.platform.os == $os and .platform.architecture == $arch) | .digest')"
+            # jq's add treats an absent or null size as zero, which would
+            # under-count a platform instead of failing, so every size is
+            # checked to be a number before any of them are summed. An empty
+            # layers array is rejected here too.
+            size="$(docker buildx imagetools inspect --raw "$repo@$manifest" | jq -r '
+              if (.layers | type) != "array" or (.layers | length) == 0 then
+                "no layers"
+              else
+                [.layers[].size, .config.size]
+                | if any(type != "number") then "a size is absent or not a number" else add end
+              end')"
+            # A size that is not a run of digits would make the comparison
+            # below answer false and pass a platform nothing was measured
+            # for, so it fails here instead.
+            case "$size" in
+              '' | *[!0-9]*)
+                echo "::error::$platform reported no numeric compressed size, got '$size'"
+                exit 1
+                ;;
+            esac
+            echo "$platform: $size bytes compressed"
+            if [ "$size" -gt 80000000 ]; then
+              echo "::error::$platform is $size bytes compressed, over the 80 MB budget"
+              exit 1
+            fi
+          done
+
+      # Registry-counted sizes cannot be had without pushing, so the image goes
+      # up under its version tag first and is measured where it landed. Only now
+      # does latest move. A gate that fails takes the job down before this step,
+      # and latest keeps pointing where it pointed, so an untagged pull never
+      # returns an image the gate rejected. The version tag itself is left in
+      # the registry and has to be deleted by hand.
+      - name: Move latest to the measured image (SR-01)
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          repo="$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')"
+          # A hyphen after the patch number is semver's pre-release marker and
+          # {{version}} carries it through, so v0.1.0-rc1 arrives here as
+          # 0.1.0-rc1 and is recognised rather than assumed away.
+          case "$VERSION" in
+            *-*)
+              echo "$VERSION is a pre-release, so latest stays where it is"
+              exit 0
+              ;;
+          esac
+          # A second tag over the index that is already published, so nothing is
+          # rebuilt and no blob is uploaded again. The source is the digest the
+          # step above measured rather than the version tag, so latest lands on
+          # those bytes and on no others.
+          docker buildx imagetools create --tag "$repo:latest" "$repo@$DIGEST"
+          # A tag is a mutable pointer, so what latest names is read back rather
+          # than reported from the command that moved it. It has to resolve to
+          # the digest the gate above measured, and a run that finds anything
+          # else fails here with both digests in the message.
+          moved="$(docker buildx imagetools inspect --format '{{.Manifest.Digest}}' "$repo:latest")"
+          if [ "$moved" != "$DIGEST" ]; then
+            echo "::error::$repo:latest resolves to $moved, expected $DIGEST"
+            exit 1
+          fi
+          echo "latest now points at $repo@$DIGEST, published as $VERSION"

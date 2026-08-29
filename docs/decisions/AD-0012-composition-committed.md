@@ -1,6 +1,12 @@
 # AD-0012 Composition as a maintainer step with committed output and a drift test
 
-Status: accepted. Date: 2026-08-27.
+Status: accepted, amended once the graph was composed. Date: 2026-08-27.
+
+Amendment, 2026-08-27: the decision as first accepted had the compose input
+give both subscription subgraphs `ws` with subprotocol `auto`, leaving the
+socket to be negotiated. The input now names `graphql-transport-ws` outright,
+which is what those two subgraphs serve, and the third subgraph, which carries
+no subscriptions, is left to the tool's default.
 
 ## Context
 
