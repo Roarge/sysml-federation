@@ -38,6 +38,10 @@ The supervisor fixes the order of startup. The subgraphs come up first and are p
 
 ## Three services and what each owns
 
+![Two apps, one graph, three services that never meet](../img/overview-sketch.png)
+
+*Two apps, one graph, three services that never meet. Cut from the [use case storyboard](../stories/use-cases.pdf).*
+
 The adapter owns the model. It publishes parts with their attributes, ports, connections and the requirements they satisfy, the requirements themselves with their text, subject, constrained quantity, comparison, limit and derivation links, verification cases, and the model's own text and version number. It is generic. Nothing in its schema or its code names the example, and a second fixture model with other names and wiring is part of its tests. Its schema carries three mutations, which are the whole of the model's edit path.
 
 ```graphql

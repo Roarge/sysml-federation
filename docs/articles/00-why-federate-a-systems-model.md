@@ -128,10 +128,6 @@ The demo publishes a SysML v2 model of a query processing pipeline as a federate
 
 Three services stand behind one router, an arrangement [The architecture in one sitting](01-the-architecture-in-one-sitting.md) takes apart. One serves the model, one computes the rollup, meaning the pipeline-wide capacity that follows from the servers, and returns a verdict, and one holds [the document's structure](../decisions/AD-0025-document-owns-its-structure.md) and nothing else. A requirements document, here, is a live view over the model plus the editorial decisions about ordering, numbering and what to include that the model does not contain. Two small web apps sit in front, a model viewer and a requirements document, and an edit can be made in either.
 
-![Two apps, one graph, three services that never meet](../img/overview-sketch.png)
-
-*Two apps, one graph, three services that never meet. Cut from the [use case storyboard](../stories/use-cases.pdf).*
-
 Change one server's throughput and the requirements document responds at once. The rolled-up capacity moves, the requirement passes or fails, and where it fails the reason names the server that limits it. Nothing is exported and nobody reruns an analysis to reissue the document.
 
 What does not happen is the instructive part. Raise the throughput of a server that is not the bottleneck and nothing moves, because a serial chain is governed by its worst link. Raise the bottleneck and the capacity rises, but the requirement still fails, because the bottleneck has moved to the next weakest stage in the wiring. Raise one of the servers there and the requirement passes. With the shipped values the pipeline sustains 1200 queries per second against a limit of 1500, and the bottleneck sits at the parse stage. That behaviour is obvious once seen and reliably surprising before. [Twelve use cases and one moving bottleneck](04-twelve-use-cases-and-one-moving-bottleneck.md) walks through it.
