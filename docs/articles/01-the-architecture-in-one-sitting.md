@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 2 of 11 in [Federating a systems model](../README.md).
+Part 2 of 12 in [Federating a systems model](../README.md).
 
 The demo publishes a SysML v2 model of a five-server query pipeline through a federated GraphQL router, so that a capacity analysis and a requirements document, neither of which has ever read a line of SysML, can attach their own data to the model's parts and requirements. All of it runs in one container.
 
@@ -12,13 +12,13 @@ The demo publishes a SysML v2 model of a five-server query pipeline through a fe
 
 ## What is in the box
 
-One command starts it, and that command is what the first tagged release publishes. Until the tag exists, the line below names an image nobody can pull.
+One command starts it, and the first tagged release published the image it names. The image carries a manifest for amd64 and one for arm64, the package is public, and a host holding no registry credential pulls it. The untagged form below resolves to `latest`.
 
 ```
 docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
 ```
 
-Inside, one Go binary runs as PID 1 and supervises everything else. Three subgraphs, each a GraphQL service that owns one slice of a merged schema, run as goroutines of that binary on loopback ports 3011, 3012 and 3013. The Cosmo router, the process that merges the three schemas into one and plans every incoming query across them, runs as a child process on loopback port 3002 from a binary copied out of the vendor's image. A UI server on port 8080 is the only listener the outside can reach. It serves the two web apps at `/viewer` and `/document` from embedded assets, proxies `/graphql` and `/playground` to the router, and redirects `/` to the viewer. Four paths on one port, and the router is never addressable on its own.
+Inside, one Go binary runs as PID 1 and supervises everything else. Three subgraphs, each a GraphQL service that owns one slice of a merged schema, run as goroutines of that binary on loopback ports 3011, 3012 and 3013. The Cosmo router, the process that merges the three schemas into one and plans every incoming query across them, runs as a child process on loopback port 3002 from a binary copied out of the vendor's image. A UI server on port 8080 is the only listener the outside can reach. It serves the two web apps at `/viewer` and `/document` from embedded assets, the client module both apps import and the drag library vendored beside it at `/shared`, proxies `/graphql` and `/playground` to the router, and redirects `/` to the viewer. Five paths on one port, and the router is never addressable on its own.
 
 ![One container, one process tree](../img/v4-container.png)
 
@@ -121,7 +121,7 @@ One thing in this design had not been exercised when the architecture was writte
 
 ## Where to go next
 
-The capacity model in full, with its assumptions, edge cases and the requirements it drove, is [From use cases to requirements](05-from-use-cases-to-requirements.md). The five architecture views and all twenty-six decisions, including the fourteen not touched here, are [Five views and twenty-six decisions](06-five-views-and-twenty-six-decisions.md). What the build has produced so far is [The demo being built](10-the-demo-being-built.md).
+The capacity model in full, with its assumptions, edge cases and the requirements it drove, is [From use cases to requirements](05-from-use-cases-to-requirements.md). The five architecture views and all twenty-six decisions, including the fourteen not touched here, are [Five views and twenty-six decisions](06-five-views-and-twenty-six-decisions.md). What the build produced, against the design described here, is [The demo as it shipped](10-the-demo-as-it-shipped.md).
 
 ---
 

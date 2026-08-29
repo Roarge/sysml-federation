@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 3 of 11 in [Federating a systems model](../README.md).
+Part 3 of 12 in [Federating a systems model](../README.md).
 
 The demo publishes a SysML v2 model of a five-server query pipeline through a federated router, the component that merges the services' schema fragments and plans a query across them. Two services that have never parsed a model file attach a throughput verdict (the analysis service's judgement on one requirement) and a requirements document to it. [The architecture in one sitting](01-the-architecture-in-one-sitting.md) describes the result.
 

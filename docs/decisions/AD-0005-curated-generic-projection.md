@@ -116,4 +116,4 @@ SR-16, SR-17, SR-21
 
 ## Sources
 
-The repository README, "What SysML v2 fixes, and what it leaves open", "Nobody outside systems engineering should need to know what SysML is" and "The adapter and the examples". The SysML v2 API and Services specification for what the metamodel returns. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the projected type set and the adapter view, and [The demo being built](../articles/10-the-demo-being-built.md) for the packages that produce it.
+The repository README, "What SysML v2 fixes, and what it leaves open", "Nobody outside systems engineering should need to know what SysML is" and "The adapter and the examples". The SysML v2 API and Services specification for what the metamodel returns. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the projected type set and the adapter view, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the packages that produce it.

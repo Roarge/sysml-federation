@@ -6,6 +6,28 @@ The goal of this project is to make SysML v2 models easier to integrate with the
 
 So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with one worked example. Next is a larger example and an adapter driven by SysML v2's own views and viewpoints.
 
+![Two apps, one graph, three services that never meet](img/overview-sketch.png)
+
+*Two apps, one graph, three services that never meet.*
+
+One container image holds all of it, and the two pages below are what it serves on port 8080. Neither of them works anything out for itself. The wiring, the arithmetic and the document ordering come from three services that share no code, joined only by the router in front of them.
+
+![The model viewer in the shipped state, with parse outlined red and the pipeline requirement failing beneath it](img/app-viewer-shipped.png)
+
+*The model viewer. The sketch is drawn from the model's own connect statements, parse holds the pipeline to 1200, and PIPE-R1 fails against its limit of 1500.*
+
+![The same requirements as a numbered document, with five derived requirements nested under the first](img/app-document-tree.png)
+
+*The requirements document. Its numbering, headings and prose belong to a service that computes nothing, and the verdict on each row comes from one that has never read a model file.*
+
+The demo starts with one command:
+
+```
+docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
+```
+
+The package is public, so a host holding no registry account pulls it, and the index behind that name carries a `linux/amd64` manifest and a `linux/arm64` one. Leave the name untagged as it stands above. The release is tagged `v0.1.0` in git and the image is tagged `0.1.0` in the registry, so a pull of `:v0.1.0` finds nothing.
+
 1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
    The integration problem MBSE never solved, what SysML v2 changes, and the claim this repository makes.
 2. [The architecture in one sitting](articles/01-the-architecture-in-one-sitting.md)  
@@ -26,12 +48,10 @@ So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with
    Five phases, one pull request each, test first, and the decisions the plan had to make on its own.
 10. [Five spikes before the first line](articles/09-five-spikes-before-the-first-line.md)  
     The syntax the reference tools accept, nested requires through the router, a router with no config file whose readiness lies, and cross-platform copying.
-11. [The demo being built](articles/10-the-demo-being-built.md)  
+11. [The demo as it shipped](articles/10-the-demo-as-it-shipped.md)  
     What it does once it runs, package by package and service by service, and what a visitor sees in fifteen minutes.
-
-![Two apps, one graph, three services that never meet.](img/overview-sketch.png)
-
-*Two apps, one graph, three services that never meet.*
+12. [What shipped, and what did not](articles/11-what-shipped-and-what-did-not.md)  
+    What the image weighs, the version tag that returns nothing, the checks nobody has run, and the one claim the running container does settle.
 
 ## Documents
 
@@ -39,8 +59,8 @@ So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with
 - [L0, Federating a systems model](a3/L0-federating-a-systems-model.pdf), an A3 sheet for the reader asking "What does this demo claim, what is in the box, and what would I keep or replace if I adopted it?"
 - [L2b, Pipeline example: capacity and verdicts](a3/L2b-pipeline-example-capacity-and-verdicts.pdf), an A3 sheet for the reader asking "Why does raising one server change nothing and raising another change everything?"
 - [Use cases](stories/use-cases.pdf), the storyboard as one PDF, one page per use case after the overview.
-- [Decision records](decisions/README.md), the 26 decisions with their alternatives and consequences.
+- [Decision records](decisions/README.md), the 28 decisions with their alternatives and consequences.
 
 ## The repository
 
-The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence. The command that starts the demo arrives when the first release is tagged. The same articles are rendered as a site at https://sysml-federation.org/.
+The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence. The same articles are rendered as a site at https://sysml-federation.org/.

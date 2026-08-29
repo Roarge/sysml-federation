@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 6 of 11 in [Federating a systems model](../README.md).
+Part 6 of 12 in [Federating a systems model](../README.md).
 
 The demo is one container that runs a SysML v2 adapter, a capacity service and a document service as three GraphQL subgraphs behind a single router, with a model viewer and a requirements document as two web apps reading the one graph. A subgraph is a GraphQL service that owns part of a shared schema. The router is the process that composes those parts into one graph and answers every query against it. The [twelve use cases](04-twelve-use-cases-and-one-moving-bottleneck.md) say what a visitor does with that. The approval gate after them, the review the requirements work had to pass before the architecture began, says what the code owes the visitor in return.
 

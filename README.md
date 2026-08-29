@@ -4,16 +4,22 @@ An adapter that publishes a SysML v2 model as a federated service, and a worked 
 
 ## Run it
 
-One container image carries both web apps, the router and the three services behind it, and it builds and runs with Docker alone.
+One container image carries both web apps, the router and the three services behind it, and it runs with Docker alone. The image is published for amd64 and arm64, and pulling it needs no registry account.
+
+```
+docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
+```
+
+Then open `http://localhost:8080/`, which redirects to the model viewer. The requirements document is at `/document/`, the router's endpoint at `/graphql` and its query editor at `/playground`. Nothing is written to disk, so stopping the container and starting it again brings the shipped model back.
+
+A clone builds the same image from source.
 
 ```
 docker build -f examples/pipeline/Dockerfile -t sysml-federation:dev .
 docker run --rm -p 8080:8080 sysml-federation:dev
 ```
 
-Then open `http://localhost:8080/`, which redirects to the model viewer. The requirements document is at `/document/`, the router's endpoint at `/graphql` and its query editor at `/playground`. Nothing is written to disk, so stopping the container and starting it again brings the shipped model back. From a checkout that already has the Go toolchain the rest of the Makefile wants, `make image` and `make run` are those same two commands.
-
-The image itself is not published yet. Publishing runs from a version tag, no version tag has been pushed, and the package a first tag creates stays private until somebody makes it public by hand, so `docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation` fetches nothing today. Building from a clone needs no registry at all.
+`make image` and `make run` wrap those two commands. The Makefile resolves a Go toolchain as it is read, so both want Go on the host even though Docker does the building.
 
 What to try, what each service holds and where the demo stops are in [the example's own README](examples/pipeline/README.md). The design underneath it is in [docs/](docs/README.md).
 

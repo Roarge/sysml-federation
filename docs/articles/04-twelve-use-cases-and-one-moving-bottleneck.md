@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 5 of 11 in [Federating a systems model](../README.md).
+Part 5 of 12 in [Federating a systems model](../README.md).
 
 The demo is a SysML v2 model of a five-server query pipeline, published through a federated GraphQL router to a capacity service, a document service and two web apps. A requirement's verdict can then be watched changing in a requirements document served by a service that has never parsed a model file.
 
@@ -71,13 +71,13 @@ The editable set is exactly the five server throughput values and the limit of `
 
 Each use case is written persona first, with a "when" clause where the situation changes the behaviour, and its criteria say what is observed rather than which control is used.
 
-Use case 1, launch with one command, belongs to the visitor. Given the image is already pulled, the line the first release will publish
+Use case 1, launch with one command, belongs to the visitor. Given the image is already pulled, the line the first release published
 
 ```
 docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
 ```
 
-renders the viewer at `http://localhost:8080/viewer` and the document at `http://localhost:8080/document` within ten seconds. For a private network the second criterion is the one to read: with no route to the internet, either app renders fully and every request it makes goes to the one published port ([one binary, one port](../decisions/AD-0011-one-binary-one-port.md)). The image pull is deliberately outside the ten seconds.
+renders the viewer at `http://localhost:8080/viewer/` and the document at `http://localhost:8080/document/` within ten seconds. For a private network the second criterion is the one to read: with no route to the internet, either app renders fully and every request it makes goes to the one published port ([one binary, one port](../decisions/AD-0011-one-binary-one-port.md)). The image pull is deliberately outside the ten seconds.
 
 Reading the model, use case 2, asks that the viewer's text pane show the model file with the servers, their throughput values, the connections, the requirements and their short names, and that the sketch show the five servers left to right as wired, each with its throughput, the capacity of 1200 and parse marked as the bottleneck. `PIPE-R1` shows its limit of 1500, a verdict of FAIL and a reason naming parse at 1200.
 
@@ -90,6 +90,10 @@ Use case 3, raise a server that is not the bottleneck, is the lesson that a chai
 ![Raise parse to 1700: the cut moves to the index pair](../img/us04-bottleneck-moves.png)
 
 *Raise parse to 1700: the cut moves to the index pair.*
+
+![The viewer after parse is raised to 1700, with both index servers outlined red](../img/app-viewer-bottleneck-moved.png)
+
+*The same state in the running viewer, with capacity 1400, bottleneck indexA and indexB, and both index boxes stroked red.*
 
 Use case 4, raise the bottleneck, is the memorable moment, and it takes two steps. Parse goes from 1200 to 1700, the capacity becomes 1400, `PIPE-R1` stays FAIL, and the bottleneck moves to the pair indexA and indexB. Then, with parse at 1700, indexA goes from 700 to 900, the capacity becomes 1600, `PIPE-R1` becomes PASS with a reason naming the index pair at 1600 against a limit of 1500, and the requirement block is no longer red.
 

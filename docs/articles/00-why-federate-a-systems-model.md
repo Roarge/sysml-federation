@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 1 of 11 in [Federating a systems model](../README.md).
+Part 1 of 12 in [Federating a systems model](../README.md).
 
 ## The documents that describe one system
 

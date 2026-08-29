@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 7 of 11 in [Federating a systems model](../README.md).
+Part 7 of 12 in [Federating a systems model](../README.md).
 
 The demo is a SysML v2 model of a five-server query pipeline, published as one federated GraphQL graph by three services in one container, with a capacity analysis and a requirements document joined to the model by the router that merges the three schemas, and edits from either app landing in the model text. Its architecture description was written for two readers who want different things from it, and a later reading of the description against the requirements changed several mechanisms without changing any decision. [The architecture in one sitting](01-the-architecture-in-one-sitting.md) covers the same ground at one sitting's length, and [an A3 sheet for a fifteen-minute reader](07-an-a3-sheet-for-a-fifteen-minute-reader.md) is what was cut from it.
 
@@ -131,7 +131,7 @@ A second fixture model with other names and wiring is part of the adapter's test
 
 ## Twenty-six decisions
 
-The records are in the Nygard form, context, decision, alternatives, consequences, requirements affected and sources, and all twenty-six are accepted. They are indexed at [docs/decisions](../decisions/README.md). Twenty-four were written from decisions already taken in the brief, the plan and the engineering log. Two more were written after the traceability showed six requirements with no decision behind them: the document owning its structure and the viewer's form were real decisions that had never been recorded.
+The records are in the Nygard form, context, decision, alternatives, consequences, requirements affected and sources, and all twenty-six are accepted. They are indexed at [docs/decisions](../decisions/README.md), which now lists twenty-eight, the two later ones written while the system was built. Twenty-four were written from decisions already taken in the brief, the plan and the engineering log. Two more were written after the traceability showed six requirements with no decision behind them: the document owning its structure and the viewer's form were real decisions that had never been recorded.
 
 The shape of the system is six records. The model, the analysis and the document structure are three independently owned subgraphs behind one router, with no service reading another's data, which is [federation over a single service](../decisions/AD-0001-federation-over-single-service.md). The platform is [Cosmo](../decisions/AD-0002-cosmo-as-platform.md), pinned to router 0.343.1 and a matching compose tool, run from a static execution configuration with no control plane and no graph token. Everything ships as [one binary, one process tree and one port](../decisions/AD-0011-one-binary-one-port.md), with the router run as [a child process from the copied binary](../decisions/AD-0010-router-as-child-process.md). Composition is [a maintainer step whose output is committed and tested for drift](../decisions/AD-0012-composition-committed.md), and the router's [telemetry is disabled by environment baked into the image](../decisions/AD-0013-telemetry-off.md).
 

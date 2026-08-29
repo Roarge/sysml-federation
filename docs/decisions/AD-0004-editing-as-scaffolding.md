@@ -100,4 +100,4 @@ decision.
 SR-09, SR-13, SR-22, SR-24, SR-25, SR-38, SR-44
 
 ## Sources
-The repository README, "Placeholders" and "The pipeline example". [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the editable set and the criteria on invalid input, and [The demo being built](../articles/10-the-demo-being-built.md) for the three mutations and the refusals as they ship. AD-0003 for why there is no repository to write to.
+The repository README, "Placeholders" and "The pipeline example". [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the editable set and the criteria on invalid input, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the three mutations and the refusals as they ship. AD-0003 for why there is no repository to write to.
