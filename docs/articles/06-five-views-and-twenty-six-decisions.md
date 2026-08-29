@@ -107,7 +107,7 @@ The UI server serves `/viewer` and `/document` from an embedded filesystem, prox
 
 The Dockerfile has three stages. A Go build stage cross-compiles the binary for the target platform. A stage named `router` is the vendor's image at the pinned version, from which `/router` is copied. The final stage is a distroless static base running as nonroot, into which go the router binary, the demo binary, the committed configuration and the model file. The router's licence is fetched at build time from the vendor's repository at the pinned tag with a pinned checksum, so it cannot drift from the binary's version. Whether `COPY --from` of a multi-platform image resolves the target platform's binary is a spike. The router is about 40 MB compressed, the demo binary a few MB and the base 2 MB, against a budget of 80 MB.
 
-Publishing runs on a pushed `v*` tag, builds `linux/amd64,linux/arm64` by cross-compilation with no QEMU, tags with the semver version and `latest`, pushes, then reads the manifest back and fails the job if either platform is missing or over budget.
+Publishing runs on a pushed `v*` tag, builds `linux/amd64,linux/arm64` by cross-compilation with no QEMU, pushes under the semver version alone, then reads the manifest back and fails the job if either platform is missing or over budget. `latest` moves onto the measured image only once both platforms have passed, and only for a version with no pre-release suffix.
 
 ### The adapter
 

@@ -4,9 +4,11 @@ Twenty-six records in the Nygard form, each giving the context, the decision,
 the alternatives considered, the consequences, the requirements affected and
 its sources. All twenty-six are accepted. They were written during the design
 phase, before any code, and copied here so that they can be read and
-challenged. One has been amended since, because building the viewer showed
-that part of it could be met only by reading the notation a second time and
-less well than the adapter already reads it, which was the objection to it. A
+challenged. Two have been amended since. Building the viewer showed that part
+of one could be met only by reading the notation a second time and less well
+than the adapter already reads it, which was the objection to it. Building the
+publishing job showed that the other put the moving `latest` tag on an image
+before anything had measured it. A
 record amended that way keeps its number and the original date in its status
 line, with a line at its head giving the date of the amendment and saying what
 changed. A record's status is `accepted`, or `accepted` followed by whatever
@@ -60,7 +62,7 @@ each produced.
 ## The repository
 
 - <span class="rec-id">AD-0016</span> [Generated code exempt from the empty-interface rule](AD-0016-generated-code-exempt.md)
-- <span class="rec-id">AD-0020</span> [The image published by a tag-triggered workflow to GHCR](AD-0020-publish-on-tags.md)
+- <span class="rec-id">AD-0020</span> [The image published by a tag-triggered workflow to GHCR](AD-0020-publish-on-tags.md) (amended)
 - <span class="rec-id">AD-0021</span> [The Markdown architecture description as the record, A3 sheets as the overview](AD-0021-architecture-record.md)
 - <span class="rec-id">AD-0022</span> [Track internal/assert and internal/tabletest](AD-0022-track-internal-helpers.md)
 - <span class="rec-id">AD-0023</span> [The light requirements scheme](AD-0023-light-requirements-scheme.md)

@@ -1,6 +1,12 @@
 # AD-0020 The image published by a tag-triggered workflow to GHCR
 
-Status: accepted. Date: 2026-08-27.
+Status: accepted, amended once the publishing job was built. Date: 2026-08-27.
+
+Amendment, 2026-08-29: the decision as first accepted put `latest` on the
+image in the same push as the version tag and measured the result afterwards,
+so an image over the size budget would already be what an untagged pull
+returns before the gate could reject it. The version tag now goes up alone and
+`latest` is moved only after both platforms have been measured and passed.
 
 ## Context
 
@@ -45,9 +51,14 @@ We will publish the image from a second GitHub Actions workflow,
 `permissions: contents: read, packages: write`, logs in to GHCR with the
 workflow token, builds for linux/amd64 and linux/arm64 by Go
 cross-compilation with `CGO_ENABLED=0` and no QEMU, tags with
-`type=semver,pattern={{version}}` and `latest`, sets `provenance: false`
-and `sbom: false`, pushes, and then reads the manifest back and fails the
-job if either platform is missing or exceeds the size budget. The package
+`type=semver,pattern={{version}}` alone with the metadata action's `latest`
+flavour turned off, sets `provenance: false`
+and `sbom: false`, and pushes that one tag. It then reads the manifest back
+and fails the job if either platform is missing or exceeds the size budget,
+and only once both have passed does it put `latest` on the digest it
+measured. A version with a pre-release suffix stops there and leaves `latest`
+alone, so a release candidate is published under its own tag and is never what
+an untagged pull returns. The package
 is made public once by hand. `test.yml` keeps its read-only permissions
 and runs the unit tests only, and the CI policy line becomes
 "unit tests, plus image publishing on tags" (SC-07).
@@ -78,6 +89,14 @@ Publishing on pushes to `main` as well, with `sha` and `edge` tags, which
 the packaging research recommends beside the tag trigger. The design takes
 the tag trigger only, and SC-07 names two jobs and nothing else.
 
+Moving `latest` in the same push as the version tag, which is what the
+metadata action does for a semver tag unless it is told otherwise, and which
+this record first accepted. Registry-counted sizes cannot be had without
+pushing, so the gate can only run after the push, and with `latest` already
+moved an over-budget image is what an untagged pull returns until somebody
+notices. Turning `latest` off in the metadata step and putting it on the
+measured digest afterwards costs one more step and one more registry call.
+
 ## Consequences
 
 The launch line works for nobody until the package has been flipped to
@@ -90,7 +109,8 @@ it (SC-04).
 
 The workflow is also the test bench for SR-05 and SR-06. After the push it
 reads the manifest back and fails if either platform is absent or if any
-platform's compressed layers exceed 80 MB. The router alone is about 40 MB
+platform's compressed layers exceed 80 MB, and `latest` waits on that result.
+The router alone is about 40 MB
 compressed and sets the floor, which leaves about 40 MB for the demo.
 
 One spike stands behind this record. Before the first tag is pushed,
@@ -106,9 +126,15 @@ pulled at runtime. The root `NOTICE` names the router at a pinned
 version that moves with each bump (SR-08). Its licence text is fetched at
 build time at the pinned tag and sits beside `/router` (SR-07).
 
-`latest` follows the newest tag, so it can drift from what the README
-describes if the README is not updated in the same tagged commit, a cost
-the packaging research names and the design accepts.
+`latest` follows the newest release that passes the gate, so it can drift from
+what the README describes if the README is not updated in the same tagged
+commit, a cost the packaging research names and the design accepts. It can also
+lag the newest tag in the registry instead of tracking it. A failed gate
+leaves the version tag published and `latest` where it was, and a pre-release
+moves nothing, so an untagged pull returns the last full release that was
+measured and passed rather than whatever went up most recently. Cutting a
+release means reading the run rather than assuming that a tag in the registry
+is what `latest` names.
 
 ## Requirements affected
 
