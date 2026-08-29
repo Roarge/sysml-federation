@@ -77,6 +77,10 @@ Every row has a grip. Drag `PIPE-R1.5` above `PIPE-R1.1` and within two seconds 
 
 The document service holds the tree and nothing else, the decision on [document-owned structure](../decisions/AD-0025-document-owns-its-structure.md), and its shipped tree is the one place the example's identifiers enter a service. Every edit above leaves the header reading `model version 1`, because a reorder, a heading, a paragraph or an exclusion is a document mutation and touches only the document's version. The value inputs go the other way: `PIPE-R1.2`'s throughput set to 1700 goes through the adapter, the model version rises, and the document's own version has not moved. Drag and drop is SortableJS, vendored as the one third-party file the decision on [vanilla web apps](../decisions/AD-0017-vanilla-web-apps.md) allows.
 
+![The document's numbered tree with PIPE-R1.4 gone, above the viewer's blocks that still list it](../img/app-both-exclusion.png)
+
+*The same exclusion from both sides. Above, the document has dropped PIPE-R1.4 and given its number to PIPE-R1.5. Below, the viewer's blocks still carry PIPE-R1.4 and its verdict, because the model never changed.*
+
 ## What a visitor sees in fifteen minutes
 
 The visitor has Docker, a browser and no manual. The walk below is the worked example of [From use cases to requirements](05-from-use-cases-to-requirements.md) observed through the router and both apps, and the plan names it as the end-to-end proof.
