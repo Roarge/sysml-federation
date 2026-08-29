@@ -17,13 +17,19 @@ integration layer for open MBSE."
 
     docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation
 
-Then open `http://localhost:8080/`. The image is published from a version tag,
-so the line above works from the first tag onwards. From a checkout there is
-nothing to wait for: `make image && make run` builds the same Dockerfile for the
-host's own architecture and runs the result on the same port.
+Then open `http://localhost:8080/`. That line fetches nothing today. Publishing
+runs from a version tag, no version tag has been pushed, and the package a first
+tag creates stays private until it is made public, which is a step the package's
+owner takes once. Until the tag exists and the package is public, the registry
+refuses the pull rather than reporting it missing, so a `denied` from the line
+above says the image is not there for anyone yet and says nothing about the
+reader's own setup. From a checkout there is nothing to wait for: `make image &&
+make run` builds the same Dockerfile for the host's own architecture and runs the
+result on the same port.
 
-Port 8080 carries four paths and nothing else. `/viewer/` is the model viewer,
-`/document/` the requirements document, `/graphql` the router's endpoint and
+Port 8080 carries five paths and nothing else. `/viewer/` is the model viewer,
+`/document/` the requirements document, `/shared/` the GraphQL client both apps
+load and the drag library the document uses, `/graphql` the router's endpoint and
 `/playground` the router's own query editor. A request to `/` is redirected to
 `/viewer/`. The three services and the router listen on loopback inside the
 container and are not reachable from outside it, and the router's health paths
@@ -85,8 +91,14 @@ the tree, a tray offers to restore it, and the viewer goes on listing it.
 ## How it is put together
 
 Three services stand behind the router. None of them imports, calls or is
-configured with the address of either of the others, and a test walks the import
-graph to keep it so.
+configured with the address of either of the others, and two tests keep it so.
+One walks the import graph of all three and fails on an import that crosses out
+of one service into another, in both directions of every pair. The other reads
+their sources for a host, a port, a URL, a command-line flag, a lookup in the
+environment or any means of opening an outbound connection, and finds none of
+them. What neither test can see is an address handed to a service at run time by
+whatever starts it, and nothing hands one over: each service is built from the
+state it serves and from nothing else.
 
 The adapter serves the model. It parses `model.sysml` and publishes parts with
 their attributes, ports, children and connections, requirements with the

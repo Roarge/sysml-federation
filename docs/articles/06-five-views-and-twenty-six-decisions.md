@@ -103,7 +103,7 @@ PID 1  sysml-federation serve            Go, supervisor, PID 1
   \-- goroutine  ui server      0.0.0.0:8080     static apps, proxy
 ```
 
-The UI server serves `/viewer` and `/document` from an embedded filesystem, proxies `/graphql` and `/playground` to the router, and redirects `/` to `/viewer`. A `healthcheck` subcommand probes the router's `/health/ready` on its loopback port and `/viewer` on the published port and exits non-zero if either fails. The router's health path is not proxied, so the four paths just named are all the published port serves.
+The UI server serves `/viewer`, `/document` and the `/shared` JavaScript the two apps draw on from an embedded filesystem, proxies `/graphql` and `/playground` to the router, and redirects `/` to `/viewer`. A `healthcheck` subcommand probes the router's `/health/ready` on its loopback port and `/viewer` on the published port and exits non-zero if either fails. The router's health path is not proxied, so the five paths just named are all the published port serves.
 
 The Dockerfile has three stages. A Go build stage cross-compiles the binary for the target platform. A stage named `router` is the vendor's image at the pinned version, from which `/router` is copied. The final stage is a distroless static base running as nonroot, into which go the router binary, the demo binary, the committed configuration and the model file. The router's licence is fetched at build time from the vendor's repository at the pinned tag with a pinned checksum, so it cannot drift from the binary's version. Whether `COPY --from` of a multi-platform image resolves the target platform's binary is a spike. The router is about 40 MB compressed, the demo binary a few MB and the base 2 MB, against a budget of 80 MB.
 
