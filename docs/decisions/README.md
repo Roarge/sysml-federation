@@ -1,11 +1,13 @@
 # Decision records
 
-Twenty-six records in the Nygard form, each giving the context, the decision,
+Twenty-eight records in the Nygard form, each giving the context, the decision,
 the alternatives considered, the consequences, the requirements affected and
-its sources. All twenty-six are accepted. They were written during the design
-phase, before any code, and copied here so that they can be read and
-challenged. Where building the system changed what a record decides, the
-record was amended and is marked as amended in the list below. Such a record
+its sources. All twenty-eight are accepted. Twenty-six of them were written
+during the design phase, before any code, and copied here so that they can be
+read and challenged. The last two, AD-0027 and AD-0028, were written later,
+while the system was being built, the second replacing the first. Where
+building the system changed what a record decides, the record was amended and
+is marked as amended in the list below. Such a record
 keeps its number and the original date in its status line, with a line at its
 head giving the date of the amendment and saying what changed. A record's
 status is `accepted`, or `accepted` followed by whatever qualification the
@@ -63,3 +65,5 @@ each produced.
 - <span class="rec-id">AD-0021</span> [The Markdown architecture description as the record, A3 sheets as the overview](AD-0021-architecture-record.md)
 - <span class="rec-id">AD-0022</span> [Track internal/assert and internal/tabletest](AD-0022-track-internal-helpers.md)
 - <span class="rec-id">AD-0023</span> [The light requirements scheme](AD-0023-light-requirements-scheme.md)
+- <span class="rec-id">AD-0027</span> [The adapter's expected scale raised to 2750 lines](AD-0027-adapter-expected-scale.md)
+- <span class="rec-id">AD-0028</span> [The line figures are estimates and never a limit](AD-0028-line-figures-are-estimates.md)
