@@ -71,9 +71,16 @@ const (
 	ComposeFile = "checkly/compose.yml"
 )
 
-// StatusDone is the status a story carries once its acceptance is met, as
-// @StoryMeta { status = StoryStatus::done; } writes it.
-const StatusDone = "done"
+// The two statuses a story of this model carries, as
+// @StoryMeta { status = StoryStatus::done; } writes them. Done is the one that
+// puts a story under the coverage checks, and in progress is the one exemption
+// from them. Any other status, and no status at all, is a defect: an exemption
+// is the one thing that turns a check off, so it may only be taken by a story
+// that says in so many words that it is unfinished.
+const (
+	StatusDone       = "done"
+	StatusInProgress = "inProgress"
+)
 
 // ErrNoModuleRoot reports that the walk upwards from the working directory
 // found no go.mod, so there is no repository to read.
@@ -97,8 +104,12 @@ var (
 	// requirement <'US-04'> US_04_RaiseTheBottleneck : UserStory {.
 	storyRE = regexp.MustCompile(`(?m)^[\t ]*requirement\s+<'((?:US|SR)-\d\d)'>\s+(\w+)\s*:\s*UserStory\s*\{`)
 
-	// The status of a story: @StoryMeta { status = StoryStatus::done; }.
-	storyStatusRE = regexp.MustCompile(`@StoryMeta\s*\{\s*status\s*=\s*StoryStatus::(\w+)\s*;\s*\}`)
+	// The status of a story: @StoryMeta { status = StoryStatus::done; }. The
+	// application is taken whole and its fields read by name, as @Evidence is:
+	// a pattern that spelt out one field and a closing brace would read no
+	// status at all from an application carrying a second field, and a story
+	// with no status is exempt from the checks that matter most.
+	storyMetaRE = regexp.MustCompile(`@StoryMeta\s*\{([^{}]*)\}`)
 
 	// A decision record wherever the model names it, in a @DecisionRecord
 	// application or in the prose of a doc: AD-0029.
@@ -132,8 +143,9 @@ var (
 	// order they are written in does not decide whether the evidence is seen.
 	evidenceRE = regexp.MustCompile(`@Evidence\s*\{([^{}]*)\}`)
 
-	// One field of a metadata application: kind = "go-test";.
-	metadataFieldRE = regexp.MustCompile(`(\w+)\s*=\s*"([^"]*)"\s*;`)
+	// One field of a metadata application, its value quoted or written bare:
+	// kind = "go-test"; and status = StoryStatus::done;.
+	metadataFieldRE = regexp.MustCompile(`(\w+)\s*=\s*(?:"([^"]*)"|([^"{};]+?))\s*;`)
 
 	// A doc and its text, over as many lines as it takes: doc /* ... */.
 	docRE = regexp.MustCompile(`(?s)doc\s*/\*(.*?)\*/`)
@@ -435,15 +447,16 @@ func GoTestEvidence(text string) []TestFunc {
 }
 
 // Stories returns the story usages of a register, in the order they are
-// written, each with the status its @StoryMeta carries. A story with no
-// @StoryMeta carries the empty status, which is not done and is reported as
-// such.
+// written, each with the status its @StoryMeta carries, read by field name and
+// without the enumeration's type. A story whose @StoryMeta is absent or carries
+// no status has the empty status, which the caller reports as a defect rather
+// than as an exemption.
 func Stories(text string) []Story {
 	var found []Story
 	for _, block := range blocks(text, storyRE) {
 		story := Story{ShortName: block.Header[1], Name: block.Header[2]}
-		if status := storyStatusRE.FindStringSubmatch(block.Body); status != nil {
-			story.Status = status[1]
+		if application := storyMetaRE.FindStringSubmatch(block.Body); application != nil {
+			story.Status = metadataFields(application[1])["status"]
 		}
 		found = append(found, story)
 	}
@@ -737,9 +750,18 @@ func evidenceFields(body string) map[string]string {
 	if application == nil {
 		return nil
 	}
+	return metadataFields(application[1])
+}
+
+// metadataFields reads the body of a metadata application into its fields, by
+// name. A quoted value loses its quotes and an enumeration literal loses its
+// type, so that a field reads the same whichever of the two it is written as.
+// A field the application does not carry reads as the empty string, which the
+// caller is expected to treat as a defect rather than as a default.
+func metadataFields(body string) map[string]string {
 	fields := make(map[string]string)
-	for _, field := range metadataFieldRE.FindAllStringSubmatch(application[1], -1) {
-		fields[field[1]] = field[2]
+	for _, field := range metadataFieldRE.FindAllStringSubmatch(body, -1) {
+		fields[field[1]] = attributeValue(field[2] + field[3])
 	}
 	return fields
 }

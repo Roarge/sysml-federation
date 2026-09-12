@@ -212,9 +212,7 @@ func coverageAgrees(t *testing.T, root string) {
 		if !derived[story.Name] {
 			t.Errorf("%s (%s) is a derived end of no derivation connection", story.ShortName, story.Name)
 		}
-		if story.Status != StatusDone {
-			t.Logf("%s (%s) is %s, so a verification case and an allocation are not due yet",
-				story.ShortName, story.Name, story.Status)
+		if !evidenceIsDue(t, story, "a verification case and an allocation") {
 			continue
 		}
 		if !verified[story.Name] {
@@ -227,9 +225,7 @@ func coverageAgrees(t *testing.T, root string) {
 
 	validation := counted(ValidationCases(text(t, root, ValidationCasesFile)))
 	for _, story := range Stories(text(t, root, StakeholderStoriesFile)) {
-		if story.Status != StatusDone {
-			t.Logf("%s (%s) is %s, so a validation case is not due yet",
-				story.ShortName, story.Name, story.Status)
+		if !evidenceIsDue(t, story, "a validation case") {
 			continue
 		}
 		want := "VAL_US_" + strings.TrimPrefix(story.ShortName, "US-")
@@ -299,6 +295,29 @@ func sessionPartsAgree(t *testing.T, root string) {
 		func(name string) string {
 			return fmt.Sprintf("the session composite carries %s, and the compose file starts no such service", name)
 		})
+}
+
+// evidenceIsDue reports whether a story is far enough along that the evidence
+// named by what is expected of it. A story in progress is exempt and logged,
+// which is the exemption the requirement grants. Every other answer is a
+// failure, including no status at all: the exemption is the one path that turns
+// a check off, so a story may not reach it by being unreadable.
+func evidenceIsDue(t *testing.T, story Story, what string) bool {
+	t.Helper()
+	switch story.Status {
+	case StatusDone:
+		return true
+	case StatusInProgress:
+		t.Logf("%s (%s) is %s, so %s is not due yet", story.ShortName, story.Name, story.Status, what)
+		return false
+	case "":
+		t.Errorf("%s (%s) carries no readable @StoryMeta", story.ShortName, story.Name)
+		return false
+	default:
+		t.Errorf("%s (%s) carries the status %s, and a story of this model is done or inProgress",
+			story.ShortName, story.Name, story.Status)
+		return false
+	}
 }
 
 // text reads one file of the repository, or fails the subtest. It exists
