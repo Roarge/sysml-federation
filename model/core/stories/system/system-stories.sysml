@@ -81,7 +81,7 @@ package Federation_SystemStories {
 
     #derive
     requirement <'SR-03'> SR_03_NoOutboundNetwork : UserStory {
-        @StoryMeta { status = StoryStatus::done; }
+        @StoryMeta { status = StoryStatus::inProgress; }
         subject :>> system : DemoElement;
         stakeholder :>> role : Visitor;
         attribute statement : String = "The demo shall make no network connection to any address outside the container, and the image shall set DO_NOT_TRACK=1, COSMO_TELEMETRY_DISABLED=true, TRACING_ENABLED=false and METRICS_OTLP_ENABLED=false in the router process's environment, and shall hand the router a configuration file only when the operator names one in SYSML_FEDERATION_ROUTER_CONFIG_PATH, in which case that file governs the router's telemetry.";
