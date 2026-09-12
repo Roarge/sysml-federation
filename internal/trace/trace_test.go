@@ -20,10 +20,9 @@ import (
 // repository it describes, and fails on the first name one side carries and the
 // other lacks.
 //
-// A register that has not been written yet gives its subtest nothing to read,
-// so the subtest skips and names the file it is waiting for. The skips go as
-// the registers land. Two subtests never skip: before the check project exists,
-// both of its sides are empty, and two empty sets agree.
+// Every register these subtests read is written, so each of them asserts. The
+// last one is the exception: the check session's compose file is not there yet,
+// so it skips and names the file it is waiting for.
 func TestSR46_ModelAndRepositoryAgree(t *testing.T) {
 	found, err := ModuleRoot()
 	root := assert.Must(t, found, err)
@@ -43,13 +42,10 @@ func TestSR46_ModelAndRepositoryAgree(t *testing.T) {
 // under docs/decisions, and every record under docs/decisions is named
 // somewhere in the model.
 //
-// The decision tags live in the logical architecture, so that register is one
-// of the files this waits for: without it no record is named and the second
-// direction would fail on all of them.
+// The decision tags live in the logical architecture, so the second direction
+// reads that register as much as this one does.
 func identifiersAgree(t *testing.T, root string) {
 	t.Helper()
-	skipWhileAbsent(t, root, StakeholderStoriesFile, SystemStoriesFile,
-		DesignConstraintsFile, ComponentsFile)
 
 	model := modelFiles(t, root)
 	declared := Declarations(model)
@@ -86,7 +82,6 @@ func identifiersAgree(t *testing.T, root string) {
 // typing slip or a requirement that was dropped without its record following.
 func requirementsAffectedAgree(t *testing.T, root string) {
 	t.Helper()
-	skipWhileAbsent(t, root, StakeholderStoriesFile, SystemStoriesFile, DesignConstraintsFile)
 
 	inModel := nameSet(ShortNames(modelFiles(t, root)))
 	for _, record := range decisionRecords(t, root) {
@@ -105,7 +100,6 @@ func requirementsAffectedAgree(t *testing.T, root string) {
 // hide one of them.
 func goTestsAgree(t *testing.T, root string) {
 	t.Helper()
-	skipWhileAbsent(t, root, VerificationCasesFile)
 
 	declarations, err := GoTestFunctions(root)
 	repository := counted(assert.Must(t, declarations, err))
@@ -133,8 +127,8 @@ func goTestsAgree(t *testing.T, root string) {
 
 // checkFilesAgree: the check files of the check project and the file names the
 // two case registers quote are the same set, and every suite file is exercised
-// by exactly one validation case. This one never skips. Before the check
-// project exists both sides are empty, which is agreement rather than absence.
+// by exactly one validation case. Before the check project exists both sides
+// are empty, which is agreement rather than absence.
 func checkFilesAgree(t *testing.T, root string) {
 	t.Helper()
 
@@ -166,7 +160,6 @@ func checkFilesAgree(t *testing.T, root string) {
 // cannot both claim to be the board a reader is looking at.
 func imagesAgree(t *testing.T, root string) {
 	t.Helper()
-	skipWhileAbsent(t, root, ViewsFile)
 
 	images, err := PNGFiles(root)
 	published := assert.Must(t, images, err)
@@ -200,8 +193,6 @@ func imagesAgree(t *testing.T, root string) {
 // expected state rather than a defect.
 func coverageAgrees(t *testing.T, root string) {
 	t.Helper()
-	skipWhileAbsent(t, root, StakeholderStoriesFile, SystemStoriesFile,
-		VerificationCasesFile, ValidationCasesFile, ComponentsFile)
 
 	stories := text(t, root, SystemStoriesFile)
 	system := Stories(stories)
@@ -240,7 +231,8 @@ func coverageAgrees(t *testing.T, root string) {
 // the manifest the check project reads says it is, are the same, and every
 // check in the manifest is constructed once. A check the manifest carries and
 // nothing constructs never runs, and one constructed twice runs twice under one
-// name. This one never skips, for the reason checkFilesAgree gives.
+// name. Both sides are empty until the check project exists, as in
+// checkFilesAgree.
 func checkInventoryAgrees(t *testing.T, root string) {
 	t.Helper()
 
@@ -342,19 +334,6 @@ func decisionRecords(t *testing.T, root string) []DecisionRecord {
 	t.Helper()
 	found, err := DecisionRecords(root)
 	return assert.Must(t, found, err)
-}
-
-// skipWhileAbsent skips the subtest while one of the files it reads has not
-// been written yet, naming the first one missing. A subtest names every file it
-// needs, not only the register it is about, so that it never runs against half
-// a model and reports the other half as a disagreement.
-func skipWhileAbsent(t *testing.T, root string, files ...string) {
-	t.Helper()
-	for _, file := range files {
-		if !Exists(root, file) {
-			t.Skipf("%s is not written yet, so there is nothing here to agree with", file)
-		}
-	}
 }
 
 // bothWays reports every name one side carries and the other lacks. The two
