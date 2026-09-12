@@ -128,7 +128,12 @@ var (
 
 	// What an action offers as evidence:
 	// @Evidence { kind = "go-test"; location = "adapter/model/patch_test.go"; }.
-	evidenceRE = regexp.MustCompile(`@Evidence\s*\{\s*kind\s*=\s*"([^"]*)"\s*;\s*location\s*=\s*"([^"]*)"\s*;\s*\}`)
+	// The body is taken whole and its fields read by name below, so that the
+	// order they are written in does not decide whether the evidence is seen.
+	evidenceRE = regexp.MustCompile(`@Evidence\s*\{([^{}]*)\}`)
+
+	// One field of a metadata application: kind = "go-test";.
+	metadataFieldRE = regexp.MustCompile(`(\w+)\s*=\s*"([^"]*)"\s*;`)
 
 	// A doc and its text, over as many lines as it takes: doc /* ... */.
 	docRE = regexp.MustCompile(`(?s)doc\s*/\*(.*?)\*/`)
@@ -414,8 +419,8 @@ func GoTestFunctions(root string) ([]TestFunc, error) {
 func GoTestEvidence(text string) []TestFunc {
 	var found []TestFunc
 	for _, block := range blocks(text, actionRE) {
-		evidence := evidenceRE.FindStringSubmatch(block.Body)
-		if evidence == nil || evidence[1] != "go-test" {
+		evidence := evidenceFields(block.Body)
+		if evidence["kind"] != "go-test" {
 			continue
 		}
 		name := block.Header[1]
@@ -424,7 +429,7 @@ func GoTestEvidence(text string) []TestFunc {
 				name = goTestNameRE.FindString(doc[1])
 			}
 		}
-		found = append(found, TestFunc{Name: name, File: evidence[2]})
+		found = append(found, TestFunc{Name: name, File: evidence["location"]})
 	}
 	return found
 }
@@ -722,6 +727,21 @@ func blockBody(text string, start int) string {
 		}
 	}
 	return text[start:]
+}
+
+// evidenceFields reads the fields of the first @Evidence application of a
+// block, by name. A block with no evidence has no fields, and reading a field
+// it does not carry gives the empty string, which no comparison matches.
+func evidenceFields(body string) map[string]string {
+	application := evidenceRE.FindStringSubmatch(body)
+	if application == nil {
+		return nil
+	}
+	fields := make(map[string]string)
+	for _, field := range metadataFieldRE.FindAllStringSubmatch(application[1], -1) {
+		fields[field[1]] = field[2]
+	}
+	return fields
 }
 
 // captures returns the first capture group of every match, in the order they
