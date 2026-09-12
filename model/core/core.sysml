@@ -11,4 +11,5 @@ package <SF> Federation_Core {
     private import Federation_InterfaceTypes::*;
     private import Federation_Context::*;
     private import Federation_Concerns::*;
+    private import Federation_StakeholderStories::*;
 }
