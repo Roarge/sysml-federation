@@ -17,4 +17,6 @@ package <SF> Federation_Core {
     private import Federation_UseCases::*;
     private import Federation_FunctionalArchitecture::*;
     private import Federation_LogicalArchitecture::*;
+    private import Federation_VerificationCases::*;
+    private import Federation_ValidationCases::*;
 }
