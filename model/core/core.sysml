@@ -16,4 +16,5 @@ package <SF> Federation_Core {
     private import Federation_DesignConstraints::*;
     private import Federation_UseCases::*;
     private import Federation_FunctionalArchitecture::*;
+    private import Federation_LogicalArchitecture::*;
 }
