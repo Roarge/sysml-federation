@@ -67,7 +67,7 @@ No implementation spike depends on this decision.
 
 ## Requirements affected
 
-SC-03, SC-04, SR-46
+SR-46, SC-03, SC-04
 
 ## Sources
 

@@ -16,7 +16,7 @@ One register per file, and the root imports every one of them.
 |---|---|
 | [`library/`](library/) | the story definitions, a story as a requirement usage with a role, a capability, a benefit, nested acceptance criteria and a status carried as metadata, and beside them the definitions particular to this model, the scheme's enumerations, the design-constraint form and the metadata for decision records and evidence |
 | [`core/core.sysml`](core/core.sysml) | the root package, which imports every register below |
-| [`core/stakeholders/`](core/stakeholders/stakeholders.sysml) | six people, each a stakeholder of the description and an actor in the context |
+| [`core/stakeholders/`](core/stakeholders/stakeholders.sysml) | six people, each a stakeholder of the description, the three personas the boards draw also the actors in the context and, with the maintainer, in the use cases |
 | [`core/concerns/`](core/concerns/concerns.sysml) | one concern per stakeholder question, in the words the boards ask them in |
 | [`core/context/`](core/context/architecture-context.sysml) | the demo among what it touches, the external systems, and the elements the requirements are allocated to |
 | [`core/domain/`](core/domain/domain.sysml) | the items that move, pages, queries, version events, the image, the router configuration, spans and alerts |
@@ -264,7 +264,8 @@ that runs them as their location. A make target is an action of kind
 named by its file, `<'model.yml'>`, or by its file and step,
 `<'publish.yml: Read the manifest back'>`. What is read rather than run, the
 router's outbound paths or the module file, is an action of kind `analysis` or
-`inspection`.
+`inspection`. An inspection's location names the practice, `review checklist`,
+rather than a file in the repository.
 
 A case names only evidence that exists. Four stories ask for more than the
 repository holds. SR-01's criterion `recordedOnThreePlatforms` has one platform
