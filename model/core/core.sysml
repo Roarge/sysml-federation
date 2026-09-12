@@ -6,4 +6,9 @@ package <SF> Federation_Core {
            short name here. See model/README.md. */
     private import VSE_Library::*;
     private import Federation_Library::*;
+    private import Federation_Stakeholders::*;
+    private import Federation_Domain::*;
+    private import Federation_InterfaceTypes::*;
+    private import Federation_Context::*;
+    private import Federation_Concerns::*;
 }
