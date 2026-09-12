@@ -248,8 +248,8 @@ func coverageAgrees(t *testing.T, root string) {
 func checkInventoryAgrees(t *testing.T, root string) {
 	t.Helper()
 
-	manifest, err := ReadManifest(root)
-	entries := assert.Must(t, manifest, err)
+	read, err := ReadManifest(root)
+	entries := assert.Must(t, read, err)
 	inManifest := byLogicalID(t, "manifest", ManifestTuples(entries))
 	inRegister := byLogicalID(t, "check register", CheckCaseTuples(text(t, root, CheckCasesFile)))
 	for _, id := range union(inManifest, inRegister) {
