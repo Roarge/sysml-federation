@@ -51,7 +51,7 @@ NOINTERFACE := $(BIN)/nointerface
 # Only the directories .gitignore actually allowlists. Support trees are
 # deliberately untracked, so finding source in them is the intended state, not a
 # forgotten allowlist entry.
-override ALLOWLIST_ROOTS := adapter cmd examples docs internal
+override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly
 override TEST_FLAGS := -race -shuffle=on -count=1 -timeout=120s
 
 # A floor, not a decoration. 'override' for the same reason as the rest: an
@@ -61,7 +61,7 @@ override MIN_COVER := 70
 .PHONY: help
 help: ## Show this help
 	@grep -hE '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) \
-	  | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}'
+	  | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 # ------------------------------------------------------------------ set-up --
 .PHONY: bootstrap
@@ -212,9 +212,14 @@ check-tracked: ## No tracked path may be excluded by .gitignore (catches git add
 
 .PHONY: check-allowlist
 check-allowlist: ## Warn about source files on disk that .gitignore would not track
+	@# Ignored files are listed one by one, and a dependency or run-output tree
+	@# holds thousands of them, so those are dropped before the extension filter
+	@# rather than reported as allowlist gaps.
 	@missing="$$(git ls-files --others --ignored --exclude-standard -z -- \
 	   $(addsuffix /,$(ALLOWLIST_ROOTS)) 2>/dev/null \
-	   | tr '\0' '\n' | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js)$$' || true)"; \
+	   | tr '\0' '\n' \
+	   | grep -vE '/(node_modules|test-results|playwright-report|\.checkly)/' \
+	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json)$$' || true)"; \
 	 if [ -n "$$missing" ]; then \
 	   printf 'source files on disk that .gitignore does not track:\n'; \
 	   printf '%s\n' "$$missing" | sed 's/^/    /'; \
@@ -225,6 +230,85 @@ check-allowlist: ## Warn about source files on disk that .gitignore would not tr
 .PHONY: modules
 modules: ## List every Go module, so none escapes the gate
 	@find . -name go.mod -not -path './bin/*' -not -path '*/node_modules/*' | sed 's/^/    /'
+
+# -------------------------------------------------------- SysML v2 model ---
+# The adapter's parser accepts a subset of the notation and cannot prove a file
+# is valid SysML v2, so the model is put to the two reference tools and both
+# have to accept it. A tool that is not installed fails the target with a
+# pointer to its install instructions; there is no skip.
+SYSML_PILOT_JAR := jupyter-sysml-kernel-0.61.0-all.jar
+# 'override' for the reason the gate inputs carry it: an empty value would turn
+# the target into a loop over nothing that reports success.
+override EXAMPLE_MODELS := examples/pipeline/model.sysml adapter/model/testdata/warehouse.sysml
+
+# Both tools as shell functions, written once and called from both targets
+# below. Each takes the files to validate as its arguments and prints one line
+# naming the tool, how many files it read and its verdict.
+#
+# The pilot reads a model from standard input between % markers and reports
+# diagnostics after a '1> ' prompt on the same line, so its verdict is read out
+# of its output rather than its exit status: no ERROR: or WARNING: diagnostic,
+# and a root element line for every file handed to it. Its library path has to
+# be absolute; a relative one fails inside the tool.
+SYSML_TOOLS = \
+  pilot_check() { \
+    local n pilot jar lib out pkgs; \
+    n=$$\#; \
+    pilot="$${SYSML_PILOT_HOME:-$$HOME/.local/share/sysml-pilot/sysml}"; \
+    jar="$$pilot/$(SYSML_PILOT_JAR)"; \
+    if [ ! -f "$$jar" ] || [ ! -d "$$pilot/sysml.library" ]; then \
+      printf 'the OMG pilot is not under %s -- install the OMG pilot 2026-07 under ~/.local/share/sysml-pilot (see examples/pipeline/README.md, Validating the model)\n' "$$pilot" >&2; \
+      return 1; \
+    fi; \
+    if ! command -v java >/dev/null 2>&1; then \
+      printf 'java is not on the PATH -- the OMG pilot needs Java 21 or later (see examples/pipeline/README.md, Validating the model)\n' >&2; \
+      return 1; \
+    fi; \
+    lib="$$(cd "$$pilot/sysml.library" && pwd)"; \
+    out="$$({ printf '%%\n'; cat "$$@"; printf '\n%%\n%%exit\n'; } \
+      | timeout 300 java -cp "$$jar" org.omg.sysml.interactive.SysMLInteractive "$$lib" 2>&1 || true)"; \
+    pkgs="$$(grep -cE '(^|> )(Package|LibraryPackage) ' <<< "$$out" || true)"; \
+    if grep -qE '(^|> )(ERROR|WARNING):' <<< "$$out" || [ "$$pkgs" -lt "$$n" ]; then \
+      grep -vE '^Reading ' <<< "$$out" >&2 || true; \
+      printf 'pilot: %s file(s), REFUSED\n' "$$n" >&2; \
+      return 1; \
+    fi; \
+    printf 'pilot: %s file(s), accepted -- %s\n' "$$n" "$$*"; \
+  }; \
+  opensysml_check() { \
+    local n out rc; \
+    n=$$\#; \
+    if ! command -v sysml >/dev/null 2>&1; then \
+      printf 'sysml is not on the PATH -- install OpenSysML v0.6.0 (go install github.com/Open-MBEE/OpenSysML/cmd/sysml@v0.6.0 or the release tarball, see examples/pipeline/README.md)\n' >&2; \
+      return 1; \
+    fi; \
+    rc=0; out="$$(sysml -validate -strict "$$@" 2>&1)" || rc=$$?; \
+    if [ "$$rc" -ne 0 ] || grep -q 'warning:' <<< "$$out"; then \
+      printf '%s\n' "$$out" >&2; \
+      printf 'opensysml: %s file(s), REFUSED\n' "$$n" >&2; \
+      return 1; \
+    fi; \
+    printf 'opensysml: %s file(s), accepted -- %s\n' "$$n" "$$*"; \
+  }
+
+.PHONY: model-check
+model-check: ## Put model/ to both SysML v2 reference tools
+	@$(SYSML_TOOLS); \
+	 files="$$(git ls-files --cached --others --exclude-standard -- \
+	   'model/*.sysml' 'model/**/*.sysml' | sort)"; \
+	 if [ -z "$$files" ]; then \
+	   printf 'model-check: no .sysml file under model/ -- nothing to validate\n' >&2; exit 1; \
+	 fi; \
+	 pilot_check $$files; \
+	 opensysml_check $$files
+
+.PHONY: example-model-check
+example-model-check: ## Put the two example models to both tools, one at a time
+	@$(SYSML_TOOLS); \
+	 for f in $(EXAMPLE_MODELS); do \
+	   pilot_check "$$f"; \
+	   opensysml_check "$$f"; \
+	 done
 
 # ------------------------------------------------------------- generation --
 # The three subgraphs carry a //go:generate line that runs gqlgen through the
@@ -269,7 +353,7 @@ check: toolchain fmt-check vet lint test any-baseline check-tracked ## The full 
 	@printf 'check: ok\n'
 
 .PHONY: preflight
-preflight: check check-allowlist cover ## Everything, as run before a push
+preflight: check check-allowlist cover model-check ## Everything, as run before a push
 	@printf 'preflight: ok\n'
 
 .PHONY: clean
