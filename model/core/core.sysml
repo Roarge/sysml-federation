@@ -13,4 +13,5 @@ package <SF> Federation_Core {
     private import Federation_Concerns::*;
     private import Federation_StakeholderStories::*;
     private import Federation_SystemStories::*;
+    private import Federation_DesignConstraints::*;
 }
