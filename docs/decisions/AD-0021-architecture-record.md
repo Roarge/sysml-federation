@@ -1,6 +1,11 @@
 # AD-0021 The Markdown architecture description as the record, A3 sheets as the overview
 
-Status: accepted. Date: 2026-08-27.
+Status: accepted, amended once the demo was modelled. Date: 2026-08-27.
+
+Amendment, 2026-09-12: the model of the demo under `model/` is now the record
+of the architecture's structure and traces, and the Markdown description
+remains the narrative that explains it. The A3 sheets stay the overview. See
+[the demo's own model](AD-0029-the-demos-own-model-in-sysml-v2.md).
 
 ## Context
 

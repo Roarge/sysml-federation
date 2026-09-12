@@ -34,6 +34,10 @@
 !/docs/**/
 !/internal/
 !/internal/**/
+!/model/
+!/model/**/
+!/checkly/
+!/checkly/**/
 
 
 # ------------------------------------------------------------ source files --
@@ -63,6 +67,23 @@
 !/examples/*/*.yaml
 !/examples/*/*.json
 !/examples/*/Dockerfile
+
+# The model of the demo and the monitoring project. Under model/ only the
+# README needs a rule of its own; the .sysml files are already admitted by the
+# unanchored rule above. The monitoring project is TypeScript, so its
+# manifests, its checks, the helpers those import, the shell that runs them and
+# the collector configuration are each named here, anchored and depth-bounded
+# like the rules above them.
+!/model/README.md
+!/checkly/README.md
+!/checkly/*.json
+!/checkly/*.ts
+!/checkly/*.yml
+!/checkly/__checks__/*.ts
+!/checkly/__checks__/*.json
+!/checkly/__checks__/lib/*.ts
+!/checkly/scripts/*.sh
+!/checkly/otel/*.yaml
 
 # The two web apps: HTML, CSS and JavaScript at any depth under examples/,
 # the MIT text beside the one vendored file (AD-0017), and the document
@@ -117,6 +138,10 @@ vendor/
 **/coverage/
 .venv/
 __pycache__/
+
+# Run output of the browser checks, rewritten on every run.
+test-results/
+playwright-report/
 
 # Build and test output.
 /bin/

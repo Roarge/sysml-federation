@@ -167,6 +167,12 @@ Three parts of the demo are stand-ins, kept deliberately small so that the argum
 
 The plan is to grow the adapter's coverage of the language with a more complete mapping from the model to the graph. SysML v2 has views and viewpoints of its own, and my intention is to use them as the way a systems engineer chooses which parts of a model to federate and how those parts appear to the services outside. That will almost certainly need a full parser for the language rather than the strict subset the adapter reads today, and it is the largest piece of work on the horizon.
 
+## The model of the demo
+
+The repository also carries a SysML v2 model of the demo itself, under `model/`. It is a different thing from the pipeline model the demo serves. That one describes five servers and their requirements, and the adapter reads it at startup. This one describes the adapter, the two services beside it, the router, the two web apps and the image they ship in. It holds the stakeholders and their concerns, the storyboard stories, the requirements as system stories with their statements kept, the constraints, the architecture and its interfaces, and a verification register in which every Go test that carries a requirement identifier, every recorded demonstration, the validators, the make targets and the workflows are named.
+
+The two reference tools, the OMG pilot implementation and OpenSysML, accept it on every change, through `make model-check` locally and the `model` workflow on every pull request that touches it. A unit test fails when the model and the repository disagree on an identifier, a test name or a published image. [The model's own README](model/README.md) says how the registers are laid out, what the identifiers mean and which board corresponds to which view.
+
 ## Reading further
 
 The design is written up as a series of articles under [docs/](docs/README.md). They start with the motivation and an overview of the architecture, then follow the design from the first research through to what shipped, and they link the decision records behind every choice. The same articles are published at https://sysml-federation.org/.

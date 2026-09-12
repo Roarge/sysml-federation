@@ -1,0 +1,106 @@
+# The demo's own model under model/, put to both reference tools on every change
+# that touches it: the OMG pilot implementation release 2026-07 and OpenSysML
+# v0.6.0, through the same `make model-check` a maintainer runs locally. Nothing
+# else in the repository judges that model's grammar. No fixture parses it and
+# no service serves it, and the agreement test in internal/trace reads names
+# out of it rather than parsing it, so a half-written register, a satisfy
+# pointing at a requirement that was renamed or an import that no longer
+# resolves would sit on main until somebody ran a validator by hand (AD-0030).
+#
+# The example model is not validated here. The adapter's tests parse it on every
+# run, so a file the reference tools would refuse is usually a file those tests
+# refuse first, and its two runs stay local under `make example-model-check`
+# (AD-0019).
+#
+# Both triggers are gated by paths, so this job reports on a pull request that
+# touches the model and stays silent on one that does not. That is why it must
+# not be added to the required checks as it stands: a required check that never
+# reports leaves a pull request pending for ever. Making it required would mean
+# running it on every pull request, which is the cost the path gate avoids.
+name: model
+
+on:
+  pull_request:
+    paths:
+      - 'model/**'
+      - 'Makefile'
+      - '.github/workflows/model.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'model/**'
+      - 'Makefile'
+      - '.github/workflows/model.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    # Both validators together take under half a minute once the downloads are
+    # cached. A parse that hangs is held by the pilot's own timeout inside the
+    # Makefile, and this is the outer bound on everything around it.
+    timeout-minutes: 15
+    steps:
+      # Every action is pinned to a commit, as in publish.yml, because a
+      # re-pointed major tag would run unseen code against a checkout of this
+      # repository. The comment names the release the commit carries.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # The kernel jar and the library together are about 135 MiB once unpacked,
+      # which is a download and an unzip on every run the cache does not cover.
+      # A cache hit restores that pair without the download, and so without the
+      # checksum the install step below holds the download to. The key carries
+      # the release and the kernel version and nothing else, so it is only ever
+      # invalidated by moving to another pilot.
+      - id: pilot
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.local/share/sysml-pilot
+          key: sysml-pilot-2026-07-kernel-0.61.0
+
+      # The release publishes no checksum file, so the value below was computed
+      # from the 126,125,572-byte artefact and is what this job will accept. A
+      # download that does not match it fails the step rather than being run.
+      - name: Install the OMG pilot implementation
+        if: steps.pilot.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.local/share/sysml-pilot
+          curl -fsSL -o kernel.zip \
+            https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/releases/download/2026-07/jupyter-sysml-kernel-0.61.0.zip
+          echo "3d310efb8a5332b11ec2441697d40ae10e7e04cfb8c8d121c198ffba38229ada  kernel.zip" | sha256sum -c -
+          unzip -q -o kernel.zip -d ~/.local/share/sysml-pilot
+          rm kernel.zip
+
+      # The checksum comes from the release's SHA256SUMS.txt. The tarball also
+      # carries a man page tree, which is of no use to a runner, so the two
+      # binaries are named rather than the archive being unpacked whole.
+      - name: Install OpenSysML
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.local/bin
+          curl -fsSL -o opensysml.tar.gz \
+            https://github.com/Open-MBEE/OpenSysML/releases/download/v0.6.0/opensysml-linux-amd64.tar.gz
+          echo "15d4a2d12a0adaadcbb1ed53946061a113c793e60a9e159b790936938323fc38  opensysml.tar.gz" | sha256sum -c -
+          tar -xzf opensysml.tar.gz -C ~/.local/bin sysml sysml-lsp
+          rm opensysml.tar.gz
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      # This job compiles nothing, and Go is here so that the Makefile can be
+      # read at all. It resolves a Go toolchain as it is parsed and stops with
+      # an error when there is none, so a runner without Go could not reach the
+      # target below to fail on its own terms.
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          # Follows the go directive in go.mod, so there is one place to bump.
+          go-version-file: go.mod
+
+      - name: Validate the model
+        run: make model-check
