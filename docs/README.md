@@ -37,7 +37,8 @@ So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with
 - [L0, Federating a systems model](a3/L0-federating-a-systems-model.pdf), an A3 sheet for the reader asking "What does this demo claim, what is in the box, and what would I keep or replace if I adopted it?"
 - [L2b, Pipeline example: capacity and verdicts](a3/L2b-pipeline-example-capacity-and-verdicts.pdf), an A3 sheet for the reader asking "Why does raising one server change nothing and raising another change everything?"
 - [Use cases](stories/use-cases.pdf), the storyboard as one PDF, one page per use case after the overview.
-- [Decision records](decisions/README.md), the 28 decisions with their alternatives and consequences.
+- [Decision records](decisions/README.md), the 30 decisions with their alternatives and consequences.
+- [The model of the demo](https://github.com/Roarge/sysml-federation/tree/main/model), the demo itself in SysML v2, with its stories, requirements, architecture, tests and views, validated by the two reference tools on every change.
 
 ## The repository
 

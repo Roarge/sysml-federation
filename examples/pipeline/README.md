@@ -240,9 +240,9 @@ between `%` markers:
       | java -cp pilot/sysml/jupyter-sysml-kernel-0.61.0-all.jar \
              org.omg.sysml.interactive.SysMLInteractive pilot/sysml/sysml.library
 
-OpenSysML v0.2.1 (Go 1.25 or later):
+OpenSysML v0.6.0 (Go 1.25 or later):
 
-    go install github.com/Open-MBEE/OpenSysML/cmd/sysml@v0.2.1
+    go install github.com/Open-MBEE/OpenSysML/cmd/sysml@v0.6.0
     sysml -validate -strict model.sysml
 
 The pilot accepts the file when its output carries no `ERROR:` or
@@ -328,12 +328,16 @@ works, with the tags and the checksums they were taken from.
 | 2026-08-27 | OpenSysML | v0.2.1, built with Go 1.27.0 | `sysml -validate -strict model.sysml` | accepted, exit 0 |
 | 2026-08-27 | OMG pilot implementation | release 2026-07, kernel 0.61.0, OpenJDK 21.0.12 | `PILOT=$HOME/.local/share/sysml-pilot/sysml` then `{ printf '%%\n'; cat adapter/model/testdata/warehouse.sysml; printf '\n%%\n%%exit\n'; } \| java -cp "$PILOT/jupyter-sysml-kernel-0.61.0-all.jar" org.omg.sysml.interactive.SysMLInteractive "$PILOT/sysml.library"` | accepted, no `ERROR:` or `WARNING:` diagnostic, root element line `1> Package <WH> Warehouse (<uuid>)` |
 | 2026-08-27 | OpenSysML | v0.2.1, built with Go 1.27.0 | `sysml -validate -strict adapter/model/testdata/warehouse.sysml` | accepted, exit 0, printing `✓ package Warehouse` and `✓ adapter/model/testdata/warehouse.sysml: no errors` |
+| 2026-09-12 | OpenSysML | v0.6.0 | `sysml -validate -strict examples/pipeline/model.sysml` | accepted, exit 0, printing `✓ package QueryPipeline` and `✓ examples/pipeline/model.sysml: no errors` |
+| 2026-09-12 | OpenSysML | v0.6.0 | `sysml -validate -strict adapter/model/testdata/warehouse.sysml` | accepted, exit 0, printing `✓ package Warehouse` and `✓ adapter/model/testdata/warehouse.sysml: no errors` |
 
-The first two rows cover this example. The last two cover the adapter's
+The first two rows cover this example. The next two cover the adapter's
 second fixture, `adapter/model/testdata/warehouse.sysml`, run from the
 repository root on the same day. That fixture carries other names, a wiring
 with fan-in, a constraint written with the subject last, a requirement
 without a short name and a literal limit inside a requirement definition.
+The last two repeat the OpenSysML check on both files with v0.6.0, run from
+the repository root.
 
 ### Constructs confirmed
 
