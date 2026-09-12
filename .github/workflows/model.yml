@@ -1,10 +1,11 @@
 # The demo's own model under model/, put to both reference tools on every change
 # that touches it: the OMG pilot implementation release 2026-07 and OpenSysML
 # v0.6.0, through the same `make model-check` a maintainer runs locally. Nothing
-# else in the repository reads that model. No fixture parses it and no service
-# serves it, so a half-written register, a satisfy pointing at a requirement
-# that was renamed or an import that no longer resolves would sit on main until
-# somebody ran a validator by hand (AD-0030).
+# else in the repository judges that model's grammar. No fixture parses it and
+# no service serves it, and the agreement test in internal/trace reads names
+# out of it rather than parsing it, so a half-written register, a satisfy
+# pointing at a requirement that was renamed or an import that no longer
+# resolves would sit on main until somebody ran a validator by hand (AD-0030).
 #
 # The example model is not validated here. The adapter's tests parse it on every
 # run, so a file the reference tools would refuse is usually a file those tests
@@ -37,7 +38,7 @@ permissions:
 jobs:
   model:
     runs-on: ubuntu-latest
-    # Both validators together take a couple of minutes once the downloads are
+    # Both validators together take under half a minute once the downloads are
     # cached. A parse that hangs is held by the pilot's own timeout inside the
     # Makefile, and this is the outer bound on everything around it.
     timeout-minutes: 15
@@ -52,10 +53,12 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      # The kernel jar and the library together are about 133 MB, which is a
-      # download and an unzip on every run the cache does not cover. The key
-      # carries the release and the kernel version and nothing else, so it is
-      # only ever invalidated by moving to another pilot.
+      # The kernel jar and the library together are about 135 MiB once unpacked,
+      # which is a download and an unzip on every run the cache does not cover.
+      # A cache hit restores that pair without the download, and so without the
+      # checksum the install step below holds the download to. The key carries
+      # the release and the kernel version and nothing else, so it is only ever
+      # invalidated by moving to another pilot.
       - id: pilot
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
