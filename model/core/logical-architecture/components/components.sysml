@@ -170,6 +170,11 @@ package Federation_LogicalArchitecture {
                requirements as a numbered document, with the editorial operations
                that shape it. Served at /document. */
         @DecisionRecord { id = "AD-0017"; title = "Vanilla web apps with one vendored file"; }
+        attribute maxDepth : Integer = 6 {
+            doc /* The document app fetches and draws six levels of the tree
+                   and withholds nesting below them. This is the MAX_DEPTH
+                   constant of the document app. */
+        }
     }
 
     // ---------------------------------------------------- what is read in --
@@ -289,6 +294,11 @@ package Federation_LogicalArchitecture {
         attribute compressedSizeCeilingMegabytes : Integer = 80;
         attribute environment : String = "DO_NOT_TRACK=1, COSMO_TELEMETRY_DISABLED=true, TRACING_ENABLED=false, METRICS_OTLP_ENABLED=false, PROMETHEUS_ENABLED=false";
         attribute layers : String = "distroless static-debian13 nonroot, /router and /router.LICENSE, /sysml-federation, /app/config.json, /app/model.sysml";
+        attribute healthcheck : String = "every 10 s after a 15 s start period, the image runs its own healthcheck subcommand" {
+            doc /* The image's HEALTHCHECK instruction, line 25 of
+                   examples/pipeline/Dockerfile. The check it runs is the
+                   supervisor's healthcheck subcommand. */
+        }
         part supervisor : Supervisor;
         part uiServer : UiServer;
         part viewer : ModelViewer;

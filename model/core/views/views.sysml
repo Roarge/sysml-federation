@@ -130,6 +130,9 @@ package Federation_Views {
 
     view v1Context : ContextView {
         expose Federation_Context::DemoContext::**;
+        expose Federation_LogicalArchitecture::ExampleModel;
+        expose Federation_LogicalArchitecture::demo::**;
+        expose Federation_Domain::RouterConfiguration;
         doc /* The context board: the demo, the people who use it and the
                machines and services around it.
                docs/img/v1-context.png
@@ -139,6 +142,7 @@ package Federation_Views {
     view v2Composition : CompositionView {
         expose Federation_LogicalArchitecture::demo::**;
         expose Federation_InterfaceTypes::**;
+        expose Federation_Domain::RouterConfiguration;
         doc /* The composition board: the services inside the demo, the ports
                between them, the three subgraph schemas and the one requirement
                the graph merges out of them.
@@ -172,6 +176,7 @@ package Federation_Views {
     view v5Adapter : AdapterView {
         expose Federation_LogicalArchitecture::Adapter::**;
         expose Federation_LogicalArchitecture::ExampleModel;
+        expose Federation_LogicalArchitecture::Router;
         expose Federation_VerificationCases::VC_SR_45::**;
         doc /* The adapter board: a model file read, projected and served as a
                subgraph.
@@ -181,6 +186,9 @@ package Federation_Views {
     view l0Sheet : SheetView {
         expose Federation_FunctionalArchitecture::TheArgument::**;
         expose Federation_LogicalArchitecture::demo::**;
+        expose Federation_Context::ContainerRegistry;
+        expose Federation_Context::Browser;
+        expose Federation_Context::MaintainerMachine;
         doc /* The L0 sheet: the whole argument on one page, with the legend
                that reads it.
                docs/img/a3-l0-model-side.png
@@ -190,6 +198,7 @@ package Federation_Views {
 
     view l2bSheet : SheetView {
         expose Federation_FunctionalArchitecture::VerdictComputation::**;
+        expose Federation_LogicalArchitecture::demo::**;
         doc /* The L2b sheet: the capacity of the wiring, the states it passes
                through, the arithmetic behind each verdict and the pipeline the
                numbers belong to.
@@ -216,6 +225,7 @@ package Federation_Views {
         expose Federation_Stakeholders::Visitor;
         expose Federation_Stakeholders::ModelOwner;
         expose Federation_Stakeholders::DocumentOwner;
+        expose Federation_LogicalArchitecture::demo::**;
         doc /* The storyboard: the journey a visitor takes through the twelve
                stories, the three people who take it, and a frame for each
                story that has one.
@@ -237,6 +247,7 @@ package Federation_Views {
         expose Federation_Views::RuntimeViewpoint;
         expose Federation_Views::DeploymentViewpoint;
         expose Federation_Views::AdapterViewpoint;
+        expose Federation_LogicalArchitecture::demo::**;
         doc /* The five views on one sheet, each with the question it answers,
                and the sketch that introduces the demo before any of them.
                docs/img/architecture-five-views.png

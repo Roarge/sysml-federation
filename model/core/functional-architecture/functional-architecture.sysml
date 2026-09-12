@@ -40,6 +40,23 @@ package Federation_FunctionalArchitecture {
                    event still fires and the apps still refetch. Nothing
                    detects a no-op. */
         }
+
+        action def ADocumentEdit {
+            doc /* A document edit. PIPE-R2 moved under PIPE-R1: moveNode(id,
+                   parentId, index) reaches the document service. It reorders,
+                   renumbers (SR-33), increments its version, emits
+                   documentChanged. The viewer, not subscribed, does nothing.
+                   The model version is unchanged (SR-36). */
+        }
+
+        action def Reset {
+            doc /* Reset. One mutation from either app carries both root
+                   fields, resetModel and resetDocument. Each service restores
+                   its shipped state, increments its version and emits its
+                   event, and both apps refetch (SR-44). If one field fails
+                   the other is still applied. Both are sent because neither
+                   service knows about the other (SR-41). */
+        }
     }
 
     // ------------------------------------------ the L2b sheet, model side --
