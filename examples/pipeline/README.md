@@ -162,6 +162,16 @@ recommended to not use this for production", and at every start without a graph
 token the router itself logs "No graph token provided. The following Cosmo Cloud
 features are disabled. Not recommended for Production."
 
+The child's environment is built in full by the supervisor and sets
+`TRACING_ENABLED=false` among nine variables, so the router makes no outbound
+connection. One variable changes that on purpose: when
+`SYSML_FEDERATION_ROUTER_CONFIG_PATH` names a router configuration file, the
+supervisor hands it to the child as `CONFIG_PATH`, and the router's own rule
+makes the file's values win over the environment's. That is the opt-in the
+optional check session uses, in a later pull request, to send the router's
+traces to a collector on the compose network rather than to the internet. With
+the variable unset the demo makes no outbound connection, as before.
+
 The demo takes that at face value rather than around it. There is no control
 plane here to fetch a configuration from, the composed file is committed where
 anyone can read it, and a test fails when it drifts from the subgraph schemas it
