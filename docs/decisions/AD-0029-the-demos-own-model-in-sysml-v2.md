@@ -4,13 +4,12 @@ Status: accepted. Date: 2026-09-12.
 
 ## Context
 
-The light requirements scheme (AD-0023) weighed a SysML model as the trace
-source and deferred it. The reason was plain. The demo's own requirements were
-not in a model, so no model could be their source, and the deferral said the
-question would return once the requirement count outgrew one screen. Forty-five
-requirements and seven design constraints outgrew one screen at gate 2.
+The light requirements scheme (AD-0023) deferred a model as the trace source
+because the demo's own requirements were not in a model, and said the question
+would return once the requirement count outgrew one screen. The count outgrew a
+screen long ago, and the requirements are now in a model.
 
-Two other decisions of that gate bear on this one. The Markdown architecture
+Two decisions taken alongside it bear on this one. The Markdown architecture
 description, published in the article series, and these records were made the
 record of the architecture, with the A3 sheets as the overview for a newcomer
 (AD-0021). Separately, `internal/` was opened for two helper packages so that
@@ -43,7 +42,7 @@ check file, a published image, a check's inventory or a compose service.
 
 Keep the Markdown description as the record and add nothing to it. That is what
 AD-0021 settled and it carried the design phase. It loses here because nothing
-checks the description against the code. Three rounds of corrections to the
+checks the description against the code. Earlier rounds of corrections to the
 published documents happened because a number, a file name or a count had
 drifted, and each drift was found by reading. Reading is not a mechanism.
 

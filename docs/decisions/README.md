@@ -7,11 +7,11 @@ during the design phase, before any code, and copied here so that they can be
 read and challenged. AD-0027 and AD-0028 were written later, while the system
 was being built, the second replacing the first, and AD-0027 is marked as
 superseded below and names its replacement in its own status line, and
-AD-0029 and AD-0030 after the first release, when the demo's own model was
-added. Where building the system changed what a record decides, the record was
-amended and is marked as amended in the list below. Such a record keeps its
-number and the original date in its status line, with a line at its head
-giving the date of the amendment and saying what changed. A record's
+AD-0029 and AD-0030 were added after the first release, when the demo's own
+model was built. Where building the system changed what a record decides, the
+record was amended and is marked as amended in the list below. Such a record
+keeps its number and the original date in its status line, with a line at its
+head giving the date of the amendment and saying what changed. A record's
 status is `accepted`, or `accepted` followed by whatever qualification the
 decision carries. A decision that replaces an earlier one gets its own number
 rather than overwriting it, and a number is never reused.
