@@ -63,12 +63,11 @@ that continuous integration runs them on every change to it. SR-48 states that
 the demo, given credentials, runs the check suite against itself through a
 tunnel and is unchanged when given none.
 
-Five statements are not word for word the texts the requirements work
-approved. SR-03, SC-01 and SC-07 were amended as the demo was built and the
-model added, and SR-30 and SC-02 lost a reference to a document that is not
-published. References to working documents that are not published were dropped
-throughout. Where an older copy disagrees with the model, the model is the
-record.
+The requirements are restated as system stories, and each story keeps its
+statement as an attribute, `attribute statement : String = "...";`, so that
+the text a case verifies is the text the story carries. Three statements were
+amended with the model: SR-03 for the configuration-file opt-in, SC-01 for the
+check project and SC-07 for the model validation.
 
 A story's status is carried as `@StoryMeta` and is `done` or `inProgress`.
 `done` is asserted as of the merge of the pull request that carries the story's
@@ -171,6 +170,21 @@ usage of another top-level package through that package's qualified name is
 accepted by both, and neither objects to the two packages referring to each
 other.
 
+Five more forms were refused while the registers were written rather than
+while they were probed, and each is recorded here with the form used. `public`
+and `connector` are reserved words, so the tunnel edge's port is `publicSide`
+and the tunnel link's end is `tunnelConnector`. An item and an interface cannot
+both be named `HeartbeatPing` under one wildcard import, so the interface is
+`Heartbeating`. An interface whose two ports are not conjugate draws a warning,
+so `TunnelPort` carries the conjugate features of `HttpClientPort`, and a
+twelfth port definition, `AlertClientPort`, was added for the alerting
+interface. The OMG pilot refused `satisfy SR_48_AnOptionalCheckSession by
+runner` until `SessionRunner` specialised `DemoElement`, because bound features
+must have conforming types. And both validators refused
+`Federation_LogicalArchitecture::session`, because the composite lives in the
+nested package and is reached as
+`Federation_LogicalArchitecture::CheckSession::session`.
+
 ## Correspondence with the published boards
 
 Every image under `docs/img` is named by exactly one view, and the `images`
@@ -184,30 +198,29 @@ storyboard frames and the screenshots of the apps draw the example's servers
 and requirements, `ingest`, `parse`, `PIPE-R1` and the rest, which are content
 of the example model and no element of this one, and those rows say "example
 content". And several boards draw the parts of `demo`, the viewer, the document
-app, the router and the three services, on a board whose own view exposes a
-functional package or a set of stories. Those parts exist in the model and are
-exposed by `v2Composition`, and the row says so rather than the view being
-widened to repeat them.
+app, the router and the three services, on a board whose own view is about a
+functional package or a set of stories. Each of those views exposes `demo` as
+well, so that what a board draws is what its view names, and the row says so.
 
 | Image | View | What the board shows | Inspected |
 |---|---|---|---|
-| [`v1-context.png`](../docs/img/v1-context.png) | `v1Context` | the demo among what it touches | 2026-09-12. The pipeline box has no element: the model declares the file, `ExampleModel`, and says the pipeline runs nowhere. The services drawn inside the box are parts of `demo`, exposed by `v2Composition`, and `config.json` is `RouterConfiguration` in the domain register. |
-| [`v2-composition.png`](../docs/img/v2-composition.png) | `v2Composition` | services, ports, schemas, the merged graph | 2026-09-12. The schema types and fields are not elements, the projection part's doc names the seven types. `config.json` is `RouterConfiguration` in the domain register, which this view does not expose. |
-| [`v2-subgraph-schemas.png`](../docs/img/v2-subgraph-schemas.png) | `v2Composition` | the three subgraph schemas | 2026-09-12. The types and fields are not elements, the three services are. |
-| [`v2-merged-requirement.png`](../docs/img/v2-merged-requirement.png) | `v2Composition` | one requirement, three fetches | 2026-09-12. The fields are not elements, the three fetches are in the doc of `demo`. |
-| [`v3-runtime.png`](../docs/img/v3-runtime.png) | `v3Runtime` | an edit's seven steps | 2026-09-12. The document edit and the reset panels have no action of their own: `EditPropagation` holds `PropagateAnEdit` and `NothingMoves`. |
+| [`v1-context.png`](../docs/img/v1-context.png) | `v1Context` | the demo among what it touches | 2026-09-12. The pipeline box corresponds to `ExampleModel`, the file that describes it, whose doc says the pipeline runs nowhere. The services and files inside the demo box are parts of `demo`, and `config.json` is `RouterConfiguration` in the domain register. The view exposes all three. |
+| [`v2-composition.png`](../docs/img/v2-composition.png) | `v2Composition` | services, ports, schemas, the merged graph | 2026-09-12. The schema types and fields are not elements: the projection part's doc names the seven types and the interface definitions carry the payloads. `config.json` is `RouterConfiguration` in the domain register, exposed by the view. |
+| [`v2-subgraph-schemas.png`](../docs/img/v2-subgraph-schemas.png) | `v2Composition` | the three subgraph schemas | 2026-09-12. The types and fields are not elements: the projection part's doc names the types and the interface definitions carry the payloads. The three services are parts of `demo`. |
+| [`v2-merged-requirement.png`](../docs/img/v2-merged-requirement.png) | `v2Composition` | one requirement, three fetches | 2026-09-12. The fields are not elements: the projection part's doc names the type and the interface definitions carry the payloads. The three fetches are described in the doc of `demo`. |
+| [`v3-runtime.png`](../docs/img/v3-runtime.png) | `v3Runtime` | an edit's seven steps | 2026-09-12. The seven steps are `PropagateAnEdit`, and the three panels beneath them are `NothingMoves`, `ADocumentEdit` and `Reset`, the four action definitions of `EditPropagation`. |
 | [`v3-nothing-moves.png`](../docs/img/v3-nothing-moves.png) | `v3Runtime` | ingest raised, nothing moves | 2026-09-12 |
-| [`v4-deployment.png`](../docs/img/v4-deployment.png) | `v4Deployment` | container, image layers, publish chain | 2026-09-12. The healthcheck is named only as a supervisor subcommand. |
+| [`v4-deployment.png`](../docs/img/v4-deployment.png) | `v4Deployment` | container, image layers, publish chain | 2026-09-12. The HEALTHCHECK block is the `healthcheck` attribute of `demo`, and the subcommand it runs is one of the supervisor's `subcommands`. |
 | [`v4-container.png`](../docs/img/v4-container.png) | `v4Deployment` | one container, one process tree | 2026-09-12 |
 | [`v4-image-layers.png`](../docs/img/v4-image-layers.png) | `v4Deployment` | the image, layer by layer | 2026-09-12 |
-| [`v5-adapter.png`](../docs/img/v5-adapter.png) | `v5Adapter` | four packages, loop back, refusal path | 2026-09-12. The router at the edge is `Router`, exposed by `v2Composition`. The second fixture is named in the doc of `VC_SR_45` and exercised by `VC_SR_16`, which this view does not expose. |
-| [`a3-l0-model-side.png`](../docs/img/a3-l0-model-side.png) | `l0Sheet` | the argument in eight steps | 2026-09-12. The registry, browser and compose step of the physical view are context elements exposed by `v1Context`. The counts of servers and requirements are the example's. |
+| [`v5-adapter.png`](../docs/img/v5-adapter.png) | `v5Adapter` | four packages, loop back, refusal path | 2026-09-12. The router at the edge is `Router`, exposed by the view. The fixtures box corresponds to the second fixture named in the doc of `VC_SR_45`. |
+| [`a3-l0-model-side.png`](../docs/img/a3-l0-model-side.png) | `l0Sheet` | the argument in eight steps | 2026-09-12. The registry, the browser and the machine the compose step runs on are `ContainerRegistry`, `Browser` and `MaintainerMachine`, exposed by the view. The counts of servers and requirements are the example's. |
 | [`a3-l0-legend.png`](../docs/img/a3-l0-legend.png) | `l0Sheet` | four decisions and the legend | 2026-09-12. The four records are tags on `demo` and `Router`. |
-| [`a3-l2b-model-side.png`](../docs/img/a3-l2b-model-side.png) | `l2bSheet` | how the number is made | 2026-09-12. The five servers are the example's. The services under "where it runs" are parts of `demo`, and the four decision records are tags on two of them, all exposed by `v2Composition`. |
+| [`a3-l2b-model-side.png`](../docs/img/a3-l2b-model-side.png) | `l2bSheet` | how the number is made | 2026-09-12. The five servers are the example's. The services under "where it runs" are parts of `demo`, exposed by the view, and the four decision records are tags on two of them. |
 | [`a3-l2b-wiring-states.png`](../docs/img/a3-l2b-wiring-states.png) | `l2bSheet` | the wiring in three states | 2026-09-12. The servers are the example's. |
 | [`a3-l2b-arithmetic.png`](../docs/img/a3-l2b-arithmetic.png) | `l2bSheet` | four states, their cuts and verdicts | 2026-09-12 |
-| [`a3-l2b-physical.png`](../docs/img/a3-l2b-physical.png) | `l2bSheet` | three services, one router | 2026-09-12. Parts of `demo`, exposed by `v2Composition`. |
-| [`stories-journey.png`](../docs/img/stories-journey.png) | `storyboard` | twelve stories in order | 2026-09-12. The sketch beneath the stories draws parts of `demo`, exposed by `v2Composition`. |
+| [`a3-l2b-physical.png`](../docs/img/a3-l2b-physical.png) | `l2bSheet` | three services, one router | 2026-09-12. Parts of `demo`, exposed by the view. |
+| [`stories-journey.png`](../docs/img/stories-journey.png) | `storyboard` | twelve stories in order | 2026-09-12. The sketch beneath the stories draws parts of `demo`, exposed by the view. |
 | [`stories-personas.png`](../docs/img/stories-personas.png) | `storyboard` | the three personas | 2026-09-12 |
 | [`us01-launch.png`](../docs/img/us01-launch.png) | `storyboard` | one command, then two tabs | 2026-09-12. Example content in both tabs. |
 | [`us03-nothing-moves.png`](../docs/img/us03-nothing-moves.png) | `storyboard` | ingest raised, nothing else moved | 2026-09-12. Example content. |
@@ -218,7 +231,7 @@ widened to repeat them.
 | [`us11-query.png`](../docs/img/us11-query.png) | `storyboard` | one query, three services | 2026-09-12. Example content. |
 | [`us12-reset.png`](../docs/img/us12-reset.png) | `storyboard` | both apps after a reset | 2026-09-12. Example content. |
 | [`architecture-five-views.png`](../docs/img/architecture-five-views.png) | `fiveViews` | five views and their questions | 2026-09-12 |
-| [`overview-sketch.png`](../docs/img/overview-sketch.png) | `fiveViews` | two apps, one graph, three services | 2026-09-12. Parts of `demo`, exposed by `v2Composition`. |
+| [`overview-sketch.png`](../docs/img/overview-sketch.png) | `fiveViews` | two apps, one graph, three services | 2026-09-12. Parts of `demo`, exposed by the view. |
 | [`app-viewer-shipped.png`](../docs/img/app-viewer-shipped.png) | `appShots` | the viewer, shipped state | 2026-09-12. Example content. |
 | [`app-viewer-bottleneck-moved.png`](../docs/img/app-viewer-bottleneck-moved.png) | `appShots` | the viewer, bottleneck moved | 2026-09-12. Example content. |
 | [`app-viewer-passing.png`](../docs/img/app-viewer-passing.png) | `appShots` | the viewer, `PIPE-R1` passing | 2026-09-12. Example content. |
@@ -226,7 +239,7 @@ widened to repeat them.
 | [`app-viewer-refusal.png`](../docs/img/app-viewer-refusal.png) | `appShots` | the viewer refusing a value | 2026-09-12. Example content. |
 | [`app-document-tree.png`](../docs/img/app-document-tree.png) | `appShots` | the document tree | 2026-09-12. Example content. |
 | [`app-both-exclusion.png`](../docs/img/app-both-exclusion.png) | `appShots` | an exclusion both apps honour | 2026-09-12. Example content. |
-| [`app-document-depth.png`](../docs/img/app-document-depth.png) | `appShots` | the depth limit | 2026-09-12. The six-level limit is recorded in three validation cases, which this view does not expose. Example content. |
+| [`app-document-depth.png`](../docs/img/app-document-depth.png) | `appShots` | the depth limit | 2026-09-12. The six-level limit is the `maxDepth` attribute of `RequirementsDocument`, exposed by the view, and three validation cases record a run against it. Example content. |
 
 ## Tests in the model
 
@@ -234,17 +247,21 @@ A verification case owns one action per piece of evidence, and the action's
 short name is the evidence's own name. A Go test is named by its function,
 `action <'TestSR02_ReadyWithinTenSeconds'> readyWithinTenSeconds`, and the
 `@Evidence` tag on it gives the kind, `go-test`, and the file,
-`cmd/sysml-federation/main_test.go`. Sixty-seven actions name a Go test this
+`cmd/sysml-federation/main_test.go`. Sixty-six actions name a Go test this
 way, and the file matters, because two functions share a name across two
-packages and the agreement test compares name and file together. A
-recorded run of the demo is named by its row in the example README's
-verification record, `<'record: 2026-08-28 SR-02'>`, with the record's anchor as
-its location, and one row stands under several cases when it bears on several
-stories. The two validators are actions of kind `validator` named
-`<'omg-pilot 2026-07'>` and `<'opensysml v0.6.0'>`, with the make target that
-runs them as their location. A make target is an action of kind `make-target`
-named as it is typed, `<'make check-tracked'>`. A workflow is named by its file,
-`<'model.yml'>`, or by its file and step,
+packages and the agreement test compares name and file together. The
+sixty-seventh, the second `TestSR25_InvalidValuesAreRefused` in the projection
+package, carries no short name because the name is taken by the first, and the
+agreement test reads the function name from that action's doc. A recorded run
+of the demo is named by its row in the example README's verification record,
+`<'record: 2026-08-28 SR-02'>`, with the record's anchor as its location. A row
+names one or more requirements, and it stands under every stakeholder story
+those requirements derive from, so one row stands under several cases when it
+bears on several stories. The two validators are actions of kind `validator`
+named `<'omg-pilot 2026-07'>` and `<'opensysml v0.6.0'>`, with the make target
+that runs them as their location. A make target is an action of kind
+`make-target` named as it is typed, `<'make check-tracked'>`. A workflow is
+named by its file, `<'model.yml'>`, or by its file and step,
 `<'publish.yml: Read the manifest back'>`. What is read rather than run, the
 router's outbound paths or the module file, is an action of kind `analysis` or
 `inspection`.
@@ -260,9 +277,16 @@ The check session, which a later pull request adds, brings its own cases with
 it. Every live check will be a verification case of its own, carrying the
 check's steps, and the session is already a composite with its behaviour:
 `Federation_LogicalArchitecture::CheckSession::session` holds the runner, the
-two tunnels, the collector, the viewer and the external services they talk to,
-each part carrying the name of the compose service it maps to, and
-`RunASession` in the functional architecture holds the runner's twelve steps.
+two tunnels, the collector, the viewer, the optional private-location agent
+and the external services they talk to. The six session parts carry the name
+of the compose service each maps to, and so does the reference to the demo
+under test, while the three `ref part`s for the external services, the
+monitoring service, the tunnel edge and the alert receiver, carry none. The
+nested `package CheckSession` in the logical architecture mirrors
+`Federation_Context::CheckSession`, which holds those externals. The two share
+a simple name, so every reference to either is qualified. The check suite's
+decomposition is `part def CheckSuiteProject :> CheckSuite`, and `RunASession`
+in the functional architecture holds the runner's twelve steps.
 Until the session lands, `VC_SR_48` carries its objective and no action, and the
 view `session` names no image.
 
@@ -323,10 +347,15 @@ published boards needed a place to be named. The particulars of the tailoring:
   informal benefit and therefore supply no trade-study criteria.
 - No rendering is declared on any view. The images are drawn by hand, and a
   view names the elements each one is about.
+- The GraphQL schema the services share, drawn on the composition boards, is
+  not modelled as elements. The interface definitions carry its payloads and
+  the projection's doc names its types.
 - Allocation is expressed by `satisfy`, ninety-four of them in the components
   register, because the allocation keyword has no recorded validation run
   against either reference tool, and a form neither has been seen to accept does
-  not go into the model. The elements allocated to are the nine of the
-  requirement scheme, the demo's own model and the check suite that came with
-  the model, and the session runner, a twelfth, because SR-48 is satisfied by it
-  beside the check suite and the repository.
+  not go into the model. The elements allocated to are twelve. The nine of the
+  requirement scheme are `Adapter`, `CapacityService`, `DocumentService`,
+  `Router`, `ModelViewer`, `RequirementsDocument`, `Demo` (the image),
+  `ExampleModel` and `Repository`. `DemoModel` and `CheckSuite` came with the
+  model. `SessionRunner` is the twelfth, because SR-48 is satisfied by it beside
+  the check suite and the repository.
