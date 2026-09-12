@@ -1,6 +1,12 @@
 # AD-0023 The light requirements scheme
 
-Status: accepted. Date: 2026-08-27.
+Status: accepted, amended once the demo was modelled. Date: 2026-08-27.
+
+Amendment, 2026-09-12: the deferral below of a SysML model as the trace source
+is lifted. The demo's own requirements are now in a model, whose short names
+are the identifiers this scheme fixed, so the scheme stands and the model
+became the source. See
+[the demo's own model](AD-0029-the-demos-own-model-in-sysml-v2.md).
 
 ## Context
 

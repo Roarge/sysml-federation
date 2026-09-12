@@ -1,13 +1,14 @@
 # Decision records
 
-Twenty-eight records in the Nygard form, each giving the context, the decision,
+Thirty records in the Nygard form, each giving the context, the decision,
 the alternatives considered, the consequences, the requirements affected and
-its sources. All twenty-eight are accepted. Twenty-six of them were written
+its sources. All thirty are accepted. Twenty-six of them were written
 during the design phase, before any code, and copied here so that they can be
-read and challenged. The last two, AD-0027 and AD-0028, were written later,
-while the system was being built, the second replacing the first, and AD-0027
-is marked as superseded below and names its replacement in its own status
-line. Where building the system changed what a record decides, the record was
+read and challenged. AD-0027 and AD-0028 were written later, while the system
+was being built, the second replacing the first, and AD-0027 is marked as
+superseded below and names its replacement in its own status line, and
+AD-0029 and AD-0030 after the first release, when the demo's own model was
+added. Where building the system changed what a record decides, the record was
 amended and is marked as amended in the list below. Such a record keeps its
 number and the original date in its status line, with a line at its head
 giving the date of the amendment and saying what changed. A record's
@@ -18,7 +19,8 @@ rather than overwriting it, and a number is never reused.
 Inside the records, `SR-nn` is a system requirement and `SC-nn` a design
 constraint, from the set of forty-five requirements and seven constraints
 that [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md)
-describes, and a name beginning `PIPE-` is a short name inside the example
+describes, with three more, SR-46 to SR-48, added when the demo's own model was
+built, and a name beginning `PIPE-` is a short name inside the example
 model. `C-nn` is an entry on the technical constraints card, a design-phase
 working document that is not published, so those references are there to show
 what a decision rested on rather than to be looked up. The four gates the
@@ -63,8 +65,10 @@ each produced.
 
 - <span class="rec-id">AD-0016</span> [Generated code exempt from the empty-interface rule](AD-0016-generated-code-exempt.md)
 - <span class="rec-id">AD-0020</span> [The image published by a tag-triggered workflow to GHCR](AD-0020-publish-on-tags.md) (amended)
-- <span class="rec-id">AD-0021</span> [The Markdown architecture description as the record, A3 sheets as the overview](AD-0021-architecture-record.md)
-- <span class="rec-id">AD-0022</span> [Track internal/assert and internal/tabletest](AD-0022-track-internal-helpers.md)
-- <span class="rec-id">AD-0023</span> [The light requirements scheme](AD-0023-light-requirements-scheme.md)
+- <span class="rec-id">AD-0021</span> [The Markdown architecture description as the record, A3 sheets as the overview](AD-0021-architecture-record.md) (amended)
+- <span class="rec-id">AD-0022</span> [Track internal/assert and internal/tabletest](AD-0022-track-internal-helpers.md) (amended)
+- <span class="rec-id">AD-0023</span> [The light requirements scheme](AD-0023-light-requirements-scheme.md) (amended)
 - <span class="rec-id">AD-0027</span> [The adapter's expected scale raised to 2750 lines](AD-0027-adapter-expected-scale.md) (superseded)
 - <span class="rec-id">AD-0028</span> [The line figures are estimates and never a limit](AD-0028-line-figures-are-estimates.md)
+- <span class="rec-id">AD-0029</span> [The demo's own model in SysML v2](AD-0029-the-demos-own-model-in-sysml-v2.md)
+- <span class="rec-id">AD-0030</span> [Model validation in continuous integration](AD-0030-model-validation-in-continuous-integration.md)

@@ -1,6 +1,12 @@
 # AD-0022 Track internal/assert and internal/tabletest
 
-Status: accepted. Date: 2026-08-27.
+Status: accepted, amended once the demo was modelled. Date: 2026-08-27.
+
+Amendment, 2026-09-12: `internal/` holds a third package, `internal/trace`, the
+unit test that keeps the demo's model and the repository in agreement (SR-46).
+It is a check rather than a helper, so the sentence below saying the two helper
+packages are all the tree holds is no longer true. See
+[the demo's own model](AD-0029-the-demos-own-model-in-sysml-v2.md).
 
 ## Context
 
@@ -61,7 +67,7 @@ No implementation spike depends on this decision.
 
 ## Requirements affected
 
-SC-03, SC-04
+SC-03, SC-04, SR-46
 
 ## Sources
 
