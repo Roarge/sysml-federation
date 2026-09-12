@@ -7,7 +7,7 @@ Status: accepted. Date: 2026-09-12.
 The light requirements scheme (AD-0023) deferred a model as the trace source
 because the demo's own requirements were not in a model, and said the question
 would return once the requirement count outgrew one screen. The count outgrew a
-screen long ago, and the requirements are now in a model.
+screen long ago.
 
 Two decisions taken alongside it bear on this one. The Markdown architecture
 description, published in the article series, and these records were made the
