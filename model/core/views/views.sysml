@@ -90,7 +90,8 @@ package Federation_Views {
 
     view def RuntimeView {
         doc /* Numbered steps along the arrows, in the order they happen, each
-               step carrying the value that travels it. */
+               step carrying the value that travels it, or the screen as it
+               stands at one such step. */
         viewpoint conformsTo : RuntimeViewpoint;
     }
 
@@ -155,7 +156,8 @@ package Federation_Views {
         expose Federation_FunctionalArchitecture::EditPropagation::**;
         expose Federation_LogicalArchitecture::demo::**;
         doc /* The runtime board: an edit in one tab travelling to the other,
-               and the same journey for an edit that moves nothing.
+               the same journey for an edit that moves nothing, and the panels
+               for a document edit and a reset.
                docs/img/v3-runtime.png
                docs/img/v3-nothing-moves.png */
     }
@@ -200,8 +202,9 @@ package Federation_Views {
         expose Federation_FunctionalArchitecture::VerdictComputation::**;
         expose Federation_LogicalArchitecture::demo::**;
         doc /* The L2b sheet: the capacity of the wiring, the states it passes
-               through, the arithmetic behind each verdict and the pipeline the
-               numbers belong to.
+               through, the arithmetic behind each verdict and where it runs,
+               with the capacity service holding no copy of the model and
+               recomputing on every read.
                docs/img/a3-l2b-model-side.png
                docs/img/a3-l2b-wiring-states.png
                docs/img/a3-l2b-arithmetic.png

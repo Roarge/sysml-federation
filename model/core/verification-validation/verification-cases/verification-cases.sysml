@@ -65,7 +65,7 @@ package Federation_VerificationCases {
             doc /* The execution configuration names only loopback addresses. */
         }
         action <'the router outbound paths'> outboundPathsAnalysed {
-            @Evidence { kind = "analysis"; location = "docs/architecture/README.md"; }
+            @Evidence { kind = "analysis"; location = "docs/decisions/AD-0013-telemetry-off.md"; }
             doc /* The router's code paths that could reach an address outside the container are read, and each is closed by a variable the image sets. */
         }
         action <'record: 2026-08-29 no outbound connection'> noConnectionWithTheRouteWithheld {
@@ -440,7 +440,7 @@ package Federation_VerificationCases {
         }
         action <'TestSR23_RedefinitionWithoutAValue'> redefinitionWithoutAValue {
             @Evidence { kind = "go-test"; location = "adapter/model/eval_test.go"; }
-            doc /* A redefinition that binds no value of its own takes the value it redefines. */
+            doc /* A redefinition that binds no value of its own takes the value it redefines, and an attribute no declaration binds reports no value. */
         }
         action <'TestSR23_ADefinitionsExpressionUsesEachUsagesOwnValues'> definitionExpressionPerUsage {
             @Evidence { kind = "go-test"; location = "adapter/model/eval_test.go"; }
@@ -664,7 +664,7 @@ package Federation_VerificationCases {
         }
         action <'TestSR35_IncludeAndEditText'> includeAndEditText {
             @Evidence { kind = "go-test"; location = "examples/pipeline/document/document_test.go"; }
-            doc /* Excluding and restoring a requirement and editing the text of a heading or a prose node behave as the operation list says. */
+            doc /* Excluding and restoring a requirement and editing the text of a prose node behave as the operation list says. */
         }
     }
 

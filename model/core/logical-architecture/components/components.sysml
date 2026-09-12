@@ -477,7 +477,10 @@ package Federation_LogicalArchitecture {
     package CheckSession {
         doc /* The optional check session beside the demo, written as the compose
                file that starts it. Every part that maps to a service carries the
-               service name, so that the two can be compared. */
+               service name, so that the two can be compared. The session is
+               modelled here as its design. The check project, the compose file
+               and the session script land in a later pull request, and are
+               checked against this register when they do. */
 
         part def CheckSession {
             doc /* The session as a whole: the runner, the tunnel, the collector,
@@ -488,9 +491,8 @@ package Federation_LogicalArchitecture {
         part def SessionRunner :> DemoElement {
             doc /* The session script in a Node container. It creates the checks,
                    runs them, tears them down again, and reports that the
-                   scheduled job ran. It is an element the requirements are
-                   allocated to because the optional session story is satisfied
-                   by it. */
+                   scheduled job ran. The optional session story SR-48 is
+                   allocated to it. */
             port control : HttpClientPort;
             port pings : HttpClientPort;
             attribute script : String = "checkly/scripts/session.sh";

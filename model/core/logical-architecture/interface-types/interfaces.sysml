@@ -84,7 +84,7 @@ package Federation_InterfaceTypes {
 
     interface def HttpOnOnePort {
         doc /* Browser to user interface server on the one published port,
-               carrying pages, GraphQL and the subscription stream. */
+               carrying pages, GraphQL and SSE. */
         end browser : HttpClientPort;
         end server : HttpServerPort;
     }

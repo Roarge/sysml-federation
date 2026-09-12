@@ -148,7 +148,7 @@ package Federation_FunctionalArchitecture {
             action readTheAccountPlan { doc /* whoami and the account plan to the log */ }
             action publishTheDemoUrl { doc /* the demo URL becomes the account variable the checks read */ }
             action recordATestSession { doc /* checkly test, recorded, every check once against this instance */ }
-            action recordASuiteSession { doc /* the Playwright suite, recorded */ }
+            action recordASuiteSession { doc /* the browser suite, run against the same instance and recorded as a session beside the first */ }
             action deployTheProject { doc /* deploy, and read the heartbeat ping address back */ }
             action triggerOnce { doc /* every deployed check runs once so the dashboard and status page fill */ }
             action keepTheHeartbeat { doc /* ping every five minutes while the session lives */ }

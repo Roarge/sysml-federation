@@ -334,7 +334,7 @@ package Federation_ValidationCases {
         }
         action <'record: 2026-08-27 SR-04'> playgroundOnTheRunningStack {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
-            doc /* The playground and the endpoint answered on the same port as the two apps. */
+            doc /* The playground answered on the same port as the two apps. */
         }
         action <'record: 2026-08-28 SR-04'> playgroundOnTheContainer {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }

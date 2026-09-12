@@ -45,7 +45,9 @@ package Federation_SystemStories {
         doc /* Rationale: the audience has Docker and fifteen minutes, and a
                clone, a compose file or a second command is where a curious
                visitor stops. The package is made public by hand before the
-               command works for anyone (AD-0011, AD-0020). Allocated to: IMAGE.
+               command works for anyone (AD-0011, AD-0020). The criterion
+               recordedOnThreePlatforms has a record for Linux alone, as the
+               release notes in article 11 say. Allocated to: IMAGE.
                Upstream: US-01. */
     }
 
@@ -298,8 +300,10 @@ package Federation_SystemStories {
         }
         doc /* Rationale: a font, script or image fetched from elsewhere would
                break the second criterion of US-01 and the air-gap claim with no
-               service at fault (AD-0011, AD-0017). Allocated to: UI-MODEL,
-               UI-DOC. Upstream: US-01. */
+               service at fault (AD-0011, AD-0017). The criterion
+               appsRenderWithTheHostOffline has no run behind it, as the release
+               notes in article 11 say. Allocated to: UI-MODEL, UI-DOC.
+               Upstream: US-01. */
     }
 
     // -------------------------------------------------------- the viewer --
@@ -1421,7 +1425,7 @@ package Federation_SystemStories {
         @StoryMeta { status = StoryStatus::inProgress; }
         subject :>> system : DemoElement;
         stakeholder :>> role : Maintainer;
-        attribute statement : String = "When Checkly credentials are supplied to the compose profile, the demo shall be reachable through a tunnel, the check suite shall run against it and record a session, the project shall be deployed for the duration and destroyed when the profile stops, and the router's traces shall reach a collector beside the demo; when no credentials are supplied, the demo shall run as docker run runs it.";
+        attribute statement : String = "When Checkly credentials are supplied to the compose profile, the demo shall be reachable through a tunnel, the check suite shall run against it and record a session, the project shall be deployed for the duration and destroyed when the profile stops, and the router's traces shall reach a collector beside the demo. When no credentials are supplied, the demo shall run as docker run runs it.";
         attribute pattern : EarsPattern = EarsPattern::Complex;
         attribute verificationMethods : VerificationMethod[1..*] = (VerificationMethod::Test, VerificationMethod::Demonstration);
         attribute :>> capability = "run the whole check suite against a running instance through a tunnel, deploy it for the session, trace every request, and destroy it on stop, only when asked";

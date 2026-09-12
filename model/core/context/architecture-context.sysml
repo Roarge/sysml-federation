@@ -68,21 +68,21 @@ package Federation_Context {
     }
 
     part def Repository :> DemoElement {
-        doc /* External system. The repository as a thing that is built, tested
+        doc /* Project element. The repository as a thing that is built, tested
                and published: the build, the tests and the workflows. The
                allocation element REPO of the requirements scheme. */
     }
 
     part def DemoModel :> DemoElement {
-        doc /* External system. The model under model/, read by the two
+        doc /* Project element. The model under model/, read by the two
                validators rather than by the demo. The allocation element
                DEMOMODEL of the requirements scheme. */
     }
 
     part def CheckSuite :> DemoElement {
-        doc /* External system. The optional check project, which drives the
+        doc /* Project element. The optional check project, which drives the
                demo through a tunnel. The allocation element CHECKS of the
-               requirements scheme. */
+               requirements scheme. It lands in a later pull request. */
     }
 
     // --------------------------------------------- environmental effect --

@@ -21,7 +21,8 @@ package Federation_DesignConstraints {
             }
         }
         doc /* Decisions: none. Allocated to: ADAPTER, CAPACITY, DOCUMENT, IMAGE,
-               REPO. */
+               REPO. The check project and the compose-file test land in a
+               later pull request. */
     }
 
     requirement <'SC-02'> SC_02_NoEmptyInterfaceInHandWrittenCode : DesignConstraint {
@@ -83,8 +84,8 @@ package Federation_DesignConstraints {
                 doc /* The line totals are measured and reported. */
             }
         }
-        doc /* Decisions: AD-0017. Allocated to: ADAPTER, CAPACITY, DOCUMENT,
-               IMAGE, UI-MODEL, UI-DOC. */
+        doc /* Decisions: AD-0017, AD-0027, AD-0028. Allocated to: ADAPTER,
+               CAPACITY, DOCUMENT, IMAGE, UI-MODEL, UI-DOC. */
     }
 
     requirement <'SC-07'> SC_07_ContinuousIntegrationRunsUnitTestsAndPublishesOnTags : DesignConstraint {
@@ -97,6 +98,6 @@ package Federation_DesignConstraints {
                        ones. */
             }
         }
-        doc /* Decisions: AD-0012, AD-0020. Allocated to: REPO. */
+        doc /* Decisions: AD-0012, AD-0020, AD-0030. Allocated to: REPO. */
     }
 }

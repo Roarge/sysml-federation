@@ -1,8 +1,10 @@
 package Federation_Stakeholders {
-    doc /* Who the demo is for and who carries it. Each definition is both a
-           stakeholder of the architecture description and a human actor in
-           the context, and the same definition serves in both places rather
-           than being written twice. */
+    doc /* Who the demo is for and who carries it. Each definition is a
+           stakeholder of the architecture description. The three personas the
+           boards draw, the visitor, the model owner and the document owner,
+           are also the human actors in the context, and they and the
+           maintainer are the actors of the use cases. One definition serves
+           in every place rather than being written twice. */
 
     part def Visitor {
         doc /* Human actor. A developer or architect at a small engineering
