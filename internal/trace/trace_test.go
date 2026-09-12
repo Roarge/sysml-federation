@@ -20,9 +20,12 @@ import (
 // repository it describes, and fails on the first name one side carries and the
 // other lacks.
 //
-// Every register these subtests read is written, so each of them asserts. The
-// last one is the exception: the check session's compose file is not there yet,
-// so it skips and names the file it is waiting for.
+// Every register of the model these subtests read is written, and a subtest
+// fails naming the file when one is absent. The check project is the
+// exception, because it lands in a later pull request: the check register and
+// the manifest are read as empty until then, so checkInventory compares two
+// empty sides, and sessionParts skips on the absent compose file, naming the
+// file it is waiting for.
 func TestSR46_ModelAndRepositoryAgree(t *testing.T) {
 	found, err := ModuleRoot()
 	root := assert.Must(t, found, err)
@@ -239,7 +242,7 @@ func checkInventoryAgrees(t *testing.T, root string) {
 	read, err := ReadManifest(root)
 	entries := assert.Must(t, read, err)
 	inManifest := byLogicalID(t, "manifest", ManifestTuples(entries))
-	inRegister := byLogicalID(t, "check register", CheckCaseTuples(text(t, root, CheckCasesFile)))
+	inRegister := byLogicalID(t, "check register", CheckCaseTuples(textIfPresent(t, root, CheckCasesFile)))
 	for _, id := range union(inManifest, inRegister) {
 		manifest, fromManifest := inManifest[id]
 		register, fromRegister := inRegister[id]
@@ -312,14 +315,31 @@ func evidenceIsDue(t *testing.T, story Story, what string) bool {
 	}
 }
 
-// text reads one file of the repository, or fails the subtest. It exists
-// because assert.Must takes the value and the error as two arguments, Go having
-// no way to spread a two-value call beside another one, and a read that appears
-// eight times reads better as a call than as a pair of statements.
+// text reads one register of the repository, or fails the subtest naming the
+// file. Every register it is asked for is written, so an absent one is a
+// failure rather than an empty register: Text returns "" for a file that is not
+// there, and a register deleted by mistake would otherwise name nothing and
+// pass every agreement that reads it. A register the branch has not grown yet
+// goes through textIfPresent instead.
 func text(t *testing.T, root, rel string) string {
 	t.Helper()
+	if !Exists(root, rel) {
+		t.Fatalf("%s is not there, and every register this test reads is written", rel)
+	}
 	found, err := Text(root, rel)
 	return assert.Must(t, found, err)
+}
+
+// textIfPresent reads a file the repository has not grown yet, and returns the
+// empty string while it is absent. The check register lands with the check
+// project, and until then the inventory it carries is as empty as the manifest
+// it is compared with.
+func textIfPresent(t *testing.T, root, rel string) string {
+	t.Helper()
+	if !Exists(root, rel) {
+		return ""
+	}
+	return text(t, root, rel)
 }
 
 // modelFiles reads the whole model, or fails the subtest.

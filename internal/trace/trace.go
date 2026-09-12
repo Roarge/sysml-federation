@@ -36,9 +36,12 @@ import (
 	"strings"
 )
 
-// The places the two sides live, as paths from the module root. A register the
-// model has not grown yet is simply absent, and the test skips the agreement
-// that would have read it.
+// The places the two sides live, as paths from the module root. Every register
+// of the model is written, apart from the check register, and the test fails
+// rather than passing over one that is absent. The check project's files under
+// checkly/ are not there yet: the check register and the manifest are read as
+// empty until they land, and the session agreement skips on the absent compose
+// file.
 const (
 	// ModelDir holds the demo's own model.
 	ModelDir = "model"
@@ -46,8 +49,6 @@ const (
 	StakeholderStoriesFile = "model/core/stories/stakeholder/stakeholder-stories.sysml"
 	// SystemStoriesFile holds the system stories SR-nn and their derivations.
 	SystemStoriesFile = "model/core/stories/system/system-stories.sysml"
-	// DesignConstraintsFile holds the constraints SC-nn.
-	DesignConstraintsFile = "model/core/constraints/design-constraints.sysml"
 	// VerificationCasesFile holds one case per system story and constraint.
 	VerificationCasesFile = "model/core/verification-validation/verification-cases/verification-cases.sysml"
 	// ValidationCasesFile holds one case per stakeholder story.
