@@ -26,7 +26,7 @@ package Federation_DesignConstraints {
 
     requirement <'SC-02'> SC_02_NoEmptyInterfaceInHandWrittenCode : DesignConstraint {
         subject :>> system : DemoElement;
-        attribute :>> statement = "No interface{} or any in a value position in hand-written code, as the working agreement states. Generated files marked // Code generated ... DO NOT EDIT. are exempt, and the analyser runs with -generated=false. A forced exception in a hand-written signature carries //nointerface:allow and a baseline bump with a justification in the pull request.";
+        attribute :>> statement = "No interface{} or any in a value position in hand-written code. Generated files marked // Code generated ... DO NOT EDIT. are exempt, and the analyser runs with -generated=false. A forced exception in a hand-written signature carries //nointerface:allow and a baseline bump with a justification in the pull request.";
         frame concern : PublishedClaimsStayTrue;
         requirement :>> acceptance {
             requirement analyserPasses {
