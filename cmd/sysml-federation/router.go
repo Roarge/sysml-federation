@@ -25,17 +25,23 @@ type process interface {
 type launcher func(env []string) process
 
 // routerConfig is where the binary and its configuration are, and where its
-// output goes. Both paths come from the environment so a developer can point
-// at a locally extracted router.
+// output goes. The binary and configuration paths come from the environment
+// so a developer can point at a locally extracted router. ConfigFile is a
+// router configuration file, empty unless the operator names one.
 type routerConfig struct {
-	Binary, Config, LogLevel string
-	Stdout, Stderr           io.Writer
+	Binary, Config, ConfigFile, LogLevel string
+	Stdout, Stderr                       io.Writer
 }
 
 // routerFromEnv reads SYSML_FEDERATION_ROUTER, SYSML_FEDERATION_CONFIG and
-// LOG_LEVEL, with the image's paths as defaults.
+// LOG_LEVEL, with the image's paths as defaults, and
+// SYSML_FEDERATION_ROUTER_CONFIG_PATH, which has no default.
 func routerFromEnv(stdout, stderr io.Writer) routerConfig {
-	cfg := routerConfig{Binary: defaultRouterBinary, Config: defaultRouterConfig, LogLevel: os.Getenv("LOG_LEVEL"), Stdout: stdout, Stderr: stderr}
+	cfg := routerConfig{
+		Binary: defaultRouterBinary, Config: defaultRouterConfig,
+		ConfigFile: os.Getenv("SYSML_FEDERATION_ROUTER_CONFIG_PATH"), LogLevel: os.Getenv("LOG_LEVEL"),
+		Stdout: stdout, Stderr: stderr,
+	}
 	if v := os.Getenv("SYSML_FEDERATION_ROUTER"); v != "" {
 		cfg.Binary = v
 	}
@@ -49,7 +55,11 @@ func routerFromEnv(stdout, stderr io.Writer) routerConfig {
 // address, the static configuration, the playground path, the four
 // variables that keep the router off the network, the error propagation
 // mode, the Prometheus switch, and LOG_LEVEL when set. Nothing of the
-// supervisor's environment is inherited.
+// supervisor's environment is inherited. A router configuration file is
+// handed over as CONFIG_PATH only when the operator names one, and the
+// router's own rule makes the file's values win over the environment's,
+// which is how the check session switches tracing on without the image
+// changing.
 //
 // pass-through puts a subgraph's own message at the top of the errors
 // array, where a client reads it, rather than nesting it under the
@@ -58,7 +68,7 @@ func routerFromEnv(stdout, stderr io.Writer) routerConfig {
 // inside of the container is disclosed. PROMETHEUS_ENABLED=false closes
 // the scrape endpoint the router opens on 127.0.0.1:8088 by default and
 // which nothing here reads.
-func routerEnv(listen, config, logLevel string) []string {
+func routerEnv(listen, config, logLevel, configFile string) []string {
 	env := []string{
 		"LISTEN_ADDR=" + listen,
 		"EXECUTION_CONFIG_FILE_PATH=" + config,
@@ -72,6 +82,9 @@ func routerEnv(listen, config, logLevel string) []string {
 	}
 	if logLevel != "" {
 		env = append(env, "LOG_LEVEL="+logLevel)
+	}
+	if configFile != "" {
+		env = append(env, "CONFIG_PATH="+configFile)
 	}
 	return env
 }

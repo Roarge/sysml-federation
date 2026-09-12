@@ -60,6 +60,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "go-test"; location = "cmd/sysml-federation/main_test.go"; }
             doc /* The router process's environment carries the four variables that switch every outbound path off. */
         }
+        action <'TestSR03_RouterConfigurationFileIsAnExplicitOptIn'> configurationFileOptIn {
+            @Evidence { kind = "go-test"; location = "cmd/sysml-federation/main_test.go"; }
+            doc /* With the variable unset the child's environment is the nine variables and carries no CONFIG_PATH. With it set, CONFIG_PATH carries the path and the nine are still set. */
+        }
         action <'TestSR03_RoutingURLsAreLoopback'> routingIsLoopback {
             @Evidence { kind = "go-test"; location = "examples/pipeline/compose_test.go"; }
             doc /* The execution configuration names only loopback addresses. */

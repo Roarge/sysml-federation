@@ -53,14 +53,15 @@ type addresses struct{ adapter, capacity, document, router, ui string }
 // supervisor is the serve subcommand: it starts the components in order,
 // watches them, and stops them in reverse order (architecture V3, Startup).
 type supervisor struct {
-	model    string
-	config   string
-	logLevel string
-	addrs    addresses
-	assets   fs.FS
-	names    flow.Names
-	launch   launcher
-	stdout   io.Writer
+	model            string
+	config           string
+	routerConfigFile string
+	logLevel         string
+	addrs            addresses
+	assets           fs.FS
+	names            flow.Names
+	launch           launcher
+	stdout           io.Writer
 }
 
 // run returns when ctx ends (nil) or when any component fails (its error),
@@ -100,7 +101,7 @@ func (s *supervisor) run(ctx context.Context) error {
 		_, _ = fmt.Fprintf(s.stdout, "%s subgraph on http://%s/graphql\n", c.name, srv.addr)
 	}
 
-	router := s.launch(routerEnv(s.addrs.router, s.config, s.logLevel))
+	router := s.launch(routerEnv(s.addrs.router, s.config, s.logLevel, s.routerConfigFile))
 	if err := router.Start(); err != nil {
 		return fmt.Errorf("router: %w", err)
 	}

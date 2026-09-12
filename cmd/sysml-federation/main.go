@@ -104,6 +104,8 @@ func usage(w io.Writer) {
 
 The router child is /router, or SYSML_FEDERATION_ROUTER. Its configuration
 is /app/config.json, or SYSML_FEDERATION_CONFIG. LOG_LEVEL is passed on.
+SYSML_FEDERATION_ROUTER_CONFIG_PATH, when set, names a router configuration
+file that is handed to the child as CONFIG_PATH.
 `)
 }
 
@@ -121,8 +123,8 @@ func runServe(ctx context.Context, args []string, stdout io.Writer) error {
 		return err
 	}
 	cfg := routerFromEnv(stdout, os.Stderr)
-	s := &supervisor{model: *modelPath, config: cfg.Config, logLevel: cfg.LogLevel, addrs: defaultAddresses,
-		assets: ui.Files, names: exampleNames, launch: cfg.launch, stdout: stdout}
+	s := &supervisor{model: *modelPath, config: cfg.Config, routerConfigFile: cfg.ConfigFile, logLevel: cfg.LogLevel,
+		addrs: defaultAddresses, assets: ui.Files, names: exampleNames, launch: cfg.launch, stdout: stdout}
 	return s.run(ctx)
 }
 
