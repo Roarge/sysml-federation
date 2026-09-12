@@ -25,7 +25,8 @@ import (
 // the registers land. Two subtests never skip: before the check project exists,
 // both of its sides are empty, and two empty sets agree.
 func TestSR46_ModelAndRepositoryAgree(t *testing.T) {
-	root := assert.Must(t, ModuleRoot())
+	found, err := ModuleRoot()
+	root := assert.Must(t, found, err)
 
 	t.Run("identifiers", func(t *testing.T) { identifiersAgree(t, root) })
 	t.Run("requirementsAffected", func(t *testing.T) { requirementsAffectedAgree(t, root) })
@@ -50,7 +51,7 @@ func identifiersAgree(t *testing.T, root string) {
 	skipWhileAbsent(t, root, StakeholderStoriesFile, SystemStoriesFile,
 		DesignConstraintsFile, ComponentsFile)
 
-	model := assert.Must(t, ModelFiles(root))
+	model := modelFiles(t, root)
 	declared := Declarations(model)
 	for _, id := range ShortNames(model) {
 		switch declared[id] {
@@ -62,7 +63,7 @@ func identifiersAgree(t *testing.T, root string) {
 		}
 	}
 
-	records := assert.Must(t, DecisionRecords(root))
+	records := decisionRecords(t, root)
 	onDisk := make(map[string]string, len(records))
 	for _, record := range records {
 		onDisk[record.ID] = record.Path
@@ -87,8 +88,8 @@ func requirementsAffectedAgree(t *testing.T, root string) {
 	t.Helper()
 	skipWhileAbsent(t, root, StakeholderStoriesFile, SystemStoriesFile, DesignConstraintsFile)
 
-	inModel := nameSet(ShortNames(assert.Must(t, ModelFiles(root))))
-	for _, record := range assert.Must(t, DecisionRecords(root)) {
+	inModel := nameSet(ShortNames(modelFiles(t, root)))
+	for _, record := range decisionRecords(t, root) {
 		for _, id := range record.RequirementsAffected {
 			if !inModel[id] {
 				t.Errorf("%s names %s under Requirements affected, and the model declares no such short name",
@@ -106,8 +107,9 @@ func goTestsAgree(t *testing.T, root string) {
 	t.Helper()
 	skipWhileAbsent(t, root, VerificationCasesFile)
 
-	repository := counted(assert.Must(t, GoTestFunctions(root)))
-	model := counted(GoTestEvidence(assert.Must(t, Text(root, VerificationCasesFile))))
+	declarations, err := GoTestFunctions(root)
+	repository := counted(assert.Must(t, declarations, err))
+	model := counted(GoTestEvidence(text(t, root, VerificationCasesFile)))
 	for _, test := range unionTests(repository, model) {
 		if test.Name == "" {
 			t.Errorf("an action of the verification register carries go-test evidence in %s without naming a test",
@@ -136,9 +138,10 @@ func goTestsAgree(t *testing.T, root string) {
 func checkFilesAgree(t *testing.T, root string) {
 	t.Helper()
 
-	onDisk := assert.Must(t, CheckFiles(root))
-	validation := assert.Must(t, Text(root, ValidationCasesFile))
-	named := CheckFileNames(assert.Must(t, Text(root, VerificationCasesFile)) + "\n" + validation)
+	files, err := CheckFiles(root)
+	onDisk := assert.Must(t, files, err)
+	validation := text(t, root, ValidationCasesFile)
+	named := CheckFileNames(text(t, root, VerificationCasesFile) + "\n" + validation)
 	bothWays(t, onDisk, named,
 		func(name string) string {
 			return fmt.Sprintf("%s/%s is a check file no case names", ChecksDir, name)
@@ -165,8 +168,9 @@ func imagesAgree(t *testing.T, root string) {
 	t.Helper()
 	skipWhileAbsent(t, root, ViewsFile)
 
-	published := assert.Must(t, PNGFiles(root))
-	named := ImageNames(assert.Must(t, Text(root, ViewsFile)))
+	images, err := PNGFiles(root)
+	published := assert.Must(t, images, err)
+	named := ImageNames(text(t, root, ViewsFile))
 	times := make(map[string]int, len(named))
 	for _, name := range named {
 		times[name]++
@@ -199,10 +203,11 @@ func coverageAgrees(t *testing.T, root string) {
 	skipWhileAbsent(t, root, StakeholderStoriesFile, SystemStoriesFile,
 		VerificationCasesFile, ValidationCasesFile, ComponentsFile)
 
-	system := Stories(assert.Must(t, Text(root, SystemStoriesFile)))
-	verified := nameSet(VerifiedStories(assert.Must(t, Text(root, VerificationCasesFile))))
-	satisfied := nameSet(SatisfiedStories(assert.Must(t, Text(root, ComponentsFile))))
-	derived := nameSet(DerivedStories(assert.Must(t, Text(root, SystemStoriesFile))))
+	stories := text(t, root, SystemStoriesFile)
+	system := Stories(stories)
+	verified := nameSet(VerifiedStories(text(t, root, VerificationCasesFile)))
+	satisfied := nameSet(SatisfiedStories(text(t, root, ComponentsFile)))
+	derived := nameSet(DerivedStories(stories))
 	for _, story := range system {
 		if !derived[story.Name] {
 			t.Errorf("%s (%s) is a derived end of no derivation connection", story.ShortName, story.Name)
@@ -220,8 +225,8 @@ func coverageAgrees(t *testing.T, root string) {
 		}
 	}
 
-	validation := counted(ValidationCases(assert.Must(t, Text(root, ValidationCasesFile))))
-	for _, story := range Stories(assert.Must(t, Text(root, StakeholderStoriesFile))) {
+	validation := counted(ValidationCases(text(t, root, ValidationCasesFile)))
+	for _, story := range Stories(text(t, root, StakeholderStoriesFile)) {
 		if story.Status != StatusDone {
 			t.Logf("%s (%s) is %s, so a validation case is not due yet",
 				story.ShortName, story.Name, story.Status)
@@ -243,9 +248,10 @@ func coverageAgrees(t *testing.T, root string) {
 func checkInventoryAgrees(t *testing.T, root string) {
 	t.Helper()
 
-	entries := assert.Must(t, ReadManifest(root))
+	manifest, err := ReadManifest(root)
+	entries := assert.Must(t, manifest, err)
 	inManifest := byLogicalID(t, "manifest", ManifestTuples(entries))
-	inRegister := byLogicalID(t, "check register", CheckCaseTuples(assert.Must(t, Text(root, CheckCasesFile))))
+	inRegister := byLogicalID(t, "check register", CheckCaseTuples(text(t, root, CheckCasesFile)))
 	for _, id := range union(inManifest, inRegister) {
 		manifest, fromManifest := inManifest[id]
 		register, fromRegister := inRegister[id]
@@ -259,7 +265,8 @@ func checkInventoryAgrees(t *testing.T, root string) {
 		}
 	}
 
-	constructed := assert.Must(t, Constructions(root))
+	built, err := Constructions(root)
+	constructed := assert.Must(t, built, err)
 	for _, entry := range entries {
 		// A suite file is not constructed by name: the check project builds one
 		// check per manifest entry that names one, so the entry is its own
@@ -283,8 +290,8 @@ func sessionPartsAgree(t *testing.T, root string) {
 		t.Skip("the compose file is not yet present, so the session has no services to be compared against")
 	}
 
-	services := ComposeServices(assert.Must(t, Text(root, ComposeFile)))
-	parts := SessionComposeServices(assert.Must(t, Text(root, ComponentsFile)))
+	services := ComposeServices(text(t, root, ComposeFile))
+	parts := SessionComposeServices(text(t, root, ComponentsFile))
 	bothWays(t, services, parts,
 		func(name string) string {
 			return fmt.Sprintf("the compose file starts %s, and no part of the session composite carries it", name)
@@ -292,6 +299,30 @@ func sessionPartsAgree(t *testing.T, root string) {
 		func(name string) string {
 			return fmt.Sprintf("the session composite carries %s, and the compose file starts no such service", name)
 		})
+}
+
+// text reads one file of the repository, or fails the subtest. It exists
+// because assert.Must takes the value and the error as two arguments, Go having
+// no way to spread a two-value call beside another one, and a read that appears
+// eight times reads better as a call than as a pair of statements.
+func text(t *testing.T, root, rel string) string {
+	t.Helper()
+	found, err := Text(root, rel)
+	return assert.Must(t, found, err)
+}
+
+// modelFiles reads the whole model, or fails the subtest.
+func modelFiles(t *testing.T, root string) []File {
+	t.Helper()
+	found, err := ModelFiles(root)
+	return assert.Must(t, found, err)
+}
+
+// decisionRecords reads the decision records, or fails the subtest.
+func decisionRecords(t *testing.T, root string) []DecisionRecord {
+	t.Helper()
+	found, err := DecisionRecords(root)
+	return assert.Must(t, found, err)
 }
 
 // skipWhileAbsent skips the subtest while one of the files it reads has not
