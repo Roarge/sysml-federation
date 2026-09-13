@@ -912,6 +912,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/alerts.check.ts"; }
             doc /* Declares the email and webhook alert channels, each only when its address is in the environment at deploy time. */
         }
+        action <'stories.check.ts'> storyChecks {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/stories.check.ts"; }
+            doc /* Constructs one check per manifest entry that names a spec file: the twelve browser checks us01-launch to us12-reset, the refusals walk, arithmetic-walk and document-operations, each with its group, its schedule and its tags from the entry. */
+        }
     }
 
     // -------------------------------------------------------- design constraints --
