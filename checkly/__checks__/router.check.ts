@@ -63,7 +63,8 @@ new ApiCheck('router-join', {
 })
 
 // The pipeline is the part with a bottleneck: a single server's capacity is
-// its own throughput and its bottleneck is empty.
+// its own throughput and its bottleneck is empty. The first bottleneck's id
+// is what is asserted, so an empty list fails the check.
 new ApiCheck('router-capacity-bottleneck', {
   name: 'router: the capacity and the bottleneck',
   group: router,
@@ -78,7 +79,7 @@ new ApiCheck('router-capacity-bottleneck', {
     assertions: [
       AssertionBuilder.statusCode().equals(200),
       AssertionBuilder.jsonBody('$.data.part.capacity').isNotNull(),
-      AssertionBuilder.jsonBody('$.data.part.bottleneck').notEmpty(),
+      AssertionBuilder.jsonBody('$.data.part.bottleneck[0].id').isNotNull(),
     ],
   },
 })
@@ -98,8 +99,10 @@ new ApiCheck('router-introspection', {
       AssertionBuilder.statusCode().equals(200),
       AssertionBuilder.textBody().contains('Verdict'),
       AssertionBuilder.textBody().contains('Document'),
-      AssertionBuilder.textBody().contains('Node'),
-      AssertionBuilder.textBody().contains('Model'),
+      // Node and Model are substrings of other type names, so the two are
+      // asserted as the whole name field, the way the router writes it.
+      AssertionBuilder.textBody().contains('"name":"Node"'),
+      AssertionBuilder.textBody().contains('"name":"Model"'),
     ],
   },
 })

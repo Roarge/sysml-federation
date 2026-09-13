@@ -4,8 +4,11 @@
 //
 // The demo has one shared in-memory state. The viewer, document and cross-app
 // groups edit it, and a retried or a parallel run would edit it twice, so each
-// of the three runs one check at a time, from one location, with no retries,
-// and alerts on the first failed run. Nothing runs in parallel anywhere.
+// of the three runs from one location, with no retries and no parallel
+// locations, and alerts on the first failed run. That is the whole of the
+// guard: a group's concurrency governs the runs a trigger or the API starts,
+// nothing serialises the scheduled runs of two checks within or across the
+// three groups, and two mutating checks due at the same moment can overlap.
 
 import { AlertEscalationBuilder, CheckGroupV2, RetryStrategyBuilder } from 'checkly/constructs'
 import type { CheckGroupV2Props } from 'checkly/constructs'
@@ -40,8 +43,8 @@ export const router = new CheckGroupV2('router', {
   alertChannels,
 })
 
-// The viewer group edits the model through the viewer: one at a time, one
-// location, no retries.
+// The viewer group edits the model through the viewer: one location, no
+// retries, no parallel locations.
 export const viewer = new CheckGroupV2('viewer', {
   name: 'Viewer',
   activated: true,
@@ -55,7 +58,7 @@ export const viewer = new CheckGroupV2('viewer', {
 })
 
 // The document group edits the document and the model through the document
-// app: one at a time, one location, no retries.
+// app: one location, no retries, no parallel locations.
 export const document = new CheckGroupV2('document', {
   name: 'Document',
   activated: true,
@@ -68,8 +71,8 @@ export const document = new CheckGroupV2('document', {
   alertChannels,
 })
 
-// The cross-app group edits in one app and reads in the other: one at a
-// time, one location, no retries.
+// The cross-app group edits in one app and reads in the other: one location,
+// no retries, no parallel locations.
 export const crossApp = new CheckGroupV2('crossApp', {
   name: 'Cross-app',
   activated: true,

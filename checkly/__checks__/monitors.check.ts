@@ -49,8 +49,9 @@ new UrlMonitor('monitor-root', {
   },
 })
 
-// The session script pings this monitor every ten minutes while it runs.
-// Five minutes of grace, and then a missed ping is a failed session.
+// The session script pings this monitor every five minutes while it runs,
+// against a period of ten. Five minutes of grace, and then a missed ping is a
+// failed session.
 new HeartbeatMonitor('session-heartbeat', {
   name: 'session: the script is still running',
   group: session,

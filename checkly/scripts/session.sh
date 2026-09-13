@@ -36,6 +36,13 @@ if [ "${1:-}" = "up" ]; then
         exit 2
     fi
     export ROUTER_CONFIG_PATH=/otel/router.yaml
+    # The second collector configuration guards its inbound port with the
+    # token and refuses to start without one, whether or not the route to
+    # that port exists.
+    if [ "${OTEL_COLLECTOR_CONFIG:-}" = collector-checkly.yaml ] && [ -z "${OTEL_INGEST_TOKEN:-}" ]; then
+        log "OTEL_COLLECTOR_CONFIG=collector-checkly.yaml needs OTEL_INGEST_TOKEN set to any secret string: it guards the inbound port 4320, which nothing reaches unless the second tunnel route exists"
+        exit 2
+    fi
     if [ -n "${TUNNEL_TOKEN:-}" ]; then
         if [ -z "${DEMO_HOSTNAME:-}" ]; then
             log "TUNNEL_TOKEN is set and DEMO_HOSTNAME is not: the named tunnel needs the hostname it carries"
@@ -64,12 +71,17 @@ if [ -z "${CHECKLY_API_KEY:-}" ] || [ -z "${CHECKLY_ACCOUNT_ID:-}" ]; then
     with_account=0
 fi
 test_status=0
+deploy_status=0
 published=0
 deployed=0
 ping_url=""
 
 # The runner sleeps between steps and while it waits for a stop. A sleep in
-# the background under wait is what lets a signal reach the trap at once.
+# the background under wait is what lets a signal reach the trap at once, and
+# the three long calls to the service, the test session, the suite session
+# and the trigger, run the same way for the same reason: a stop during one
+# of them reaches the trap at once rather than when the call returns, which
+# a trigger can put past the grace period.
 pause() {
     sleep "$1" &
     wait $! || true
@@ -81,7 +93,8 @@ graphql() {
 
 # Step 12, on a stop. The project is destroyed if it was deployed, the
 # account variable removed if it was published, and the exit code is the test
-# session's.
+# session's. A deploy that failed is logged with its own status and does not
+# replace the test session's.
 on_stop() {
     trap - TERM INT
     log "[12/12] destroyOnStop"
@@ -91,7 +104,10 @@ on_stop() {
     if [ "$published" = 1 ]; then
         npx checkly env rm DEMO_URL --force || log "the account variable DEMO_URL was not removed"
     fi
-    log "session ends with status $test_status"
+    if [ "$deploy_status" != 0 ]; then
+        log "the deploy ended with status $deploy_status"
+    fi
+    log "session ends with the test session's status $test_status"
     exit "$test_status"
 }
 trap on_stop TERM INT
@@ -201,13 +217,15 @@ published=1
 session="sysml-federation $(date -u +%FT%TZ)"
 log "[7/12] recordATestSession: $session"
 npx checkly test --record --reporter list --env DEMO_URL="$DEMO_URL" --env SSE_STREAMS="$SSE_STREAMS" \
-    --test-session-name "$session" || test_status=$?
+    --test-session-name "$session" &
+wait $! || test_status=$?
 log "the test session ended with status $test_status"
 
 # Step 8. The browser suite as a second recorded session.
 log "[8/12] recordASuiteSession"
 npx checkly pw-test --record --env DEMO_URL="$DEMO_URL" --env SSE_STREAMS="$SSE_STREAMS" \
-    --test-session-name "$session, the suite" -- --project chromium || true
+    --test-session-name "$session, the suite" -- --project chromium &
+wait $! || true
 
 # Step 9. The project deployed for the session, and the heartbeat's ping
 # address read from the deploy's output, or from the account when the output
@@ -220,7 +238,6 @@ if [ "$deploy_status" != 0 ]; then
     log "deploy failed with status $deploy_status. A slug already taken on the dashboard or the status page is a configuration error, fixed by CHECKLY_DASHBOARD_SLUG or CHECKLY_STATUS_SLUG"
     rm -f "$deploy_out"
     deployed=1
-    test_status=$deploy_status
     on_stop
 fi
 deployed=1
@@ -248,7 +265,8 @@ log "status page https://$status_slug.checkly-status-page.com"
 
 # Step 10. Every deployed check once, so the dashboard and the page fill.
 log "[10/12] triggerOnce"
-npx checkly trigger --tags demo --record || log "the trigger ended with a failure, the session goes on"
+npx checkly trigger --tags demo --record &
+wait $! || log "the trigger ended with a failure, the session goes on"
 
 # Step 11. The heartbeat, every five minutes, until stopped.
 log "[11/12] keepTheHeartbeat"

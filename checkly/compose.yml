@@ -39,7 +39,7 @@ services:
       - "--no-autoupdate"
       - "run"
     environment:
-      - "TUNNEL_TOKEN=${TUNNEL_TOKEN}"
+      - "TUNNEL_TOKEN=${TUNNEL_TOKEN:-}"
     depends_on:
       - demo
 
@@ -95,7 +95,8 @@ services:
       - "16686:16686"
 
   # The session runner: the check project mounted from this directory, its
-  # dependencies in a named volume so that the host's tree is not written, and
+  # dependencies in a named volume so that they are not written into the
+  # host's tree, and
   # the script that walks the session's twelve steps. The browser specs run on
   # the monitoring service's runners, never in this container, so no browser
   # is downloaded here. The grace period is what the destroy on stop needs.

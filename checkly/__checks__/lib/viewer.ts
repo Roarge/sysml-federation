@@ -13,8 +13,8 @@ export class Viewer {
     return new Viewer(page)
   }
 
-  // status is the line under the header: empty after a successful round
-  // trip, a sentence in red after a refusal.
+  // status is the line at the foot of the header: empty after a successful
+  // round trip, a sentence in red after a refusal.
   status(): Locator {
     return this.page.locator('#status')
   }

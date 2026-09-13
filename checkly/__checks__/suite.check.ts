@@ -1,6 +1,6 @@
 // The story suite: the twelve browser specs run as one Playwright project on
-// the service's runner, daily, from the viewer group so that it runs one at
-// a time beside the group's own checks. The configuration is the shipped
+// the service's runner, daily, from the viewer group, under its one location
+// and no retries. The configuration is the shipped
 // playwright.config.ts beside this directory, whose testMatch selects the
 // us*.spec.ts files and nothing else.
 

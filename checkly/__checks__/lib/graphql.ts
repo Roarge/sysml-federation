@@ -14,7 +14,7 @@ type ResetAnswer = {
 }
 
 // RESET is the document both apps send from their Reset button: the two root
-// fields travel in one mutation, and each is applied even if the other fails.
+// fields travel in one mutation, the way the apps send them.
 const RESET = 'mutation Reset { resetModel { version } resetDocument { version } }'
 
 export async function graphql<T>(
@@ -26,7 +26,7 @@ export async function graphql<T>(
     headers: { 'Content-Type': 'application/json' },
     data: { query, variables },
   })
-  const answer = (await response.json()) as GraphQLAnswer<T>
+  const answer = parse<T>(response.status(), await response.text())
   if (answer.errors !== undefined && answer.errors.length > 0) {
     throw new Error(answer.errors[0].message)
   }
@@ -34,6 +34,24 @@ export async function graphql<T>(
     throw new Error(`the router answered ${response.status()} without data`)
   }
   return answer.data
+}
+
+// parse reads a body as the object a GraphQL answer always is, and throws
+// naming the status and the body's first line when it is not one: a tunnel
+// answering a 502 page, or an empty body, is reported as what it is rather
+// than as a syntax error.
+function parse<T>(status: number, body: string): GraphQLAnswer<T> {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(body)
+  } catch {
+    parsed = undefined
+  }
+  if (typeof parsed !== 'object' || parsed === null) {
+    const line = body.split('\n', 1)[0].trim()
+    throw new Error(`the router answered ${status} with a body that is not a JSON object: ${line}`)
+  }
+  return parsed as GraphQLAnswer<T>
 }
 
 // resetBoth puts the model and the document back to their shipped state.
