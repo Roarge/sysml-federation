@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 10 of 12 in [Federating a systems model](../README.md).
+Part 10 of 13 in [Federating a systems model](../README.md).
 
 The demo serves a SysML v2 model of a query pipeline through a federated GraphQL graph, with one subgraph reading the model text, a second computing capacity and verdicts, and a third owning a document that quotes the requirements. A subgraph is one GraphQL service that owns part of the graph, and the router is the process that stitches the subgraphs into one schema and answers queries against it. A verdict is the capacity service's judgement on one requirement, PASS, FAIL, INCONCLUSIVE or ERROR, with a reason built from a template. [The architecture in one sitting](01-the-architecture-in-one-sitting.md) gives the whole shape.
 

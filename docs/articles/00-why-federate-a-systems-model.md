@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 1 of 12 in [Federating a systems model](../README.md).
+Part 1 of 13 in [Federating a systems model](../README.md).
 
 ## The documents that describe one system
 
@@ -133,6 +133,14 @@ Change one server's throughput and the requirements document responds at once. T
 What does not happen is the instructive part. Raise the throughput of a server that is not the bottleneck and nothing moves, because a serial chain is governed by its worst link. Raise the bottleneck and the capacity rises, but the requirement still fails, because the bottleneck has moved to the next weakest stage in the wiring. Raise one of the servers there and the requirement passes. With the shipped values the pipeline sustains 1200 queries per second against a limit of 1500, and the bottleneck sits at the parse stage. That behaviour is obvious once seen and reliably surprising before. [Twelve use cases and one moving bottleneck](04-twelve-use-cases-and-one-moving-bottleneck.md) walks through it.
 
 None of the three services knows about the other two. The analysis and the document service are written against what the adapter publishes, and an organisation adopting this would put its own in their place. The verdict a reader sees against a requirement comes from a service that has never parsed a model file, sitting beside text from a service that has never computed anything.
+
+## The demo described in its own language
+
+The repository also carries a SysML v2 model of the demo itself, [the model](https://github.com/Roarge/sysml-federation/tree/main/model) under `model/`, and it is a different thing from the pipeline model the demo serves. The pipeline model describes five servers and their requirements, and the adapter reads it at startup. This one describes the adapter, the two services beside it, the router, the two web apps and the image they ship in. It holds the stakeholders and their concerns, the twelve stories of the storyboard and seven more that came with the model, the requirements restated as system stories with their statements kept, the design constraints, the architecture with its interfaces, the tests as verification actions, so that a Go test, a recorded demonstration, a validator run, a make target, a workflow and a live check are each an action of a case, and views that name the published boards, one view per board, exposing what the board draws.
+
+Both reference tools, the OMG pilot implementation and OpenSysML, accept it on every change, locally through one make target and in continuous integration on every pull request that touches it. A unit test keeps it in step with the documents and the tests. It fails when the model and the repository disagree on an identifier, a decision record, a test name, a check file, a published image, a check's inventory or a compose service. I had argued for a model at the centre of an organisation's engineering while keeping this repository's own description in prose that nothing checked, and the drift that prose accumulated is what changed my mind. [A model of the demo itself](12-a-model-of-the-demo-itself.md) is the account of what the model holds and what it leaves out.
+
+The test setup around the demo has four layers. The unit tests run under the race detector on every pull request. A demonstration record in the example's README carries the runs against the container that no unit test can make, each dated and each named by the requirements it bears on. The two validators read both models, the example's before any parser test uses it and the demo's own on every change to it. And [the check session](https://github.com/Roarge/sysml-federation/tree/main/checkly) is optional. A reader with a Checkly account can run it against their own instance and watch every story exercised through a tunnel by a browser on the monitoring service's runners, with every request the router sees traced in a viewer beside the demo and, with a tracing key, beside the check result that caused it. Without an account nothing of it runs, and the demo is one `docker run` as before.
 
 ## Placeholders, and what replaces them
 

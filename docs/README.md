@@ -30,6 +30,8 @@ So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with
     What it does once it runs, package by package and service by service, and what a visitor sees in fifteen minutes.
 12. [What shipped, and what did not](articles/11-what-shipped-and-what-did-not.md)  
     What the image weighs, the version tag that returns nothing, the checks nobody has run, and the one claim the running container does settle.
+13. [A model of the demo itself](articles/12-a-model-of-the-demo-itself.md)  
+    The demo in SysML v2 with its tests as verification cases, the two reference tools on every change, and an optional check session that runs every story through a tunnel and traces every request.
 
 ## Documents
 
@@ -37,8 +39,9 @@ So far this is a proof of concept, a SysML v2 adapter behind a Cosmo router with
 - [L0, Federating a systems model](a3/L0-federating-a-systems-model.pdf), an A3 sheet for the reader asking "What does this demo claim, what is in the box, and what would I keep or replace if I adopted it?"
 - [L2b, Pipeline example: capacity and verdicts](a3/L2b-pipeline-example-capacity-and-verdicts.pdf), an A3 sheet for the reader asking "Why does raising one server change nothing and raising another change everything?"
 - [Use cases](stories/use-cases.pdf), the storyboard as one PDF, one page per use case after the overview.
-- [Decision records](decisions/README.md), the 30 decisions with their alternatives and consequences.
+- [Decision records](decisions/README.md), the 31 decisions with their alternatives and consequences.
 - [The model of the demo](https://github.com/Roarge/sysml-federation/tree/main/model), the demo itself in SysML v2, with its stories, requirements, architecture, tests and views, validated by the two reference tools on every change.
+- [The check session](https://github.com/Roarge/sysml-federation/tree/main/checkly), an optional Checkly project with a tunnel, a collector and a trace viewer, run against your own instance with your own account.
 
 ## The repository
 
