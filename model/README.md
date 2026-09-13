@@ -29,6 +29,7 @@ One register per file, and the root imports every one of them.
 | [`core/logical-architecture/components/`](core/logical-architecture/components/components.sysml) | what the demo is made of, the project around it, the check session, every allocation as a `satisfy` and the decision records as tags |
 | [`core/verification-validation/verification-cases/`](core/verification-validation/verification-cases/verification-cases.sysml) | one verification case per system story and per constraint, with the evidence as actions |
 | [`core/verification-validation/validation-cases/`](core/verification-validation/validation-cases/validation-cases.sysml) | one validation case per stakeholder story, with the recorded runs as actions |
+| [`core/verification-validation/check-cases/`](core/verification-validation/check-cases/check-cases.sysml) | one case per check and monitor of the check project, its attributes equal to the manifest's entry and its actions the check's own steps |
 | [`core/views/`](core/views/views.sysml) | the viewpoints, the view definitions and one view per published board or sheet |
 
 The [articles](../docs/README.md) are the narrative and the

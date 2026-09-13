@@ -103,6 +103,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The container answered the redirect, the three paths, a query and a held subscription all on port 8080. */
         }
+        action <'router.check.ts'> pathsAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
+            doc /* router-playground reads the playground as HTML, router-root-redirect reads the 302 to the viewer without following it, and router-health-not-proxied expects a 404 on the health path, each hourly against a running instance. */
+        }
     }
 
     verification def VC_SR_05 {
@@ -477,6 +481,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A derived limit set through the router came back refused, with no change to the model version and no event on the subscription. */
         }
+        action <'refusals.multistep.spec.ts'> derivedLimitRefusedAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
+            doc /* The refusals check sets PIPE-R1.3's limit through the router and expects the sentence that the value is not a literal in the source, with no data and the model version unchanged. */
+        }
     }
 
     verification def VC_SR_25 {
@@ -503,6 +511,10 @@ package Federation_VerificationCases {
         action <'record: 2026-08-28 Refusal text'> refusalTextReachesTheClient {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A refusal from the document service reached the client as the whole of the first error message, unwrapped. */
+        }
+        action <'refusals.multistep.spec.ts'> negativeValueRefusedAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
+            doc /* The refusals check sets PIPE-S1's throughput to -5 through the router and expects the sentence that the value must be a finite, non-negative number, with no data and the model version unchanged. */
         }
     }
 
@@ -796,6 +808,10 @@ package Federation_VerificationCases {
         action <'record: 2026-08-27 SR-43'> oneQueryThreeServices {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* One query asked for a requirement's text, verdict and document number and one response carried all three, with introspection listing types from each subgraph. */
+        }
+        action <'router.check.ts'> joinAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
+            doc /* router-join asks PIPE-R1 for its text, verdict, verdictReason and documentNumber through the router every hour and expects the shipped text, a verdict and document number 1 in one answer, with router-version reading the version through the same path. */
         }
     }
 
