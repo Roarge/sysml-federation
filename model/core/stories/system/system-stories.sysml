@@ -83,7 +83,7 @@ package Federation_SystemStories {
 
     #derive
     requirement <'SR-03'> SR_03_NoOutboundNetwork : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : DemoElement;
         stakeholder :>> role : Visitor;
         attribute statement : String = "The demo shall make no network connection to any address outside the container, and the image shall set DO_NOT_TRACK=1, COSMO_TELEMETRY_DISABLED=true, TRACING_ENABLED=false and METRICS_OTLP_ENABLED=false in the router process's environment, and shall hand the router a configuration file only when the operator names one in SYSML_FEDERATION_ROUTER_CONFIG_PATH, in which case that file governs the router's telemetry.";
@@ -1422,7 +1422,7 @@ package Federation_SystemStories {
 
     #derive
     requirement <'SR-48'> SR_48_AnOptionalCheckSession : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : DemoElement;
         stakeholder :>> role : Maintainer;
         attribute statement : String = "When Checkly credentials are supplied to the compose profile, the demo shall be reachable through a tunnel, the check suite shall run against it and record a session, the project shall be deployed for the duration and destroyed when the profile stops, and the router's traces shall reach a collector beside the demo. When no credentials are supplied, the demo shall run as docker run runs it.";
