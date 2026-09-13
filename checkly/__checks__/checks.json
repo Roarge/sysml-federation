@@ -321,5 +321,41 @@
     "mutating": true,
     "group": "crossApp",
     "target": "/viewer/"
+  },
+  {
+    "id": "arithmetic-walk",
+    "kind": "MultiStepCheck",
+    "file": "arithmetic-walk.multistep.spec.ts",
+    "story": "US-04",
+    "frequencyMinutes": 360,
+    "locations": ["eu-central-1"],
+    "deployed": true,
+    "mutating": true,
+    "group": "crossApp",
+    "target": "/graphql"
+  },
+  {
+    "id": "document-operations",
+    "kind": "MultiStepCheck",
+    "file": "document-operations.multistep.spec.ts",
+    "story": "US-07",
+    "frequencyMinutes": 1440,
+    "locations": ["eu-central-1"],
+    "deployed": false,
+    "mutating": true,
+    "group": "document",
+    "target": "/graphql"
+  },
+  {
+    "id": "story-suite",
+    "kind": "PlaywrightSuite",
+    "file": "suite.check.ts",
+    "story": "US-19",
+    "frequencyMinutes": 1440,
+    "locations": ["eu-central-1"],
+    "deployed": true,
+    "mutating": true,
+    "group": "viewer",
+    "target": "the whole suite"
   }
 ]

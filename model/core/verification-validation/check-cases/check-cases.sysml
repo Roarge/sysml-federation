@@ -532,4 +532,69 @@ package Federation_CheckCases {
         action pressReset { doc /* Press Reset in the viewer and expect both apps back at the shipped state within two seconds: the caption, the verdict of PIPE-R1, the tray empty and PIPE-R1.4 numbered 1.4 again. */ }
         action putTheDemoBack { doc /* Put the demo back as it was found: reset the model and the document through the router, open the viewer and expect the caption capacity 1200, bottleneck parse. */ }
     }
+
+    // -------------------------------------------- the two multistep walks --
+
+    verification def CHK_ArithmeticWalk {
+        doc /* The arithmetic walk: the four rows of the capacity table read through the router one after another, as shipped, then ingest at 3000, then parse at 1700, then indexA at 900, each asserting the capacity, the bottleneck and every verdict the table lists. The edits are US-04's, and the last row is the state US-10 is watched from. */
+        subject demo : Demo;
+        actor checkly : Federation_Context::CheckSession::ChecklyCloud;
+        objective { verify US_04_RaiseTheBottleneck.acceptance; }
+        attribute logicalId : String = "arithmetic-walk";
+        attribute kind : CheckKind = CheckKind::MultiStepCheck;
+        attribute frequencyMinutes : Integer = 360;
+        attribute locations : String[1..3] = ("eu-central-1");
+        attribute deployed : Boolean = true;
+        attribute mutating : Boolean = true;
+        attribute target : String = "/graphql";
+        @Evidence { kind = "checkly"; location = "checkly/__checks__/arithmetic-walk.multistep.spec.ts"; }
+        action readTheShippedRow { doc /* As shipped: capacity 1200, the cut parse, PIPE-R1 FAIL and the derived verdicts PASS FAIL FAIL FAIL PASS. */ }
+        action raiseIngest { doc /* Ingest at 3000: nothing moves, the same number and the same cut. */ }
+        action raiseParse { doc /* Parse at 1700: capacity 1400, the cut moves to indexA and indexB, PIPE-R1 FAIL and the derived verdicts PASS PASS FAIL FAIL PASS. */ }
+        action raiseIndexA { doc /* IndexA at 900: capacity 1600, PIPE-R1 PASS and the derived verdicts PASS PASS PASS FAIL PASS. */ }
+        action putTheDemoBack { doc /* Put the demo back as it was found: reset the model and the document through the router and expect the shipped row again. */ }
+    }
+
+    verification def CHK_DocumentOperations {
+        doc /* The document operations: the six editorial mutations the document app sends, through the router, one step each, with the document each one answers read for the numbering and the placement it states. The model version is read before and after and is the same. The moves are US-07's and the heading, the prose and the exclusion are US-08's. Test sessions only, since the check edits the document at length. */
+        subject demo : Demo;
+        actor checkly : Federation_Context::CheckSession::ChecklyCloud;
+        objective { verify US_07_ReorderAndNest.acceptance; }
+        attribute logicalId : String = "document-operations";
+        attribute kind : CheckKind = CheckKind::MultiStepCheck;
+        attribute frequencyMinutes : Integer = 1440;
+        attribute locations : String[1..3] = ("eu-central-1");
+        attribute deployed : Boolean = false;
+        attribute mutating : Boolean = true;
+        attribute target : String = "/graphql";
+        @Evidence { kind = "checkly"; location = "checkly/__checks__/document-operations.multistep.spec.ts"; }
+        action readTheVersionAndTheDocument { doc /* Read the model version and the shipped document, and keep the version. */ }
+        action moveNode { doc /* Move PIPE-R1.5 above PIPE-R1.1 and expect it numbered 1.1 with the others shifted to 1.2 to 1.5. */ }
+        action insertHeading { doc /* Insert a heading above PIPE-R1 and expect it to take number 1, PIPE-R1 to become 1.1 and its children 1.1.1 to 1.1.5. */ }
+        action addProse { doc /* Add a paragraph under the heading, after PIPE-R1, and expect it there with no number. */ }
+        action editText { doc /* Edit the paragraph and expect it to read its new text, still with no number. */ }
+        action excludeRequirement { doc /* Exclude PIPE-R1.4 and expect it gone from the document, with the children that remain closed up to 1.1.1 to 1.1.4. */ }
+        action includeRequirement { doc /* Include PIPE-R1.4 and expect it back as the last child of PIPE-R1, numbered 1.1.5. */ }
+        action readTheVersionAgain { doc /* Read the model version again and expect the one kept. */ }
+        action putTheDemoBack { doc /* Put the demo back as it was found: reset the model and the document through the router and expect the shipped tree again. */ }
+    }
+
+    // ------------------------------------------------------ the suite --
+
+    verification def CHK_StorySuite {
+        doc /* The story suite: the twelve browser specs run as one Playwright project on the service's runner, daily, from the viewer group so that it runs one at a time beside the group's own checks. Each spec is also its own check above, so the suite is the twelve run together as one result. */
+        subject demo : Demo;
+        actor checkly : Federation_Context::CheckSession::ChecklyCloud;
+        objective { verify US_19_TheStoriesExercisedAgainstARunningInstance.acceptance.withCredentials; }
+        attribute logicalId : String = "story-suite";
+        attribute kind : CheckKind = CheckKind::PlaywrightSuite;
+        attribute frequencyMinutes : Integer = 1440;
+        attribute locations : String[1..3] = ("eu-central-1");
+        attribute deployed : Boolean = true;
+        attribute mutating : Boolean = true;
+        attribute target : String = "the whole suite";
+        @Evidence { kind = "checkly"; location = "checkly/__checks__/suite.check.ts"; }
+        action installTheProject { doc /* Install the check project on the runner from its lock file. */ }
+        action runTheSuite { doc /* Run the twelve browser specs in the chromium project under the shipped configuration and expect every one to pass or be skipped. */ }
+    }
 }

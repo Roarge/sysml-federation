@@ -151,6 +151,10 @@ package Federation_ValidationCases {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/us04-bottleneck-moves.spec.ts"; }
             doc /* Parse raised to 1700 in the viewer of a running instance moved the bottleneck to the index pair at capacity 1400, and indexA raised to 900 gave 1600 and a pass. */
         }
+        action <'arithmetic-walk.multistep.spec.ts'> theFourRowsThroughTheRouter {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/arithmetic-walk.multistep.spec.ts"; }
+            doc /* The four rows of the capacity table read through the router of a running instance: as shipped, ingest at 3000, parse at 1700 and indexA at 900, each with the capacity, the cut and every verdict the table lists. The last row is the state US-10 is watched from. */
+        }
     }
 
     verification def VAL_US_05 {
@@ -235,6 +239,10 @@ package Federation_ValidationCases {
         action <'us07-reorder-and-nest.spec.ts'> reorderAndNestAgainstARunningInstance {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/us07-reorder-and-nest.spec.ts"; }
             doc /* PIPE-R1.5 moved above PIPE-R1.1 took 1.1 and the others shifted, PIPE-R2 moved under PIPE-R1 took 1.6 and kept its relations, and the model version stood, on a running instance. */
+        }
+        action <'document-operations.multistep.spec.ts'> theSixOperationsThroughTheRouter {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/document-operations.multistep.spec.ts"; }
+            doc /* The six editorial mutations through the router of a running instance, each answering the renumbered document, with the model version the same before and after. The heading, the prose and the exclusion are US-08's. */
         }
     }
 

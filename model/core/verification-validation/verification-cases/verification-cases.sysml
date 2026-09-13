@@ -916,6 +916,18 @@ package Federation_VerificationCases {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/stories.check.ts"; }
             doc /* Constructs one check per manifest entry that names a spec file: the twelve browser checks us01-launch to us12-reset, the refusals walk, arithmetic-walk and document-operations, each with its group, its schedule and its tags from the entry. */
         }
+        action <'suite.check.ts'> storySuite {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/suite.check.ts"; }
+            doc /* Declares story-suite, the twelve browser specs run as one Playwright project under the shipped configuration. */
+        }
+        action <'arithmetic-walk.multistep.spec.ts'> arithmeticWalk {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/arithmetic-walk.multistep.spec.ts"; }
+            doc /* Drives the arithmetic-walk check: the four rows of the capacity table through the router, then the reset. */
+        }
+        action <'document-operations.multistep.spec.ts'> documentOperations {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/document-operations.multistep.spec.ts"; }
+            doc /* Drives the document-operations check: the six editorial mutations through the router with the model version read before and after, then the reset. */
+        }
     }
 
     // -------------------------------------------------------- design constraints --
