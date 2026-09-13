@@ -23,8 +23,9 @@ import (
 // Every register of the model these subtests read is written, and a subtest
 // fails naming the file when one is absent. The check register and the
 // manifest are the exception and are read as empty when absent, so that
-// checkInventory compares two empty sides rather than failing on a project
-// that is not there.
+// checkInventory reports each check the other side still carries rather than
+// failing on the file, and a repository with neither fails checkFiles and
+// sessionParts instead.
 func TestSR46_ModelAndRepositoryAgree(t *testing.T) {
 	found, err := ModuleRoot()
 	root := assert.Must(t, found, err)
@@ -129,8 +130,8 @@ func goTestsAgree(t *testing.T, root string) {
 
 // checkFilesAgree: the check files of the check project and the file names the
 // two case registers quote are the same set, and every suite file is exercised
-// by exactly one validation case. Before the check project exists both sides
-// are empty, which is agreement rather than absence.
+// by exactly one validation case. An absent check directory reads as no
+// files, and every file the registers quote is then reported.
 func checkFilesAgree(t *testing.T, root string) {
 	t.Helper()
 
@@ -233,8 +234,8 @@ func coverageAgrees(t *testing.T, root string) {
 // the manifest the check project reads says it is, are the same, and every
 // check in the manifest is constructed once. A check the manifest carries and
 // nothing constructs never runs, and one constructed twice runs twice under one
-// name. Both sides are empty until the check project exists, as in
-// checkFilesAgree.
+// name. An absent register or manifest reads as empty, and every check the
+// other side carries is then reported.
 func checkInventoryAgrees(t *testing.T, root string) {
 	t.Helper()
 
@@ -332,10 +333,9 @@ func text(t *testing.T, root, rel string) string {
 	return assert.Must(t, found, err)
 }
 
-// textIfPresent reads a file the repository has not grown yet, and returns the
-// empty string while it is absent. The check register lands with the check
-// project, and until then the inventory it carries is as empty as the manifest
-// it is compared with.
+// textIfPresent reads the check register and returns the empty string when it
+// is absent, the one register read with that tolerance, so that the inventory
+// agreement reports what the manifest carries rather than failing on the file.
 func textIfPresent(t *testing.T, root, rel string) string {
 	t.Helper()
 	if !Exists(root, rel) {

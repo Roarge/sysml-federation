@@ -37,11 +37,11 @@ import (
 )
 
 // The places the two sides live, as paths from the module root. Every register
-// of the model is written, apart from the check register, and the test fails
-// rather than passing over one that is absent. The check project's files under
-// checkly/ are not there yet: the check register and the manifest are read as
-// empty until they land, and the session agreement skips on the absent compose
-// file.
+// of the model and every file of the check project is written, and the test
+// fails rather than passing over an absent one, with one tolerance: an absent
+// check register or manifest is read as empty, so the inventory agreement
+// reports each check the other side still carries, and a repository with
+// neither fails the check-file and session agreements instead.
 const (
 	// ModelDir holds the demo's own model.
 	ModelDir = "model"
