@@ -928,6 +928,22 @@ package Federation_VerificationCases {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/document-operations.multistep.spec.ts"; }
             doc /* Drives the document-operations check: the six editorial mutations through the router with the model version read before and after, then the reset. */
         }
+        action <'dashboard.check.ts'> dashboard {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/dashboard.check.ts"; }
+            doc /* Declares sysml-federation-dashboard, the public dashboard of every check tagged demo, under a slug from the environment or derived from the account id. */
+        }
+        action <'status-page.check.ts'> statusPage {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/status-page.check.ts"; }
+            doc /* Declares sysml-federation-status with one card, The demo, and the four services Viewer, Document, Router and Session, and, only when CHECKLY_INCIDENTS is 1, one automation rule per service tagged with its group's name. */
+        }
+        action <'maintenance.check.ts'> maintenanceWindow {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/maintenance.check.ts"; }
+            doc /* Declares weekly, the maintenance window over every check tagged demo, constructed only when CHECKLY_MAINTENANCE is 1. */
+        }
+        action <'private-location.check.ts'> privateLocation {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/private-location.check.ts"; }
+            doc /* Declares demo-private, the private location every group runs from in place of its public locations, constructed only when CHECKLY_PRIVATE_LOCATION_SLUG names its slug. */
+        }
     }
 
     // -------------------------------------------------------- design constraints --

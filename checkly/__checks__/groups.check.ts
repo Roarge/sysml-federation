@@ -8,7 +8,22 @@
 // and alerts on the first failed run. Nothing runs in parallel anywhere.
 
 import { AlertEscalationBuilder, CheckGroupV2, RetryStrategyBuilder } from 'checkly/constructs'
+import type { CheckGroupV2Props } from 'checkly/constructs'
 import { alertChannels } from './alerts.check'
+import { privateLocation } from './private-location.check'
+
+// Where a group's checks run: the public locations it names, or, when a
+// private location is configured, that location alone. A group with a
+// private location names no public one, so nothing runs from outside the
+// demo's own network. This is the Team-plan route, untested on the free tier.
+type Where = Pick<CheckGroupV2Props, 'locations' | 'privateLocations'>
+
+function where(locations: NonNullable<CheckGroupV2Props['locations']>): Where {
+  if (privateLocation === undefined) {
+    return { locations }
+  }
+  return { privateLocations: [privateLocation] }
+}
 
 // The router group reads and never writes, so it may run from three
 // locations, retry a failure in the same region, and alert on the second
@@ -17,7 +32,7 @@ export const router = new CheckGroupV2('router', {
   name: 'Router',
   activated: true,
   tags: ['demo', 'router'],
-  locations: ['eu-central-1', 'eu-west-2', 'us-east-1'],
+  ...where(['eu-central-1', 'eu-west-2', 'us-east-1']),
   concurrency: 3,
   runParallel: false,
   retryStrategy: RetryStrategyBuilder.linearStrategy({ baseBackoffSeconds: 30, maxRetries: 2, sameRegion: true }),
@@ -31,7 +46,7 @@ export const viewer = new CheckGroupV2('viewer', {
   name: 'Viewer',
   activated: true,
   tags: ['demo', 'viewer'],
-  locations: ['eu-central-1'],
+  ...where(['eu-central-1']),
   concurrency: 1,
   runParallel: false,
   retryStrategy: RetryStrategyBuilder.noRetries(),
@@ -45,7 +60,7 @@ export const document = new CheckGroupV2('document', {
   name: 'Document',
   activated: true,
   tags: ['demo', 'document'],
-  locations: ['eu-central-1'],
+  ...where(['eu-central-1']),
   concurrency: 1,
   runParallel: false,
   retryStrategy: RetryStrategyBuilder.noRetries(),
@@ -59,7 +74,7 @@ export const crossApp = new CheckGroupV2('crossApp', {
   name: 'Cross-app',
   activated: true,
   tags: ['demo', 'crossApp'],
-  locations: ['eu-central-1'],
+  ...where(['eu-central-1']),
   concurrency: 1,
   runParallel: false,
   retryStrategy: RetryStrategyBuilder.noRetries(),
@@ -75,7 +90,7 @@ export const session = new CheckGroupV2('session', {
   name: 'Session',
   activated: true,
   tags: ['demo', 'session'],
-  locations: ['eu-central-1'],
+  ...where(['eu-central-1']),
   concurrency: 1,
   runParallel: false,
   retryStrategy: RetryStrategyBuilder.noRetries(),
