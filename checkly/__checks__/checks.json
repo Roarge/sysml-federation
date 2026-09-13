@@ -88,7 +88,7 @@
     "kind": "MultiStepCheck",
     "file": "refusals.multistep.spec.ts",
     "story": "SR-24",
-    "frequencyMinutes": 60,
+    "frequencyMinutes": 360,
     "locations": ["eu-central-1", "eu-west-2", "us-east-1"],
     "deployed": true,
     "mutating": false,

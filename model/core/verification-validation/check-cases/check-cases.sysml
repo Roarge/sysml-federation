@@ -62,7 +62,7 @@ package Federation_CheckCases {
         attribute target : String = "/graphql";
         @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
         action postTheCapacityQuery { doc /* POST the part query for PIPE-P1 asking for capacity and the bottleneck's ids. */ }
-        action expectACapacityAndABottleneck { doc /* Status 200, a capacity that is not null and a bottleneck that is not empty. */ }
+        action expectACapacityAndABottleneck { doc /* Status 200, a capacity that is not null and a first bottleneck whose id is not null. */ }
     }
 
     verification def CHK_RouterIntrospection {
@@ -79,7 +79,7 @@ package Federation_CheckCases {
         attribute target : String = "/graphql";
         @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
         action postTheIntrospectionQuery { doc /* POST the schema query asking for the name of every type. */ }
-        action expectTypesFromEachSubgraph { doc /* Status 200 and a body that contains Verdict, Document, Node and Model. */ }
+        action expectTypesFromEachSubgraph { doc /* Status 200 and a body that contains Verdict and Document, and the whole name field for Node and for Model, which are substrings of other type names. */ }
     }
 
     verification def CHK_RouterPlayground {
@@ -146,7 +146,7 @@ package Federation_CheckCases {
         }
         attribute logicalId : String = "refusals";
         attribute kind : CheckKind = CheckKind::MultiStepCheck;
-        attribute frequencyMinutes : Integer = 60;
+        attribute frequencyMinutes : Integer = 360;
         attribute locations : String[1..3] = ("eu-central-1", "eu-west-2", "us-east-1");
         attribute deployed : Boolean = true;
         attribute mutating : Boolean = false;
@@ -582,7 +582,7 @@ package Federation_CheckCases {
     // ------------------------------------------------------ the suite --
 
     verification def CHK_StorySuite {
-        doc /* The story suite: the twelve browser specs run as one Playwright project on the service's runner, daily, from the viewer group so that it runs one at a time beside the group's own checks. Each spec is also its own check above, so the suite is the twelve run together as one result. */
+        doc /* The story suite: the twelve browser specs run as one Playwright project on the service's runner, daily, from the viewer group, under its one location and no retries. Each spec is also its own check above, so the suite is the twelve run together as one result. */
         subject demo : Demo;
         actor checkly : Federation_Context::CheckSession::ChecklyCloud;
         objective { verify US_19_TheStoriesExercisedAgainstARunningInstance.acceptance.withCredentials; }
@@ -601,7 +601,7 @@ package Federation_CheckCases {
     // ------------------------------------------- the session's own record --
 
     verification def CHK_TraceCorrelation {
-        doc /* The trace of one check request, found in the viewer beside the demo and, when the ingest key is set, beside the check result at the monitoring service. It is the session's own record rather than a construct of the check project, so it has no kind, no schedule and no location, and the manifest does not carry it. */
+        doc /* The trace of one check request, found in the viewer beside the demo and, when the ingest key is set, beside the check result at the monitoring service, a half that is pending in the record this case cites. It is the session's own record rather than a construct of the check project, so it has no kind, no schedule and no location, and the manifest does not carry it. */
         subject demo : Demo;
         actor checkly : Federation_Context::CheckSession::ChecklyCloud;
         objective { verify SR_48_AnOptionalCheckSession.acceptance.tracesReachTheCollector; }

@@ -131,7 +131,8 @@ package Federation_FunctionalArchitecture {
 
     package Session {
         doc /* The behaviour of the optional check session, written as the
-               design and read against the session script when it exists. */
+               design and read against the session script, which follows it
+               step by step. */
 
         action def RunASession {
             doc /* The session runner's twelve steps. With no credentials

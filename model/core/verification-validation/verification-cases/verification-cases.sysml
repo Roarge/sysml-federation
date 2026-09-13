@@ -887,9 +887,10 @@ package Federation_VerificationCases {
 
     verification def VC_SR_48 {
         doc /* An optional check session: the files of the check project, one
-               action per file, with the checks, the monitors, the groups and
-               the alert channels each declares. Every check has its own case
-               in the check register. */
+               action per file, with the checks, the monitors, the groups, the
+               alert channels, the dashboard, the status page, the maintenance
+               window and the private location each declares. Every check has
+               its own case in the check register. */
         subject checkSuite : CheckSuite;
         objective { verify SR_48_AnOptionalCheckSession.acceptance; }
         action <'TestSR48_TheCheckProfileIsOptional'> profileIsOptional {
@@ -934,11 +935,11 @@ package Federation_VerificationCases {
         }
         action <'dashboard.check.ts'> dashboard {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/dashboard.check.ts"; }
-            doc /* Declares sysml-federation-dashboard, the public dashboard of every check tagged demo, under a slug from the environment or derived from the account id. */
+            doc /* Declares sysml-federation-dashboard, the public dashboard of every check tagged demo, constructed only when a slug or the account id is present, under the slug given or one derived from the account id. */
         }
         action <'status-page.check.ts'> statusPage {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/status-page.check.ts"; }
-            doc /* Declares sysml-federation-status with one card, The demo, and the four services Viewer, Document, Router and Session, and, only when CHECKLY_INCIDENTS is 1, one automation rule per service tagged with its group's name. */
+            doc /* Declares sysml-federation-status with one card, The demo, and the four services Viewer, Document, Router and Session, constructed only when a slug or the account id is present, and, only when CHECKLY_INCIDENTS is 1, one automation rule per service tagged with its group's name. */
         }
         action <'maintenance.check.ts'> maintenanceWindow {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/maintenance.check.ts"; }
