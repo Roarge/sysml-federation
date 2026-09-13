@@ -21,11 +21,10 @@ import (
 // other lacks.
 //
 // Every register of the model these subtests read is written, and a subtest
-// fails naming the file when one is absent. The check project is the
-// exception, because it lands in a later pull request: the check register and
-// the manifest are read as empty until then, so checkInventory compares two
-// empty sides, and sessionParts skips on the absent compose file, naming the
-// file it is waiting for.
+// fails naming the file when one is absent. The check register and the
+// manifest are the exception and are read as empty when absent, so that
+// checkInventory compares two empty sides rather than failing on a project
+// that is not there.
 func TestSR46_ModelAndRepositoryAgree(t *testing.T) {
 	found, err := ModuleRoot()
 	root := assert.Must(t, found, err)
@@ -246,6 +245,12 @@ func checkInventoryAgrees(t *testing.T, root string) {
 	for _, id := range union(inManifest, inRegister) {
 		manifest, fromManifest := inManifest[id]
 		register, fromRegister := inRegister[id]
+		// A case with no kind is the session's own record, the correlation
+		// check, rather than a construct of the check project, so the manifest
+		// does not carry it.
+		if fromRegister && register.Kind == "" {
+			continue
+		}
 		switch {
 		case !fromRegister:
 			t.Errorf("%s is in the manifest, and the check register declares no such check", id)
@@ -277,9 +282,6 @@ func checkInventoryAgrees(t *testing.T, root string) {
 // are the parts the session composite carries, and nothing else.
 func sessionPartsAgree(t *testing.T, root string) {
 	t.Helper()
-	if !Exists(root, ComposeFile) {
-		t.Skip("the compose file is not yet present, so the session has no services to be compared against")
-	}
 
 	services := ComposeServices(text(t, root, ComposeFile))
 	parts := SessionComposeServices(text(t, root, ComponentsFile))

@@ -597,4 +597,19 @@ package Federation_CheckCases {
         action installTheProject { doc /* Install the check project on the runner from its lock file. */ }
         action runTheSuite { doc /* Run the twelve browser specs in the chromium project under the shipped configuration and expect every one to pass or be skipped. */ }
     }
+
+    // ------------------------------------------- the session's own record --
+
+    verification def CHK_TraceCorrelation {
+        doc /* The trace of one check request, found in the viewer beside the demo and, when the ingest key is set, beside the check result at the monitoring service. It is the session's own record rather than a construct of the check project, so it has no kind, no schedule and no location, and the manifest does not carry it. */
+        subject demo : Demo;
+        actor checkly : Federation_Context::CheckSession::ChecklyCloud;
+        objective { verify SR_48_AnOptionalCheckSession.acceptance.tracesReachTheCollector; }
+        attribute logicalId : String = "trace-correlation";
+        attribute deployed : Boolean = false;
+        @Evidence { kind = "record"; location = "checkly/README.md#verification-record"; }
+        action sendTheJoinQueryWithTraceContext { doc /* POST the join query for PIPE-R1 with a traceparent header and tracestate checkly=true, as the monitoring service's runner sends it. */ }
+        action expectTheTraceInTheViewer { doc /* One trace in the viewer under the trace id sent: the router's span at the root and three subgraph fetch spans under it. */ }
+        action expectTheTraceBesideTheCheckResult { doc /* When the ingest key is set, the same trace shown beside the check result at the monitoring service. */ }
+    }
 }

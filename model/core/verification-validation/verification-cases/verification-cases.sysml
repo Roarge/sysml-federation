@@ -948,6 +948,26 @@ package Federation_VerificationCases {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/private-location.check.ts"; }
             doc /* Declares demo-private, the private location every group runs from in place of its public locations, constructed only when CHECKLY_PRIVATE_LOCATION_SLUG names its slug. */
         }
+        action <'compose.yml'> theStack {
+            @Evidence { kind = "record"; location = "checkly/compose.yml"; }
+            doc /* The demo alone by default and, under the profiles, one tunnel, the collector, the viewer, the runner and the private-location route, every image pinned by tag and digest. */
+        }
+        action <'session.sh'> theScript {
+            @Evidence { kind = "record"; location = "checkly/scripts/session.sh"; }
+            doc /* On the host, up brings the stack up with the profiles the environment calls for. In the runner, the twelve steps of the session under their numbers, the destroy on stop. */
+        }
+        action <'router.yaml'> routerTracing {
+            @Evidence { kind = "record"; location = "checkly/otel/router.yaml"; }
+            doc /* The router configuration the session hands to the demo: tracing on, every request sampled, incoming trace context kept, and one exporter, the collector on the compose network. */
+        }
+        action <'collector-local.yaml'> localCollector {
+            @Evidence { kind = "record"; location = "checkly/otel/collector-local.yaml"; }
+            doc /* The collector without an ingest key: every span to the viewer and a line per batch to the log. */
+        }
+        action <'collector-checkly.yaml'> ingestCollector {
+            @Evidence { kind = "record"; location = "checkly/otel/collector-checkly.yaml"; }
+            doc /* The collector with an ingest key: every span to the viewer, only the spans marked checkly=true to the monitoring service on a second pipeline, and a receiver under a bearer token for spans that arrive from outside. */
+        }
     }
 
     // -------------------------------------------------------- design constraints --
