@@ -892,6 +892,10 @@ package Federation_VerificationCases {
                in the check register. */
         subject checkSuite : CheckSuite;
         objective { verify SR_48_AnOptionalCheckSession.acceptance; }
+        action <'TestSR48_TheCheckProfileIsOptional'> profileIsOptional {
+            @Evidence { kind = "go-test"; location = "checkly/compose_test.go"; }
+            doc /* The demo service has no profile and the image the README names, every other service one profile, the tunnels one each. */
+        }
         action <'router.check.ts'> routerChecks {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
             doc /* Declares the seven API checks on the router: router-version, router-join, router-capacity-bottleneck, router-introspection, router-playground, router-root-redirect and router-health-not-proxied. */
