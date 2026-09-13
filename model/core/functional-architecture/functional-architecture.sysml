@@ -131,25 +131,27 @@ package Federation_FunctionalArchitecture {
 
     package Session {
         doc /* The behaviour of the optional check session, written as the
-               design and read against the session script when it exists. */
+               design and read against the session script, which follows it
+               step by step. */
 
         action def RunASession {
             doc /* The session runner's twelve steps. With no credentials
-                   nothing runs. With a tunnel token the named tunnel carries
-                   the public hostname, and without it a quick tunnel is opened
-                   and the subscriptions are probed. The last step returns the
-                   test session's exit code. */
+                   nothing runs, unless the session is asked for without an
+                   account, when it stops after the probe. With a tunnel token
+                   the named tunnel carries the public hostname, and without it
+                   a quick tunnel is opened and the subscriptions are probed.
+                   The last step returns the test session's exit code. */
             in credentialsPresent : Boolean;
             in tunnelToken : Boolean;
-            action installDependencies { doc /* npm ci in the runner */ }
+            action installDependencies { doc /* npm ci in the runner, with the HTTP client the runner image lacks */ }
             action resolveTheDemoUrl { doc /* the public hostname when a tunnel token is set, else the quick tunnel's hostname read from its metrics endpoint */ }
             action waitForTheDemo { doc /* GET /viewer/ through the tunnel answers 200, up to 120 seconds */ }
-            action probeSubscriptions { doc /* quick tunnel only: a POST subscription and a parallel mutation. An event frame within ten seconds means streams arrive */ }
+            action probeSubscriptions { doc /* quick tunnel only: a POST subscription and a parallel mutation. An event frame within ten seconds means streams arrive. Without an account the runner stops here and keeps the stack up */ }
             action readTheAccountPlan { doc /* whoami and the account plan to the log */ }
             action publishTheDemoUrl { doc /* the demo URL becomes the account variable the checks read */ }
             action recordATestSession { doc /* checkly test, recorded, every check once against this instance */ }
             action recordASuiteSession { doc /* the browser suite, run against the same instance and recorded as a session beside the first */ }
-            action deployTheProject { doc /* deploy, and read the heartbeat ping address back */ }
+            action deployTheProject { doc /* deploy, and read the heartbeat ping address back from the output, or from the account when the output lacks it */ }
             action triggerOnce { doc /* every deployed check runs once so the dashboard and status page fill */ }
             action keepTheHeartbeat { doc /* ping every five minutes while the session lives */ }
             action destroyOnStop { doc /* on stop, destroy the project and remove the account variable, then exit with the test session's code */ }

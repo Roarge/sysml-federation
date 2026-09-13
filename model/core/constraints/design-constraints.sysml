@@ -20,9 +20,8 @@ package Federation_DesignConstraints {
                        tests, and what those require. */
             }
         }
-        doc /* Decisions: none. Allocated to: ADAPTER, CAPACITY, DOCUMENT, IMAGE,
-               REPO. The check project and the compose-file test land in a
-               later pull request. */
+        doc /* Decisions: AD-0031. Allocated to: ADAPTER, CAPACITY, DOCUMENT,
+               IMAGE, REPO. */
     }
 
     requirement <'SC-02'> SC_02_NoEmptyInterfaceInHandWrittenCode : DesignConstraint {

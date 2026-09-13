@@ -252,6 +252,7 @@ package Federation_LogicalArchitecture {
                The inventory of checks is not here. It lives in the check case
                register and in the manifest the check project reads, and those
                two are compared with each other rather than with this. */
+        @DecisionRecord { id = "AD-0031"; title = "An optional check session through a tunnel, with traces"; }
         part groups : CheckGroup[5];
         part checks : Check[*];
         part alertChannels : AlertChannel[0..2];
@@ -477,10 +478,9 @@ package Federation_LogicalArchitecture {
     package CheckSession {
         doc /* The optional check session beside the demo, written as the compose
                file that starts it. Every part that maps to a service carries the
-               service name, so that the two can be compared. The session is
-               modelled here as its design. The check project, the compose file
-               and the session script land in a later pull request, and are
-               checked against this register when they do. */
+               service name, so that the two can be compared, and the agreement
+               test holds the composite's parts to the services the compose
+               file starts. */
 
         part def CheckSession {
             doc /* The session as a whole: the runner, the tunnel, the collector,
@@ -536,6 +536,7 @@ package Federation_LogicalArchitecture {
             doc /* The optional check session beside the demo: the runner, the
                    tunnel, the collector, the viewer, and the external services
                    they talk to. Exactly one of the two tunnels runs. */
+            @DecisionRecord { id = "AD-0031"; title = "An optional check session through a tunnel, with traces"; }
             part runner : SessionRunner {
                 attribute composeService : String = "checkly";
             }

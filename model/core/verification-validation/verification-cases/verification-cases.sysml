@@ -60,6 +60,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "go-test"; location = "cmd/sysml-federation/main_test.go"; }
             doc /* The router process's environment carries the four variables that switch every outbound path off. */
         }
+        action <'TestSR03_RouterConfigurationFileIsAnExplicitOptIn'> configurationFileOptIn {
+            @Evidence { kind = "go-test"; location = "cmd/sysml-federation/main_test.go"; }
+            doc /* With the variable unset the child's environment is the nine variables and carries no CONFIG_PATH. With it set, CONFIG_PATH carries the path and the nine are still set. */
+        }
         action <'TestSR03_RoutingURLsAreLoopback'> routingIsLoopback {
             @Evidence { kind = "go-test"; location = "examples/pipeline/compose_test.go"; }
             doc /* The execution configuration names only loopback addresses. */
@@ -98,6 +102,10 @@ package Federation_VerificationCases {
         action <'record: 2026-08-28 SR-04'> pathsOnTheContainer {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The container answered the redirect, the three paths, a query and a held subscription all on port 8080. */
+        }
+        action <'router.check.ts'> pathsAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
+            doc /* router-playground reads the playground as HTML, router-root-redirect reads the 302 to the viewer without following it, and router-health-not-proxied expects a 404 on the health path, each hourly against a running instance. */
         }
     }
 
@@ -473,6 +481,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A derived limit set through the router came back refused, with no change to the model version and no event on the subscription. */
         }
+        action <'refusals.multistep.spec.ts'> derivedLimitRefusedAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
+            doc /* The refusals check sets PIPE-R1.3's limit through the router and expects the sentence that the value is not a literal in the source, with no data and the model version unchanged. */
+        }
     }
 
     verification def VC_SR_25 {
@@ -499,6 +511,10 @@ package Federation_VerificationCases {
         action <'record: 2026-08-28 Refusal text'> refusalTextReachesTheClient {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A refusal from the document service reached the client as the whole of the first error message, unwrapped. */
+        }
+        action <'refusals.multistep.spec.ts'> negativeValueRefusedAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
+            doc /* The refusals check sets PIPE-S1's throughput to -5 through the router and expects the sentence that the value must be a finite, non-negative number, with no data and the model version unchanged. */
         }
     }
 
@@ -793,6 +809,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* One query asked for a requirement's text, verdict and document number and one response carried all three, with introspection listing types from each subgraph. */
         }
+        action <'router.check.ts'> joinAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
+            doc /* router-join asks PIPE-R1 for its text, verdict, verdictReason and documentNumber through the router every hour and expects the shipped text, a verdict and document number 1 in one answer, with router-version reading the version through the same path. */
+        }
     }
 
     verification def VC_SR_44 {
@@ -866,11 +886,89 @@ package Federation_VerificationCases {
     }
 
     verification def VC_SR_48 {
-        doc /* An optional check session. The evidence for this story lands with
-               the check session itself, which a later change adds, so the case
-               carries its objective and no action yet. */
+        doc /* An optional check session: the files of the check project, one
+               action per file, with the checks, the monitors, the groups, the
+               alert channels, the dashboard, the status page, the maintenance
+               window and the private location each declares. Every check has
+               its own case in the check register. */
         subject checkSuite : CheckSuite;
         objective { verify SR_48_AnOptionalCheckSession.acceptance; }
+        action <'TestSR48_TheCheckProfileIsOptional'> profileIsOptional {
+            @Evidence { kind = "go-test"; location = "checkly/compose_test.go"; }
+            doc /* The demo service has no profile and the image the README names, every other service one profile, the tunnels one each. */
+        }
+        action <'router.check.ts'> routerChecks {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
+            doc /* Declares the seven API checks on the router: router-version, router-join, router-capacity-bottleneck, router-introspection, router-playground, router-root-redirect and router-health-not-proxied. */
+        }
+        action <'refusals.multistep.spec.ts'> refusalsWalk {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
+            doc /* Drives the refusals check: the model version, two edits the router refuses, and the version again. */
+        }
+        action <'monitors.check.ts'> monitors {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/monitors.check.ts"; }
+            doc /* Declares monitor-viewer, monitor-document, monitor-root and session-heartbeat, and, when a hostname is set, demo-certificate, demo-dns and demo-tcp. */
+        }
+        action <'groups.check.ts'> groups {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/groups.check.ts"; }
+            doc /* Declares the five groups router, viewer, document, crossApp and session, with their locations, concurrency and retry policy. */
+        }
+        action <'alerts.check.ts'> alertChannels {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/alerts.check.ts"; }
+            doc /* Declares the email and webhook alert channels, each only when its address is in the environment at deploy time. */
+        }
+        action <'stories.check.ts'> storyChecks {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/stories.check.ts"; }
+            doc /* Constructs one check per manifest entry that names a spec file: the twelve browser checks us01-launch to us12-reset, the refusals walk, arithmetic-walk and document-operations, each with its group, its schedule and its tags from the entry. */
+        }
+        action <'suite.check.ts'> storySuite {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/suite.check.ts"; }
+            doc /* Declares story-suite, the twelve browser specs run as one Playwright project under the shipped configuration. */
+        }
+        action <'arithmetic-walk.multistep.spec.ts'> arithmeticWalk {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/arithmetic-walk.multistep.spec.ts"; }
+            doc /* Drives the arithmetic-walk check: the four rows of the capacity table through the router, then the reset. */
+        }
+        action <'document-operations.multistep.spec.ts'> documentOperations {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/document-operations.multistep.spec.ts"; }
+            doc /* Drives the document-operations check: the six editorial mutations through the router with the model version read before and after, then the reset. */
+        }
+        action <'dashboard.check.ts'> dashboard {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/dashboard.check.ts"; }
+            doc /* Declares sysml-federation-dashboard, the public dashboard of every check tagged demo, constructed only when a slug or the account id is present, under the slug given or one derived from the account id. */
+        }
+        action <'status-page.check.ts'> statusPage {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/status-page.check.ts"; }
+            doc /* Declares sysml-federation-status with one card, The demo, and the four services Viewer, Document, Router and Session, constructed only when a slug or the account id is present, and, only when CHECKLY_INCIDENTS is 1, one automation rule per service tagged with its group's name. */
+        }
+        action <'maintenance.check.ts'> maintenanceWindow {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/maintenance.check.ts"; }
+            doc /* Declares weekly, the maintenance window over every check tagged demo, constructed only when CHECKLY_MAINTENANCE is 1. */
+        }
+        action <'private-location.check.ts'> privateLocation {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/private-location.check.ts"; }
+            doc /* Declares demo-private, the private location every group runs from in place of its public locations, constructed only when CHECKLY_PRIVATE_LOCATION_SLUG names its slug. */
+        }
+        action <'compose.yml'> theStack {
+            @Evidence { kind = "record"; location = "checkly/compose.yml"; }
+            doc /* The demo alone by default and, under the profiles, one tunnel, the collector, the viewer, the runner and the private-location route, every image pinned by tag and digest. */
+        }
+        action <'session.sh'> theScript {
+            @Evidence { kind = "record"; location = "checkly/scripts/session.sh"; }
+            doc /* On the host, up brings the stack up with the profiles the environment calls for. In the runner, the twelve steps of the session under their numbers, the destroy on stop. */
+        }
+        action <'router.yaml'> routerTracing {
+            @Evidence { kind = "record"; location = "checkly/otel/router.yaml"; }
+            doc /* The router configuration the session hands to the demo: tracing on, every request sampled, incoming trace context kept, and one exporter, the collector on the compose network. */
+        }
+        action <'collector-local.yaml'> localCollector {
+            @Evidence { kind = "record"; location = "checkly/otel/collector-local.yaml"; }
+            doc /* The collector without an ingest key: every span to the viewer and a line per batch to the log. */
+        }
+        action <'collector-checkly.yaml'> ingestCollector {
+            @Evidence { kind = "record"; location = "checkly/otel/collector-checkly.yaml"; }
+            doc /* The collector with an ingest key: every span to the viewer, only the spans marked checkly=true to the monitoring service on a second pipeline, and a receiver under a bearer token for spans that arrive from outside. */
+        }
     }
 
     // -------------------------------------------------------- design constraints --

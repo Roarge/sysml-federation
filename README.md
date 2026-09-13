@@ -173,6 +173,12 @@ The repository also carries a SysML v2 model of the demo itself, under `model/`.
 
 The two reference tools, the OMG pilot implementation and OpenSysML, accept it on every change, through `make model-check` locally and the `model` workflow on every pull request that touches it. A unit test fails when the model and the repository disagree on an identifier, a test name or a published image. [The model's own README](model/README.md) says how the registers are laid out, what the identifiers mean and which board corresponds to which view.
 
+## An optional check session
+
+With a Checkly account and `bash checkly/scripts/session.sh up`, a compose profile beside the demo opens a tunnel to this instance, records a test session of every story against it on the monitoring service's runners, deploys the check project for as long as the stack runs and destroys it when the stack stops. A collector beside the demo receives the router's trace of every request and shows it in Jaeger, and with the tracing key each check's own trace is shown beside its result. [The check session's README](checkly/README.md) has the setup, the thirty checks and monitors, the free tier's budget and the verification record, and [the decision behind it](docs/decisions/AD-0031-an-optional-check-session.md) says why the tunnel and the collector are where they are.
+
+Without credentials `docker run` runs the demo exactly as before. The variable that hands the router a configuration file is unset, the router's environment is what the supervisor sets, and nothing under `checkly/` is built, run or read.
+
 ## Reading further
 
 The design is written up as a series of articles under [docs/](docs/README.md). They start with the motivation and an overview of the architecture, then follow the design from the first research through to what shipped, and they link the decision records behind every choice. The same articles are published at https://sysml-federation.org/.

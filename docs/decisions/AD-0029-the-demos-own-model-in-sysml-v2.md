@@ -32,13 +32,12 @@ storyboard stories and seven added with the model, the forty-five requirements
 restated as system stories with their statements kept, the seven design
 constraints, the architecture and its interfaces, and a verification register
 in which every Go test that carries a requirement identifier, every recorded
-demonstration, the two validators, the make targets and the workflows are
-actions or cases of their own and, once the check session lands, every live
-check is a case of its own. The published boards correspond to named views.
-The identifiers of the light scheme are the
-model's short names. A unit test in `internal/trace` fails when the model and
-the repository disagree on an identifier, a test name, a check file, a
-published image, a check's inventory or a compose service.
+demonstration, the two validators, the make targets, the workflows and every
+live check are actions or cases of their own. The published boards correspond
+to named views. The identifiers of the light scheme are the model's short
+names. A unit test in `internal/trace` fails when the model and the repository
+disagree on an identifier, a test name, a check file, a published image, a
+check's inventory or a compose service.
 
 ## Alternatives considered
 
@@ -92,4 +91,4 @@ SR-46, SR-47
 The light requirements scheme (AD-0023), whose identifiers the model reuses as
 short names, the architecture record decision (AD-0021) for what the Markdown
 description is, and the tracked helpers decision (AD-0022) for the tree the
-check package joins. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for the forty-five requirements and the traceability as published.
+check package joins. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for the forty-five requirements and the traceability as published, and [A model of the demo itself](../articles/12-a-model-of-the-demo-itself.md) for the model as built.

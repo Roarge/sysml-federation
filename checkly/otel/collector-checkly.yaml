@@ -1,0 +1,60 @@
+# The collector for a session with an ingest key. Every span still goes to the
+# viewer. A second pipeline keeps only the spans whose trace state carries the
+# mark the monitoring service's runners set, checkly=true, and forwards them
+# to its ingest endpoint, where each is shown beside the check result that
+# caused it. The endpoint below is a data-residency host, and the owner reads
+# the one shown on their integration page. The key is the whole value of the
+# `authorization` header, with no scheme in front of it.
+#
+# The third receiver is the optional inbound side: spans that arrive from
+# outside the network, under a bearer token, join the viewer's pipeline.
+extensions:
+  bearertokenauth:
+    token: "${env:OTEL_INGEST_TOKEN}"
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+  otlp/public:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4320
+        auth:
+          authenticator: bearertokenauth
+
+processors:
+  batch: {}
+  # A condition that holds drops the span, so the spans that pass are the ones
+  # the monitoring service marked.
+  filter/checkly:
+    error_mode: ignore
+    trace_conditions:
+      - 'span.trace_state["checkly"] != "true"'
+
+exporters:
+  otlp_grpc/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+  otlp_grpc/checkly:
+    endpoint: otel.eu-west-1.checklyhq.com:4317
+    headers:
+      authorization: "${env:CHECKLY_OTEL_API_KEY}"
+  debug:
+    verbosity: basic
+
+service:
+  extensions: [bearertokenauth]
+  pipelines:
+    traces:
+      receivers: [otlp, otlp/public]
+      processors: [batch]
+      exporters: [otlp_grpc/jaeger, debug]
+    traces/checkly:
+      receivers: [otlp]
+      processors: [filter/checkly, batch]
+      exporters: [otlp_grpc/checkly]

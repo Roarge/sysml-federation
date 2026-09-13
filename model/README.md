@@ -29,6 +29,7 @@ One register per file, and the root imports every one of them.
 | [`core/logical-architecture/components/`](core/logical-architecture/components/components.sysml) | what the demo is made of, the project around it, the check session, every allocation as a `satisfy` and the decision records as tags |
 | [`core/verification-validation/verification-cases/`](core/verification-validation/verification-cases/verification-cases.sysml) | one verification case per system story and per constraint, with the evidence as actions |
 | [`core/verification-validation/validation-cases/`](core/verification-validation/validation-cases/validation-cases.sysml) | one validation case per stakeholder story, with the recorded runs as actions |
+| [`core/verification-validation/check-cases/`](core/verification-validation/check-cases/check-cases.sysml) | one case per check and monitor of the check project, its attributes equal to the manifest's entry and its actions the check's own steps |
 | [`core/views/`](core/views/views.sysml) | the viewpoints, the view definitions and one view per published board or sheet |
 
 The [articles](../docs/README.md) are the narrative and the
@@ -71,17 +72,17 @@ check project and SC-07 for the model validation.
 
 A story's status is carried as `@StoryMeta` and is `done` or `inProgress`.
 `done` is asserted as of the merge of the pull request that carries the story's
-evidence, and not before. Three stories are in progress. US-19 and SR-48 wait
-for the check session, which a later pull request adds. SR-03 waits for the
-configuration-file opt-in its statement describes, which is not yet
-implemented, so its case names the evidence that exists and the story stays
-open until the rest does.
+evidence, and not before. No story is in progress. US-19, SR-03 and SR-48
+were the last three to close, and `done` was asserted for them when their
+evidence landed with the check session: the configuration-file opt-in and its
+test for SR-03, and the compose file with its test, the check project and the
+session script for SR-48 and US-19.
 
 ## Validation
 
 `make model-check` puts the whole tree to both reference tools. The OMG pilot
 implementation, release 2026-07 with kernel 0.61.0, is run in batch: the
-seventeen files are concatenated in path order between `%` markers and read on
+eighteen files are concatenated in path order between `%` markers and read on
 standard input as one block, so that the imports between registers resolve. The
 target reads its verdict out of the output rather than the exit status, and
 passes on a root element line for every file handed to it and no line matching
@@ -105,13 +106,17 @@ and the record of the validator runs is in the
 
 ### Verification record
 
-Both commands were run from the repository root over the seventeen files as
-committed, in the order `git ls-files` sorts them.
+Both commands were run from the repository root, in the order `git ls-files`
+sorts the files: over the seventeen files of the model as the first pull
+request committed it, and over the eighteen files of the model with the check
+session's registers.
 
 | Date | Tool | Version | What was run | What was observed |
 |---|---|---|---|---|
 | 2026-09-12 | OMG pilot implementation | release 2026-07, kernel 0.61.0, OpenJDK 21.0.12 | `PILOT="$HOME/.local/share/sysml-pilot/sysml"` then `{ printf '%%\n'; cat $(git ls-files -- 'model/*.sysml' 'model/**/*.sysml' \| sort); printf '\n%%\n%%exit\n'; } \| java -cp "$PILOT/jupyter-sysml-kernel-0.61.0-all.jar" org.omg.sysml.interactive.SysMLInteractive "$(cd "$PILOT/sysml.library" && pwd)"` | accepted: seventeen root element lines after the `1>` prompt, `Package Federation_Concerns (<uuid>)` first and `Package VSE_Library (<uuid>)` last, with `Package <SF> Federation_Core (<uuid>)` among them, and no line matching `ERROR:` or `WARNING:` |
 | 2026-09-12 | OpenSysML | v0.6.0, built with Go 1.25.14 | `sysml -validate -strict $(git ls-files -- 'model/*.sysml' 'model/**/*.sysml' \| sort)` | accepted, exit 0, seventeen `✓ package` lines from `Federation_Concerns` to `VSE_Library`, then one `✓` line naming all seventeen files and ending `no errors`, and no `warning:` line |
+| 2026-09-14 | OMG pilot implementation | release 2026-07, kernel 0.61.0, OpenJDK 21.0.12 | `PILOT="$HOME/.local/share/sysml-pilot/sysml"` then `{ printf '%%\n'; cat $(git ls-files -- 'model/*.sysml' 'model/**/*.sysml' \| sort); printf '\n%%\n%%exit\n'; } \| java -cp "$PILOT/jupyter-sysml-kernel-0.61.0-all.jar" org.omg.sysml.interactive.SysMLInteractive "$(cd "$PILOT/sysml.library" && pwd)"` | accepted: eighteen root element lines after the `1>` prompt, `Package Federation_Concerns (<uuid>)` first and `Package VSE_Library (<uuid>)` last, with `Package <SF> Federation_Core (<uuid>)` among them, and no line matching `ERROR:` or `WARNING:` |
+| 2026-09-14 | OpenSysML | v0.6.0, built with Go 1.25.14 | `sysml -validate -strict $(git ls-files -- 'model/*.sysml' 'model/**/*.sysml' \| sort)` | accepted, exit 0, eighteen `✓ package` lines from `Federation_Concerns` to `VSE_Library`, then one `✓` line naming all eighteen files and ending `no errors`, and no `warning:` line |
 
 ## Forms the reference tools accepted
 
@@ -247,10 +252,10 @@ A verification case owns one action per piece of evidence, and the action's
 short name is the evidence's own name. A Go test is named by its function,
 `action <'TestSR02_ReadyWithinTenSeconds'> readyWithinTenSeconds`, and the
 `@Evidence` tag on it gives the kind, `go-test`, and the file,
-`cmd/sysml-federation/main_test.go`. Sixty-six actions name a Go test this
+`cmd/sysml-federation/main_test.go`. Sixty-eight actions name a Go test this
 way, and the file matters, because two functions share a name across two
 packages and the agreement test compares name and file together. The
-sixty-seventh, the second `TestSR25_InvalidValuesAreRefused` in the projection
+sixty-ninth, the second `TestSR25_InvalidValuesAreRefused` in the projection
 package, carries no short name because the name is taken by the first, and the
 agreement test reads the function name from that action's doc. A recorded run
 of the demo is named by its row in the example README's verification record,
@@ -274,22 +279,28 @@ offline, has no recorded run. SR-40 and SR-43 name `Test` among their methods
 and have no test function of their own, so their cases carry the inspection and
 the recorded run alone. Each case claims what is there and nothing more.
 
-The check session, which a later pull request adds, brings its own cases with
-it. Every live check will be a verification case of its own, carrying the
-check's steps, and the session is already a composite with its behaviour:
+The check session brings its own cases with it. Every live check is a
+verification case of its own, carrying the check's steps: thirty-one cases in
+the check register, one per entry of the manifest the check project reads and
+one for the session's own record, the trace of a check request found in the
+viewer beside the demo. The session is a composite with its behaviour:
 `Federation_LogicalArchitecture::CheckSession::session` holds the runner, the
-two tunnels, the collector, the viewer, the optional private-location agent
-and the external services they talk to. The six session parts carry the name
+two tunnels, the collector, the viewer, the optional container for a private
+location and the external services they talk to. The six session parts carry
+the name
 of the compose service each maps to, and so does the reference to the demo
 under test, while the three `ref part`s for the external services, the
-monitoring service, the tunnel edge and the alert receiver, carry none. The
-nested `package CheckSession` in the logical architecture mirrors
-`Federation_Context::CheckSession`, which holds those externals. The two share
-a simple name, so every reference to either is qualified. The check suite's
-decomposition is `part def CheckSuiteProject :> CheckSuite`, and `RunASession`
-in the functional architecture holds the runner's twelve steps.
-Until the session lands, `VC_SR_48` carries its objective and no action, and the
-view `session` names no image.
+monitoring service, the tunnel edge and the alert receiver, carry none. Those
+seven names are the seven services the compose file starts, and the
+`sessionParts` subtest asserts it. The nested `package CheckSession` in the
+logical architecture mirrors `Federation_Context::CheckSession`, which holds
+those externals. The two share a simple name, so every reference to either is
+qualified. The check suite's decomposition is
+`part def CheckSuiteProject :> CheckSuite`, and `RunASession` in the
+functional architecture holds the runner's twelve steps. `VC_SR_48` carries
+nineteen actions, the compose-file test, the thirteen files that declare
+checks and drive walks, the compose file, the session script and the three
+OpenTelemetry files, and the view `session` names no image.
 
 `TestSR46_ModelAndRepositoryAgree` in
 [`internal/trace`](../internal/trace/trace_test.go) is the evidence for SR-46.
@@ -313,13 +324,14 @@ them, one subtest per agreement.
   stakeholder story that is done has exactly one validation case, and a story in
   progress is reported by name and exempt from the first two.
 - `checkInventory`: the check register and the manifest the check project reads
-  carry the same checks with the same fields, each constructed once.
+  carry the same checks with the same fields, each constructed once, apart from
+  the session's own record, which has no kind and is in the register alone.
 - `sessionParts`: the services the compose file of the check session starts are
   the parts the session composite carries, and nothing else.
 
-Three of these read the check project. `checkFiles` and `checkInventory`
-compare two empty sides until it exists, which is agreement rather than absence,
-and `sessionParts` skips, naming the compose file it waits for.
+Three of these read the check project: `checkFiles` the files under
+`checkly/__checks__/`, `checkInventory` the manifest, and `sessionParts` the
+compose file.
 
 ## Tailoring
 

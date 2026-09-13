@@ -250,6 +250,9 @@ func TestSR02_ReadyWithinTenSeconds(t *testing.T) {
 	assert.Equal(t, post(t, base+"/graphql", `{"query":"{ __typename }"}`), `{"data":{"__typename":"Query"}}`)
 	assert.Equal(t, post(t, "http://"+s.addrs.adapter+"/graphql", `{"query":"{ model { version } }"}`), `{"data":{"model":{"version":1}}}`)
 	assert.Equal(t, envValue(fake.env, "EXECUTION_CONFIG_FILE_PATH"), "config.json")
+	for _, kv := range fake.env {
+		assert.True(t, !strings.HasPrefix(kv, "CONFIG_PATH="), "no configuration file is handed over unless one is named: "+kv)
+	}
 	cancel()
 	assert.NoError(t, <-done)
 	assert.Equal(t, <-fake.signals, os.Signal(syscall.SIGTERM))
@@ -257,6 +260,24 @@ func TestSR02_ReadyWithinTenSeconds(t *testing.T) {
 		_, err := net.Dial("tcp", addr)
 		assert.Error(t, err)
 	}
+}
+
+// TestServeHandsTheRouterItsConfigurationFile: the file the supervisor was
+// given reaches the child as CONFIG_PATH. TestSR02_ReadyWithinTenSeconds
+// holds the other state, no file and no CONFIG_PATH, so the wiring from the
+// supervisor to routerEnv is pinned at both ends and not only by a container
+// run.
+func TestServeHandsTheRouterItsConfigurationFile(t *testing.T) {
+	s, fake := newSupervisor(t)
+	s.routerConfigFile = "/otel/router.yaml"
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan error, 1)
+	go func() { done <- s.run(ctx) }()
+	waitHTTP(t, "http://"+s.addrs.ui+"/viewer/")
+	assert.Equal(t, envValue(fake.env, "CONFIG_PATH"), "/otel/router.yaml")
+	assert.Equal(t, envValue(fake.env, "TRACING_ENABLED"), "false")
+	cancel()
+	assert.NoError(t, <-done)
 }
 
 func TestServeFailsWhenTheRouterDies(t *testing.T) {
@@ -281,18 +302,43 @@ func TestServeRefusesAModelItCannotRead(t *testing.T) {
 // TestSR03_RouterEnvironmentDisablesTelemetry: the child's environment is
 // the nine variables of AD-0010 and nothing inherited.
 func TestSR03_RouterEnvironmentDisablesTelemetry(t *testing.T) {
-	env := routerEnv("127.0.0.1:3002", "/app/config.json", "")
+	env := routerEnv("127.0.0.1:3002", "/app/config.json", "", "")
 	assert.SliceEqual(t, env, []string{
 		"LISTEN_ADDR=127.0.0.1:3002", "EXECUTION_CONFIG_FILE_PATH=/app/config.json", "PLAYGROUND_PATH=/playground",
 		"DO_NOT_TRACK=1", "COSMO_TELEMETRY_DISABLED=true", "TRACING_ENABLED=false", "METRICS_OTLP_ENABLED=false",
 		"SUBGRAPH_ERROR_PROPAGATION_MODE=pass-through", "PROMETHEUS_ENABLED=false",
 	})
-	assert.Contains(t, routerEnv("127.0.0.1:3002", "/app/config.json", "debug"), "LOG_LEVEL=debug")
+	assert.Contains(t, routerEnv("127.0.0.1:3002", "/app/config.json", "debug", ""), "LOG_LEVEL=debug")
 	cfg := routerConfig{Binary: "/router", Config: "/app/config.json", Stdout: io.Discard, Stderr: io.Discard}
 	cmd := cfg.command(env)
 	assert.Equal(t, cmd.Path, "/router")
 	assert.Equal(t, cmd.Dir, "/app")
 	assert.SliceEqual(t, cmd.Env, env)
+}
+
+// TestSR03_RouterConfigurationFileIsAnExplicitOptIn: with no configuration
+// file named, the child's environment is the nine variables and carries no
+// CONFIG_PATH. With one named, CONFIG_PATH carries the path and the nine are
+// still set, TRACING_ENABLED=false among them.
+func TestSR03_RouterConfigurationFileIsAnExplicitOptIn(t *testing.T) {
+	nine := []string{
+		"LISTEN_ADDR=127.0.0.1:3002", "EXECUTION_CONFIG_FILE_PATH=/app/config.json", "PLAYGROUND_PATH=/playground",
+		"DO_NOT_TRACK=1", "COSMO_TELEMETRY_DISABLED=true", "TRACING_ENABLED=false", "METRICS_OTLP_ENABLED=false",
+		"SUBGRAPH_ERROR_PROPAGATION_MODE=pass-through", "PROMETHEUS_ENABLED=false",
+	}
+	unset := routerEnv("127.0.0.1:3002", "/app/config.json", "", "")
+	assert.SliceEqual(t, unset, nine)
+	for _, v := range unset {
+		assert.True(t, !strings.HasPrefix(v, "CONFIG_PATH="), "no configuration file is handed over unless one is named: "+v)
+	}
+
+	set := routerEnv("127.0.0.1:3002", "/app/config.json", "", "/otel/router.yaml")
+	assert.Contains(t, set, "CONFIG_PATH=/otel/router.yaml")
+	assert.Equal(t, len(set), len(nine)+1)
+	for _, v := range nine {
+		assert.Contains(t, set, v)
+	}
+	assert.Contains(t, set, "TRACING_ENABLED=false")
 }
 
 // TestRouterRunsAsAChildProcess exercises execProcess against the helper
@@ -301,7 +347,7 @@ func TestRouterRunsAsAChildProcess(t *testing.T) {
 	var out bytes.Buffer
 	cfg := routerConfig{Binary: os.Args[0], Config: filepath.Join(t.TempDir(), "config.json"), Stdout: &out, Stderr: io.Discard}
 	addr := freeAddr(t)
-	cmd := cfg.command(routerEnv(addr, cfg.Config, ""))
+	cmd := cfg.command(routerEnv(addr, cfg.Config, "", ""))
 	cmd.Args = append(cmd.Args, "-test.run=^TestHelperRouter$")
 	cmd.Env = append(cmd.Env, "SYSML_FEDERATION_HELPER=1")
 	var p process = &execProcess{cmd: cmd}
@@ -320,7 +366,7 @@ func TestRouterRunsAsAChildProcess(t *testing.T) {
 func TestStopRouterKillsAChildThatIgnoresSIGTERM(t *testing.T) {
 	fake := newFakeRouter()
 	fake.ignoreTerm = true
-	p := fake.launch(routerEnv(freeAddr(t), "config.json", ""))
+	p := fake.launch(routerEnv(freeAddr(t), "config.json", "", ""))
 	assert.NoError(t, p.Start())
 	exited := make(chan error, 1)
 	go func() { exited <- p.Wait() }()
@@ -338,25 +384,28 @@ func TestStopRouterKillsAChildThatIgnoresSIGTERM(t *testing.T) {
 	assert.Equal(t, <-fake.signals, os.Kill)
 }
 
-// TestRouterFromEnvReadsTheTwoPaths covers each variable set and unset.
-func TestRouterFromEnvReadsTheTwoPaths(t *testing.T) {
+// TestRouterFromEnvReadsTheThreePaths covers each variable set and unset.
+func TestRouterFromEnvReadsTheThreePaths(t *testing.T) {
 	// t.Setenv is called for the restore it registers, and the variable is
 	// then removed so the unset case is genuinely unset.
-	for _, key := range []string{"SYSML_FEDERATION_ROUTER", "SYSML_FEDERATION_CONFIG", "LOG_LEVEL"} {
+	for _, key := range []string{"SYSML_FEDERATION_ROUTER", "SYSML_FEDERATION_CONFIG", "SYSML_FEDERATION_ROUTER_CONFIG_PATH", "LOG_LEVEL"} {
 		t.Setenv(key, "")
 		assert.NoError(t, os.Unsetenv(key))
 	}
 	unset := routerFromEnv(io.Discard, io.Discard)
 	assert.Equal(t, unset.Binary, defaultRouterBinary)
 	assert.Equal(t, unset.Config, defaultRouterConfig)
+	assert.Equal(t, unset.ConfigFile, "")
 	assert.Equal(t, unset.LogLevel, "")
 
 	t.Setenv("SYSML_FEDERATION_ROUTER", "/tmp/router")
 	t.Setenv("SYSML_FEDERATION_CONFIG", "/src/examples/pipeline/config.json")
+	t.Setenv("SYSML_FEDERATION_ROUTER_CONFIG_PATH", "/otel/router.yaml")
 	t.Setenv("LOG_LEVEL", "debug")
 	set := routerFromEnv(io.Discard, io.Discard)
 	assert.Equal(t, set.Binary, "/tmp/router")
 	assert.Equal(t, set.Config, "/src/examples/pipeline/config.json")
+	assert.Equal(t, set.ConfigFile, "/otel/router.yaml")
 	assert.Equal(t, set.LogLevel, "debug")
 }
 

@@ -54,6 +54,10 @@ package Federation_ValidationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The one docker run line pulled the published image from a shell holding no credential and served the demo. */
         }
+        action <'us01-launch.spec.ts'> bothAppsRenderAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us01-launch.spec.ts"; }
+            doc /* The viewer and the document rendered from the one published port and every request either page made went to it, checked against a running instance. */
+        }
     }
 
     verification def VAL_US_02 {
@@ -76,6 +80,10 @@ package Federation_ValidationCases {
         action <'record: 2026-08-28 SR-12, SR-14, SR-22'> viewerUnderEdits {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The same three readings held while values were edited in the viewer's panel. */
+        }
+        action <'us02-read-the-model.spec.ts'> textSketchAndVerdictAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us02-read-the-model.spec.ts"; }
+            doc /* The text pane, the sketch with its capacity and bottleneck, and the verdict of PIPE-R1 with its reason, read from a running instance. */
         }
     }
 
@@ -112,6 +120,10 @@ package Federation_ValidationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A refusal reached the client as the service's own message, so what a visitor sees is what the service said. */
         }
+        action <'us03-nothing-moves.spec.ts'> nothingMovesAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us03-nothing-moves.spec.ts"; }
+            doc /* Ingest raised to 3000 in the viewer of a running instance left the capacity, the bottleneck and the verdict of PIPE-R1 where they were, with PIPE-R1.1 passing on the new value. */
+        }
     }
 
     verification def VAL_US_04 {
@@ -135,6 +147,14 @@ package Federation_ValidationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* Raising the bottleneck to 1700 gave capacity 1400 with the index pair red, and raising one of the pair to 900 gave 1600 and a pass. */
         }
+        action <'us04-bottleneck-moves.spec.ts'> bottleneckMovesAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us04-bottleneck-moves.spec.ts"; }
+            doc /* Parse raised to 1700 in the viewer of a running instance moved the bottleneck to the index pair at capacity 1400, and indexA raised to 900 gave 1600 and a pass. */
+        }
+        action <'arithmetic-walk.multistep.spec.ts'> theFourRowsThroughTheRouter {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/arithmetic-walk.multistep.spec.ts"; }
+            doc /* The four rows of the capacity table read through the router of a running instance: as shipped, ingest at 3000, parse at 1700 and indexA at 900, each with the capacity, the cut and every verdict the table lists. The last row is the state US-10 is watched from. */
+        }
     }
 
     verification def VAL_US_05 {
@@ -154,6 +174,10 @@ package Federation_ValidationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The limit at 1000 gave a pass and at 2500 a red failure naming the bottleneck, with the new number in the served text where the old literal was. */
         }
+        action <'us05-tighten-limit.spec.ts'> limitChangedBothWaysAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us05-tighten-limit.spec.ts"; }
+            doc /* The limit of PIPE-R1 at 1000 gave a pass and at 2500 a red failure naming parse, with the new number in the served text where the old literal was, in the viewer of a running instance. */
+        }
     }
 
     verification def VAL_US_06 {
@@ -172,6 +196,10 @@ package Federation_ValidationCases {
         action <'record: 2026-08-28 Depth limit'> depthLimit {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* At the sixth level the app says how deep the document is shown and offers only what still applies. */
+        }
+        action <'us06-read-document.spec.ts'> documentAsServedAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us06-read-document.spec.ts"; }
+            doc /* The numbering, the row of PIPE-R1.4 with everything the model knows about it, and PIPE-R2 INCONCLUSIVE, read from the document of a running instance. */
         }
     }
 
@@ -208,6 +236,14 @@ package Federation_ValidationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* Nesting stops at the sixth level, and the app says so rather than refusing silently. */
         }
+        action <'us07-reorder-and-nest.spec.ts'> reorderAndNestAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us07-reorder-and-nest.spec.ts"; }
+            doc /* PIPE-R1.5 moved above PIPE-R1.1 took 1.1 and the others shifted, PIPE-R2 moved under PIPE-R1 took 1.6 and kept its relations, and the model version stood, on a running instance. */
+        }
+        action <'document-operations.multistep.spec.ts'> theSixOperationsThroughTheRouter {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/document-operations.multistep.spec.ts"; }
+            doc /* The six editorial mutations through the router of a running instance, each answering the renumbered document, with the model version the same before and after. The heading, the prose and the exclusion are US-08's. */
+        }
     }
 
     verification def VAL_US_08 {
@@ -242,6 +278,10 @@ package Federation_ValidationCases {
         action <'record: 2026-08-28 Depth limit'> depthLimit {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* Adding headings stops at the sixth level, with the reason on the row. */
+        }
+        action <'us08-shape-the-document.spec.ts'> shapeTheDocumentAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us08-shape-the-document.spec.ts"; }
+            doc /* A heading took number 1 and pushed PIPE-R1 to 1.1, a paragraph appeared unnumbered, PIPE-R1.4 left for the tray and came back last on restore, and the model version stood, in the document of a running instance. */
         }
     }
 
@@ -286,6 +326,10 @@ package Federation_ValidationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A throughput and a limit corrected in the document moved the verdicts there and reached the viewer's text and sketch without a reload. */
         }
+        action <'us09-edit-from-document.spec.ts'> viewerFollowsTheDocumentAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us09-edit-from-document.spec.ts"; }
+            doc /* The limit of PIPE-R1 and the throughput of parse corrected in the document of a running instance reached the viewer on a second page within two seconds, with no reload. Skipped where the session carries no stream. */
+        }
     }
 
     verification def VAL_US_10 {
@@ -321,6 +365,10 @@ package Federation_ValidationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* Two values raised in the viewer moved the document's verdicts and reasons with no reload. */
         }
+        action <'us10-viewer-to-document.spec.ts'> documentFollowsTheViewerAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us10-viewer-to-document.spec.ts"; }
+            doc /* IndexA raised to 900 in the viewer of a running instance, with parse at 1700, moved the document's verdicts on a second page within two seconds, with no reload. Skipped where the session carries no stream. */
+        }
     }
 
     verification def VAL_US_11 {
@@ -339,6 +387,10 @@ package Federation_ValidationCases {
         action <'record: 2026-08-28 SR-04'> playgroundOnTheContainer {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The same held for the container, where a query on the endpoint answered beside the three app paths. */
+        }
+        action <'us11-query-the-graph.spec.ts'> oneQueryThreeServicesAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us11-query-the-graph.spec.ts"; }
+            doc /* One query for the text, the verdict and the document number of PIPE-R1 answered in one response by a running instance, its schema carrying a type from each subgraph, and the playground loading beside it. */
         }
     }
 
@@ -371,6 +423,10 @@ package Federation_ValidationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The edits in both apps that the reset was pressed on top of. */
         }
+        action <'us12-reset.spec.ts'> resetFromTheViewerAgainstARunningInstance {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/us12-reset.spec.ts"; }
+            doc /* After an edit in each app, Reset in the viewer of a running instance brought both apps back to the shipped state within two seconds. Skipped where the session carries no stream. */
+        }
     }
 
     // ----------------------------- added with the model, US-13 to US-19 --
@@ -394,11 +450,15 @@ package Federation_ValidationCases {
 
     verification def VAL_US_15 {
         doc /* A served model that is never silently wrong. Exercised by
-               VC_SR_18 for the refusal that names file, line and column, and by
+               VC_SR_18 for the refusal that names file, line and column, by
                VC_SR_24 for the value bound by an expression that an edit cannot
-               reach. */
+               reach, and against a running instance by the refusals check. */
         subject demo : Demo;
         objective { verify US_15_AServedModelThatIsNeverSilentlyWrong.acceptance; }
+        action <'refusals.multistep.spec.ts'> boundValuesStayBoundThroughTheRouter {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
+            doc /* An edit aimed at a limit bound by an expression is refused through the router, and the model version is the same before and after. */
+        }
     }
 
     verification def VAL_US_16 {
@@ -428,8 +488,9 @@ package Federation_ValidationCases {
 
     verification def VAL_US_19 {
         doc /* The stories exercised against a running instance. Exercised by
-               VC_SR_48, whose evidence is the session record that a later change
-               adds. */
+               VC_SR_48, whose actions are the files of the check project and
+               the session's stack, and by CHK_TraceCorrelation, whose evidence
+               is the session record. */
         subject demo : Demo;
         objective { verify US_19_TheStoriesExercisedAgainstARunningInstance.acceptance; }
     }

@@ -168,6 +168,16 @@ anyone can read it, and a test fails when it drifts from the subgraph schemas it
 was built from. That answers the caveat for a demo, which is what this is. It
 does not answer it for a deployment.
 
+The child's environment is built in full by the supervisor and sets
+`TRACING_ENABLED=false` among nine variables, so the router makes no outbound
+connection. One variable changes that on purpose: when
+`SYSML_FEDERATION_ROUTER_CONFIG_PATH` names a router configuration file, the
+supervisor hands it to the child as `CONFIG_PATH`, and the router's own rule
+makes the file's values win over the environment's. That is the opt-in the
+optional check session uses to send the router's traces to a collector on the
+compose network rather than to the internet. With the variable unset the demo
+makes no outbound connection, as before.
+
 ### The image
 
 `examples/pipeline/Dockerfile` builds in three stages. Go 1.27 cross-compiles

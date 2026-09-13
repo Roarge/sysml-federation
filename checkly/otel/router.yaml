@@ -1,0 +1,20 @@
+# The router configuration the check session hands to the demo. The demo runs
+# the router with tracing off and no exporter. This file, named through
+# SYSML_FEDERATION_ROUTER_CONFIG_PATH, turns tracing on with one exporter, the
+# collector on the compose network, and defining that exporter is what keeps
+# the router's default one off. Every request is sampled, and a request that
+# arrives with trace context keeps its trace id, which is how the monitoring
+# service's own id is found on the span.
+version: "1"
+telemetry:
+  service_name: sysml-federation-router
+  tracing:
+    enabled: true
+    sampling_rate: 1
+    parent_based_sampler: true
+    export_graphql_variables: false
+    propagation:
+      trace_context: true
+    exporters:
+      - exporter: http
+        endpoint: http://otel-collector:4318

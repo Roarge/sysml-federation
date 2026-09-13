@@ -1,0 +1,19 @@
+{
+  "name": "sysml-federation-checks",
+  "private": true,
+  "description": "The optional check session for the sysml-federation demo",
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "test": "checkly test",
+    "deploy": "checkly deploy",
+    "destroy": "checkly destroy",
+    "trigger": "checkly trigger",
+    "pw-test": "checkly pw-test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "@types/node": "22.20.2",
+    "checkly": "9.3.0",
+    "typescript": "5.9.3"
+  }
+}

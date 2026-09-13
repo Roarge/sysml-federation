@@ -1,6 +1,10 @@
 # AD-0014 Subscriptions as version events with client refetch
 
-Status: accepted. Date: 2026-08-27.
+Status: accepted, amended once the check session was added. Date: 2026-08-27.
+
+Amendment, 2026-09-13: the sentence on browser automation was corrected when
+the check session added browser specs that run on the monitoring service's
+runners.
 
 ## Context
 
@@ -106,8 +110,9 @@ scaling story, a cache per model version, stays one sentence on the A3 sheet.
 
 The browser side carries its own reconnect logic because the documented path
 has none. It is written once in the shared module and used by both apps. The
-two-second bound of SR-39 is demonstrated rather than tested, because the
-repository carries no browser automation.
+two-second bound of SR-39 is demonstrated rather than tested in the Go suite.
+The repository carries browser specs that exercise it, run by the check
+session of AD-0031 rather than by `make check`.
 
 Choosing `ws` towards the subgraphs makes gqlgen's WebSocket transport a
 dependency and means both pushing subgraphs hold connections from the router.

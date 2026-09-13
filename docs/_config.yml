@@ -51,3 +51,4 @@ series:
   - { path: articles/09-five-spikes-before-the-first-line.md, title: "Five spikes before the first line", date: 2026-08-27 }
   - { path: articles/10-the-demo-as-it-shipped.md, title: "The demo as it shipped", date: 2026-08-27 }
   - { path: articles/11-what-shipped-and-what-did-not.md, title: "What shipped, and what did not", date: 2026-08-29 }
+  - { path: articles/12-a-model-of-the-demo-itself.md, title: "A model of the demo itself", date: 2026-09-13 }

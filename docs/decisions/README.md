@@ -1,20 +1,20 @@
 # Decision records
 
-Thirty records in the Nygard form, each giving the context, the decision,
+Thirty-one records in the Nygard form, each giving the context, the decision,
 the alternatives considered, the consequences, the requirements affected and
-its sources. All thirty are accepted. Twenty-six of them were written
+its sources. All thirty-one are accepted. Twenty-six of them were written
 during the design phase, before any code, and copied here so that they can be
 read and challenged. AD-0027 and AD-0028 were written later, while the system
 was being built, the second replacing the first, and AD-0027 is marked as
 superseded below and names its replacement in its own status line, and
-AD-0029 and AD-0030 were added after the first release, when the demo's own
-model was built. Where building the system changed what a record decides, the
-record was amended and is marked as amended in the list below. Such a record
-keeps its number and the original date in its status line, with a line at its
-head giving the date of the amendment and saying what changed. A record's
-status is `accepted`, or `accepted` followed by whatever qualification the
-decision carries. A decision that replaces an earlier one gets its own number
-rather than overwriting it, and a number is never reused.
+AD-0029 to AD-0031 were added after the first release, when the demo's own
+model and the check session were built. Where building the system changed what
+a record decides, the record was amended and is marked as amended in the list
+below. Such a record keeps its number and the original date in its status
+line, with a line at its head giving the date of the amendment and saying what
+changed. A record's status is `accepted`, or `accepted` followed by whatever
+qualification the decision carries. A decision that replaces an earlier one
+gets its own number rather than overwriting it, and a number is never reused.
 
 Inside the records, `SR-nn` is a system requirement and `SC-nn` a design
 constraint, from the set of forty-five requirements and seven constraints
@@ -56,8 +56,8 @@ each produced.
 
 ## The apps
 
-- <span class="rec-id">AD-0014</span> [Subscriptions as version events with client refetch](AD-0014-version-events.md)
-- <span class="rec-id">AD-0017</span> [Vanilla web apps with one vendored file](AD-0017-vanilla-web-apps.md)
+- <span class="rec-id">AD-0014</span> [Subscriptions as version events with client refetch](AD-0014-version-events.md) (amended)
+- <span class="rec-id">AD-0017</span> [Vanilla web apps with one vendored file](AD-0017-vanilla-web-apps.md) (amended)
 - <span class="rec-id">AD-0025</span> [The document owns its structure and nothing else](AD-0025-document-owns-its-structure.md)
 - <span class="rec-id">AD-0026</span> [The viewer shows the model's text beside a sketch of its wiring](AD-0026-viewer-shows-text-and-wiring.md) (amended)
 
@@ -72,3 +72,4 @@ each produced.
 - <span class="rec-id">AD-0028</span> [The line figures are estimates and never a limit](AD-0028-line-figures-are-estimates.md)
 - <span class="rec-id">AD-0029</span> [The demo's own model in SysML v2](AD-0029-the-demos-own-model-in-sysml-v2.md)
 - <span class="rec-id">AD-0030</span> [Model validation in continuous integration](AD-0030-model-validation-in-continuous-integration.md)
+- <span class="rec-id">AD-0031</span> [An optional check session through a tunnel, with traces](AD-0031-an-optional-check-session.md)

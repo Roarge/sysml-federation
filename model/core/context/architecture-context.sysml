@@ -80,9 +80,9 @@ package Federation_Context {
     }
 
     part def CheckSuite :> DemoElement {
-        doc /* Project element. The optional check project, which drives the
-               demo through a tunnel. The allocation element CHECKS of the
-               requirements scheme. It lands in a later pull request. */
+        doc /* Project element. The optional check project under checkly/,
+               which drives the demo through a tunnel and is no part of running
+               it. The allocation element CHECKS of the requirements scheme. */
     }
 
     // --------------------------------------------- environmental effect --

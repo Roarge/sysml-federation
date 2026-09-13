@@ -451,7 +451,7 @@ package Federation_StakeholderStories {
     }
 
     requirement <'US-19'> US_19_TheStoriesExercisedAgainstARunningInstance : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : Demo;
         stakeholder :>> role : Maintainer;
         attribute :>> capability = "every story's acceptance exercised against a running instance by a monitoring service, with the trace of each request kept";
