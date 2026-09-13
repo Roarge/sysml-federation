@@ -394,11 +394,15 @@ package Federation_ValidationCases {
 
     verification def VAL_US_15 {
         doc /* A served model that is never silently wrong. Exercised by
-               VC_SR_18 for the refusal that names file, line and column, and by
+               VC_SR_18 for the refusal that names file, line and column, by
                VC_SR_24 for the value bound by an expression that an edit cannot
-               reach. */
+               reach, and against a running instance by the refusals check. */
         subject demo : Demo;
         objective { verify US_15_AServedModelThatIsNeverSilentlyWrong.acceptance; }
+        action <'refusals.multistep.spec.ts'> boundValuesStayBoundThroughTheRouter {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
+            doc /* An edit aimed at a limit bound by an expression is refused through the router, and the model version is the same before and after. */
+        }
     }
 
     verification def VAL_US_16 {

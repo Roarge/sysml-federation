@@ -20,4 +20,5 @@ package <SF> Federation_Core {
     private import Federation_VerificationCases::*;
     private import Federation_ValidationCases::*;
     private import Federation_Views::*;
+    private import Federation_CheckCases::*;
 }

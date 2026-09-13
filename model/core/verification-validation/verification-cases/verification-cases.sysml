@@ -870,11 +870,32 @@ package Federation_VerificationCases {
     }
 
     verification def VC_SR_48 {
-        doc /* An optional check session. The evidence for this story lands with
-               the check session itself, which a later change adds, so the case
-               carries its objective and no action yet. */
+        doc /* An optional check session: the files of the check project, one
+               action per file, with the checks, the monitors, the groups and
+               the alert channels each declares. Every check has its own case
+               in the check register. */
         subject checkSuite : CheckSuite;
         objective { verify SR_48_AnOptionalCheckSession.acceptance; }
+        action <'router.check.ts'> routerChecks {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
+            doc /* Declares the seven API checks on the router: router-version, router-join, router-capacity-bottleneck, router-introspection, router-playground, router-root-redirect and router-health-not-proxied. */
+        }
+        action <'refusals.multistep.spec.ts'> refusalsWalk {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
+            doc /* Drives the refusals check: the model version, two edits the router refuses, and the version again. */
+        }
+        action <'monitors.check.ts'> monitors {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/monitors.check.ts"; }
+            doc /* Declares monitor-viewer, monitor-document, monitor-root and session-heartbeat, and, when a hostname is set, demo-certificate, demo-dns and demo-tcp. */
+        }
+        action <'groups.check.ts'> groups {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/groups.check.ts"; }
+            doc /* Declares the five groups router, viewer, document, crossApp and session, with their locations, concurrency and retry policy. */
+        }
+        action <'alerts.check.ts'> alertChannels {
+            @Evidence { kind = "checkly"; location = "checkly/__checks__/alerts.check.ts"; }
+            doc /* Declares the email and webhook alert channels, each only when its address is in the environment at deploy time. */
+        }
     }
 
     // -------------------------------------------------------- design constraints --
