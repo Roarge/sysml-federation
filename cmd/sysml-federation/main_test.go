@@ -250,6 +250,9 @@ func TestSR02_ReadyWithinTenSeconds(t *testing.T) {
 	assert.Equal(t, post(t, base+"/graphql", `{"query":"{ __typename }"}`), `{"data":{"__typename":"Query"}}`)
 	assert.Equal(t, post(t, "http://"+s.addrs.adapter+"/graphql", `{"query":"{ model { version } }"}`), `{"data":{"model":{"version":1}}}`)
 	assert.Equal(t, envValue(fake.env, "EXECUTION_CONFIG_FILE_PATH"), "config.json")
+	for _, kv := range fake.env {
+		assert.True(t, !strings.HasPrefix(kv, "CONFIG_PATH="), "no configuration file is handed over unless one is named: "+kv)
+	}
 	cancel()
 	assert.NoError(t, <-done)
 	assert.Equal(t, <-fake.signals, os.Signal(syscall.SIGTERM))
@@ -257,6 +260,24 @@ func TestSR02_ReadyWithinTenSeconds(t *testing.T) {
 		_, err := net.Dial("tcp", addr)
 		assert.Error(t, err)
 	}
+}
+
+// TestServeHandsTheRouterItsConfigurationFile: the file the supervisor was
+// given reaches the child as CONFIG_PATH. TestSR02_ReadyWithinTenSeconds
+// holds the other state, no file and no CONFIG_PATH, so the wiring from the
+// supervisor to routerEnv is pinned at both ends and not only by a container
+// run.
+func TestServeHandsTheRouterItsConfigurationFile(t *testing.T) {
+	s, fake := newSupervisor(t)
+	s.routerConfigFile = "/otel/router.yaml"
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan error, 1)
+	go func() { done <- s.run(ctx) }()
+	waitHTTP(t, "http://"+s.addrs.ui+"/viewer/")
+	assert.Equal(t, envValue(fake.env, "CONFIG_PATH"), "/otel/router.yaml")
+	assert.Equal(t, envValue(fake.env, "TRACING_ENABLED"), "false")
+	cancel()
+	assert.NoError(t, <-done)
 }
 
 func TestServeFailsWhenTheRouterDies(t *testing.T) {

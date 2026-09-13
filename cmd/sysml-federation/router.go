@@ -33,9 +33,10 @@ type routerConfig struct {
 	Stdout, Stderr                       io.Writer
 }
 
-// routerFromEnv reads SYSML_FEDERATION_ROUTER, SYSML_FEDERATION_CONFIG and
-// LOG_LEVEL, with the image's paths as defaults, and
-// SYSML_FEDERATION_ROUTER_CONFIG_PATH, which has no default.
+// routerFromEnv reads four variables: SYSML_FEDERATION_ROUTER and
+// SYSML_FEDERATION_CONFIG, which default to the image's paths, and
+// SYSML_FEDERATION_ROUTER_CONFIG_PATH and LOG_LEVEL, which default to
+// nothing.
 func routerFromEnv(stdout, stderr io.Writer) routerConfig {
 	cfg := routerConfig{
 		Binary: defaultRouterBinary, Config: defaultRouterConfig,

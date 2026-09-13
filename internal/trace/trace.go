@@ -37,11 +37,10 @@ import (
 )
 
 // The places the two sides live, as paths from the module root. Every register
-// of the model and every file of the check project is written, and the test
-// fails rather than passing over an absent one, with one tolerance: an absent
-// check register or manifest is read as empty, so the inventory agreement
-// reports each check the other side still carries, and a repository without
-// the check project fails the check-file and session agreements instead.
+// of the model, the manifest and the compose file are written, and the test
+// fails naming the file rather than passing over an absent one. The check
+// directory is the one thing read with tolerance: absent, it holds no files,
+// and the check-file agreement then reports every file the registers name.
 const (
 	// ModelDir holds the demo's own model.
 	ModelDir = "model"
@@ -81,6 +80,16 @@ const (
 const (
 	StatusDone       = "done"
 	StatusInProgress = "inProgress"
+)
+
+// The two kinds of evidence a case of the check register offers, as
+// @Evidence { kind = "checkly"; ... } writes them. A check the project
+// constructs offers the file that declares or drives it, and the manifest
+// carries its row. The session's own record offers the record it is written
+// in, and the manifest does not carry it.
+const (
+	EvidenceCheckly = "checkly"
+	EvidenceRecord  = "record"
 )
 
 // ErrNoModuleRoot reports that the walk upwards from the working directory
@@ -256,6 +265,15 @@ type CheckTuple struct {
 	FrequencyMinutes string
 	Deployed         string
 	Locations        string
+}
+
+// CheckCase is one case of the check register: the row it declares, and the
+// kind of evidence its @Evidence offers, which says whether the manifest is
+// expected to carry the row. A case offering no evidence has the empty kind,
+// which the test reports rather than passing over.
+type CheckCase struct {
+	CheckTuple
+	Evidence string
 }
 
 // ManifestEntry is one entry of the check project's manifest. Two of its fields
@@ -564,14 +582,13 @@ func SpecFileCases(text string) map[string]int {
 // ReadManifest reads the inventory the check project runs from. The file
 // carries either the entries as a list or an object whose checks field is that
 // list, and both are read, because the shape of the manifest is the check
-// project's to choose. An absent file carries no entries.
+// project's to choose. An absent file is an error naming it, like an absent
+// register: the manifest is written, and a test reading nothing in its place
+// would report every case of the register instead of the missing file.
 func ReadManifest(root string) ([]ManifestEntry, error) {
 	raw, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(ChecksManifestFile)))
-	if errors.Is(err, fs.ErrNotExist) {
-		return nil, nil
-	}
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("reading %s: %w", ChecksManifestFile, err)
 	}
 	var entries []ManifestEntry
 	if err := json.Unmarshal(raw, &entries); err == nil {
@@ -602,21 +619,25 @@ func ManifestTuples(entries []ManifestEntry) []CheckTuple {
 	return tuples
 }
 
-// CheckCaseTuples reads the same rows out of the check register, one per CHK_
-// case, from the attributes it declares.
-func CheckCaseTuples(text string) []CheckTuple {
-	var tuples []CheckTuple
+// CheckCases reads the same rows out of the check register, one per CHK_ case,
+// from the attributes it declares, each with the kind of evidence the case
+// offers.
+func CheckCases(text string) []CheckCase {
+	var cases []CheckCase
 	for _, block := range blocks(text, checkCaseRE) {
 		values := attributeValues(block.Body)
-		tuples = append(tuples, CheckTuple{
-			LogicalID:        values["logicalId"],
-			Kind:             values["kind"],
-			FrequencyMinutes: values["frequencyMinutes"],
-			Deployed:         values["deployed"],
-			Locations:        values["locations"],
+		cases = append(cases, CheckCase{
+			CheckTuple: CheckTuple{
+				LogicalID:        values["logicalId"],
+				Kind:             values["kind"],
+				FrequencyMinutes: values["frequencyMinutes"],
+				Deployed:         values["deployed"],
+				Locations:        values["locations"],
+			},
+			Evidence: evidenceFields(block.Body)["kind"],
 		})
 	}
-	return tuples
+	return cases
 }
 
 // Constructions counts, per logical identifier, the times the check project

@@ -20,12 +20,10 @@ import (
 // repository it describes, and fails on the first name one side carries and the
 // other lacks.
 //
-// Every register of the model these subtests read is written, and a subtest
-// fails naming the file when one is absent. The check register and the
-// manifest are the exception and are read as empty when absent, so that
-// checkInventory reports each check the other side still carries rather than
-// failing on the file, and a repository without the check project fails
-// checkFiles and sessionParts instead.
+// Every register of the model, the manifest and the compose file these
+// subtests read is written, and a subtest fails naming the file when one is
+// absent. The check directory is the one thing read with tolerance: absent, it
+// holds no files, and checkFiles reports every file the registers name.
 func TestSR46_ModelAndRepositoryAgree(t *testing.T) {
 	found, err := ModuleRoot()
 	root := assert.Must(t, found, err)
@@ -234,31 +232,36 @@ func coverageAgrees(t *testing.T, root string) {
 // the manifest the check project reads says it is, are the same, and every
 // check in the manifest is constructed once. A check the manifest carries and
 // nothing constructs never runs, and one constructed twice runs twice under one
-// name. An absent register or manifest reads as empty, and every check the
-// other side carries is then reported.
+// name. The one case the manifest does not carry is the session's own record,
+// known by the evidence it offers rather than by anything it lacks: a case
+// that offers a check file and no kind is reported, not passed over.
 func checkInventoryAgrees(t *testing.T, root string) {
 	t.Helper()
 
 	read, err := ReadManifest(root)
 	entries := assert.Must(t, read, err)
-	inManifest := byLogicalID(t, "manifest", ManifestTuples(entries))
-	inRegister := byLogicalID(t, "check register", CheckCaseTuples(textIfPresent(t, root, CheckCasesFile)))
+	inManifest := byLogicalID(t, "manifest", ManifestTuples(entries), func(row CheckTuple) string { return row.LogicalID })
+	inRegister := byLogicalID(t, "check register", CheckCases(text(t, root, CheckCasesFile)),
+		func(c CheckCase) string { return c.LogicalID })
 	for _, id := range union(inManifest, inRegister) {
 		manifest, fromManifest := inManifest[id]
 		register, fromRegister := inRegister[id]
-		// A case with no kind is the session's own record, the correlation
-		// check, rather than a construct of the check project, so the manifest
-		// does not carry it.
-		if fromRegister && register.Kind == "" {
-			continue
-		}
 		switch {
+		case fromRegister && register.Evidence == EvidenceRecord:
+			if fromManifest {
+				t.Errorf("%s is the session's own record in the check register, and the manifest carries it as a check", id)
+			}
+		case fromRegister && register.Evidence != EvidenceCheckly:
+			t.Errorf("%s is in the check register with evidence of kind %q, and a case offers checkly or record",
+				id, register.Evidence)
 		case !fromRegister:
 			t.Errorf("%s is in the manifest, and the check register declares no such check", id)
 		case !fromManifest:
 			t.Errorf("%s is in the check register, and the manifest carries no such check", id)
-		case manifest != register:
-			t.Errorf("%s disagrees:\n  manifest: %+v\n  register: %+v", id, manifest, register)
+		case register.Kind == "":
+			t.Errorf("%s is in the manifest, and its case in the check register carries no kind", id)
+		case manifest != register.CheckTuple:
+			t.Errorf("%s disagrees:\n  manifest: %+v\n  register: %+v", id, manifest, register.CheckTuple)
 		}
 	}
 
@@ -322,8 +325,7 @@ func evidenceIsDue(t *testing.T, story Story, what string) bool {
 // file. Every register it is asked for is written, so an absent one is a
 // failure rather than an empty register: Text returns "" for a file that is not
 // there, and a register deleted by mistake would otherwise name nothing and
-// pass every agreement that reads it. A register the branch has not grown yet
-// goes through textIfPresent instead.
+// pass every agreement that reads it.
 func text(t *testing.T, root, rel string) string {
 	t.Helper()
 	if !Exists(root, rel) {
@@ -331,17 +333,6 @@ func text(t *testing.T, root, rel string) string {
 	}
 	found, err := Text(root, rel)
 	return assert.Must(t, found, err)
-}
-
-// textIfPresent reads the check register and returns the empty string when it
-// is absent, the one register read with that tolerance, so that the inventory
-// agreement reports what the manifest carries rather than failing on the file.
-func textIfPresent(t *testing.T, root, rel string) string {
-	t.Helper()
-	if !Exists(root, rel) {
-		return ""
-	}
-	return text(t, root, rel)
 }
 
 // modelFiles reads the whole model, or fails the subtest.
@@ -403,8 +394,10 @@ func counted[T comparable](values []T) map[T]int {
 }
 
 // union returns every key of either map, in order, so that the two can be
-// compared in one pass and the failures come out the same way each run.
-func union[T cmp.Ordered, V any](first, second map[T]V) []T {
+// compared in one pass and the failures come out the same way each run. The
+// two sides may hold values of different types, as the manifest's rows and
+// the register's cases do.
+func union[T cmp.Ordered, V, W any](first map[T]V, second map[T]W) []T {
 	keys := slices.Sorted(maps.Keys(first))
 	for _, key := range slices.Sorted(maps.Keys(second)) {
 		if _, ok := first[key]; !ok {
@@ -426,16 +419,16 @@ func unionTests(first, second map[TestFunc]int) []TestFunc {
 	return slices.Compact(tests)
 }
 
-// byLogicalID keys the check tuples by the identifier they carry, and reports a
-// side that names one check twice rather than letting one of the two vanish.
-func byLogicalID(t *testing.T, side string, tuples []CheckTuple) map[string]CheckTuple {
+// byLogicalID keys one side's rows by the identifier each carries, and reports
+// a side that names one check twice rather than letting one of the two vanish.
+func byLogicalID[T any](t *testing.T, side string, rows []T, id func(T) string) map[string]T {
 	t.Helper()
-	byID := make(map[string]CheckTuple, len(tuples))
-	for _, tuple := range tuples {
-		if _, seen := byID[tuple.LogicalID]; seen {
-			t.Errorf("the %s carries %s twice", side, tuple.LogicalID)
+	byID := make(map[string]T, len(rows))
+	for _, row := range rows {
+		if _, seen := byID[id(row)]; seen {
+			t.Errorf("the %s carries %s twice", side, id(row))
 		}
-		byID[tuple.LogicalID] = tuple
+		byID[id(row)] = row
 	}
 	return byID
 }
