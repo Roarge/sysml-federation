@@ -1,15 +1,18 @@
 // US-04, raise the bottleneck: parse goes from 1200 to 1700 and the
 // bottleneck moves to the index pair, then indexA goes from 700 to 900 and
-// PIPE-R1 passes. The demo is put back as it was found.
+// PIPE-R1 passes. The viewer follows on a live update, so the check is
+// skipped where the session carries no stream. The demo is put back as it
+// was found.
 
 import { expect, test } from '@playwright/test'
 import { resetBoth } from './lib/graphql'
-import { expectWithin } from './lib/sse'
+import { expectWithin, skipUnlessStreams } from './lib/sse'
 import { Viewer } from './lib/viewer'
 
 const SHIPPED_CAPTION = 'capacity 1200, bottleneck parse'
 
 test('US-04 raise the bottleneck', async ({ page, request }) => {
+  skipUnlessStreams(test)
   try {
     const viewer = await Viewer.open(page)
     const block = viewer.requirement('PIPE-R1')

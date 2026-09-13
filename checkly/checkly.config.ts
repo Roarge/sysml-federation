@@ -12,7 +12,8 @@ export default defineConfig({
     frequency: Frequency.EVERY_1H,
     checkMatch: '**/__checks__/**/*.check.ts',
     ignoreDirectoriesMatch: ['node_modules', 'test-results', 'playwright-report'],
-    playwrightConfigPath: './playwright.config.ts',
+    // The suite is declared in __checks__/suite.check.ts. Naming the Playwright
+    // configuration here would construct a second suite outside every group.
     retryStrategy: RetryStrategyBuilder.noRetries(),
   },
   cli: { runLocation: 'eu-central-1', reporters: ['list'] },

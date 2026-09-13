@@ -36,6 +36,10 @@ test('US-09 change a value from the document', async ({ context, page, request }
     })
 
     await test.step('change the throughput of parse to 1700 in the row of PIPE-R1.2 and expect the viewer to follow within two seconds', async () => {
+      // The document redraws its rows on the first edit's event, so wait for
+      // its own row to show that edit before typing into a row that may
+      // otherwise be replaced under the fill.
+      await expectWithin(rowOf('PIPE-R1').locator('.verdict'), 'against 1600')
       await document.edit('attribute|PIPE-S2|throughput', '1700')
       // PIPE-R1.2's limit is derived from PIPE-R1's, so it too now reads 1600.
       await expectWithin(rowOf('PIPE-R1.2').locator('.verdict'), 'PASS throughput 1700 against 1600')

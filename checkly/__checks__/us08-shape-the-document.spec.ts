@@ -3,11 +3,13 @@
 // requirement leaves the document for the tray and comes back on restore,
 // and the model is untouched throughout. The heading and prose buttons open
 // a prompt, which the page's dialog handler answers before the click. The
-// demo is put back as it was found.
+// document follows on a live update, so the check is skipped where the
+// session carries no stream. The demo is put back as it was found.
 
 import { expect, test } from '@playwright/test'
 import { Document } from './lib/document'
 import { resetBoth } from './lib/graphql'
+import { skipUnlessStreams } from './lib/sse'
 import { Viewer } from './lib/viewer'
 
 const SHIPPED_CAPTION = 'capacity 1200, bottleneck parse'
@@ -15,6 +17,7 @@ const HEADING = 'Performance'
 const PROSE = 'A paragraph on the budget.'
 
 test('US-08 shape the document', async ({ page, request }) => {
+  skipUnlessStreams(test)
   try {
     const before = await test.step('open the viewer and keep its version mark', async () => {
       const viewer = await Viewer.open(page)

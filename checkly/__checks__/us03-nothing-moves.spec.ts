@@ -1,11 +1,13 @@
 // US-03, raise a server that is not the bottleneck: ingest goes from 2000 to
 // 3000 and nothing moves. The version still grows by one, because the edit
 // was accepted, and that is what shows the page has redrawn before the
-// caption is read. The demo is put back as it was found.
+// caption is read. The viewer follows on a live update, so the check is
+// skipped where the session carries no stream. The demo is put back as it
+// was found.
 
 import { expect, test } from '@playwright/test'
 import { resetBoth } from './lib/graphql'
-import { expectWithin } from './lib/sse'
+import { expectWithin, skipUnlessStreams } from './lib/sse'
 import { Viewer } from './lib/viewer'
 
 const SHIPPED_CAPTION = 'capacity 1200, bottleneck parse'
@@ -21,6 +23,7 @@ async function versionNumber(viewer: Viewer): Promise<number> {
 }
 
 test('US-03 raise a server that is not the bottleneck', async ({ page, request }) => {
+  skipUnlessStreams(test)
   try {
     const viewer = await Viewer.open(page)
 

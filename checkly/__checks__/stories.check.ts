@@ -2,9 +2,10 @@
 // whose kind is BrowserCheck or MultiStepCheck becomes one check here, driven
 // by the spec file the entry names: the twelve browser specs, the refusals
 // walk and the two multistep walks. The manifest is the one list of what the
-// session runs, so a spec is added by adding its entry and its file, and
-// nothing is constructed by name in this file. Entries of other kinds are
-// constructed in their own files and ignored here.
+// session runs, so a spec is added by adding its entry, its file and its
+// display name in the NAMES map below, and the parse throws without the
+// name. No check is constructed by hand in this file. Entries of other kinds
+// are constructed in their own files and ignored here.
 
 import path from 'node:path'
 import { BrowserCheck, Frequency, MultiStepCheck } from 'checkly/constructs'

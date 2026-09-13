@@ -1,16 +1,18 @@
 // US-05, tighten the limit: PIPE-R1's limit goes to 1000 and the verdict
 // passes, then to 2500 and it fails naming parse, with the edited number in
-// the served text where the literal was. The demo is put back as it was
-// found.
+// the served text where the literal was. The viewer follows on a live
+// update, so the check is skipped where the session carries no stream. The
+// demo is put back as it was found.
 
 import { expect, test } from '@playwright/test'
 import { resetBoth } from './lib/graphql'
-import { expectWithin } from './lib/sse'
+import { expectWithin, skipUnlessStreams } from './lib/sse'
 import { Viewer } from './lib/viewer'
 
 const SHIPPED_CAPTION = 'capacity 1200, bottleneck parse'
 
 test('US-05 tighten the limit', async ({ page, request }) => {
+  skipUnlessStreams(test)
   try {
     const viewer = await Viewer.open(page)
     const block = viewer.requirement('PIPE-R1')

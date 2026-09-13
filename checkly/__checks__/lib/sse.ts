@@ -1,7 +1,8 @@
 // The live-update helpers. A page refreshes on a server-sent event, and only
 // a tunnel that carries a streamed response lets that event through. A
-// session without one sets SSE_STREAMS=0, and the checks that wait for a
-// second page to catch up are skipped rather than failed.
+// session without one sets SSE_STREAMS=0, and every check whose page must
+// learn of an edit from the stream, its own page or a second one, is skipped
+// rather than failed.
 
 import { expect } from '@playwright/test'
 import type {

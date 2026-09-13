@@ -4,7 +4,10 @@ export default defineConfig({
   testDir: './__checks__',
   testMatch: 'us*.spec.ts',
   fullyParallel: false,
-  workers: process.env.CHECKLY ? 4 : 1,
+  // The demo has one shared in-memory state, and two specs editing it at once
+  // would see each other's edits, so the suite runs one file at a time
+  // everywhere.
+  workers: 1,
   reporter: [['html', { outputFolder: 'playwright-report', open: 'never' }], ['list']],
   outputDir: 'test-results',
   use: {

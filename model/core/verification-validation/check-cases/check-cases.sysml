@@ -312,13 +312,13 @@ package Federation_CheckCases {
         attribute mutating : Boolean = false;
         attribute target : String = "/viewer/";
         @Evidence { kind = "checkly"; location = "checkly/__checks__/us02-read-the-model.spec.ts"; }
-        action expectTheTextPane { doc /* Open the viewer and expect the text pane to show the model file, with its keywords, its names and its numbers marked. */ }
+        action expectTheTextPane { doc /* Open the viewer and expect the text pane to show the model file, with its keyword and name tokens present and its number tokens counted. */ }
         action expectTheSketch { doc /* Expect the sketch to show the five servers wired, the caption capacity 1200 and parse marked as the bottleneck. */ }
         action expectTheVerdictOfPipeR1 { doc /* Expect PIPE-R1 to show its limit of 1500, a verdict of FAIL, a reason naming parse at 1200 and the block red. */ }
     }
 
     verification def CHK_Us03NothingMoves {
-        doc /* Raise a server that is not the bottleneck: ingest goes from 2000 to 3000 and nothing moves. The version still grows by one, which is what shows the page redrew before the caption is read. Test sessions only, since the check mutates and teaches nothing new about the shipped state as a monitor. */
+        doc /* Raise a server that is not the bottleneck: ingest goes from 2000 to 3000 and nothing moves. The version still grows by one, which is what shows the page redrew before the caption is read. The viewer follows on a live update, so the check is skipped where the session carries no stream. Test sessions only, since the check mutates and teaches nothing new about the shipped state as a monitor. */
         subject demo : Demo;
         actor checkly : Federation_Context::CheckSession::ChecklyCloud;
         objective { verify US_03_RaiseAServerThatIsNotTheBottleneck.acceptance.nothingMoves; }
@@ -338,7 +338,7 @@ package Federation_CheckCases {
     }
 
     verification def CHK_Us04BottleneckMoves {
-        doc /* Raise the bottleneck: parse goes from 1200 to 1700 and the bottleneck moves to the index pair, then indexA goes from 700 to 900 and PIPE-R1 passes. */
+        doc /* Raise the bottleneck: parse goes from 1200 to 1700 and the bottleneck moves to the index pair, then indexA goes from 700 to 900 and PIPE-R1 passes. The viewer follows on a live update, so the check is skipped where the session carries no stream. */
         subject demo : Demo;
         actor checkly : Federation_Context::CheckSession::ChecklyCloud;
         objective {
@@ -360,7 +360,7 @@ package Federation_CheckCases {
     }
 
     verification def CHK_Us05TightenLimit {
-        doc /* Tighten the limit: the limit of PIPE-R1 goes to 1000 and the verdict passes, then to 2500 and it fails naming parse, with the edited number in the served text where the literal was. Test sessions only, since the check mutates and teaches nothing new about the shipped state as a monitor. */
+        doc /* Tighten the limit: the limit of PIPE-R1 goes to 1000 and the verdict passes, then to 2500 and it fails naming parse, with the edited number in the served text where the literal was. The viewer follows on a live update, so the check is skipped where the session carries no stream. Test sessions only, since the check mutates and teaches nothing new about the shipped state as a monitor. */
         subject demo : Demo;
         actor checkly : Federation_Context::CheckSession::ChecklyCloud;
         objective {
@@ -430,7 +430,7 @@ package Federation_CheckCases {
     }
 
     verification def CHK_Us08ShapeTheDocument {
-        doc /* Shape the document: a heading takes a number and pushes PIPE-R1 under it, a paragraph of prose appears with no number, an excluded requirement leaves the document for the tray and comes back on restore, and the model is untouched throughout. The heading and prose buttons open a prompt, which the page's dialog handler answers before the click. */
+        doc /* Shape the document: a heading takes a number and pushes PIPE-R1 under it, a paragraph of prose appears with no number, an excluded requirement leaves the document for the tray and comes back on restore, and the model is untouched throughout. The heading and prose buttons open a prompt, which the page's dialog handler answers before the click. The document follows on a live update, so the check is skipped where the session carries no stream. */
         subject demo : Demo;
         actor checkly : Federation_Context::CheckSession::ChecklyCloud;
         objective {
@@ -449,7 +449,7 @@ package Federation_CheckCases {
         @Evidence { kind = "checkly"; location = "checkly/__checks__/us08-shape-the-document.spec.ts"; }
         action openTheViewer { doc /* Open the viewer and keep its version mark. */ }
         action insertAHeading { doc /* Open the document, insert a heading above PIPE-R1 and expect it numbered 1, PIPE-R1 at 1.1 and its derived requirements 1.1.1 to 1.1.5. */ }
-        action addProse { doc /* Add a paragraph of prose under the heading and expect it in place, as the heading's last child, with no number. */ }
+        action addProse { doc /* Add a paragraph of prose and expect it in place under the heading, with no number. */ }
         action excludePipeR14 { doc /* Exclude PIPE-R1.4 and expect it in the tray, gone from the document, and PIPE-R1.5 renumbered to 1.1.4. The tray is drawn from the model's own requirement list, so PIPE-R1.4 listed there is the model still listing it. */ }
         action restorePipeR14 { doc /* Restore PIPE-R1.4 and expect it back as the last child of PIPE-R1, numbered 1.1.5, and the tray empty. */ }
         action expectTheModelUntouched { doc /* Open the viewer and expect the model version unchanged and PIPE-R1.4 still listed. */ }
