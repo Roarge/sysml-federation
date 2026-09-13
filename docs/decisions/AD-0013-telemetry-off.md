@@ -1,12 +1,20 @@
 # AD-0013 Telemetry disabled by environment baked into the image
 
-Status: accepted, amended once the image was built. Date: 2026-08-27.
+Status: accepted, amended twice, once when the image was built and once when the check session was added. Date: 2026-08-27.
 
 Amendment, 2026-08-29: the decision as first accepted named four `ENV` lines
 for the image and left `PROMETHEUS_ENABLED=false` to the router child's
 environment alone, so the scrape endpoint stayed open for anyone who ran the
 router binary out of the image directly. The image now carries that variable
 as a fifth `ENV` line beside the four, and it is no part of SR-03.
+
+Amendment, 2026-09-13: the router's telemetry stays off by environment. When
+the operator names a router configuration file in
+`SYSML_FEDERATION_ROUTER_CONFIG_PATH`, the supervisor hands it to the child as
+`CONFIG_PATH` and the file governs the router's telemetry, because the router's
+own rule makes a file's values win over the environment's. The check session
+uses that to send the router's traces to a collector beside the demo (AD-0031).
+With the variable unset nothing changes.
 
 ## Context
 

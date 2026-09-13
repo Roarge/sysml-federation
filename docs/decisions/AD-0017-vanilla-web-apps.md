@@ -1,6 +1,10 @@
 # AD-0017 Vanilla web apps with one vendored file
 
-Status: accepted. Date: 2026-08-27.
+Status: accepted, amended once the check session was added. Date: 2026-08-27.
+
+Amendment, 2026-09-13: the sentence on browser automation was corrected when
+the check session added browser specs that run on the monitoring service's
+runners.
 
 ## Context
 
@@ -105,9 +109,11 @@ modification time, so the handler's `no-cache` is what stops a browser
 serving a stale app.
 
 Behaviour that lives in browser JavaScript is verified by demonstration
-against a scripted checklist, because the repository carries no browser
-automation and SC-01 permits none, so SR-11, SR-12 and SR-34 are
-demonstrated rather than tested. No spike belongs to this decision.
+against a scripted checklist in the Go gate, and SR-11, SR-12 and SR-34 are
+demonstrated rather than tested there. The repository carries browser specs
+that exercise them, run by the check session of AD-0031 rather than by
+`make check`, and SC-01 keeps browser automation out of the product code. No
+spike belongs to this decision.
 
 ## Requirements affected
 
