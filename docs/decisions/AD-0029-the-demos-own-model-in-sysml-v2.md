@@ -32,13 +32,12 @@ storyboard stories and seven added with the model, the forty-five requirements
 restated as system stories with their statements kept, the seven design
 constraints, the architecture and its interfaces, and a verification register
 in which every Go test that carries a requirement identifier, every recorded
-demonstration, the two validators, the make targets and the workflows are
-actions or cases of their own and, once the check session lands, every live
-check is a case of its own. The published boards correspond to named views.
-The identifiers of the light scheme are the
-model's short names. A unit test in `internal/trace` fails when the model and
-the repository disagree on an identifier, a test name, a check file, a
-published image, a check's inventory or a compose service.
+demonstration, the two validators, the make targets, the workflows and every
+live check are actions or cases of their own. The published boards correspond
+to named views. The identifiers of the light scheme are the model's short
+names. A unit test in `internal/trace` fails when the model and the repository
+disagree on an identifier, a test name, a check file, a published image, a
+check's inventory or a compose service.
 
 ## Alternatives considered
 

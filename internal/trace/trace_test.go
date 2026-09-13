@@ -24,8 +24,8 @@ import (
 // fails naming the file when one is absent. The check register and the
 // manifest are the exception and are read as empty when absent, so that
 // checkInventory reports each check the other side still carries rather than
-// failing on the file, and a repository with neither fails checkFiles and
-// sessionParts instead.
+// failing on the file, and a repository without the check project fails
+// checkFiles and sessionParts instead.
 func TestSR46_ModelAndRepositoryAgree(t *testing.T) {
 	found, err := ModuleRoot()
 	root := assert.Must(t, found, err)

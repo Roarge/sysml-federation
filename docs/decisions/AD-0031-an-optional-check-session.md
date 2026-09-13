@@ -38,8 +38,8 @@ handed to the router only when `SYSML_FEDERATION_ROUTER_CONFIG_PATH` names one,
 and the file's values then govern the router's telemetry, because the router's
 own rule makes a file win over the environment. The session names a file that
 exports to the collector beside the demo, and the collector forwards every span
-to the viewer and only the spans a check marked as its own to the monitoring
-service.
+to the viewer and, when an ingest key is supplied, only the spans a check
+marked as its own to the monitoring service.
 
 Without credentials nothing changes. `docker run` runs the demo as before, the
 variable is unset, the router's environment is what the supervisor sets, and
@@ -85,11 +85,13 @@ rather than in `make check`, so the Go gate keeps its shape and its timing.
 `go-yaml` becomes a direct dependency of the module, for one test that reads
 the compose file and holds the demo service outside every profile.
 
-The quick tunnel carries no streamed response, so a page behind it never hears
-the server-sent event that would redraw it. Seven of the twelve story checks
-depend on that event and skip on a quick-tunnel session, with the reason
-recorded, rather than fail. A named tunnel carries the stream and runs all
-twelve.
+The session probes whether a subscription's events cross the tunnel before the
+checks run, and the seven story checks that depend on an event reaching the
+page skip, with the reason in their log, when none arrives. Quick tunnels are
+documented as carrying no streamed response, so on one the seven are expected
+to skip and the named tunnel on the operator's own zone is the route for all
+twelve. The record in `checkly/README.md` says which route each recorded run
+used.
 
 While a session runs the demo answers at a public hostname without
 authentication, for the session's duration. The demo holds no secret, so what

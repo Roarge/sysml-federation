@@ -123,8 +123,8 @@ package Federation_SystemStories {
                first two variables switches it off, and the last two are belt and
                braces beside an empty exporter token. A failure to reach the
                tracker is not fatal, so readiness alone proves nothing about
-               attempts (AD-0002, AD-0010, AD-0013). Allocated to: IMAGE, ROUTER.
-               Upstream: US-01. */
+               attempts (AD-0002, AD-0010, AD-0013, AD-0031). Allocated to:
+               IMAGE, ROUTER. Upstream: US-01. */
     }
 
     #derive
@@ -1462,8 +1462,8 @@ package Federation_SystemStories {
             }
         }
         doc /* Rationale: a monitoring service runs elsewhere and a demo on one
-               machine answers only there. Allocated to: CHECKS, REPO. Upstream:
-               US-19. */
+               machine answers only there (AD-0031). Allocated to: CHECKS, REPO.
+               Upstream: US-19. */
     }
 
     // ------------------------------------------------ the derivations, US-01 to US-19 --

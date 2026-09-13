@@ -82,7 +82,7 @@ session script for SR-48 and US-19.
 
 `make model-check` puts the whole tree to both reference tools. The OMG pilot
 implementation, release 2026-07 with kernel 0.61.0, is run in batch: the
-seventeen files are concatenated in path order between `%` markers and read on
+eighteen files are concatenated in path order between `%` markers and read on
 standard input as one block, so that the imports between registers resolve. The
 target reads its verdict out of the output rather than the exit status, and
 passes on a root element line for every file handed to it and no line matching

@@ -40,8 +40,8 @@ import (
 // of the model and every file of the check project is written, and the test
 // fails rather than passing over an absent one, with one tolerance: an absent
 // check register or manifest is read as empty, so the inventory agreement
-// reports each check the other side still carries, and a repository with
-// neither fails the check-file and session agreements instead.
+// reports each check the other side still carries, and a repository without
+// the check project fails the check-file and session agreements instead.
 const (
 	// ModelDir holds the demo's own model.
 	ModelDir = "model"

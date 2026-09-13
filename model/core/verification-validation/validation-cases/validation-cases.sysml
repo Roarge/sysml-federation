@@ -488,8 +488,9 @@ package Federation_ValidationCases {
 
     verification def VAL_US_19 {
         doc /* The stories exercised against a running instance. Exercised by
-               VC_SR_48, whose evidence is the session record that a later change
-               adds. */
+               VC_SR_48, whose actions are the files of the check project and
+               the session's stack, and by CHK_TraceCorrelation, whose evidence
+               is the session record. */
         subject demo : Demo;
         objective { verify US_19_TheStoriesExercisedAgainstARunningInstance.acceptance; }
     }
