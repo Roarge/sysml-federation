@@ -55,7 +55,8 @@ machine is the whole demo.
 
 A private location, the monitoring service's runners placed beside the demo so
 that no tunnel is needed. That is the cleaner topology, and the compose file
-carries the agent for it behind a profile of its own. It loses as the route
+carries the container for a private location behind a profile of its own. It
+loses as the route
 because it needs a paid plan, and the project is kept deployable on the free
 one.
 
@@ -85,9 +86,10 @@ rather than in `make check`, so the Go gate keeps its shape and its timing.
 `go-yaml` becomes a direct dependency of the module, for one test that reads
 the compose file and holds the demo service outside every profile.
 
-The session probes whether a subscription's events cross the tunnel before the
-checks run, and the seven story checks that depend on an event reaching the
-page skip, with the reason in their log, when none arrives. Quick tunnels are
+The session on a quick tunnel probes whether a subscription's events cross the
+tunnel before the checks run, and the seven story checks that depend on an
+event reaching the page skip, with the reason in their log, when none arrives.
+Quick tunnels are
 documented as carrying no streamed response, so on one the seven are expected
 to skip and the named tunnel on the operator's own zone is the route for all
 twelve. The record in `checkly/README.md` says which route each recorded run

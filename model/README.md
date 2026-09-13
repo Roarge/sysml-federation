@@ -106,13 +106,17 @@ and the record of the validator runs is in the
 
 ### Verification record
 
-Both commands were run from the repository root over the seventeen files as
-committed, in the order `git ls-files` sorts them.
+Both commands were run from the repository root, in the order `git ls-files`
+sorts the files: over the seventeen files of the model as the first pull
+request committed it, and over the eighteen files of the model with the check
+session's registers.
 
 | Date | Tool | Version | What was run | What was observed |
 |---|---|---|---|---|
 | 2026-09-12 | OMG pilot implementation | release 2026-07, kernel 0.61.0, OpenJDK 21.0.12 | `PILOT="$HOME/.local/share/sysml-pilot/sysml"` then `{ printf '%%\n'; cat $(git ls-files -- 'model/*.sysml' 'model/**/*.sysml' \| sort); printf '\n%%\n%%exit\n'; } \| java -cp "$PILOT/jupyter-sysml-kernel-0.61.0-all.jar" org.omg.sysml.interactive.SysMLInteractive "$(cd "$PILOT/sysml.library" && pwd)"` | accepted: seventeen root element lines after the `1>` prompt, `Package Federation_Concerns (<uuid>)` first and `Package VSE_Library (<uuid>)` last, with `Package <SF> Federation_Core (<uuid>)` among them, and no line matching `ERROR:` or `WARNING:` |
 | 2026-09-12 | OpenSysML | v0.6.0, built with Go 1.25.14 | `sysml -validate -strict $(git ls-files -- 'model/*.sysml' 'model/**/*.sysml' \| sort)` | accepted, exit 0, seventeen `✓ package` lines from `Federation_Concerns` to `VSE_Library`, then one `✓` line naming all seventeen files and ending `no errors`, and no `warning:` line |
+| 2026-09-14 | OMG pilot implementation | release 2026-07, kernel 0.61.0, OpenJDK 21.0.12 | `PILOT="$HOME/.local/share/sysml-pilot/sysml"` then `{ printf '%%\n'; cat $(git ls-files -- 'model/*.sysml' 'model/**/*.sysml' \| sort); printf '\n%%\n%%exit\n'; } \| java -cp "$PILOT/jupyter-sysml-kernel-0.61.0-all.jar" org.omg.sysml.interactive.SysMLInteractive "$(cd "$PILOT/sysml.library" && pwd)"` | accepted: eighteen root element lines after the `1>` prompt, `Package Federation_Concerns (<uuid>)` first and `Package VSE_Library (<uuid>)` last, with `Package <SF> Federation_Core (<uuid>)` among them, and no line matching `ERROR:` or `WARNING:` |
+| 2026-09-14 | OpenSysML | v0.6.0, built with Go 1.25.14 | `sysml -validate -strict $(git ls-files -- 'model/*.sysml' 'model/**/*.sysml' \| sort)` | accepted, exit 0, eighteen `✓ package` lines from `Federation_Concerns` to `VSE_Library`, then one `✓` line naming all eighteen files and ending `no errors`, and no `warning:` line |
 
 ## Forms the reference tools accepted
 
@@ -281,8 +285,9 @@ the check register, one per entry of the manifest the check project reads and
 one for the session's own record, the trace of a check request found in the
 viewer beside the demo. The session is a composite with its behaviour:
 `Federation_LogicalArchitecture::CheckSession::session` holds the runner, the
-two tunnels, the collector, the viewer, the optional private-location agent
-and the external services they talk to. The six session parts carry the name
+two tunnels, the collector, the viewer, the optional container for a private
+location and the external services they talk to. The six session parts carry
+the name
 of the compose service each maps to, and so does the reference to the demo
 under test, while the three `ref part`s for the external services, the
 monitoring service, the tunnel edge and the alert receiver, carry none. Those

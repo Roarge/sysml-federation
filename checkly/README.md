@@ -40,6 +40,7 @@ rest are optional.
 | `CHECKLY_DASHBOARD_SLUG`, `CHECKLY_STATUS_SLUG` | the dashboard's and the status page's subdomains, derived from the account id when unset |
 | `CHECKLY_INCIDENTS`, `CHECKLY_MAINTENANCE` | `1` constructs the status page's automation rules and the weekly maintenance window, each a paid feature |
 | `CHECKLY_PRIVATE_LOCATION_SLUG` | constructs a private location and moves every group onto it, a paid feature |
+| `CHECKLY_PL_API_KEY` | the private location's own key, read by the compose file's `checkly-agent` service under the `checkly-private` profile, which the session script never starts and which has not been run |
 
 One command starts everything.
 
@@ -54,9 +55,10 @@ channel is configured, and hands over to `docker compose` with the profiles
 that choice calls for. Five containers come up: the demo, one tunnel, the
 collector, the viewer and the runner. The runner is a Node image with the
 project mounted from this directory and its dependencies in a named volume, so
-the host's tree is never written. It installs an HTTP client and a certificate
-store on every start, about fifteen seconds and a network dependency, because
-the pinned image carries neither and the probes and the pings are `curl`.
+the dependencies are not written into the host's tree. It installs an HTTP
+client and a certificate store on every start, about fifteen seconds and a
+network dependency, because the pinned image carries neither and the probes
+and the pings are `curl`.
 
 Inside the runner the same script walks the session's twelve steps and logs
 each under its number, `[1/12] installDependencies` through
@@ -114,7 +116,7 @@ and each has a case in the model whose attributes equal its entry.
 | `router-playground` | ApiCheck | `/playground` answers 200 with HTML | hourly | yes |
 | `router-root-redirect` | ApiCheck | `/` answers 302 to `/viewer/` | hourly | yes |
 | `router-health-not-proxied` | ApiCheck | `/health/ready` answers 404 | hourly | yes |
-| `refusals` | MultiStepCheck | a bound limit and a negative value are refused, and the version stands | hourly | yes |
+| `refusals` | MultiStepCheck | a bound limit and a negative value are refused, and the version stands | every 6 hours | yes |
 | `monitor-viewer` | UrlMonitor | `/viewer/` answers 200 | every 10 minutes | yes |
 | `monitor-document` | UrlMonitor | `/document/` answers 200 | every 10 minutes | yes |
 | `monitor-root` | UrlMonitor | `/` answers 200 after its redirect | every 10 minutes | yes |
@@ -149,11 +151,15 @@ the concurrency and the retry policy of every check in it. The router group
 reads and never writes, so it runs from three locations, retries a failure
 twice in the same region, and alerts on the second failed run. The viewer,
 document and cross-app groups edit the demo's one in-memory state, and a
-retried or a parallel run would edit it twice, so each runs one check at a
-time from one location, with no retries, and alerts on the first failed run.
-The session group holds the monitors under the same single-location policy.
-Nothing runs in parallel anywhere. Every group is tagged `demo` and with its
-own name, and every story check with `demo` and its story's identifier.
+retried or a parallel run would edit it twice, so each runs from one location,
+with no retries and no parallel locations, and alerts on the first failed run.
+That is the whole of the guard. A group's concurrency of one governs the runs
+a trigger or the API starts, which is how the session's tenth step runs them,
+and nothing serialises the scheduled runs of two checks within or across the
+three groups, nor the runs of a test session. The session group holds the
+monitors under the same single-location policy. No check runs from parallel
+locations anywhere. Every group is tagged `demo` and with its own name, and
+every story check with `demo` and its story's identifier.
 
 Two alert channels are constructed when their variables are set and never
 otherwise. The email channel sends on failure, on recovery and on a
@@ -199,12 +205,13 @@ hostname under the tunnel provider's own domain for the life of the session,
 and the runner reads it from the tunnel's metrics endpoint on port 2000 inside
 the compose network.
 
-The two differ in one thing that matters here. The named tunnel carries a
-streamed response, and the quick one does not, so a page behind a quick tunnel
-never hears the server-sent event that would redraw it. The runner's fourth
-step settles it for each session: under the quick tunnel it holds a
-subscription open, sends a mutation beside it, and sets `SSE_STREAMS=1` if an
-event frame arrives within ten seconds and `SSE_STREAMS=0` otherwise. Every
+The two differ in one thing that matters here. Quick tunnels are documented as
+carrying no streamed response, so a page behind one is expected never to hear
+the server-sent event that would redraw it, and the named tunnel is the route
+for all twelve stories. The runner's fourth step settles it for each session
+on a quick tunnel: it holds a subscription open, sends a mutation beside it,
+and sets `SSE_STREAMS=1` if an event frame arrives within ten seconds and
+`SSE_STREAMS=0` otherwise. Every
 check whose page must learn of an edit from the stream, its own page or a
 second one, reads that verdict and skips with the reason
 `live updates need the named tunnel` rather than fail. Seven of the twelve
@@ -271,16 +278,16 @@ Three multipliers apply on top: each request of a multistep check counts as a
 run, a Playwright suite counts one run for every 30 seconds of its execution,
 and every retry counts.
 
-Over a month of 30 days the seven hourly API checks cost 5,040 runs. The
-refusals walk sends four requests an hour, 2,880 more, and the arithmetic walk
-nine requests every six hours, 1,080 more, which puts the API side at 9,000 of
-10,000, and at 9,300 in a month of 31 days. The router group's two retries add
-runs only in an hour that fails. On the browser side the ten deployed story
-checks, eight daily and two every six hours, cost 480 runs, and the suite's 30
-executions cost 30 runs if each stays inside half a minute and 60 if each
-stays inside a minute, so the browser side sits between 510 and 540 of 1,000.
-The monitors are four without a hostname and seven with one, of the ten
-allowed.
+Over a month of 30 days the seven hourly API checks cost 5,040 runs. The two
+deployed multistep checks run every six hours, 120 executions each: the
+refusals walk sends four requests a run, 480 more, and the arithmetic walk
+nine, 1,080 more, which puts the API side at 6,600 of 10,000, and at 6,820 in
+a month of 31 days. The router group's two retries add runs only in an hour
+that fails. On the browser side the ten deployed story checks, eight daily and
+two every six hours, cost 480 runs, and the suite's 30 executions cost 30 runs
+if each stays inside half a minute and 60 if each stays inside a minute, so
+the browser side sits between 510 and 540 of 1,000. The monitors are four
+without a hostname and seven with one, of the ten allowed.
 
 ## What is not done
 
@@ -299,19 +306,29 @@ authentication, for the session's duration. The demo holds no secret, so what
 a visitor can do in that window is edit a value, and an edit that lands while
 a check is reading can fail that check.
 
+Two mutating checks scheduled at the same frequency can overlap, because the
+service does not serialise them. A check that meets another check's edit
+fails, and its reset restores the state. The first session's record is where
+this shows, if it does.
+
 ## Verification record
 
-Every row was run from the repository root on the branch as committed, with
-the demo image built from source with `make image`. The rows with a date have
-been observed. The pending rows need an account, a token or a network that
-resolves the tunnel service, and are the owner's to add when they have run the
-setup steps.
+The rows on the compose file and the stack were run from the repository root
+with the demo image built from source with `make image`, and the first of
+them with the published image as well. The rows on the project itself, its
+construction, its type check, its specs and its API requests, were run from
+`checkly/`, against a local container of the same build where one was
+needed. Every row is of the branch as committed, except where a row says
+which correction came after its run. The rows with a date have been observed.
+The pending rows need an account, a token or a network that resolves the
+tunnel service, and are the owner's to add when they have run the setup
+steps.
 
 | date | what | how | observed |
 |---|---|---|---|
 | 2026-09-13 | the demo alone through the compose file | `docker compose -f checkly/compose.yml up -d demo`, once with `DEMO_IMAGE=sysml-federation:dev` and once with the published image | `/health/ready` 404, `/viewer/` 200 and `/` 302 to `/viewer/` both times. The router process's environment, read from the container's process table, held nine variables with `TRACING_ENABLED=false` among them and no `CONFIG_PATH`, and the log had no configuration-file line |
 | 2026-09-13 | the router with the file | the stack with `SYSML_FEDERATION_ROUTER_CONFIG_PATH=/otel/router.yaml` | the router logged the configuration-file line naming `/otel/router.yaml` and one `Tracer enabled` line, `exporter http`, `endpoint http://otel-collector:4318`, and no other exporter |
-| 2026-09-13 | the stack under the quick profile | `DEMO_IMAGE=sysml-federation:dev SESSION_WITHOUT_ACCOUNT=1 bash checkly/scripts/session.sh up` | the host side printed `tunnel mode quick` and five containers started. The tunnel's request for a hostname was refused: the access provider's resolver answers the tunnel service's name with a block page whose certificate names the provider's own hosts, so the tunnel exited and the runner reported no hostname within two minutes. The collector logged its two receivers ready and the viewer its receivers and query server. `down -v` removed the containers, the network and the volume |
+| 2026-09-13 | the stack under the quick profile | `DEMO_IMAGE=sysml-federation:dev SESSION_WITHOUT_ACCOUNT=1 bash checkly/scripts/session.sh up` | the host side printed `tunnel mode quick` and five containers started. The tunnel's request for a hostname was refused: the access provider's resolver answers the tunnel service's name with a block page whose certificate names the provider's own hosts, so the tunnel exited and the runner reported no hostname. The run recorded here waited under a count-bounded loop corrected before the commit, and the committed script, run later the same day, reported no hostname within two minutes. The collector logged its two receivers ready and the viewer its receivers and query server. `down -v` removed the containers, the network and the volume |
 | 2026-09-13 | the subscription probe | the probe's own commands from the host against `http://localhost:8080` with the stack up | the mutation answered the part's id, the held stream carried a heartbeat and then `event: next` with `modelChanged` after a second, the reset answered, so `SSE_STREAMS=1` |
 | 2026-09-13 | the runner's first four steps | the same stack with a stand-in for the quick tunnel's metrics endpoint answering the demo's own address over plain HTTP | `[1/12]` to `[4/12]` logged in order, the demo at `http://demo:8080`, the viewer answering 200, `SSE_STREAMS=1`, then the no-account stop, and the runner exited 0 within four seconds of the stop |
 | 2026-09-13 | the join query in the viewer | the join query for `PIPE-R1` to `/graphql` with the stack up, then `/api/services` and `/api/traces?service=sysml-federation-router` on port 16686 | one service, `sysml-federation-router`. One trace of 13 spans: `query unnamed` as the server span, `HTTP - Read Body` and the five `Operation -` spans beneath it, and under `Operation - Execute` three `Engine - Fetch` spans for `model`, `document` and `capacity`, each with the client span of its HTTP call. The collector logged one batch of 13 spans |
@@ -323,6 +340,7 @@ setup steps.
 | 2026-09-13 | the three multistep specs | under a copy of the configuration matching `*.multistep.spec.ts` against the same container | 3 passed in 1.4 s, the container back at its shipped state |
 | 2026-09-13 | the seven API checks | each request sent with `curl` against a local container on port 18080, with the check's assertions applied to the answer | every assertion held: the version 1, the join answer's text, verdict `FAIL` and document number `1`, `PIPE-P1` at capacity 1200 with the bottleneck `PIPE-S2`, the four type names in the schema, `/playground` 200 with `<html`, `/` 302 to `/viewer/`, `/health/ready` 404 |
 | 2026-09-14 | the contributor commands as this file gives them | `npx tsc --noEmit`, the twelve specs with `SSE_STREAMS=1` and with `SSE_STREAMS=0`, the multistep specs under `multistep.config.ts`, a copy of `playwright.config.ts` differing in its `testMatch` line alone, and the seven API requests, all against a local container on port 18080 | the type check clean. 12 passed in 6.9 s, then 7 skipped and 5 passed in 2.7 s, then 3 passed in 1.2 s. Every API assertion held. The container answered capacity 1200, bottleneck parse, and the shipped verdicts at model version 26 afterwards |
+| 2026-09-14 | the checks after the bottleneck and introspection assertions changed, and the collector configurations after their exporters were renamed | the twelve specs with `SSE_STREAMS=1`, the three multistep specs under the copied configuration, and the seven API requests, all against a local container on port 18080, then `validate` with the pinned collector image over both configurations with stand-in values, and each configuration started once | 12 passed in 6.8 s, 3 passed in 1.3 s, and every API assertion held, `PIPE-P1`'s first bottleneck `PIPE-S2` and the whole name field for `Node` and `Model` among them. The container answered capacity 1200, bottleneck parse, afterwards. Both configurations validated at exit 0, and each started to `Everything is ready` with no deprecation line in its log, where the `otlp` exporter alias had drawn one before |
 | pending | a quick-tunnel session | `bash checkly/scripts/session.sh up` from a network whose resolver answers the tunnel service | the hostname read from the tunnel, the viewer through it, and the probe's verdict |
 | pending | a named-tunnel session | `TUNNEL_TOKEN` and `DEMO_HOSTNAME` set | the viewer through the hostname, `SSE_STREAMS=1`, all twelve story checks run |
 | pending | the recorded test session and the suite session | steps 7 and 8 with an account | the two sessions in the account, every check once, the test-only checks among them |
