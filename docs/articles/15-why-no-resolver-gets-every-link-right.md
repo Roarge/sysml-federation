@@ -94,8 +94,8 @@ Taken together, those conditions make a link more than yes or no. It has a state
 
 A resolver judged by how many links it adds will add too many. [Heindl and Biffl](https://doi.org/10.1145/1081706.1081717) found that tracing requirements by their value took around 35% of the effort of tracing all of them in full. The risky and volatile requirements were the ones that warranted more detail. At a 2015 [Dagstuhl seminar](https://drops.dagstuhl.de/storage/04dagstuhl-reports/volume05/issue04/15162/DagRep.5.4.76/DagRep.5.4.76.pdf) on traceability, Cleland-Huang argued that the traceability certifiers prescribe "tends to be overly extensive". For the parse stage, the link that earns its keep runs from `PIPE-R1.2` to the check that measures throughput. A link from `PIPE-S2` to every log line that mentions parsing adds nothing a search couldn't.
 
-Part 4, coming up next, is about measuring a resolver against a set of right answers that changes along with the system.
+[Part 4](16-measuring-a-resolver.md) is about measuring a resolver against a set of right answers that changes along with the system.
 
 ---
 
-Previous: [The parts of a resolution task](14-the-parts-of-a-resolution-task.md) · Index: [Automating traceability](../README.md)
+Previous: [The parts of a resolution task](14-the-parts-of-a-resolution-task.md) · Index: [Automating traceability](../README.md) · Next: [Measuring a resolver](16-measuring-a-resolver.md)
