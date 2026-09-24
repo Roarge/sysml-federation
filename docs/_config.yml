@@ -115,9 +115,9 @@ series:
       - { title: "Errors and measurement", from: 2, count: 2, dek: "Why does no resolver get every link right, and how can you tell how good one is?" }
     articles:
       - path: articles/13-why-a-model-needs-entity-resolution.md
-        title: "Why does a model need entity resolution?"
+        title: "Why does a systems model need entity resolution?"
         date: 2026-09-24
-        dek: "Hardly anything a team builds carries its model's keys. What does it take to find a model element's counterparts anyway, and why is that job never quite finished?"
+        dek: "Hardly anything a team builds carries the keys from its systems model. What does it take to find the counterparts of each element anyway, and why is that job never quite finished?"
       - path: articles/14-the-parts-of-a-resolution-task.md
         title: "The parts of a resolution task"
         date: 2026-09-24
