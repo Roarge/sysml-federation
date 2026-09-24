@@ -44,6 +44,8 @@ Each is written persona first. Its criteria say what is observed, not which cont
 
 **12. Reset (visitor).** The reset control in either app returns both apps to the shipped values and document structure within two seconds.
 
+The PDF is built from HTML sources in the repository, one per board, which a reader who finds an error can correct as described in [`illustrations/`](https://github.com/Roarge/sysml-federation/tree/main/illustrations).
+
 ---
 
 Index: [Federating a systems model](../README.md) · Repository: https://github.com/Roarge/sysml-federation

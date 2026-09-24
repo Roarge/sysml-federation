@@ -114,6 +114,8 @@ files --> lexer --> parser --> AST with spans --> resolver --> projection --> gq
 
 A second fixture model with other names and wiring is part of the adapter's tests. A construct outside the subset is refused rather than served generically. The example model is checked against the two reference tools locally before it becomes a fixture ([the SysML 2.0 target](../decisions/AD-0019-sysml-2-0-target.md)).
 
+The PDF is built from HTML sources in the repository, one per board, which a reader who finds an error can correct as described in [`illustrations/`](https://github.com/Roarge/sysml-federation/tree/main/illustrations).
+
 ---
 
 Index: [Federating a systems model](../README.md) · Repository: https://github.com/Roarge/sysml-federation

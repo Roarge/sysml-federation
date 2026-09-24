@@ -13,6 +13,8 @@ The layout follows the A3 architecture overview cookbook of Borches and Bonnema,
 
 Owner: Roar Georgsen
 
+Each published sheet is built from an HTML source in the repository, which a reader who finds an error can correct as described in [`illustrations/`](https://github.com/Roarge/sysml-federation/tree/main/illustrations).
+
 ---
 
 Index: [Federating a systems model](../README.md) · Repository: https://github.com/Roarge/sysml-federation

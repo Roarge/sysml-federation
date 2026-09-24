@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>US-11 Query the graph</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 960px; height: 640px; box-sizing: border-box; padding: 26px 30px; background: var(--paper); display: flex; flex-direction: column; gap: 14px; }
+    .head { display: flex; flex-direction: row; gap: 14px; align-items: baseline; }
+    .id { font-family: var(--display); font-size: 30px; line-height: 1; }
+    .title { font-family: var(--display); font-size: 30px; line-height: 1; margin: 0; flex: 1 1 auto; }
+    .who { font-size: 13px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 9px; background: var(--paper); }
+    .who.m { background: var(--shade); }
+    .who.d { background: var(--shade); border-style: dashed; }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .sketch { flex: 0 0 460px; display: flex; flex-direction: column; gap: 6px; }
+    .caption { font-size: 12px; color: var(--pencil); }
+    .text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .story { margin: 0; font-size: 15px; }
+    .story b { font-weight: 600; }
+    .text h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .crit { margin: 0; padding-left: 18px; font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
+    .crit li { margin: 0; }
+    .crit b { font-weight: 600; }
+    .none { font-size: 13px; color: var(--pencil); margin: 0; }
+    .trace { font-size: 12px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 6px; margin-top: auto; }
+  </style>
+  <style>
+    @page { size: 960px 640px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <span class="id">US-11</span>
+    <h2 class="title">Query the graph</h2>
+    <span class="who">the visitor</span>
+  </div>
+  <div class="body">
+    <div class="sketch">
+      <svg viewBox="0 0 460 470" width="460" height="470" font-family="Patrick Hand, cursive" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="6" y="6" width="448" height="458" rx="4"></rect>
+        <text x="20" y="30" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">playground, one query for PIPE-R1</text>
+        <rect x="18" y="42" width="424" height="296" rx="3"></rect>
+        <text x="28" y="60" fill="oklch(25% 0.01 260)" stroke="none" font-size="15">playground</text>
+        <rect x="384" y="48" width="48" height="16" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(25% 0.01 260)"></rect>
+        <text x="408" y="60" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none" font-size="13">Run</text>
+        <path d="M18 68 L442 68" stroke="oklch(58% 0.01 260)"></path>
+        <rect x="28" y="78" width="168" height="248" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="36" y="94" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">query</text>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="36" y="114">{</text>
+          <text x="44" y="131">requirement(</text>
+          <text x="52" y="148">id: "PIPE-R1"</text>
+          <text x="44" y="165">) {</text>
+          <text x="52" y="182" fill="oklch(25% 0.01 260)">text</text>
+          <text x="52" y="199" fill="oklch(25% 0.01 260)">verdict</text>
+          <text x="52" y="216" fill="oklch(25% 0.01 260)">documentNumber</text>
+          <text x="44" y="233">}</text>
+          <text x="36" y="250">}</text>
+        </g>
+        <rect x="206" y="78" width="226" height="248" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="214" y="94" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">response</text>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="214" y="114">{</text>
+          <text x="222" y="131">"requirement": {</text>
+          <text x="230" y="150" fill="oklch(25% 0.01 260)">"text":</text>
+          <text x="238" y="167" fill="oklch(25% 0.01 260)">"The pipeline shall sustain</text>
+          <text x="238" y="184" fill="oklch(25% 0.01 260)">the required query rate",</text>
+          <text x="230" y="205" fill="oklch(25% 0.01 260)">"verdict":</text>
+          <text x="238" y="222" fill="oklch(55% 0.19 25)">FAIL,</text>
+          <text x="230" y="243" fill="oklch(25% 0.01 260)">"documentNumber":</text>
+          <text x="238" y="260" fill="oklch(25% 0.01 260)">"1"</text>
+          <text x="222" y="281">}</text>
+          <text x="214" y="298">}</text>
+        </g>
+        <g font-size="13" stroke="oklch(52% 0.12 250)">
+          <rect x="368" y="137" width="58" height="17" rx="3" fill="oklch(98% 0.005 90)"></rect>
+          <text x="397" y="150" text-anchor="middle" fill="oklch(52% 0.12 250)" stroke="none">model</text>
+          <rect x="368" y="192" width="58" height="17" rx="3" fill="oklch(98% 0.005 90)"></rect>
+          <text x="397" y="205" text-anchor="middle" fill="oklch(52% 0.12 250)" stroke="none">capacity</text>
+          <rect x="368" y="230" width="58" height="17" rx="3" fill="oklch(98% 0.005 90)"></rect>
+          <text x="397" y="243" text-anchor="middle" fill="oklch(52% 0.12 250)" stroke="none">document</text>
+        </g>
+        <path d="M 346 362 C 354 354, 360 346, 368 338" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <text x="24" y="370" fill="oklch(25% 0.01 260)" stroke="none" font-size="17">one query, three services, one answer</text>
+        <text x="20" y="402" fill="oklch(25% 0.01 260)" stroke="none" font-size="17">and the served schema:</text>
+        <rect x="18" y="414" width="424" height="34" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="30" y="436" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-family="Source Sans 3, sans-serif">types from all three subgraphs: model, capacity, document</text>
+      </svg>
+      <span class="caption">Sketch of the playground after one query, each response field tagged with the service that answered it.</span>
+    </div>
+    <div class="text">
+      <p class="story">As <b>the visitor</b>, I want to run one query that returns fields from all three services for one requirement, so that I see the federation rather than take it on trust.</p>
+      <h4>Acceptance</h4>
+      <ol class="crit">
+        <li><b>Given</b> the demo is running, <b>when</b> one query in the playground asks for PIPE-R1's text, verdict and document number, <b>then</b> one response carries all three, and the served schema contains types contributed by all three subgraphs.</li>
+      </ol>
+      <h4>Why it matters</h4>
+      <p class="none">The two apps show the data being shared, but a visitor could still suspect that one app calls the other. One response with a field from each service settles it, because the services never meet and the router joins them on the key PIPE-R1.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>US-04 Raise the bottleneck</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 960px; height: 640px; box-sizing: border-box; padding: 26px 30px; background: var(--paper); display: flex; flex-direction: column; gap: 14px; }
+    .head { display: flex; flex-direction: row; gap: 14px; align-items: baseline; }
+    .id { font-family: var(--display); font-size: 30px; line-height: 1; }
+    .title { font-family: var(--display); font-size: 30px; line-height: 1; margin: 0; flex: 1 1 auto; }
+    .who { font-size: 13px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 9px; background: var(--paper); }
+    .who.m { background: var(--shade); }
+    .who.d { background: var(--shade); border-style: dashed; }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .sketch { flex: 0 0 460px; display: flex; flex-direction: column; gap: 6px; }
+    .caption { font-size: 12px; color: var(--pencil); }
+    .text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .story { margin: 0; font-size: 15px; }
+    .story b { font-weight: 600; }
+    .text h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .crit { margin: 0; padding-left: 18px; font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
+    .crit li { margin: 0; }
+    .crit b { font-weight: 600; }
+    .none { font-size: 13px; color: var(--pencil); margin: 0; }
+    .trace { font-size: 12px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 6px; margin-top: auto; }
+  </style>
+  <style>
+    @page { size: 960px 640px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <span class="id">US-04</span>
+    <h2 class="title">Raise the bottleneck</h2>
+    <span class="who">the visitor</span>
+  </div>
+  <div class="body">
+    <div class="sketch">
+      <svg viewBox="0 0 460 470" width="460" height="470" font-family="Patrick Hand, cursive" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="6" y="6" width="448" height="458" rx="4"></rect>
+        <text x="20" y="30" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">model viewer, after raising parse</text>
+        <rect x="18" y="42" width="196" height="260" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="26" y="63" fill="oklch(58% 0.01 260)" stroke="none" font-size="13.5">editable values</text>
+        <text x="118" y="64" fill="oklch(25% 0.01 260)" stroke="none" font-size="11.5" font-family="Source Sans 3, sans-serif">parse</text>
+        <rect x="150" y="50" width="58" height="18" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(25% 0.01 260)"></rect>
+        <text x="179" y="64" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-family="Source Sans 3, sans-serif">1700</text>
+        <path d="M26 78 L206 78" stroke="oklch(58% 0.01 260)" stroke-dasharray="4 3"></path>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="26" y="96">package Pipeline {</text>
+          <text x="34" y="112">part ingest : Server {</text>
+          <text x="42" y="128">throughput = 2000; }</text>
+          <text x="34" y="144">part parse : Server {</text>
+          <text x="42" y="160" fill="oklch(25% 0.01 260)">throughput = 1700; }</text>
+          <text x="34" y="176">part indexA : Server {</text>
+          <text x="42" y="192">throughput = 700; }</text>
+          <text x="34" y="208">part indexB : Server {</text>
+          <text x="42" y="224">throughput = 700; }</text>
+          <text x="34" y="240">part serve : Server {</text>
+          <text x="42" y="256">throughput = 1800; }</text>
+          <text x="26" y="276" fill="oklch(55% 0.19 25)">requirement PIPE-R1</text>
+          <text x="34" y="292" fill="oklch(55% 0.19 25)">capacity >= 1500   FAIL</text>
+        </g>
+        <path d="M 212 64 C 224 62, 236 66, 246 71" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <text x="250" y="73" fill="oklch(58% 0.01 260)" stroke="none" font-size="14">was 1200</text>
+        <g font-size="13" font-family="Source Sans 3, sans-serif">
+          <rect x="226" y="150" width="56" height="30" rx="2"></rect>
+          <text x="254" y="163" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">ingest</text>
+          <text x="254" y="176" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">2000</text>
+          <rect x="300" y="150" width="56" height="30" rx="2"></rect>
+          <text x="328" y="163" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">parse</text>
+          <text x="328" y="176" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">1700</text>
+          <rect x="300" y="204" width="56" height="30" rx="2" stroke="oklch(55% 0.19 25)" stroke-width="2.2"></rect>
+          <text x="328" y="217" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">indexA</text>
+          <text x="328" y="230" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">700</text>
+          <rect x="300" y="250" width="56" height="30" rx="2" stroke="oklch(55% 0.19 25)" stroke-width="2.2"></rect>
+          <text x="328" y="263" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">indexB</text>
+          <text x="328" y="276" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">700</text>
+          <rect x="390" y="227" width="56" height="30" rx="2"></rect>
+          <text x="418" y="240" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">serve</text>
+          <text x="418" y="253" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">1800</text>
+        </g>
+        <path d="M282 165 L300 165 M328 180 L328 204 M328 234 L328 250 M356 219 C 372 219, 376 242, 390 242 M356 265 C 372 265, 376 242, 390 242" stroke="oklch(58% 0.01 260)"></path>
+        <text x="236" y="310" fill="oklch(25% 0.01 260)" stroke="none" font-size="16">capacity 1400</text>
+        <text x="236" y="330" fill="oklch(55% 0.19 25)" stroke="none" font-size="14">bottleneck: indexA + indexB</text>
+        <path d="M 300 150 C 306 136, 330 128, 348 134" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <text x="262" y="140" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">was here</text>
+        <text x="20" y="372" fill="oklch(25% 0.01 260)" stroke="none" font-size="17">then raise indexA to 900:</text>
+        <text x="20" y="396" fill="oklch(25% 0.01 260)" stroke="none" font-size="16">capacity 1600, PIPE-R1 PASS, the pair still red</text>
+        <rect x="18" y="412" width="424" height="36" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="30" y="435" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-family="Source Sans 3, sans-serif">requirement PIPE-R1   capacity >= 1500   PASS</text>
+      </svg>
+      <span class="caption">Sketch of the viewer after the first edit, with the second edit noted below it.</span>
+    </div>
+    <div class="text">
+      <p class="story">As <b>the visitor</b>, when I raise the throughput of the bottleneck, I want to see the capacity rise and the bottleneck move, so that I see the model respond as a whole.</p>
+      <h4>Acceptance</h4>
+      <ol class="crit">
+        <li><b>Given</b> the shipped model, <b>when</b> parse is raised from 1200 to 1700, <b>then</b> the capacity becomes 1400, PIPE-R1 stays FAIL, and the bottleneck moves to the pair indexA and indexB.</li>
+        <li><b>Given</b> parse at 1700, <b>when</b> indexA is raised from 700 to 900, <b>then</b> the capacity becomes 1600, PIPE-R1 becomes PASS with a reason naming the index pair at 1600 against a limit of 1500, and that pair stays outlined red as the bottleneck.</li>
+      </ol>
+      <h4>Why it matters</h4>
+      <p class="none">The rollup is min over the chain and sum over the parallel pair. Raising the bottleneck exposes the next cut, which is what makes the effect surprising before it is seen and obvious after.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

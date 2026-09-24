@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>V3 Runtime</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 1440px; height: 900px; box-sizing: border-box; padding: 28px 36px; background: var(--paper); display: flex; flex-direction: column; gap: 12px; }
+    .head { display: flex; flex-direction: row; gap: 16px; align-items: baseline; }
+    .title { font-family: var(--display); font-size: 34px; line-height: 1; margin: 0; }
+    .scope { font-size: 14px; color: var(--pencil); }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .diagram { flex: 0 0 1000px; }
+    .aside { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; font-size: 13.5px; }
+    .aside h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .aside p { margin: 0; }
+    .aside .legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 8px; margin-top: auto; }
+    .aside .legend span .sw { display: inline-block; width: 22px; height: 12px; border: 1.5px solid var(--ink); border-radius: 2px; vertical-align: middle; margin-right: 6px; background: var(--paper); }
+    .aside .legend span .sw.s { background: var(--shade); }
+    .aside .legend span .sw.b { border-color: var(--blue); background: color-mix(in oklch, var(--blue) 12%, var(--paper)); }
+    .aside .legend span .sw.d { border-style: dashed; }
+  </style>
+  <style>
+    @page { size: 1440px 900px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <h2 class="title">V3 Runtime</h2>
+    <span class="scope">what happens on an edit, from the viewer to both apps</span>
+  </div>
+  <div class="body">
+    <div class="diagram">
+      <svg viewBox="0 0 1000 720" width="1000" height="720" font-family="Source Sans 3, sans-serif" font-size="12" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="oklch(25% 0.01 260)" stroke="none"></path></marker>
+          <marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="oklch(52% 0.12 250)" stroke="none"></path></marker>
+        </defs>
+        <text x="20" y="28" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="17">an edit in the viewer: parse raised from 1200 to 1700, and the seven steps until both apps show it</text>
+        <rect x="10" y="40" width="140" height="62" rx="3"></rect>
+        <text x="18" y="60" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">model viewer</text>
+        <text x="18" y="76" fill="oklch(58% 0.01 260)" stroke="none">web app</text>
+        <text x="18" y="91" fill="oklch(58% 0.01 260)" stroke="none">served at /viewer</text>
+        <rect x="158" y="40" width="124" height="62" rx="3"></rect>
+        <text x="166" y="60" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">UI server</text>
+        <text x="166" y="76" fill="oklch(58% 0.01 260)" stroke="none">Go, static apps</text>
+        <text x="166" y="91" fill="oklch(58% 0.01 260)" stroke="none">proxies /graphql</text>
+        <rect x="298" y="40" width="124" height="62" rx="3" stroke="oklch(52% 0.12 250)" fill="color-mix(in oklch, oklch(52% 0.12 250) 12%, oklch(98% 0.005 90))"></rect>
+        <text x="306" y="60" fill="oklch(52% 0.12 250)" stroke="none" font-size="13" font-weight="600">router</text>
+        <text x="306" y="76" fill="oklch(52% 0.12 250)" stroke="none">Cosmo 0.343.1</text>
+        <text x="306" y="91" fill="oklch(52% 0.12 250)" stroke="none">child process</text>
+        <rect x="438" y="40" width="124" height="62" rx="3"></rect>
+        <text x="446" y="60" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">adapter</text>
+        <text x="446" y="76" fill="oklch(58% 0.01 260)" stroke="none">Go subgraph</text>
+        <text x="446" y="91" fill="oklch(58% 0.01 260)" stroke="none">loopback 3011</text>
+        <rect x="578" y="40" width="124" height="62" rx="3" fill="oklch(93% 0.006 90)"></rect>
+        <text x="586" y="60" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">capacity</text>
+        <text x="586" y="76" fill="oklch(58% 0.01 260)" stroke="none">Go subgraph</text>
+        <text x="586" y="91" fill="oklch(58% 0.01 260)" stroke="none">loopback 3012</text>
+        <rect x="718" y="40" width="124" height="62" rx="3" fill="oklch(93% 0.006 90)"></rect>
+        <text x="726" y="60" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">document</text>
+        <text x="726" y="76" fill="oklch(58% 0.01 260)" stroke="none">Go subgraph</text>
+        <text x="726" y="91" fill="oklch(58% 0.01 260)" stroke="none">loopback 3013</text>
+        <rect x="850" y="40" width="140" height="62" rx="3"></rect>
+        <text x="858" y="60" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">requirements</text>
+        <text x="858" y="75" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">document</text>
+        <text x="858" y="91" fill="oklch(58% 0.01 260)" stroke="none">web app, /document</text>
+        <path d="M80 102 L80 578" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <path d="M220 102 L220 578" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <path d="M360 102 L360 578" stroke="oklch(52% 0.12 250)" stroke-width="1"></path>
+        <path d="M500 102 L500 578" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <path d="M640 102 L640 578" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <path d="M780 102 L780 578" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <path d="M920 102 L920 578" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <rect x="496" y="194" width="8" height="68" fill="oklch(98% 0.005 90)"></rect>
+        <rect x="636" y="414" width="8" height="116" fill="oklch(93% 0.006 90)"></rect>
+        <path d="M80 150 L220 150" marker-end="url(#ah)"></path>
+        <text x="86" y="116" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">1 setAttribute(</text>
+        <text x="86" y="129" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">PIPE-S2,</text>
+        <text x="86" y="142" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">throughput, 1700)</text>
+        <path d="M220 174 L360 174" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="226" y="165" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">2 proxy to router</text>
+        <path d="M360 198 L496 198" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="366" y="189" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">2 planned to adapter</text>
+        <text x="508" y="212" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">3 validate, SR-25</text>
+        <text x="508" y="225" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">is a literal, SR-24</text>
+        <text x="508" y="238" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">patch literal at span</text>
+        <text x="508" y="251" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">rebuild, version 2</text>
+        <path d="M496 258 L360 258" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="366" y="249" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">3 modelChanged: 2</text>
+        <path d="M360 282 L80 282" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="226" y="273" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">4 SSE modelChanged: 2</text>
+        <path d="M360 290 L920 290" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="786" y="281" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">4 SSE modelChanged: 2</text>
+        <path d="M80 314 L360 314" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="86" y="305" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">5 refetch its query</text>
+        <path d="M920 322 L360 322" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="786" y="313" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">5 refetch its query</text>
+        <path d="M360 346 L500 346" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="366" y="337" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">5 parts, requirements</text>
+        <path d="M360 382 L780 382" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="646" y="361" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">5 documentNumber,</text>
+        <text x="646" y="373" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">included, by key</text>
+        <path d="M360 418 L636 418" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="506" y="397" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">5 representations</text>
+        <text x="506" y="409" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">for capacity, verdict</text>
+        <text x="648" y="430" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">6 build flow network</text>
+        <text x="648" y="443" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">max flow 1400</text>
+        <text x="648" y="456" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">bottleneck</text>
+        <text x="648" y="469" fill="oklch(55% 0.19 25)" stroke="none" font-size="11">[indexA, indexB]</text>
+        <text x="648" y="482" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">verdict <tspan fill="oklch(55% 0.19 25)" font-weight="600">FAIL</tspan></text>
+        <text x="648" y="495" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">reason: capacity 1400</text>
+        <text x="648" y="508" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">against 1500, limited</text>
+        <text x="648" y="521" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">by indexA, indexB</text>
+        <path d="M636 526 L360 526" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="366" y="517" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">6 capacity 1400, <tspan fill="oklch(55% 0.19 25)" font-weight="600">FAIL</tspan></text>
+        <path d="M360 554 L80 554" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="86" y="533" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">7 render: red outline</text>
+        <text x="86" y="545" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">now on indexA, indexB</text>
+        <path d="M360 562 L920 562" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="786" y="541" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">7 render: PIPE-R1.2</text>
+        <text x="786" y="553" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">PASS, PIPE-R1 reason</text>
+        <path d="M20 592 L330 592" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <text x="20" y="610" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="16">Nothing moves</text>
+        <text x="20" y="626" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">ingest raised to 3000. Steps 1 to 5 are identical.</text>
+        <text x="20" y="639" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">In step 6 the cut is still parse and every number</text>
+        <text x="20" y="652" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">and verdict is unchanged. In step 7 only the number</text>
+        <text x="20" y="665" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">on ingest changes. The event still fires and the</text>
+        <text x="20" y="678" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">apps still refetch. Nothing detects a no-op.</text>
+        <path d="M345 592 L655 592" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <text x="345" y="610" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="16">A document edit</text>
+        <text x="345" y="626" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">PIPE-R2 moved under PIPE-R1: moveNode(id, parentId,</text>
+        <text x="345" y="639" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">index) reaches the document service. It reorders,</text>
+        <text x="345" y="652" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">renumbers (SR-33), increments its version, emits</text>
+        <text x="345" y="665" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">documentChanged. The viewer, not subscribed, does</text>
+        <text x="345" y="678" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">nothing. The model version is unchanged (SR-36).</text>
+        <path d="M670 592 L980 592" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <text x="670" y="610" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="16">Reset</text>
+        <text x="670" y="626" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">One mutation from either app carries both root</text>
+        <text x="670" y="639" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">fields, resetModel and resetDocument. Each service</text>
+        <text x="670" y="652" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">restores its shipped state, increments its version</text>
+        <text x="670" y="665" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">(C-92) and emits its event, and both apps refetch</text>
+        <text x="670" y="678" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">(SR-44). If one field fails the other is still</text>
+        <text x="670" y="691" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">applied. Both are sent because neither service</text>
+        <text x="670" y="704" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">knows about the other (SR-41).</text>
+        <text x="20" y="704" fill="oklch(25% 0.01 260)" stroke="none" font-size="13">bounded by SR-39: two seconds from step 3 to step 7</text>
+      </svg>
+    </div>
+    <div class="aside">
+      <h4>The round trip</h4>
+      <p>One mutation leaves the viewer, passes the UI server's reverse proxy and reaches the router, which plans it to the adapter. The adapter patches the literal, rebuilds, moves the version to 2 and emits the event on the WebSocket subscription the router holds. The router fans the event out over SSE, each app refetches, and each answer comes from the adapter first, then the entity resolvers. Both apps' traffic passes the proxy, which flushes on text/event-stream (C-62), drawn once at step 2.</p>
+      <h4>What the demo does not do</h4>
+      <p>Nothing detects that nothing changed. Raise ingest to 3000 and the event still fires, both apps refetch and only the number on ingest differs. No service calls another. The capacity service computes from the representation the router hands it, and the document service never reads the model. Capacity, bottleneck, verdict and reason are computed on every read from the fields the @requires names (SR-28 to SR-32).</p>
+      <h4>Startup</h4>
+      <p>serve starts the three subgraphs as goroutines on loopback ports, the adapter reading /app/model.sysml by default, and waits for each health endpoint. It then starts the router as a child process with SR-03's environment and EXECUTION_CONFIG_FILE_PATH pointing at the copied configuration, waits for /health/ready on the router's loopback port and only then opens the published port. What /health/ready reports before the subgraphs answer is C-57's spike, and the order does not depend on it.</p>
+      <div class="legend">
+        <span><span class="sw"></span>a component of the demo, with its type and technology</span>
+        <span><span class="sw s"></span>owned by the example rather than the adapter</span>
+        <span><span class="sw b"></span>the router, and every message that passes through it</span>
+        <span><span class="sw" style="width: 8px"></span>an activation, where a service computes (steps 3 and 6)</span>
+        <span><span style="color: var(--red)"><b>FAIL</b></span> red marks the failing verdict and the bottleneck, nothing else</span>
+        <span>arrows are one-directional, numbered by step and labelled with what they carry</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>US-07 Reorder and nest</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 960px; height: 640px; box-sizing: border-box; padding: 26px 30px; background: var(--paper); display: flex; flex-direction: column; gap: 14px; }
+    .head { display: flex; flex-direction: row; gap: 14px; align-items: baseline; }
+    .id { font-family: var(--display); font-size: 30px; line-height: 1; }
+    .title { font-family: var(--display); font-size: 30px; line-height: 1; margin: 0; flex: 1 1 auto; }
+    .who { font-size: 13px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 9px; background: var(--paper); }
+    .who.m { background: var(--shade); }
+    .who.d { background: var(--shade); border-style: dashed; }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .sketch { flex: 0 0 460px; display: flex; flex-direction: column; gap: 6px; }
+    .caption { font-size: 12px; color: var(--pencil); }
+    .text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .story { margin: 0; font-size: 15px; }
+    .story b { font-weight: 600; }
+    .text h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .crit { margin: 0; padding-left: 18px; font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
+    .crit li { margin: 0; }
+    .crit b { font-weight: 600; }
+    .none { font-size: 13px; color: var(--pencil); margin: 0; }
+    .trace { font-size: 12px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 6px; margin-top: auto; }
+  </style>
+  <style>
+    @page { size: 960px 640px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <span class="id">US-07</span>
+    <h2 class="title">Reorder and nest</h2>
+    <span class="who d">the document owner</span>
+  </div>
+  <div class="body">
+    <div class="sketch">
+      <svg viewBox="0 0 460 470" width="460" height="470" font-family="Patrick Hand, cursive" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="6" y="6" width="448" height="458" rx="4"></rect>
+        <text x="20" y="30" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">requirements document, mid-drag</text>
+        <rect x="18" y="42" width="424" height="196" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <g fill="oklch(25% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="26" y="62" fill="oklch(55% 0.19 25)">1  PIPE-R1  1500  FAIL, parse is the bottleneck at 1200</text>
+          <text x="40" y="90">1.1   PIPE-R1.5   serve   PASS</text>
+          <text x="40" y="112">1.2   PIPE-R1.1   ingest   PASS</text>
+          <text x="40" y="132" fill="oklch(55% 0.19 25)">1.3   PIPE-R1.2   parse   FAIL</text>
+          <text x="40" y="152" fill="oklch(55% 0.19 25)">1.4   PIPE-R1.3   indexA   FAIL</text>
+          <text x="40" y="172" fill="oklch(55% 0.19 25)">1.5   PIPE-R1.4   indexB   FAIL</text>
+          <text x="40" y="194">1.6   PIPE-R2   200 ms   INCONCLUSIVE</text>
+        </g>
+        <path d="M26 69 L26 75 M26 72 L286 72 M286 69 L286 75" stroke-width="2.2"></path>
+        <rect x="26" y="76" width="260" height="20" rx="2" stroke="oklch(58% 0.01 260)" stroke-dasharray="4 3"></rect>
+        <rect x="296" y="66" width="116" height="20" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(58% 0.01 260)" stroke-dasharray="4 3"></rect>
+        <text x="304" y="80" fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">PIPE-R1.5 serve</text>
+        <path d="M414 74 L414 87 L417 84 L419.5 89 L422 88 L419.5 83 L423.5 83 Z"></path>
+        <path d="M 302 88 C 308 100, 322 106, 340 108" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <text x="346" y="112" fill="oklch(58% 0.01 260)" stroke="none" font-size="14">was 1.5</text>
+        <rect x="50" y="202" width="126" height="18" rx="3" fill="oklch(98% 0.005 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="113" y="214" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11" font-family="Source Sans 3, sans-serif">verified by PIPE-VC1</text>
+        <text x="186" y="215" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">unchanged</text>
+        <path d="M 298 197 C 290 204, 276 204, 270 199" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <text x="300" y="194" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">was 2, now nested</text>
+        <text x="20" y="258" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">model viewer</text>
+        <rect x="18" y="268" width="196" height="182" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="26" y="288">package Pipeline {</text>
+          <text x="34" y="306">part parse : Server {</text>
+          <text x="42" y="323">throughput = 1200; }</text>
+          <text x="34" y="341">part serve : Server {</text>
+          <text x="42" y="358">throughput = 1800; }</text>
+          <text x="26" y="382" fill="oklch(55% 0.19 25)">requirement PIPE-R1</text>
+          <text x="34" y="398" fill="oklch(55% 0.19 25)">capacity >= 1500   FAIL</text>
+          <text x="26" y="420">requirement PIPE-R2</text>
+          <text x="34" y="436">verified by PIPE-VC1</text>
+        </g>
+        <text x="236" y="296" fill="oklch(58% 0.01 260)" stroke="none" font-size="17">model untouched</text>
+        <path d="M 232 300 C 226 306, 222 312, 216 320" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <g font-size="12" font-family="Source Sans 3, sans-serif">
+          <rect x="240" y="322" width="50" height="26" rx="2"></rect>
+          <text x="265" y="333" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">ingest</text>
+          <text x="265" y="344" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="10">2000</text>
+          <rect x="304" y="322" width="50" height="26" rx="2" stroke="oklch(55% 0.19 25)" stroke-width="2.2"></rect>
+          <text x="329" y="333" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">parse</text>
+          <text x="329" y="344" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="10">1200</text>
+          <rect x="304" y="358" width="50" height="26" rx="2"></rect>
+          <text x="329" y="369" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">indexA</text>
+          <text x="329" y="380" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="10">700</text>
+          <rect x="304" y="392" width="50" height="26" rx="2"></rect>
+          <text x="329" y="403" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">indexB</text>
+          <text x="329" y="414" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="10">700</text>
+          <rect x="380" y="375" width="50" height="26" rx="2"></rect>
+          <text x="405" y="386" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">serve</text>
+          <text x="405" y="397" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="10">1800</text>
+        </g>
+        <path d="M290 335 L304 335 M329 348 L329 358 M329 384 L329 392 M354 371 C 366 371, 368 388, 380 388 M354 405 C 366 405, 368 388, 380 388" stroke="oklch(58% 0.01 260)"></path>
+        <text x="240" y="438" fill="oklch(25% 0.01 260)" stroke="none" font-size="14">capacity 1200</text>
+        <text x="240" y="456" fill="oklch(55% 0.19 25)" stroke="none" font-size="13">bottleneck: parse</text>
+      </svg>
+      <span class="caption">Sketch of the document mid-drag, numbering already recomputed, PIPE-R2 nested under PIPE-R1 and the viewer unchanged below.</span>
+    </div>
+    <div class="text">
+      <p class="story">As <b>the document owner</b>, I want to move requirements into a different order and nest one under another, so that the document reads the way my readers expect while the model stays untouched.</p>
+      <h4>Acceptance</h4>
+      <ol class="crit">
+        <li><b>Given</b> the shipped document, <b>when</b> PIPE-R1.5 is moved above PIPE-R1.1, <b>then</b> PIPE-R1.5 becomes 1.1, the others shift to 1.2 to 1.5 in their former order, and nothing else changes number.</li>
+        <li><b>Given</b> the shipped document, <b>when</b> PIPE-R2 is moved under PIPE-R1, <b>then</b> it is numbered 1.6, and its relationships in the model are unchanged and still shown.</li>
+        <li><b>Given</b> a reordered document, <b>when</b> the model viewer is read, <b>then</b> the model text and the sketch are unchanged.</li>
+      </ol>
+      <h4>Why it matters</h4>
+      <p class="none">Ordering and nesting are editorial decisions held by the document service alone, so the document owner can shape the reading order without touching a model they have never seen. The relationships and verdicts still arrive from the other two services, which shows three services holding different facts about one requirement.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
