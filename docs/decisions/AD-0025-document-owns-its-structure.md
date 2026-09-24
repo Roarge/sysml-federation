@@ -56,11 +56,11 @@ The document reads like a specification and every editorial change is one
 mutation, which the stories can exercise one operation at a time. A tree with
 three node kinds and a numbering function, the service is small and holds no
 copy of the model (SR-36 is a one-line test). The cost is the stated limit: a
-requirement not in the shipped tree is not in the document, which [the
-architecture page](../architecture/README.md) says plainly. An adopter replaces
-the shipped tree along with the model. Excluded requirements keep their former
-parent in the service's own data, which is what makes restore (SR-35) possible
-without reading anything from the model.
+requirement not in the shipped tree is not in the document, which
+[the architecture page](../architecture/README.md) says plainly. An adopter
+replaces the shipped tree along with the model. Excluded requirements keep
+their former parent in the service's own data, which is what makes restore
+(SR-35) possible without reading anything from the model.
 
 ## Requirements affected
 

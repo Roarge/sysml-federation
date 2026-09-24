@@ -93,9 +93,10 @@ SR-46, SR-47
 The light requirements scheme (AD-0023), whose identifiers the model reuses as
 short names. The architecture record decision (AD-0021) for what the Markdown
 description is, and the tracked helpers decision (AD-0022) for the tree the
-check package joins. [From use cases to
-requirements](../articles/05-from-use-cases-to-requirements.md) for how the
-forty-five requirements and their traceability were written, [the model of the
-demo](https://github.com/Roarge/sysml-federation/blob/main/model/README.md) for
-the requirements restated as system stories, and [A model of the demo
-itself](../articles/12-a-model-of-the-demo-itself.md) for the model as built.
+check package joins.
+[From use cases to requirements](../articles/05-from-use-cases-to-requirements.md)
+for how the forty-five requirements and their traceability were written,
+[the model of the demo](https://github.com/Roarge/sysml-federation/blob/main/model/README.md)
+for the requirements restated as system stories, and
+[A model of the demo itself](../articles/12-a-model-of-the-demo-itself.md) for
+the model as built.
