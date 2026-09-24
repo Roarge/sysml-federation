@@ -56,9 +56,8 @@ in the reference text.
 
 We will publish the image from a second GitHub Actions workflow,
 `.github/workflows/publish.yml`, that runs on `push: tags: ['v*']`, grants
-each of its jobs only the permissions that job uses, with `contents: read` and
-`packages: write` for the job that builds and pushes, logs in to GHCR with the
-workflow token, builds for linux/amd64 and linux/arm64 by Go
+permissions job by job, logs in to GHCR with the workflow token, builds for
+linux/amd64 and linux/arm64 by Go
 cross-compilation with `CGO_ENABLED=0` and no QEMU, tags with
 `type=semver,pattern={{version}}` alone with the metadata action's `latest`
 flavour turned off, sets `provenance: false`
@@ -70,6 +69,8 @@ leg pulls the pushed digest with no credential and no platform named, so that
 Docker picks the variant as it does on a user's machine, then starts the
 container and checks what it serves. Only once the gate and both legs have
 passed does a third job put `latest` on the digest that was measured and run.
+The job that builds and pushes and the job that moves `latest` hold
+`contents: read` and `packages: write`, and the native legs hold none.
 A version with a pre-release suffix is measured and run like any other, and
 the third job then leaves `latest` alone, so a release candidate is published
 under its own tag and is never what an untagged pull returns. The package
@@ -103,7 +104,8 @@ explaining it.
 
 Publishing on pushes to `main` as well, with `sha` and `edge` tags, which
 the packaging research recommends beside the tag trigger. The design takes
-the tag trigger only, and `SC-07` names publishing on tags alone.
+the tag trigger only, and SC-07 names the `v*` tag as the only publishing
+trigger.
 
 Moving `latest` in the same push as the version tag, which is what the
 metadata action does for a semver tag unless it is told otherwise, and which
@@ -154,8 +156,9 @@ version that moves with each bump (SR-08). Its licence text is fetched at
 build time at the pinned tag and sits beside `/router` (SR-07).
 
 `latest` is what the launch line pulls, since it names no tag, so what `latest`
-points at decides what a stranger gets (SR-01). It follows the newest release
-that passes the gate and both native legs, so it can drift from what the
+points at decides what a stranger gets (SR-01). It is moved by each full
+release whose run passes every check the workflow holds, the gate and, since
+the second amendment, both native legs, so it can drift from what the
 README describes if the README is not updated in the same tagged commit, a
 cost the packaging research names and the design accepts. It can also
 lag the newest tag in the registry instead of tracking it. A failed gate or
