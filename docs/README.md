@@ -12,16 +12,16 @@ Complete, in thirteen parts, written for release v0.3.0. If a later release chan
 
 ### The idea
 
-Why models stay locked in their tools, and what federation changes.
+Why do models stay locked in their tools, and what does federation change?
 
 1. [Why federate a systems model?](articles/00-why-federate-a-systems-model.md)  
    Models were meant to end the drift between an organisation's documents, and closed tools kept them out of reach. SysML v2 opens the model up, and federation lets other tools join it without learning SysML.
 2. [The architecture in one sitting](articles/01-the-architecture-in-one-sitting.md)  
-   How one query collects its answer from three services that never talk to each other, and the decisions that put them all in one container.
+   How does one query collect its answer from three services that never talk to each other, and which decisions put them all in one container?
 
 ### The design
 
-How the demo was designed before any code was written, and what each round of review caught.
+How was the demo designed before any code was written, and what did each round of review catch?
 
 3. [How the design was run](articles/02-how-the-design-was-run.md)  
    Four approval gates stood between the idea and the first line of code. Reading each document back against its sources caught three design errors early.
@@ -34,31 +34,31 @@ How the demo was designed before any code was written, and what each round of re
 7. [Five views and twenty-six decisions](articles/06-five-views-and-twenty-six-decisions.md)  
    The architecture seen from five angles, each for a different reader, with a written record behind every choice that shaped it.
 8. [An A3 sheet for a fifteen-minute reader](articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md)  
-   Why the overview is one printed sheet, what the A3 method forces on it, and the two sheets drawn so far.
+   Why is the overview one printed sheet, what does the A3 method force on it, and what do the two sheets drawn so far show?
 
 ### The build
 
-From the approved design to a published container image.
+How did the approved design become a published container image?
 
 9. [Planning the build](articles/08-planning-the-build.md)  
-   How the approved design became five phases of work, one pull request each and tests first, and the choices the design had left open.
+   How did the approved design become five phases of work, one pull request each and tests first? And which choices did the design leave for the plan?
 10. [Five spikes before the first line](articles/09-five-spikes-before-the-first-line.md)  
     Five small experiments tested the riskiest assumptions, four of them before any product code existed. None failed outright, and each of those four corrected the plan.
 11. [The demo as it shipped](articles/10-the-demo-as-it-shipped.md)  
-    What the finished demo shows once it runs, the fifteen-minute walk a visitor takes through it, and what the build came to.
+    What does the finished demo show once it runs, how does a visitor's fifteen-minute walk through it go, and what did the build come to?
 
 ### Looking back
 
-What the finished demo proves and leaves open, and a model of the demo itself.
+What does the finished demo prove and leave open, and why does it now have a systems model of its own?
 
 12. [What shipped, and what did not](articles/11-what-shipped-and-what-did-not.md)  
-    How big the published image is, how its release is guarded, what a run with no network proves, and where the demo has been run.
+    How big is the published image, how is its release guarded, what does a run with no network prove, and where has the demo been run?
 13. [A model of the demo itself](articles/12-a-model-of-the-demo-itself.md)  
     I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every storyboard story against the live demo.
 
 ### The documents behind it
 
-The boards, sheets and records the articles draw on, for anyone who wants the source material.
+These are the boards, sheets and records the articles draw on, for anyone who wants the source material.
 
 - [Architecture views](architecture/architecture-views.pdf), the five views and the overview board as one PDF, one page per board.
 - [L0, Federating a systems model](a3/L0-federating-a-systems-model.pdf), an A3 sheet for the reader asking "What does this demo claim, what is in the box, and what would I keep or replace if I adopted it?"
