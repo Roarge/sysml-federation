@@ -1,12 +1,20 @@
 # AD-0020 The image published by a tag-triggered workflow to GHCR
 
-Status: accepted, amended once the publishing job was built. Date: 2026-08-27.
+Status: accepted, amended twice, once when the publishing job was built and
+once when a native run of the image on both architectures was added to the
+workflow. Date: 2026-08-27.
 
 Amendment, 2026-08-29: the decision as first accepted put `latest` on the
 image in the same push as the version tag and measured the result afterwards,
 so an image over the size budget would already be what an untagged pull
 returns before the gate could reject it. The version tag now goes up alone and
 `latest` is moved only after both platforms have been measured and passed.
+
+Amendment, 2026-09-24: `latest` now also waits for the image to run natively
+on both architectures. After the gate, a job runs one leg per platform, and
+each leg pulls the pushed digest with no credential on a runner of that
+platform's architecture, starts the container and checks what it serves.
+`latest` moves only once both legs have passed.
 
 ## Context
 
@@ -47,18 +55,25 @@ in the reference text.
 ## Decision
 
 We will publish the image from a second GitHub Actions workflow,
-`.github/workflows/publish.yml`, that runs on `push: tags: ['v*']` with
-`permissions: contents: read, packages: write`, logs in to GHCR with the
-workflow token, builds for linux/amd64 and linux/arm64 by Go
+`.github/workflows/publish.yml`, that runs on `push: tags: ['v*']`, grants
+permissions job by job, logs in to GHCR with the workflow token, builds for
+linux/amd64 and linux/arm64 by Go
 cross-compilation with `CGO_ENABLED=0` and no QEMU, tags with
 <!-- {% raw %} -->`type=semver,pattern={{version}}`<!-- {% endraw %} --> alone with the metadata action's `latest`
 flavour turned off, sets `provenance: false`
 and `sbom: false`, and pushes that one tag. It then reads the manifest back
-and fails the job if either platform is missing or exceeds the size budget,
-and only once both have passed does it put `latest` on the digest it
-measured. A version with a pre-release suffix stops there and leaves `latest`
-alone, so a release candidate is published under its own tag and is never what
-an untagged pull returns. The package
+and fails the job if either platform is missing or exceeds the size budget.
+After the gate a second job runs one leg per platform on a native runner,
+`ubuntu-24.04` for linux/amd64 and `ubuntu-24.04-arm` for linux/arm64. Each
+leg pulls the pushed digest with no credential and no platform named, so that
+Docker picks the variant as it does on a user's machine, then starts the
+container and checks what it serves. Only once the gate and both legs have
+passed does a third job put `latest` on the digest that was measured and run.
+The job that builds and pushes and the job that moves `latest` hold
+`contents: read` and `packages: write`, and the native legs hold none.
+A version with a pre-release suffix is measured and run like any other, and
+the third job then leaves `latest` alone, so a release candidate is published
+under its own tag and is never what an untagged pull returns. The package
 is made public once by hand. `test.yml` keeps its read-only permissions
 and runs the unit tests only, and the CI policy line becomes
 "unit tests, plus image publishing on tags" (SC-07).
@@ -76,7 +91,9 @@ Actions example uses. It lost because
 emulation is slow for compilation and unnecessary when every stage is Go
 and the foreign binary is already published for both architectures. Native
 arm64 runners, free for public repositories, are named by the research
-only for the case where a native build is ever wanted.
+for the case where a native build is ever wanted. The build still runs on one
+amd64 runner, and an arm64 runner is used only to run the arm64 image after
+the gate.
 
 Keeping provenance and SBOM attestations. They give SLSA
 provenance, which some readers regard as good hygiene for a public image.
@@ -87,7 +104,8 @@ explaining it.
 
 Publishing on pushes to `main` as well, with `sha` and `edge` tags, which
 the packaging research recommends beside the tag trigger. The design takes
-the tag trigger only, and SC-07 names two jobs and nothing else.
+the tag trigger only, and SC-07 names the `v*` tag as the only publishing
+trigger.
 
 Moving `latest` in the same push as the version tag, which is what the
 metadata action does for a semver tag unless it is told otherwise, and which
@@ -97,11 +115,21 @@ moved an over-budget image is what an untagged pull returns until somebody
 notices. Turning `latest` off in the metadata step and putting it on the
 measured digest afterwards costs one more step and one more registry call.
 
+Two other ways of running the image were rejected. Running it only after
+`latest` has moved would report on an image an untagged pull already returns,
+which makes the run a report rather than a gate, the same wrong order the
+first amendment corrected for the size gate. Running the arm64 image under
+emulation on the amd64 runner would not be the native run an arm64 host makes,
+and it would bring QEMU into a workflow whose build sets up none.
+
 ## Consequences
 
 The launch line works for nobody until the package has been flipped to
 public by hand, and the flip cannot be undone. SR-01's demonstration
 from a host not authenticated to GHCR is what proves the flip was made.
+The native legs pull without a credential too, so while the package is private
+they fail, and `latest` is not moved until the package is public and the
+workflow has run again.
 
 Two workflow files with different permissions. `test.yml` stays read-only
 and `publish.yml` alone holds `packages: write`, and the allowlist tracks
@@ -109,7 +137,8 @@ it (SC-04).
 
 The workflow is also the test bench for SR-05 and SR-06. After the push it
 reads the manifest back and fails if either platform is absent or if any
-platform's compressed layers exceed 80 MB, and `latest` waits on that result.
+platform's compressed layers exceed 80 MB, and `latest` waits on that result
+and on the two native legs.
 The router alone is about 40 MB
 compressed and sets the floor, which leaves about 40 MB for the demo.
 
@@ -127,14 +156,16 @@ version that moves with each bump (SR-08). Its licence text is fetched at
 build time at the pinned tag and sits beside `/router` (SR-07).
 
 `latest` is what the launch line pulls, since it names no tag, so what `latest`
-points at decides what a stranger gets (SR-01). It follows the newest release
-that passes the gate, so it can drift from what the README describes if the
-README is not updated in the same tagged commit, a cost the packaging
-research names and the design accepts. It can also
-lag the newest tag in the registry instead of tracking it. A failed gate
-leaves the version tag published and `latest` where it was, and a pre-release
-moves nothing, so an untagged pull returns the last full release that was
-measured and passed rather than whatever went up most recently. Cutting a
+points at decides what a stranger gets (SR-01). It is moved by each full
+release whose run passes every check the workflow holds, the gate and, since
+the second amendment, both native legs, so it can drift from what the
+README describes if the README is not updated in the same tagged commit, a
+cost the packaging research names and the design accepts. It can also
+lag the newest tag in the registry instead of tracking it. A failed gate or
+a failed leg leaves the version tag published and `latest` where it was, and a
+pre-release moves nothing, so an untagged pull returns the last full release
+whose run passed every check the workflow held at the time, rather than
+whatever went up most recently. Cutting a
 release means reading the run rather than assuming that a tag in the registry
 is what `latest` names.
 
@@ -144,4 +175,4 @@ SR-01, SR-05, SR-06, SR-08, SC-07
 
 ## Sources
 
-GitHub's documentation on package visibility for a package first published under a personal account, and on the permissions a publishing workflow needs. Docker's pages on multi-platform builds, QEMU emulation and cross-compilation, `docker/metadata-action` and `docker/build-push-action`. The distroless static base image. [The image](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-image) in the example's README for the Dockerfile and the publish job as they ship.
+GitHub's documentation on package visibility for a package first published under a personal account, and on the permissions a publishing workflow needs. GitHub's reference for its hosted runners, which lists the `ubuntu-24.04` and `ubuntu-24.04-arm` labels. Docker's pages on multi-platform builds, QEMU emulation and cross-compilation, `docker/metadata-action` and `docker/build-push-action`. The page on multi-platform builds says that on a pull "Docker automatically selects the correct variant based on the host's architecture". The distroless static base image. [The image](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-image) in the example's README for the Dockerfile and the publish job as they ship.
