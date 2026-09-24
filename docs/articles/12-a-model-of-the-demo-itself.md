@@ -169,7 +169,7 @@ Two parts of the check session have never run, because both need a paid Checkly 
 
 One last thing before you start a session. While it runs, the demo answers on a public hostname with no authentication. It holds no secret, so the worst a visitor can do in that window is edit a value and fail a check.
 
-That closes this series. The next one, [Automating traceability](13-why-a-model-needs-entity-resolution.md), takes on automating the federation itself. Before the rest of a system's tools can join the graph, something has to decide which of their objects are which model elements, and in this demo that's still me, by hand.
+That closes this series. The next one, [Automating traceability](13-why-a-model-needs-entity-resolution.md), takes on automating the federation itself. Before the rest of a system's tools can join the graph, something has to decide which of their objects are which elements of the systems model, and in this demo that's still me, by hand.
 
 Decision records: [docs/decisions](../decisions/README.md) · Repository: https://github.com/Roarge/sysml-federation
 

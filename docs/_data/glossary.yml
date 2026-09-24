@@ -15,11 +15,22 @@
   term: SysML v2
   definition: >-
     The second version of the Systems Modeling Language, the Object Management
-    Group's standard for describing a system as a model: its parts, the
+    Group's standard for describing a system as a systems model: its parts, the
     properties they carry, the requirements they must meet and the links
-    between them. Version 2 has its own textual notation, so a model can live
+    between them. Version 2 has its own textual notation, so a systems model can live
     as text files in Git.
   link: https://www.omg.org/spec/SysML/2.0
+
+- id: systems-model
+  term: Systems model
+  definition: >-
+    A structured description of a system being engineered, written in a
+    modelling language such as SysML v2, so that tools can read it. It holds
+    the system's parts, what each must do and how they connect. It's a
+    different thing from a data model or database schema, which describes the
+    shape of records, and from a machine learning model, which is trained on
+    data.
+  link: https://sebokwiki.org/wiki/Model-Based_Systems_Engineering_(MBSE)
 
 - id: router
   term: Router
@@ -33,9 +44,9 @@
 - id: adapter
   term: Adapter
   definition: >-
-    This project's service that reads a SysML v2 model from its text files and
+    This project's service that reads a SysML v2 systems model from its text files and
     publishes it as a GraphQL subgraph. It knows the language and nothing about
-    any particular model.
+    any particular systems model.
   link: https://github.com/Roarge/sysml-federation/tree/main/adapter
 
 - id: projection
