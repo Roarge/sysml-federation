@@ -951,7 +951,7 @@ package Federation_VerificationCases {
         }
         action <'compose.yml'> theStack {
             @Evidence { kind = "record"; location = "checkly/compose.yml"; }
-            doc /* The demo alone by default and, under the profiles, one tunnel, the collector, the viewer, the runner and the private-location route, every image pinned by tag and digest. */
+            doc /* The demo alone by default and, under the profiles, one tunnel, the collector, the viewer, the runner and the private-location route, every image but the demo's pinned by tag and digest. */
         }
         action <'session.sh'> theScript {
             @Evidence { kind = "record"; location = "checkly/scripts/session.sh"; }
