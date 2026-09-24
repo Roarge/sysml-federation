@@ -4,7 +4,7 @@
 
 I want SysML v2 models to be easier to connect to everything else an engineering organisation runs, down to the spreadsheets that quietly hold the place together. My proposal is federation. The model's owners publish a small projection of it, chosen with SysML's own views and viewpoints, and other services attach their own data to the model's elements by agreeing on an identifier. Nobody else has to learn SysML to join in.
 
-This site is where I write up the experiments. It is a personal blog, so expect opinions and the occasional admission that I should have known better. The first series builds a proof of concept, a SysML v2 adapter behind a Cosmo router with one worked example, and follows it from the first sketch to a published container image. It is a demo and not a product. The second series, still being written, asks how the model's links to everything else that gets built could be found and kept without anyone typing them.
+This site is where I write up the experiments. It is a personal blog, so expect opinions and the occasional admission that I should have known better. The first series builds a proof of concept, a SysML v2 adapter behind a Cosmo router with one worked example, and follows it from the first sketch to a published container image. It is a demo and not a product. The second series, still being written, asks how a systems model's links to everything else that gets built could be found and kept without anyone typing them.
 
 ## Federating a systems model
 
@@ -70,7 +70,7 @@ The boards, sheets and records the articles draw on, for anyone who wants the so
 
 ## Automating traceability
 
-In progress. The second series takes on automating the federation itself. Before the rest of a system's tools can join the graph, something has to decide which of their objects are which model elements, and in the demo that's still me, by hand. New parts appear here as they're published.
+In progress. The second series takes on automating the federation itself. Before the rest of a system's tools can join the graph, something has to decide which of their objects are which elements of the systems model, and in the demo that's still me, by hand. New parts appear here as they're published.
 
 ### The task
 
