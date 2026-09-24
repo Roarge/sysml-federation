@@ -411,3 +411,20 @@
     flow it carries, since that flow could be pushed back. A node the source
     can still reach in it is one more flow could get to.
   link: https://en.wikipedia.org/wiki/Flow_network
+
+- id: a3-overview
+  term: A3 architecture overview
+  definition: >-
+    A way of summarising one aspect of a system's architecture on a single
+    two-sided sheet of A3 paper, from Borches and Bonnema, developed at
+    Philips Healthcare. One side carries models of the system and the other a
+    short text summary.
+  link: https://www.gaudisite.nl/BorchesCookbookA3architectureOverview.pdf
+
+- id: es-modules
+  term: ES modules
+  definition: >-
+    JavaScript's own module system, built into every current browser. A page
+    can load code split across files with import and export, with no bundler
+    or build step in between.
+  link: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
