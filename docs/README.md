@@ -76,8 +76,8 @@ In progress. The second series takes on automating the federation itself. Before
 
 What entity resolution between a model and a built system is, and why a model needs it.
 
-1. [Why a model needs entity resolution](articles/13-why-a-model-needs-entity-resolution.md)  
-   Most of what gets built never carries the model's keys. What it takes to find a model element's counterparts anyway, and why that finding has to keep happening.
+1. [Why does a model need entity resolution?](articles/13-why-a-model-needs-entity-resolution.md)  
+   Hardly anything a team builds carries its model's keys. What it takes to find a model element's counterparts anyway, and why that job is never quite finished.
 
 ## The repository
 

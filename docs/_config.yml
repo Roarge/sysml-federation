@@ -57,7 +57,7 @@ series:
       - { title: "Looking back", from: 11, count: 2, dek: "What the finished demo proves and leaves open, and a model of the demo itself." }
     articles:
       - path: articles/00-why-federate-a-systems-model.md
-        title: "Why federate a systems model"
+        title: "Why federate a systems model?"
         date: 2026-08-27
         dek: "Models were meant to end the drift between an organisation's documents, and closed tools kept them out of reach. SysML v2 opens the model up, and federation lets other tools join it without learning SysML."
       - path: articles/01-the-architecture-in-one-sitting.md
@@ -114,6 +114,6 @@ series:
       - { title: "The task", from: 0, count: 1, dek: "What entity resolution between a model and a built system is, and why a model needs it." }
     articles:
       - path: articles/13-why-a-model-needs-entity-resolution.md
-        title: "Why a model needs entity resolution"
+        title: "Why does a model need entity resolution?"
         date: 2026-09-24
-        dek: "Most of what gets built never carries the model's keys. What it takes to find a model element's counterparts anyway, and why that finding has to keep happening."
+        dek: "Hardly anything a team builds carries its model's keys. What it takes to find a model element's counterparts anyway, and why that job is never quite finished."
