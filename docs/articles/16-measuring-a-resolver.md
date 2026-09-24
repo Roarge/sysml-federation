@@ -87,8 +87,8 @@ A score against last month's gold set describes last month's system. For a syste
 
 The gold set decays along with the links it describes, so it needs the same care. After part 3's split, the OpenTofu task's gold set gains the `lex` row above, and the telemetry task's gains `query-frontend` resolving to `PIPE-S2`. Without those updates, the next measurement marks the resolver down for being right.
 
-Part 5, coming up next, looks at what else decides whether a resolver is worth running, once its links are good enough.
+[Part 5](17-what-makes-a-resolver-worth-running.md) looks at what else decides whether a resolver is worth running, once its links are good enough.
 
 ---
 
-Previous: [Why no resolver gets every link right](15-why-no-resolver-gets-every-link-right.md) · Index: [Automating traceability](../README.md)
+Previous: [Why no resolver gets every link right](15-why-no-resolver-gets-every-link-right.md) · Index: [Automating traceability](../README.md) · Next: [What makes a resolver worth running](17-what-makes-a-resolver-worth-running.md)

@@ -113,6 +113,7 @@ series:
     parts:
       - { title: "The task", from: 0, count: 2, dek: "What is entity resolution between a systems model and a built system, and what is a single task of it made of?" }
       - { title: "Errors and measurement", from: 2, count: 2, dek: "Why does no resolver get every link right, and how can you tell how good one is?" }
+      - { title: "Running a resolver", from: 4, count: 1, dek: "What decides whether a resolver is worth running, once its links are good enough?" }
     articles:
       - path: articles/13-why-a-model-needs-entity-resolution.md
         title: "Why does a systems model need entity resolution?"
@@ -130,3 +131,7 @@ series:
         title: "Measuring a resolver"
         date: 2026-09-24
         dek: "How can a perfect score prove nothing, and 99% accuracy mean linking nothing? And how do you measure a resolver against right answers that keep changing?"
+      - path: articles/17-what-makes-a-resolver-worth-running.md
+        title: "What makes a resolver worth running"
+        date: 2026-09-24
+        dek: "A resolver that measures well can still be the wrong one to run. What else decides it, from where a link came from to who may read the systems model?"

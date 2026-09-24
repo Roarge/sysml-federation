@@ -90,6 +90,13 @@ Why does no resolver get every link right, and how can you tell how good one is?
 4. [Measuring a resolver](articles/16-measuring-a-resolver.md)  
    How can a perfect score prove nothing, and 99% accuracy mean linking nothing? And how do you measure a resolver against right answers that keep changing?
 
+### Running a resolver
+
+What decides whether a resolver is worth running, once its links are good enough?
+
+5. [What makes a resolver worth running](articles/17-what-makes-a-resolver-worth-running.md)  
+   A resolver that measures well can still be the wrong one to run. What else decides it, from where a link came from to who may read the systems model?
+
 ## The repository
 
 The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence.
