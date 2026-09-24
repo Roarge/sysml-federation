@@ -95,7 +95,7 @@ Why does no resolver get every link right, and how can you tell how good one is?
 What decides whether a resolver is worth running, once its links are good enough?
 
 5. [What makes a resolver worth running](articles/17-what-makes-a-resolver-worth-running.md)  
-   A resolver that measures well can still be the wrong one to run. What else decides it, from where a link came from to who may read the model?
+   A resolver that measures well can still be the wrong one to run. What else decides it, from where a link came from to who may read the systems model?
 
 ## The repository
 

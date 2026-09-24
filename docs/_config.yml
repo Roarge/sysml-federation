@@ -134,4 +134,4 @@ series:
       - path: articles/17-what-makes-a-resolver-worth-running.md
         title: "What makes a resolver worth running"
         date: 2026-09-24
-        dek: "A resolver that measures well can still be the wrong one to run. What else decides it, from where a link came from to who may read the model?"
+        dek: "A resolver that measures well can still be the wrong one to run. What else decides it, from where a link came from to who may read the systems model?"
