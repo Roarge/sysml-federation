@@ -118,15 +118,15 @@ series:
       - path: articles/13-why-a-model-needs-entity-resolution.md
         title: "Why does a model need entity resolution?"
         date: 2026-09-24
-        dek: "Hardly anything a team builds carries its model's keys. What it takes to find a model element's counterparts anyway, and why that job is never quite finished."
+        dek: "Hardly anything a team builds carries its model's keys. What does it take to find a model element's counterparts anyway, and why is that job never quite finished?"
       - path: articles/14-the-parts-of-a-resolution-task.md
         title: "The parts of a resolution task"
         date: 2026-09-24
-        dek: "One resolution task taken apart, from what counts as a candidate to where the finished link lands, and why two tools disagree about whether a renamed thing is still the same thing."
+        dek: "What goes into a single resolution task, from what counts as a candidate to where the finished link lands? And why do two tools disagree about whether a renamed thing is still the same thing?"
       - path: articles/15-why-no-resolver-gets-every-link-right.md
         title: "Why no resolver gets every link right"
         date: 2026-09-24
-        dek: "One change to a made-up pipeline breaks three links nobody touched. Why some wrong links and missing ones are certain, and when a resolver can still be left to add links on its own."
+        dek: "One change to a made-up pipeline breaks three links nobody touched. Why are some wrong links and missing ones certain, and when can a resolver still be left to add links on its own?"
       - path: articles/16-measuring-a-resolver.md
         title: "Measuring a resolver"
         date: 2026-09-24

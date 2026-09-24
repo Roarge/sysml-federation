@@ -74,21 +74,21 @@ In progress. The second series takes on automating the federation itself. Before
 
 ### The task
 
-What entity resolution between a model and a built system is, and what a single task of it is made of.
+What is entity resolution between a model and a built system, and what is a single task of it made of?
 
 1. [Why does a model need entity resolution?](articles/13-why-a-model-needs-entity-resolution.md)  
-   Hardly anything a team builds carries its model's keys. What it takes to find a model element's counterparts anyway, and why that job is never quite finished.
+   Hardly anything a team builds carries its model's keys. What does it take to find a model element's counterparts anyway, and why is that job never quite finished?
 2. [The parts of a resolution task](articles/14-the-parts-of-a-resolution-task.md)  
-   One resolution task taken apart, from what counts as a candidate to where the finished link lands, and why two tools disagree about whether a renamed thing is still the same thing.
+   What goes into a single resolution task, from what counts as a candidate to where the finished link lands? And why do two tools disagree about whether a renamed thing is still the same thing?
 
 ### Errors and measurement
 
-Why no resolver gets every link right, and how to tell how good one is.
+Why does no resolver get every link right, and how can you tell how good one is?
 
 3. [Why no resolver gets every link right](articles/15-why-no-resolver-gets-every-link-right.md)  
-   One change to a made-up pipeline breaks three links nobody touched. Why some wrong links and missing ones are certain, and when a resolver can still be left to add links on its own.
+   One change to a made-up pipeline breaks three links nobody touched. Why are some wrong links and missing ones certain, and when can a resolver still be left to add links on its own?
 4. [Measuring a resolver](articles/16-measuring-a-resolver.md)  
-   Why a perfect score can prove nothing and 99% accuracy can mean linking nothing, and how to measure a resolver against right answers that keep changing.
+   How can a perfect score prove nothing, and 99% accuracy mean linking nothing? And how do you measure a resolver against right answers that keep changing?
 
 ### Running a resolver
 
