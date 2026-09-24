@@ -27,18 +27,18 @@ Sampling does the job. Tepping proposed a way in 1968, as [Binette and Steorts](
 
 A good enough resolver might seem able to get every link right, if only someone built it carefully. My demo suggests otherwise. Here are eight of the names in it that contain the word router:
 
-- `Router`, the part definition in the demo's systems model
-- `router`, the part in the same systems model that uses it
-- ROUTER, the allocation element that definition's documentation names
+- `Router`, a <span class="term" data-term="part">part</span> definition in the demo's systems model, which works like a type
+- `router`, the part in the same systems model that is declared from it
+- ROUTER, the label that definition's documentation gives the router when requirements are allocated to it
 - `sysml-federation-router`, the service name in the router's telemetry configuration
 - `routerVersion`, an attribute holding the router's version number, 0.343.1
 - `router-version`, the logical ID of a Checkly check
 - "router: the model version", the same check's display name
-- `CHK_RouterVersion`, the case in the systems model that describes that check
+- `CHK_RouterVersion`, the <span class="term" data-term="verification-case">verification case</span> in the systems model that describes that check
 
 The first four are the router, in four different spellings, and the other four aren't. What makes this a trap is the pair in the middle. `routerVersion` holds the version of the router, while the check called `router-version` asks the demo for the version of the systems model it serves, through the router. A name strategy sees "router" in all eight and "version" in four. I chose every one of these names myself, which rather spoils the option of blaming anyone else.
 
-Even a careful person can go round in circles on one of them. The check's own file calls it one of "the seven API checks on the router", and it sits in the router's group. The systems model's case for the same check gives its subject as the whole demo. It says the check verifies `SR-43`, which asks that one response carry a requirement's text, verdict and document number from a schema all three services contribute to. My two records disagree about what the check is about, and I wrote both.
+Even a careful person can go round in circles on one of them. The check's own file calls it one of "the seven API checks on the router", and it sits in the router's group. The systems model's verification case for the same check gives its subject as the whole demo. It says the check verifies `SR-43`, which asks that one response carry a requirement's text, verdict and document number from a schema all three services contribute to. My two records disagree about what the check is about, and I wrote both.
 
 Names in a built system are written for the people who work on it, and those people read them with context a resolver doesn't have. Text-based recovery has leaned from the start on the premise, in [Antoniol and colleagues'](https://doi.org/10.1109/TSE.2002.1041053) words, "that programmers use meaningful names for program items". Mostly they do, and the names mean something to whoever chose them. The 2014 review found that the gains from those methods "seem to have plateaued", mostly because of term mismatches between the documents being traced.
 
@@ -46,7 +46,7 @@ Resolvers still differ a lot. One that reads the `stage` tag on the OpenTofu res
 
 Sometimes the fault isn't in the resolver at all. After the split, the new `lex` instance had nothing to resolve to, because the systems model has no `lex`. A resolver that trusts the systems model completely drops that instance without comment, and yet it's the most useful thing the run turned up. The systems model is out of date, and the unresolved object is the evidence.
 
-Software architecture research met this in the 1990s. [Murphy and Notkin's](https://www.cs.ubc.ca/~murphy/papers/rm/rm-case-study.pdf) reflexion models compare a high-level diagram of a software architecture with the code. An engineer writes a map from the code to the diagram's boxes by hand, often with regular expressions over file names, and a tool then reports where the two agree and where they don't. In their case study, the first comparison found 15 convergences, 83 divergences and four absences. Where the code had an interaction the diagram lacked, the engineer updated the diagram. My own systems model has been the stale side too. When I read each of the demo's 36 images against the views in its systems model on 12 September, I found three things on the boards the systems model didn't yet hold. So an object that resolves to nothing is a report on the systems model as much as on the resolver, and whichever way of working you choose, it should reach a person.
+Software architecture research met this in the 1990s. [Murphy and Notkin's](https://www.cs.ubc.ca/~murphy/papers/rm/rm-case-study.pdf) reflexion models compare a high-level diagram of a software architecture with the code. An engineer writes a map from the code to the diagram's boxes by hand, often with regular expressions over file names, and a tool then reports where the two agree and where they don't. In their case study, the first comparison found 15 convergences, 83 divergences and four absences. Where the code had an interaction the diagram lacked, the engineer updated the diagram. My own systems model has been the stale side too. When I read each of the demo's 36 drawings and screenshots against the <span class="term" data-term="view">views</span> in its systems model on 12 September, I found three things in them that the systems model didn't yet hold. So an object that resolves to nothing is a report on the systems model as much as on the resolver, and whichever way of working you choose, it should reach a person.
 
 ## Fixing the case in front of you
 
