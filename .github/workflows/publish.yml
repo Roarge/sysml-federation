@@ -4,9 +4,10 @@ on:
   push:
     tags: ['v*']
 
-# Each job is granted what it uses and no more. The publish job checks out and
-# pushes, the latest job moves a tag, and the smoke legs hold no scope at all,
-# because they pull the image the way a stranger would.
+# Each job is granted its own scopes. The publish job checks out and pushes
+# under contents: read and packages: write, the latest job moves a tag under
+# the same two, and the smoke legs hold no scope at all, because they pull the
+# image the way a stranger would.
 permissions: {}
 
 # One publish at a time. The group deliberately leaves the ref out, because two
@@ -68,9 +69,9 @@ jobs:
             type=semver,pattern={{version}}
           # No latest tag from here, by decision rather than by omission. This
           # step runs before the image has been measured or run, and latest is
-          # what an untagged pull returns, so it is moved by a later job that
-          # runs only once the size gate and both native runs have passed, and
-          # only for a full release.
+          # what an untagged pull returns, so it is moved by a later job, only
+          # once the size gate and both native runs have passed and only for a
+          # full release.
           flavor: |
             latest=false
 
@@ -396,14 +397,18 @@ jobs:
   # under its version tag first, is measured where it landed, and is run from
   # there on both architectures. Only then does latest move. If the gate or
   # either leg fails, this job does not run and latest keeps pointing where it
-  # pointed, so an untagged pull never returns an image the gate rejected or
-  # one that a leg failed. The version tag itself is left in the registry and
-  # has to be deleted by hand.
+  # pointed, so a run never moves latest onto an image that its gate rejected
+  # or that one of its legs failed. The version tag itself is left in the
+  # registry and has to be deleted by hand.
   latest:
     needs: [publish, smoke]
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # The two scopes the move ran under while it was a step of the publish
+    # job, which are the two that publishing from a workflow is documented
+    # to need.
     permissions:
+      contents: read
       packages: write
     steps:
       # Pinned to the same commits as in the publish job, for the same reason:
