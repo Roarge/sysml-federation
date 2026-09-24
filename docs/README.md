@@ -77,7 +77,7 @@ In progress. The second series takes on automating the federation itself. Before
 What is entity resolution between a systems model and a built system, and why does a systems model need it?
 
 1. [Why does a systems model need entity resolution?](articles/13-why-a-model-needs-entity-resolution.md)  
-   Hardly anything a team builds carries the keys from its systems model. What does it take to find the counterparts of each element anyway, and why is that job never quite finished?
+   Hardly anything a team builds carries the keys from its systems model. What does it take to find the counterparts of each element of the systems model anyway, and why is that job never quite finished?
 
 ## The repository
 
