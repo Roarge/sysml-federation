@@ -1,0 +1,224 @@
+# Definitions behind the click-to-define terms in the articles.
+#
+# An article marks a term as <span class="term" data-term="ID">text</span>.
+# The article layout embeds this file in the page, and assets/site.js shows
+# the definition in place when a reader clicks, taps or presses Enter on the
+# term. Jekyll reads _data but never publishes it as a page, so this file is
+# the one place a definition is written, and articles stay consistent by
+# pointing at it.
+#
+# Two or three plain sentences in UK English per entry, written for a reader
+# who knows either systems engineering or web APIs and not necessarily both.
+# A link is optional and must have been checked by a live request.
+
+- id: sysml-v2
+  term: SysML v2
+  definition: >-
+    The second version of the Systems Modeling Language, the Object Management
+    Group's standard for describing a system as a model: its parts, the
+    properties they carry, the requirements they must meet and the links
+    between them. Version 2 has its own textual notation, so a model can live
+    as text files in Git.
+  link: https://www.omg.org/spec/SysML/2.0
+
+- id: router
+  term: Router
+  definition: >-
+    In GraphQL federation, the single endpoint that clients talk to. It holds
+    the merged schema, works out which service owns each field a query asks
+    for, calls those services and puts their answers together. This demo uses
+    the Cosmo router from WunderGraph.
+  link: https://cosmo-docs.wundergraph.com/router/intro
+
+- id: subgraph
+  term: Subgraph
+  definition: >-
+    One service's share of a federated GraphQL schema. Each subgraph is written
+    and run by its own team, and the router merges them into one graph that a
+    client queries as if it were a single service.
+  link: https://graphql.org/learn/federation/
+
+- id: adapter
+  term: Adapter
+  definition: >-
+    This project's service that reads a SysML v2 model from its text files and
+    publishes it as a GraphQL subgraph. It knows the language and nothing about
+    any particular model.
+  link: https://github.com/Roarge/sysml-federation/tree/main/adapter
+
+- id: projection
+  term: Projection
+  definition: >-
+    The small, plainly typed view of a model that the adapter publishes. Other
+    services see parts, attributes, connections and requirements rather than
+    the full SysML metamodel, so they never need to learn SysML.
+
+- id: decision-record
+  term: Decision record
+  definition: >-
+    A short document that records one architectural decision: the context, the
+    choice made, the alternatives that lost and the consequences. This project
+    keeps its records in the form Michael Nygard proposed in 2011.
+  link: https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions
+
+- id: short-name
+  term: Short name
+  definition: >-
+    A second, shorter name a SysML v2 element can carry, written between angle
+    brackets and quotes, such as <'SR-22'>. This project uses short names as
+    identifiers that people can type and that every service agrees on.
+
+- id: satisfy
+  term: Satisfy
+  definition: >-
+    A SysML relationship stating that a part of the design meets a requirement,
+    as in "satisfy SR_22_EditsPatchTheSource by adapter". It records which part
+    is answerable for which requirement.
+
+- id: verification-case
+  term: Verification case
+  definition: >-
+    A defined way of showing that a requirement is met, by test, analysis,
+    inspection or demonstration. In SysML v2 it is a model element that names
+    the requirement it verifies and the steps that make up the check.
+  link: https://sebokwiki.org/wiki/System_Verification
+
+- id: validation-case
+  term: Validation case
+  definition: >-
+    Verification asks whether a system was built as specified. Validation asks
+    whether it does what its users wanted. In this model a validation case
+    checks a stakeholder story against recorded runs of the demo and browser
+    tests.
+  link: https://sebokwiki.org/wiki/System_Validation
+
+- id: derivation
+  term: Derivation
+  definition: >-
+    A link saying that one requirement follows from another, such as a limit
+    on each server derived from a limit on the whole pipeline. SysML v2 writes
+    it as a derivation connection with one original end and one or more
+    derived ends.
+  link: https://en.wikipedia.org/wiki/Requirements_traceability
+
+- id: ears
+  term: EARS
+  definition: >-
+    The Easy Approach to Requirements Syntax, published by Alistair Mavin and
+    colleagues in 2009. It offers a handful of fixed sentence templates, such
+    as "When [trigger], the [system] shall [response]", that make requirements
+    shorter and less ambiguous.
+  link: https://alistairmavin.com/ears/
+
+- id: make-target
+  term: Make target
+  definition: >-
+    A named recipe in a project's Makefile, run by typing make followed by its
+    name, as in make check. This repository uses targets to bundle its checks
+    so that one command runs them all.
+  link: https://en.wikipedia.org/wiki/Make_(software)
+
+- id: view
+  term: View
+  definition: >-
+    A selection from a model that answers one audience's concerns, such as a
+    deployment picture for the people who run the system. SysML v2 has views
+    as model elements, and the ISO/IEC/IEEE 42010 standard for architecture
+    descriptions defines views and the viewpoints that govern them.
+  link: https://en.wikipedia.org/wiki/ISO/IEC_42010
+
+- id: pilot-implementation
+  term: OMG pilot implementation
+  definition: >-
+    The open-source Java tooling for SysML v2, developed alongside the standard
+    and published by the Systems-Modeling project. This series treats it as one
+    of the two reference tools that decide whether a model is valid SysML.
+  link: https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation
+
+- id: opensysml
+  term: OpenSysML
+  definition: >-
+    An open-source SysML v2 parser and validator written in Go and published by
+    the Open-MBEE community, with a command line that checks model files. It is
+    the second reference tool this project uses, and it makes no claim of
+    conformance to the standard.
+  link: https://github.com/Open-MBEE/OpenSysML
+
+- id: ci
+  term: Continuous integration
+  definition: >-
+    The practice of building and testing every change automatically as soon as
+    it is pushed, so that a mistake shows up within minutes. This repository
+    runs its continuous integration on GitHub Actions.
+  link: https://en.wikipedia.org/wiki/Continuous_integration
+
+- id: conjugate-port
+  term: Conjugate port
+  definition: >-
+    A SysML v2 port definition says what flows in and out at a connection
+    point. Its conjugate is the mirror image, with every input turned into an
+    output and every output into an input, so two conjugate ports fit together.
+
+- id: checkly
+  term: Checkly
+  definition: >-
+    A hosted monitoring service that runs API checks and browser tests against
+    a live site on a schedule, and raises an alert when one fails. Its checks
+    are written as code, so they can sit in a repository beside what they test.
+  link: https://www.checklyhq.com/
+
+- id: compose-profile
+  term: Compose profile
+  definition: >-
+    Docker Compose starts several containers from one file. A profile is a
+    named group of services in that file that only starts when asked for, so
+    extra tooling can sit beside an application without running by default.
+  link: https://docs.docker.com/compose/how-tos/profiles/
+
+- id: tunnel
+  term: Tunnel
+  definition: >-
+    A way to give a service on a private machine a public address. The machine
+    keeps an outbound connection open to a provider, and the provider forwards
+    requests back through it. The check session uses Cloudflare Tunnel, either
+    named on your own hostname or quick on a temporary one.
+  link: https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/
+
+- id: opentelemetry
+  term: OpenTelemetry
+  definition: >-
+    An open standard and set of tools for collecting traces, metrics and logs
+    from software. Its collector is a separate process that receives this data
+    and forwards it to wherever it is stored or shown.
+  link: https://opentelemetry.io/docs/collector/
+
+- id: heartbeat
+  term: Heartbeat
+  definition: >-
+    A monitor that expects a regular ping from the thing it watches and raises
+    an alert when the pings stop. It catches a process that has quietly died.
+  link: https://www.checklyhq.com/docs/detect/uptime-monitoring/heartbeat-monitors/overview/
+
+- id: server-sent-events
+  term: Server-sent events
+  definition: >-
+    A web standard that lets a server push a stream of messages to a browser
+    over one long-lived HTTP response. The demo uses it to tell both apps that
+    the model or the document has changed.
+  link: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
+
+- id: trace
+  term: Trace
+  definition: >-
+    A record of one request's path through a system, made up of spans. Reading
+    a trace shows which services the request touched, in what order, and how
+    long each step took.
+  link: https://opentelemetry.io/docs/concepts/signals/traces/
+
+- id: span
+  term: Span
+  definition: >-
+    One timed step inside a trace, such as parsing a query or calling another
+    service. Spans nest, so a trace reads as a tree of the work one request
+    caused.
+  link: https://opentelemetry.io/docs/concepts/signals/traces/
