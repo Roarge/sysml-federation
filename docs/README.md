@@ -74,4 +74,4 @@ A second series, on automating the schema federation process, is coming soon.
 
 ## The repository
 
-The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence. The same articles are rendered as a site at https://sysml-federation.org/.
+The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence.
