@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Architecture views, overview</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 1440px; height: 560px; box-sizing: border-box; padding: 32px 36px; background: var(--paper); display: flex; flex-direction: column; gap: 18px; }
+    .title { font-family: var(--display); font-size: 40px; line-height: 1; margin: 0; }
+    .sub { font-size: 16px; color: var(--pencil); margin: 0; max-width: 1100px; }
+    .grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
+    .view { border: 1.5px solid var(--ink); border-radius: 3px; padding: 12px 14px; background: var(--paper); display: flex; flex-direction: column; gap: 8px; min-height: 230px; }
+    .view h3 { font-family: var(--display); font-size: 24px; margin: 0; line-height: 1; }
+    .view .who { font-size: 12px; color: var(--pencil); }
+    .view p { margin: 0; font-size: 13.5px; }
+    .view .q { font-size: 13px; color: var(--pencil); margin-top: auto; }
+    .legend { display: flex; flex-direction: row; gap: 22px; align-items: center; font-size: 13px; color: var(--pencil); flex-wrap: wrap; }
+    .legend .sw { display: inline-block; width: 26px; height: 14px; border: 1.5px solid var(--ink); border-radius: 2px; vertical-align: middle; margin-right: 6px; background: var(--paper); }
+    .legend .sw.s { background: var(--shade); }
+    .legend .sw.b { border-color: var(--blue); background: color-mix(in oklch, var(--blue) 12%, var(--paper)); }
+    .legend .sw.d { border-style: dashed; }
+    .legend .sw.r { border-color: var(--red); }
+    .legend .ar { display: inline-block; width: 30px; border-top: 1.5px solid var(--ink); vertical-align: middle; margin-right: 6px; position: relative; }
+  </style>
+  <style>
+    @page { size: 1440px 560px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <h1 class="title">Pipeline demo: the architecture in five views</h1>
+  <p class="sub">The entity of interest is the demo: the SysML adapter, the example stack behind it and the image they ship in. The pipeline the example models is a system the demo describes, never the demo itself. Each view answers the concerns of named stakeholders and has a text form in the architecture description, which is the record.</p>
+  <div class="grid">
+    <div class="view">
+      <h3>V1 Context</h3>
+      <span class="who">the visitor</span>
+      <p>The demo among the things it touches: a browser with two tabs, the Docker host, the registry the image is pulled from, the maintainer's machine. Nothing leaves the container while it runs.</p>
+      <p class="q">What is inside, what is outside, what crosses the line?</p>
+    </div>
+    <div class="view">
+      <h3>V2 Composition</h3>
+      <span class="who">the model owner, the document owner, the maintainer, an organisation deciding</span>
+      <p>Three subgraphs, their schemas, the entity keys they join on, and the merged graph the router serves. Who owns which field, and what the capacity service has to agree with the adapter.</p>
+      <p class="q">What do the services agree on?</p>
+    </div>
+    <div class="view">
+      <h3>V3 Runtime</h3>
+      <span class="who">the visitor, the model owner, the document owner</span>
+      <p>What happens on an edit: mutation, version event, fan-out, refetch, rollup on read, render in both apps. The case where nothing moves, a document edit, a reset, and startup.</p>
+      <p class="q">How does a change in one tab reach the other?</p>
+    </div>
+    <div class="view">
+      <h3>V4 Deployment</h3>
+      <span class="who">the maintainer, an organisation deciding</span>
+      <p>One container, one process tree, one published port. The image layers, the router copied in and its licence fetched beside it, the environment that keeps it offline, the build and the tag-triggered publish.</p>
+      <p class="q">What runs where, and how does it get built?</p>
+    </div>
+    <div class="view">
+      <h3>V5 Adapter</h3>
+      <span class="who">the model owner, the maintainer, a contributor</span>
+      <p>Inside the one reusable component: lexer, parser, AST with source spans, resolver, projection, server. How an edit patches the text, how unsupported syntax is refused, how the example is validated.</p>
+      <p class="q">How does a model file become a subgraph?</p>
+    </div>
+  </div>
+  <div class="legend">
+    <span><span class="sw"></span>a component of the demo, named with its type and technology</span>
+    <span><span class="sw s"></span>a component of the demo owned by the example rather than the adapter</span>
+    <span><span class="sw b"></span>the router, and what is shared through it</span>
+    <span><span class="sw d"></span>something outside the demo</span>
+    <span><span class="sw r"></span>a failing requirement or a bottleneck, the only red</span>
+    <span><span class="ar"></span>a labelled, one-directional relationship</span>
+  </div>
+</div>
+</body>
+</html>

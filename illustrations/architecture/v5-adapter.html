@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>V5 Adapter</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 1440px; height: 900px; box-sizing: border-box; padding: 28px 36px; background: var(--paper); display: flex; flex-direction: column; gap: 12px; }
+    .head { display: flex; flex-direction: row; gap: 16px; align-items: baseline; }
+    .title { font-family: var(--display); font-size: 34px; line-height: 1; margin: 0; }
+    .scope { font-size: 14px; color: var(--pencil); }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .diagram { flex: 0 0 1000px; }
+    .aside { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; font-size: 13.5px; }
+    .aside h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .aside p { margin: 0; }
+    .aside .legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 8px; margin-top: auto; }
+    .aside .legend span .sw { display: inline-block; width: 22px; height: 12px; border: 1.5px solid var(--ink); border-radius: 2px; vertical-align: middle; margin-right: 6px; background: var(--paper); }
+    .aside .legend span .sw.s { background: var(--shade); }
+    .aside .legend span .sw.b { border-color: var(--blue); background: color-mix(in oklch, var(--blue) 12%, var(--paper)); }
+    .aside .legend span .sw.d { border-style: dashed; }
+  </style>
+  <style>
+    @page { size: 1440px 900px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <h2 class="title">V5 Adapter</h2>
+    <span class="scope">inside the reusable component, from model file to subgraph</span>
+  </div>
+  <div class="body">
+    <div class="diagram">
+      <svg viewBox="0 0 1000 720" width="1000" height="720" font-family="Source Sans 3, sans-serif" font-size="12" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="oklch(25% 0.01 260)" stroke="none"></path></marker>
+          <marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="oklch(52% 0.12 250)" stroke="none"></path></marker>
+        </defs>
+        <text x="20" y="40" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="17">inside the reusable component: four Go packages, one loop back, one refusal path</text>
+        <rect x="16" y="70" width="160" height="62" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="26" y="90" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">model file</text>
+        <text x="26" y="106" fill="oklch(58% 0.01 260)" stroke="none">read once at startup</text>
+        <text x="26" y="121" fill="oklch(58% 0.01 260)" stroke="none">content, not code</text>
+        <path d="M176 101 L230 101" marker-end="url(#ah)"></path>
+        <text x="192" y="91" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">text</text>
+        <rect x="230" y="70" width="140" height="62" rx="3"></rect>
+        <text x="240" y="90" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">syntax</text>
+        <text x="240" y="106" fill="oklch(58% 0.01 260)" stroke="none">lexer, parser</text>
+        <text x="240" y="121" fill="oklch(58% 0.01 260)" stroke="none">adapter/syntax, Go</text>
+        <path d="M370 101 L460 101" marker-end="url(#ah)"></path>
+        <text x="392" y="77" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">AST with</text>
+        <text x="379" y="91" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">source spans</text>
+        <rect x="460" y="70" width="230" height="150" rx="3"></rect>
+        <text x="470" y="90" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">model</text>
+        <text x="470" y="106" fill="oklch(58% 0.01 260)" stroke="none">adapter/model, Go</text>
+        <text x="470" y="121" fill="oklch(58% 0.01 260)" stroke="none">resolver: names, feature chains</text>
+        <text x="470" y="136" fill="oklch(58% 0.01 260)" stroke="none">expressions: literal with unit,</text>
+        <text x="470" y="151" fill="oklch(58% 0.01 260)" stroke="none">chain, + - * /, parentheses</text>
+        <text x="470" y="166" fill="oklch(58% 0.01 260)" stroke="none">constraint shape: quantity,</text>
+        <text x="470" y="181" fill="oklch(58% 0.01 260)" stroke="none">comparison, limit (SR-19)</text>
+        <text x="470" y="196" fill="oklch(58% 0.01 260)" stroke="none">port direction check (SR-20)</text>
+        <text x="470" y="211" fill="oklch(58% 0.01 260)" stroke="none">literal index, patch at span</text>
+        <path d="M690 101 L760 101" marker-end="url(#ah)"></path>
+        <text x="701" y="77" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">resolved</text>
+        <text x="701" y="91" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">elements</text>
+        <rect x="760" y="70" width="224" height="92" rx="3"></rect>
+        <text x="770" y="90" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">projection</text>
+        <text x="770" y="106" fill="oklch(58% 0.01 260)" stroke="none">adapter/projection, gqlgen</text>
+        <text x="770" y="121" fill="oklch(58% 0.01 260)" stroke="none">Model, Part, Attribute, Port,</text>
+        <text x="770" y="136" fill="oklch(58% 0.01 260)" stroke="none">Connection, Requirement,</text>
+        <text x="770" y="151" fill="oklch(58% 0.01 260)" stroke="none">VerificationCase</text>
+        <path d="M872 162 L872 250" marker-end="url(#ah)"></path>
+        <text x="880" y="212" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">resolvers</text>
+        <rect x="760" y="250" width="224" height="76" rx="3"></rect>
+        <text x="770" y="270" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">serve</text>
+        <text x="770" y="286" fill="oklch(58% 0.01 260)" stroke="none">adapter/serve, gqlgen server</text>
+        <text x="770" y="301" fill="oklch(58% 0.01 260)" stroke="none">WebSocket subscriptions (C-11)</text>
+        <text x="770" y="316" fill="oklch(58% 0.01 260)" stroke="none">version counter</text>
+        <path d="M760 310 L548 310 L548 220" marker-end="url(#ah)"></path>
+        <text x="556" y="258" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">setAttribute, setLimit:</text>
+        <text x="556" y="272" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">patch literal at span, re-parse,</text>
+        <text x="556" y="286" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">version + 1 (SR-22)</text>
+        <path d="M244 132 L244 360" marker-end="url(#ah)"></path>
+        <text x="252" y="170" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">construct outside</text>
+        <text x="252" y="184" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">the subset (SR-18)</text>
+        <path d="M490 220 L490 360" marker-end="url(#ah)"></path>
+        <text x="482" y="246" text-anchor="end" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">constraint of another shape (SR-19)</text>
+        <text x="482" y="260" text-anchor="end" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">port directions disagree</text>
+        <text x="482" y="274" text-anchor="end" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">with end order (SR-20)</text>
+        <rect x="230" y="360" width="276" height="76" rx="3" stroke="oklch(55% 0.19 25)"></rect>
+        <text x="240" y="380" fill="oklch(55% 0.19 25)" stroke="none" font-size="13" font-weight="600">refuse</text>
+        <text x="240" y="396" fill="oklch(58% 0.01 260)" stroke="none">file, line and column of</text>
+        <text x="240" y="411" fill="oklch(58% 0.01 260)" stroke="none">the first offending token</text>
+        <text x="240" y="426" fill="oklch(58% 0.01 260)" stroke="none">SR-18, SR-19, SR-20</text>
+        <path d="M872 326 L872 400" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="864" y="356" text-anchor="end" fill="oklch(52% 0.12 250)" stroke="none" font-size="11">subgraph model, 127.0.0.1:3011</text>
+        <text x="864" y="370" text-anchor="end" fill="oklch(52% 0.12 250)" stroke="none" font-size="11">HTTP, subscriptions over WS</text>
+        <rect x="760" y="400" width="224" height="50" rx="3" stroke="oklch(52% 0.12 250)" fill="color-mix(in oklch, oklch(52% 0.12 250) 12%, oklch(98% 0.005 90))"></rect>
+        <text x="770" y="420" fill="oklch(52% 0.12 250)" stroke="none" font-size="13" font-weight="600">router</text>
+        <text x="770" y="437" fill="oklch(52% 0.12 250)" stroke="none">Cosmo 0.343.1, child process</text>
+        <rect x="16" y="190" width="200" height="96" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="26" y="210" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">validation</text>
+        <text x="26" y="226" fill="oklch(58% 0.01 260)" stroke="none">local only, never CI</text>
+        <text x="26" y="241" fill="oklch(58% 0.01 260)" stroke="none">OMG pilot 2026-07 and</text>
+        <text x="26" y="256" fill="oklch(58% 0.01 260)" stroke="none">OpenSysML CLI accept</text>
+        <text x="26" y="271" fill="oklch(58% 0.01 260)" stroke="none">model.sysml (SR-45)</text>
+        <path d="M96 190 L96 132" marker-end="url(#ah)" stroke-dasharray="4 3"></path>
+        <text x="104" y="166" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">before it ships</text>
+        <rect x="16" y="360" width="200" height="96" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="26" y="380" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">fixtures</text>
+        <text x="26" y="396" fill="oklch(58% 0.01 260)" stroke="none">read by the tests</text>
+        <text x="26" y="411" fill="oklch(58% 0.01 260)" stroke="none">the example model and</text>
+        <text x="26" y="426" fill="oklch(58% 0.01 260)" stroke="none">a second model with other</text>
+        <text x="26" y="441" fill="oklch(58% 0.01 260)" stroke="none">names and wiring (SR-16)</text>
+        <rect x="230" y="480" width="754" height="80" rx="3" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="240" y="500" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">the accepted subset (C-23 to C-37)</text>
+        <text x="240" y="516" fill="oklch(58% 0.01 260)" stroke="none">package, import, part def, part, attribute, port, connect, requirement def, requirement,</text>
+        <text x="240" y="531" fill="oklch(58% 0.01 260)" stroke="none">require constraint, #derivation, satisfy, verification def, verification, doc, short names</text>
+        <text x="240" y="546" fill="oklch(58% 0.01 260)" stroke="none">anything else is refused with file, line and column, there is no generic fallback in this phase (AD-0005)</text>
+        <text x="16" y="600" fill="oklch(25% 0.01 260)" stroke="none" font-size="13">The served text is the source with edited literals patched in (SR-22). The file is read once and never written.</text>
+        <text x="16" y="620" fill="oklch(58% 0.01 260)" stroke="none">The adapter has no example identifiers (SR-17): every name in this view is generic, the values in the other views come from the example.</text>
+      </svg>
+    </div>
+    <div class="aside">
+      <h4>Spans are the mechanism</h4>
+      <p>Every node of the AST carries its byte range in the source, and the model package keeps an index from every numeric literal to its span. That is what makes an edit cheap and honest: setAttribute and setLimit replace one literal at its recorded span and re-parse, so the served text and the projection are rebuilt together and the version counter moves once (SR-22). A value bound by an expression has no literal to patch and is refused (SR-24), which is why editable is a fact about the source rather than a setting.</p>
+      <h4>No opinion about the example</h4>
+      <p>The types are Part, Attribute, Port, Connection, Requirement and VerificationCase, and nothing in adapter/ names a server or a pipeline (SR-17). A second fixture model with other names and wiring runs through the same tests (SR-16). A construct outside the subset is refused with its position rather than served through a generic element type. That escape hatch stays open in AD-0005, and this phase takes the smaller cut.</p>
+      <h4>What it will not do</h4>
+      <p>It does not cover the language. The subset of the syntax card (C-23 to C-37) is parsed by hand and everything else stops at the first offending token (AD-0015). It does not evaluate the rollup: expressions go as far as literals with a unit, feature chains, the four operators and parentheses, enough to bind a derived limit (SR-23), and capacity belongs to the service that computes it. It never writes to disk. Edits live in the served text and its version until reset.</p>
+      <div class="legend">
+        <span><span class="sw"></span>a package of the adapter, with its technology</span>
+        <span><span class="sw b"></span>the router, where the subgraph is shared</span>
+        <span><span class="sw" style="border-color: oklch(55% 0.19 25)"></span>the refusal path, with file, line and column</span>
+        <span><span class="sw d"></span>outside the adapter, or content it reads</span>
+        <span><span class="sw" style="border-color: oklch(58% 0.01 260)"></span>a note, not a component</span>
+        <span>arrows are one-directional and labelled with their intent, the loop is the edit path</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

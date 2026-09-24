@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>V4 Deployment</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 1440px; height: 900px; box-sizing: border-box; padding: 28px 36px; background: var(--paper); display: flex; flex-direction: column; gap: 12px; }
+    .head { display: flex; flex-direction: row; gap: 16px; align-items: baseline; }
+    .title { font-family: var(--display); font-size: 34px; line-height: 1; margin: 0; }
+    .scope { font-size: 14px; color: var(--pencil); }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .diagram { flex: 0 0 1000px; }
+    .aside { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; font-size: 13.5px; }
+    .aside h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .aside p { margin: 0; }
+    .aside .legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 8px; margin-top: auto; }
+    .aside .legend span .sw { display: inline-block; width: 22px; height: 12px; border: 1.5px solid var(--ink); border-radius: 2px; vertical-align: middle; margin-right: 6px; background: var(--paper); }
+    .aside .legend span .sw.s { background: var(--shade); }
+    .aside .legend span .sw.b { border-color: var(--blue); background: color-mix(in oklch, var(--blue) 12%, var(--paper)); }
+    .aside .legend span .sw.d { border-style: dashed; }
+  </style>
+  <style>
+    @page { size: 1440px 900px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <h2 class="title">V4 Deployment</h2>
+    <span class="scope">one container, one process tree, one port, and how the image is built and published</span>
+  </div>
+  <div class="body">
+    <div class="diagram">
+      <svg viewBox="0 0 1000 720" width="1000" height="720" font-family="Source Sans 3, sans-serif" font-size="12" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="oklch(25% 0.01 260)" stroke="none"></path></marker>
+        </defs>
+        <text x="160" y="40" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="17">one container, one process tree, one port</text>
+        <text x="685" y="40" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="17">the image, built and published</text>
+        <rect x="160" y="62" width="500" height="428" rx="4" stroke-width="2"></rect>
+        <text x="176" y="88" fill="oklch(25% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="22">container</text>
+        <text x="176" y="106" fill="oklch(58% 0.01 260)" stroke="none">ghcr.io/roarge/sysml-federation, one process tree, one published port</text>
+        <rect x="180" y="116" width="460" height="46" rx="3"></rect>
+        <text x="190" y="135" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">sysml-federation serve</text>
+        <text x="190" y="151" fill="oklch(58% 0.01 260)" stroke="none">PID 1, Go supervisor</text>
+        <path d="M196 162 L196 437" stroke="oklch(58% 0.01 260)"></path>
+        <path d="M196 197 L212 197" stroke="oklch(58% 0.01 260)"></path>
+        <path d="M196 253 L212 253" stroke="oklch(58% 0.01 260)"></path>
+        <path d="M196 309 L212 309" stroke="oklch(58% 0.01 260)"></path>
+        <path d="M196 365 L212 365" stroke="oklch(58% 0.01 260)"></path>
+        <path d="M196 437 L212 437" stroke="oklch(58% 0.01 260)"></path>
+        <rect x="212" y="174" width="428" height="46" rx="3"></rect>
+        <text x="222" y="193" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">adapter</text>
+        <text x="222" y="209" fill="oklch(58% 0.01 260)" stroke="none">goroutine, 127.0.0.1:3011, gqlgen subgraph "model"</text>
+        <rect x="212" y="230" width="428" height="46" rx="3" fill="oklch(93% 0.006 90)"></rect>
+        <text x="222" y="249" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">capacity</text>
+        <text x="222" y="265" fill="oklch(58% 0.01 260)" stroke="none">goroutine, 127.0.0.1:3012, gqlgen subgraph "capacity"</text>
+        <rect x="212" y="286" width="428" height="46" rx="3" fill="oklch(93% 0.006 90)"></rect>
+        <text x="222" y="305" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">document</text>
+        <text x="222" y="321" fill="oklch(58% 0.01 260)" stroke="none">goroutine, 127.0.0.1:3013, gqlgen subgraph "document"</text>
+        <rect x="212" y="342" width="218" height="62" rx="3" stroke="oklch(52% 0.12 250)" fill="color-mix(in oklch, oklch(52% 0.12 250) 12%, oklch(98% 0.005 90))"></rect>
+        <text x="222" y="362" fill="oklch(52% 0.12 250)" stroke="none" font-size="13" font-weight="600">/router</text>
+        <text x="222" y="378" fill="oklch(52% 0.12 250)" stroke="none">child process, 127.0.0.1:3002</text>
+        <text x="222" y="393" fill="oklch(52% 0.12 250)" stroke="none">Cosmo router 0.343.1</text>
+        <rect x="212" y="414" width="218" height="62" rx="3"></rect>
+        <text x="222" y="434" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">UI server</text>
+        <text x="222" y="450" fill="oklch(58% 0.01 260)" stroke="none">goroutine, 0.0.0.0:8080</text>
+        <text x="222" y="465" fill="oklch(58% 0.01 260)" stroke="none">embed.FS apps, reverse proxy</text>
+        <rect x="444" y="342" width="196" height="134" rx="3"></rect>
+        <text x="452" y="362" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">environment</text>
+        <path transform="translate(596 358)" d="M0 -6 L1.53 -2.1 L5.71 -1.85 L2.47 0.8 L3.53 4.85 L0 2.6 L-3.53 4.85 L-2.47 0.8 L-5.71 -1.85 L-1.53 -2.1 Z" fill="oklch(58% 0.01 260)" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <text x="605" y="362" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">C-20</text>
+        <text x="452" y="378" fill="oklch(58% 0.01 260)" stroke="none">set by the supervisor</text>
+        <text x="452" y="390" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">LISTEN_ADDR=127.0.0.1:3002</text>
+        <text x="452" y="401" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">PLAYGROUND_PATH=/playground</text>
+        <text x="452" y="412" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">EXECUTION_CONFIG_FILE_PATH=</text>
+        <text x="464" y="423" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">/app/config.json</text>
+        <text x="452" y="434" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">DO_NOT_TRACK=1</text>
+        <text x="452" y="445" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">COSMO_TELEMETRY_DISABLED=true</text>
+        <text x="452" y="456" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">TRACING_ENABLED=false</text>
+        <text x="452" y="467" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">METRICS_OTLP_ENABLED=false</text>
+        <path d="M70 530 L70 462 L212 462" marker-end="url(#ah)"></path>
+        <text x="78" y="482" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">-p 8080:8080</text>
+        <rect x="20" y="530" width="130" height="77" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="30" y="550" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">Docker host</text>
+        <text x="30" y="566" fill="oklch(58% 0.01 260)" stroke="none">Linux, macOS</text>
+        <text x="30" y="581" fill="oklch(58% 0.01 260)" stroke="none">or Windows</text>
+        <text x="30" y="596" fill="oklch(58% 0.01 260)" stroke="none">publishes 8080</text>
+        <text x="160" y="514" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="17">the image, layer by layer, base at the bottom</text>
+        <rect x="160" y="526" width="500" height="25" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="170" y="542" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">/app/model.sysml</text>
+        <text x="380" y="542" fill="oklch(58% 0.01 260)" stroke="none">example model, read once by the adapter</text>
+        <rect x="160" y="555" width="500" height="25" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="170" y="571" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">/app/config.json</text>
+        <text x="380" y="571" fill="oklch(58% 0.01 260)" stroke="none">composed router configuration, committed</text>
+        <rect x="160" y="584" width="500" height="25" rx="3"></rect>
+        <text x="170" y="600" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">/sysml-federation</text>
+        <text x="380" y="600" fill="oklch(58% 0.01 260)" stroke="none">Go, static, CGO_ENABLED=0, a few MB</text>
+        <rect x="160" y="613" width="500" height="25" rx="3" stroke="oklch(52% 0.12 250)" fill="color-mix(in oklch, oklch(52% 0.12 250) 12%, oklch(98% 0.005 90))"></rect>
+        <text x="170" y="629" fill="oklch(52% 0.12 250)" stroke="none" font-size="13" font-weight="600">/router, /router.LICENSE</text>
+        <text x="380" y="629" fill="oklch(52% 0.12 250)" stroke="none">Cosmo router 0.343.1, about 40 MB</text>
+        <path transform="translate(614 625)" d="M0 -6 L1.53 -2.1 L5.71 -1.85 L2.47 0.8 L3.53 4.85 L0 2.6 L-3.53 4.85 L-2.47 0.8 L-5.71 -1.85 L-1.53 -2.1 Z" fill="oklch(58% 0.01 260)" stroke="oklch(58% 0.01 260)" stroke-width="1"></path>
+        <text x="623" y="629" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">C-53</text>
+        <rect x="160" y="642" width="500" height="25" rx="3"></rect>
+        <text x="170" y="658" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">distroless static-debian13</text>
+        <text x="380" y="658" fill="oklch(58% 0.01 260)" stroke="none">nonroot base image, 2 MB</text>
+        <text x="160" y="684" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">HEALTHCHECK</text>
+        <text x="258" y="684" fill="oklch(58% 0.01 260)" stroke="none">healthcheck subcommand, interval 10 s, start period 15 s</text>
+        <text x="258" y="698" fill="oklch(58% 0.01 260)" stroke="none">GETs /health/ready on the router's loopback, /viewer on 8080</text>
+        <text x="258" y="712" fill="oklch(58% 0.01 260)" stroke="none">exits non-zero if either fails (C-55)</text>
+        <rect x="685" y="62" width="300" height="77" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="695" y="82" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">compose step</text>
+        <text x="695" y="98" fill="oklch(58% 0.01 260)" stroke="none">wgc router compose graph.yaml, Node</text>
+        <text x="695" y="113" fill="oklch(58% 0.01 260)" stroke="none">output config.json committed</text>
+        <text x="695" y="128" fill="oklch(58% 0.01 260)" stroke="none">drift test in Go (SR-42)</text>
+        <path d="M790 139 L790 183" marker-end="url(#ah)"></path>
+        <text x="800" y="165" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">commits config.json</text>
+        <rect x="685" y="183" width="300" height="48" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="695" y="203" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">repository</text>
+        <text x="695" y="219" fill="oklch(58% 0.01 260)" stroke="none">v* tag pushed by the maintainer (AD-0020)</text>
+        <path d="M790 231 L790 275" marker-end="url(#ah)"></path>
+        <text x="800" y="257" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">tag push starts the workflow</text>
+        <rect x="685" y="275" width="300" height="62" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="695" y="295" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">GitHub Actions publish.yml</text>
+        <text x="695" y="311" fill="oklch(58% 0.01 260)" stroke="none">workflow, runs on push of a v* tag</text>
+        <text x="695" y="326" fill="oklch(58% 0.01 260)" stroke="none">contents: read, packages: write</text>
+        <path d="M790 337 L790 381" marker-end="url(#ah)"></path>
+        <text x="800" y="363" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">cross-compiles both platforms</text>
+        <rect x="685" y="381" width="300" height="62" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="695" y="401" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">docker build</text>
+        <text x="695" y="417" fill="oklch(58% 0.01 260)" stroke="none">examples/pipeline/Dockerfile, root context</text>
+        <text x="695" y="432" fill="oklch(58% 0.01 260)" stroke="none">linux/amd64, linux/arm64, no QEMU (C-49)</text>
+        <path d="M790 443 L790 487" marker-end="url(#ah)"></path>
+        <text x="800" y="469" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">pushes with the workflow token</text>
+        <rect x="685" y="487" width="300" height="77" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="695" y="507" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">GHCR</text>
+        <text x="695" y="523" fill="oklch(58% 0.01 260)" stroke="none">ghcr.io/roarge/sysml-federation, public</text>
+        <text x="695" y="538" fill="oklch(58% 0.01 260)" stroke="none">tags {{version}} and latest</text>
+        <text x="695" y="553" fill="oklch(58% 0.01 260)" stroke="none">provenance attestations off (C-52)</text>
+        <path d="M790 564 L790 608" marker-end="url(#ah)"></path>
+        <text x="800" y="590" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">read back after the push</text>
+        <rect x="685" y="608" width="300" height="62" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="695" y="628" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">manifest read back</text>
+        <text x="695" y="644" fill="oklch(58% 0.01 260)" stroke="none">two platforms, each under 80 MB</text>
+        <text x="695" y="659" fill="oklch(58% 0.01 260)" stroke="none">or the job fails (SR-05, SR-06)</text>
+      </svg>
+    </div>
+    <div class="aside">
+      <h4>The process tree</h4>
+      <p>One binary is PID 1 and everything else runs under it: the three gqlgen subgraphs as goroutines on loopback ports, the vendor router as a child process, and the UI server on the one published port (AD-0010, AD-0011). The supervisor is the router's direct parent and reaps it through os/exec without tini (C-58). Subgraphs start first, each waited for on its health endpoint, then the router until /health/ready answers on its loopback port, then port 8080 opens.</p>
+      <h4>Offline by construction</h4>
+      <p>No connection leaves the container while it runs (SR-03). The four telemetry variables are baked into the image with ENV (AD-0013), and the supervisor adds the listen address, the playground path and the path of the copied configuration, so the router needs no YAML file of its own. Whether it starts from environment alone in a distroless image is C-20's spike. Its licence text is fetched at build time from the vendor's repository at the pinned tag, with a pinned checksum, so it cannot drift from the binary (SR-07).</p>
+      <h4>Subcommands</h4>
+      <p>serve is the default and runs everything in the tree. adapter, capacity, document and ui each run one component on a given address, for anyone who wants to see the services apart. healthcheck GETs the router's /health/ready on its loopback port and /viewer on the published port, and exits non-zero if either fails. That is what the image's HEALTHCHECK calls, since a distroless image has no shell to run anything else (C-55).</p>
+      <div class="legend">
+        <span><span class="sw"></span>a component of the demo, with its type and technology</span>
+        <span><span class="sw s"></span>owned by the example rather than the adapter</span>
+        <span><span class="sw b"></span>the router, a vendor binary run as a child process</span>
+        <span><span class="sw d"></span>outside the demo, or content the demo reads</span>
+        <span><svg width="22" height="12" viewBox="-11 -6 22 12" style="vertical-align: middle; margin-right: 6px"><path d="M0 -6 L1.53 -2.1 L5.71 -1.85 L2.47 0.8 L3.53 4.85 L0 2.6 L-3.53 4.85 L-2.47 0.8 L-5.71 -1.85 L-1.53 -2.1 Z" fill="oklch(58% 0.01 260)" stroke="none"></path></svg>a spike before the first tag: C-20 the router from environment alone, C-53 COPY --from on the arm64 layer</span>
+        <span>arrows are one-directional and labelled with their intent, the trunk and ticks are the process tree</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

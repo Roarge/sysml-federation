@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>US-02 Read the model</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 960px; height: 640px; box-sizing: border-box; padding: 26px 30px; background: var(--paper); display: flex; flex-direction: column; gap: 14px; }
+    .head { display: flex; flex-direction: row; gap: 14px; align-items: baseline; }
+    .id { font-family: var(--display); font-size: 30px; line-height: 1; }
+    .title { font-family: var(--display); font-size: 30px; line-height: 1; margin: 0; flex: 1 1 auto; }
+    .who { font-size: 13px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 9px; background: var(--paper); }
+    .who.m { background: var(--shade); }
+    .who.d { background: var(--shade); border-style: dashed; }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .sketch { flex: 0 0 460px; display: flex; flex-direction: column; gap: 6px; }
+    .caption { font-size: 12px; color: var(--pencil); }
+    .text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .story { margin: 0; font-size: 15px; }
+    .story b { font-weight: 600; }
+    .text h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .crit { margin: 0; padding-left: 18px; font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
+    .crit li { margin: 0; }
+    .crit b { font-weight: 600; }
+    .none { font-size: 13px; color: var(--pencil); margin: 0; }
+    .trace { font-size: 12px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 6px; margin-top: auto; }
+  </style>
+  <style>
+    @page { size: 960px 640px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <span class="id">US-02</span>
+    <h2 class="title">Read the model</h2>
+    <span class="who">the visitor</span>
+  </div>
+  <div class="body">
+    <div class="sketch">
+      <svg viewBox="0 0 460 470" width="460" height="470" font-family="Patrick Hand, cursive" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="6" y="6" width="448" height="458" rx="4"></rect>
+        <text x="20" y="30" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">model viewer, shipped state</text>
+        <rect x="18" y="42" width="196" height="310" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="26" y="62">package Pipeline {</text>
+          <text x="34" y="79">part ingest : Server {</text>
+          <text x="42" y="96">throughput = 2000; }</text>
+          <text x="34" y="113">part parse : Server {</text>
+          <text x="42" y="130">throughput = 1200; }</text>
+          <text x="34" y="147">part indexA : Server {</text>
+          <text x="42" y="164">throughput = 700; }</text>
+          <text x="34" y="181">part indexB : Server {</text>
+          <text x="42" y="198">throughput = 700; }</text>
+          <text x="34" y="215">part serve : Server {</text>
+          <text x="42" y="232">throughput = 1800; }</text>
+          <text x="34" y="251">connect ingest to parse;</text>
+          <text x="34" y="268">connect parse to indexA;</text>
+          <text x="34" y="285">...</text>
+          <text x="26" y="306" fill="oklch(55% 0.19 25)">requirement PIPE-R1</text>
+          <text x="34" y="322" fill="oklch(55% 0.19 25)">capacity >= 1500   FAIL</text>
+          <text x="34" y="338" fill="oklch(55% 0.19 25)">parse is the bottleneck at 1200</text>
+        </g>
+        <g font-size="13" font-family="Source Sans 3, sans-serif">
+          <rect x="226" y="150" width="56" height="30" rx="2"></rect>
+          <text x="254" y="163" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">ingest</text>
+          <text x="254" y="176" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">2000</text>
+          <rect x="300" y="150" width="56" height="30" rx="2" stroke="oklch(55% 0.19 25)" stroke-width="2.2"></rect>
+          <text x="328" y="163" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">parse</text>
+          <text x="328" y="176" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">1200</text>
+          <rect x="300" y="204" width="56" height="30" rx="2"></rect>
+          <text x="328" y="217" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">indexA</text>
+          <text x="328" y="230" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">700</text>
+          <rect x="300" y="250" width="56" height="30" rx="2"></rect>
+          <text x="328" y="263" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">indexB</text>
+          <text x="328" y="276" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">700</text>
+          <rect x="390" y="227" width="56" height="30" rx="2"></rect>
+          <text x="418" y="240" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">serve</text>
+          <text x="418" y="253" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">1800</text>
+        </g>
+        <path d="M282 165 L300 165 M328 180 L328 204 M328 234 L328 250 M356 219 C 372 219, 376 242, 390 242 M356 265 C 372 265, 376 242, 390 242" stroke="oklch(58% 0.01 260)"></path>
+        <text x="236" y="310" fill="oklch(25% 0.01 260)" stroke="none" font-size="16">capacity 1200</text>
+        <text x="236" y="330" fill="oklch(55% 0.19 25)" stroke="none" font-size="14">bottleneck: parse</text>
+        <path d="M 232 346 C 222 334, 218 290, 214 260" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <text x="236" y="350" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">drawn from the connect lines</text>
+        <text x="20" y="384" fill="oklch(25% 0.01 260)" stroke="none" font-size="17">capacity = min(2000, 1200, 700 + 700, 1800) = 1200</text>
+        <text x="20" y="408" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">min along the chain, sum across the pair</text>
+        <text x="20" y="432" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">1200 is below the 1500 limit, so the reason names parse</text>
+      </svg>
+      <span class="caption">Sketch of the viewer as it opens, with nothing edited yet.</span>
+    </div>
+    <div class="text">
+      <p class="story">As <b>the visitor</b>, I want to see the pipeline model as SysML v2 text beside a sketch of the wiring, so that I understand what is being modelled without knowing the language.</p>
+      <h4>Acceptance</h4>
+      <ol class="crit">
+        <li><b>Given</b> the shipped model, <b>when</b> the viewer opens, <b>then</b> the text pane shows the model file with the servers, their throughput values, the connections, the requirements and their short names.</li>
+        <li><b>Given</b> the shipped model, <b>when</b> the viewer opens, <b>then</b> the sketch shows the five servers left to right as wired, each with its throughput, the rolled-up capacity of 1200, and parse marked as the bottleneck.</li>
+        <li><b>Given</b> the shipped model, <b>when</b> the viewer opens, <b>then</b> PIPE-R1 shows its limit of 1500, a verdict of FAIL and a reason naming parse at 1200.</li>
+      </ol>
+      <h4>Why it matters</h4>
+      <p class="none">The viewer puts the model text and the wiring side by side, so a visitor who has never read SysML can see what the five servers are and why the capacity is 1200. Every later story edits something on this screen, and this is the state those edits start from.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

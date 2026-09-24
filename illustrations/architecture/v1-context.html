@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>V1 Context</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 1440px; height: 900px; box-sizing: border-box; padding: 28px 36px; background: var(--paper); display: flex; flex-direction: column; gap: 12px; }
+    .head { display: flex; flex-direction: row; gap: 16px; align-items: baseline; }
+    .title { font-family: var(--display); font-size: 34px; line-height: 1; margin: 0; }
+    .scope { font-size: 14px; color: var(--pencil); }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .diagram { flex: 0 0 1000px; }
+    .aside { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; font-size: 13.5px; }
+    .aside h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .aside p { margin: 0; }
+    .aside .legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 8px; margin-top: auto; }
+    .aside .legend span .sw { display: inline-block; width: 22px; height: 12px; border: 1.5px solid var(--ink); border-radius: 2px; vertical-align: middle; margin-right: 6px; background: var(--paper); }
+    .aside .legend span .sw.s { background: var(--shade); }
+    .aside .legend span .sw.b { border-color: var(--blue); background: color-mix(in oklch, var(--blue) 12%, var(--paper)); }
+    .aside .legend span .sw.d { border-style: dashed; }
+  </style>
+  <style>
+    @page { size: 1440px 900px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <h2 class="title">V1 Context</h2>
+    <span class="scope">the demo among the things it touches, at the level of one container and its neighbours</span>
+  </div>
+  <div class="body">
+    <div class="diagram">
+      <svg viewBox="0 0 1000 720" width="1000" height="720" font-family="Source Sans 3, sans-serif" font-size="12" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="oklch(25% 0.01 260)" stroke="none"></path></marker>
+        </defs>
+        <text x="20" y="40" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="17">outside the demo</text>
+        <text x="340" y="40" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="17">inside the boundary: one container, one published port</text>
+        <rect x="320" y="70" width="460" height="500" rx="4" stroke-width="2"></rect>
+        <text x="336" y="96" fill="oklch(25% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="22">the demo</text>
+        <text x="336" y="114" fill="oklch(58% 0.01 260)" stroke="none">one container, started by one command</text>
+        <rect x="340" y="132" width="204" height="62" rx="3"></rect>
+        <text x="350" y="152" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">model viewer</text>
+        <text x="350" y="168" fill="oklch(58% 0.01 260)" stroke="none">web app, HTML and ES modules</text>
+        <text x="350" y="183" fill="oklch(58% 0.01 260)" stroke="none">served at /viewer</text>
+        <rect x="556" y="132" width="204" height="62" rx="3"></rect>
+        <text x="566" y="152" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">requirements document</text>
+        <text x="566" y="168" fill="oklch(58% 0.01 260)" stroke="none">web app, HTML and ES modules</text>
+        <text x="566" y="183" fill="oklch(58% 0.01 260)" stroke="none">served at /document</text>
+        <rect x="340" y="210" width="420" height="50" rx="3"></rect>
+        <text x="350" y="230" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">UI server</text>
+        <text x="350" y="247" fill="oklch(58% 0.01 260)" stroke="none">Go, serves both apps, proxies /graphql and /playground, redirects /</text>
+        <rect x="340" y="276" width="420" height="50" rx="3" stroke="oklch(52% 0.12 250)" fill="color-mix(in oklch, oklch(52% 0.12 250) 12%, oklch(98% 0.005 90))"></rect>
+        <text x="350" y="296" fill="oklch(52% 0.12 250)" stroke="none" font-size="13" font-weight="600">router</text>
+        <text x="350" y="313" fill="oklch(52% 0.12 250)" stroke="none">Cosmo 0.343.1, vendor binary, static configuration, child process</text>
+        <rect x="340" y="342" width="130" height="62" rx="3"></rect>
+        <text x="350" y="362" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">adapter</text>
+        <text x="350" y="378" fill="oklch(58% 0.01 260)" stroke="none">Go subgraph, generic</text>
+        <text x="350" y="393" fill="oklch(58% 0.01 260)" stroke="none">reads the model file</text>
+        <rect x="485" y="342" width="130" height="62" rx="3" fill="oklch(93% 0.006 90)"></rect>
+        <text x="495" y="362" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">capacity</text>
+        <text x="495" y="378" fill="oklch(58% 0.01 260)" stroke="none">Go subgraph</text>
+        <text x="495" y="393" fill="oklch(58% 0.01 260)" stroke="none">rollup, verdicts</text>
+        <rect x="630" y="342" width="130" height="62" rx="3" fill="oklch(93% 0.006 90)"></rect>
+        <text x="640" y="362" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">document</text>
+        <text x="640" y="378" fill="oklch(58% 0.01 260)" stroke="none">Go subgraph</text>
+        <text x="640" y="393" fill="oklch(58% 0.01 260)" stroke="none">structure, numbering</text>
+        <rect x="340" y="420" width="204" height="62" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="350" y="440" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">model.sysml</text>
+        <text x="350" y="456" fill="oklch(58% 0.01 260)" stroke="none">the example model, content</text>
+        <text x="350" y="471" fill="oklch(58% 0.01 260)" stroke="none">read once by the adapter</text>
+        <rect x="556" y="420" width="204" height="62" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="566" y="440" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">config.json</text>
+        <text x="566" y="456" fill="oklch(58% 0.01 260)" stroke="none">composed router configuration</text>
+        <text x="566" y="471" fill="oklch(58% 0.01 260)" stroke="none">committed, read by the router</text>
+        <text x="340" y="520" fill="oklch(25% 0.01 260)" stroke="none" font-size="13">Built to make no connection outside the container while it runs (SR-03).</text>
+        <text x="340" y="540" fill="oklch(58% 0.01 260)" stroke="none">Every service, the router and both apps run inside this one container.</text>
+        <rect x="20" y="132" width="190" height="72" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="30" y="152" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">the visitor's browser</text>
+        <text x="30" y="168" fill="oklch(58% 0.01 260)" stroke="none">two tabs, or two visitors</text>
+        <text x="30" y="183" fill="oklch(58% 0.01 260)" stroke="none">a desktop browser</text>
+        <path d="M210 168 L320 168" marker-end="url(#ah)"></path>
+        <text x="216" y="158" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">HTTP on one port</text>
+        <text x="216" y="182" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">pages, GraphQL, SSE</text>
+        <rect x="20" y="400" width="190" height="72" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="30" y="420" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">the Docker host</text>
+        <text x="30" y="436" fill="oklch(58% 0.01 260)" stroke="none">Linux, macOS or Windows</text>
+        <text x="30" y="451" fill="oklch(58% 0.01 260)" stroke="none">publishes port 8080</text>
+        <path d="M210 436 L320 436" marker-end="url(#ah)"></path>
+        <text x="216" y="426" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">docker run, once</text>
+        <rect x="20" y="600" width="190" height="72" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="30" y="620" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">GitHub container registry</text>
+        <text x="30" y="636" fill="oklch(58% 0.01 260)" stroke="none">ghcr.io/roarge/sysml-federation</text>
+        <text x="30" y="651" fill="oklch(58% 0.01 260)" stroke="none">public package, two platforms</text>
+        <path d="M115 600 L115 472" marker-end="url(#ah)"></path>
+        <text x="122" y="540" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">pulls the image, once</text>
+        <rect x="800" y="600" width="190" height="72" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="810" y="620" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">the maintainer's machine</text>
+        <text x="810" y="636" fill="oklch(58% 0.01 260)" stroke="none">Go, Node for wgc, Docker</text>
+        <text x="810" y="651" fill="oklch(58% 0.01 260)" stroke="none">pushes a v* tag</text>
+        <path d="M800 636 L210 636" marker-end="url(#ah)"></path>
+        <text x="330" y="626" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">GitHub Actions builds and publishes the image on the tag</text>
+        <path d="M895 600 L895 570" marker-end="url(#ah)" stroke-dasharray="4 3"></path>
+        <text x="660" y="588" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">composes config.json with wgc, commits it</text>
+        <rect x="800" y="132" width="190" height="90" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="810" y="152" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">the pipeline</text>
+        <text x="810" y="168" fill="oklch(58% 0.01 260)" stroke="none">the system the model describes</text>
+        <text x="810" y="183" fill="oklch(58% 0.01 260)" stroke="none">five servers, wired</text>
+        <text x="810" y="198" fill="oklch(58% 0.01 260)" stroke="none">not running anywhere</text>
+        <path d="M800 168 L780 168" stroke-dasharray="4 3"></path>
+      </svg>
+    </div>
+    <div class="aside">
+      <h4>What crosses the line</h4>
+      <p>The browser makes HTTP requests to one published port: the two pages, GraphQL queries and mutations, and the SSE streams that carry version events. The Docker host pulls the image once. The maintainer's machine, never the container, runs the composition step and pushes the tag that publishes the image.</p>
+      <h4>Two things easy to mistake for the inside</h4>
+      <p>The example model is content the adapter reads, authored in the repository and validated with the OMG pilot before it ships (SR-45). The pipeline it describes does not run anywhere. The router is a vendor binary copied into the image and driven only by configuration and environment (AD-0010).</p>
+      <h4>Concerns addressed</h4>
+      <p>The visitor: can I launch it with one command, and where do I look (US-01, SR-01, SR-04). An organisation deciding looks past this view: V2 for the agreement between services, V4 for what to replace.</p>
+      <div class="legend">
+        <span><span class="sw"></span>a component of the demo, with its type and technology</span>
+        <span><span class="sw s"></span>owned by the example rather than the adapter</span>
+        <span><span class="sw b"></span>the router, the only place the services meet</span>
+        <span><span class="sw d"></span>outside the demo, or content the demo reads</span>
+        <span>arrows are one-directional and labelled with their intent</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

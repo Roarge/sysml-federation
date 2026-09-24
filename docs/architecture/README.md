@@ -6,6 +6,8 @@ The text form is in [The architecture in one sitting](../articles/01-the-archite
 
 The record of each decision is in [the decision records](../decisions/README.md).
 
+The PDF is built from HTML sources in the repository, one per board, which a reader who finds an error can correct as described in [`illustrations/`](https://github.com/Roarge/sysml-federation/tree/main/illustrations).
+
 ---
 
 Index: [Federating a systems model](../README.md) · Repository: https://github.com/Roarge/sysml-federation

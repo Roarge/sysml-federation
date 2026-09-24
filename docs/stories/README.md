@@ -6,6 +6,8 @@ The text form is [Twelve use cases and one moving bottleneck](../articles/04-twe
 
 Values on the boards follow the design brief: ingest 2000, parse 1200, indexA 700, indexB 700, serve 1800, limit 1500.
 
+The PDF is built from HTML sources in the repository, one per board, which a reader who finds an error can correct as described in [`illustrations/`](https://github.com/Roarge/sysml-federation/tree/main/illustrations).
+
 ---
 
 Index: [Federating a systems model](../README.md) · Repository: https://github.com/Roarge/sysml-federation

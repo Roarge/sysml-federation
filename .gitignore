@@ -38,6 +38,8 @@
 !/model/**/
 !/checkly/
 !/checkly/**/
+!/illustrations/
+!/illustrations/**/
 
 
 # ------------------------------------------------------------ source files --
@@ -96,9 +98,18 @@
 !/examples/*/ui/shared/LICENSE.*
 !/examples/*/*/*.json
 
-# Exports of the design canvases, one PDF per set and one directory level
-# down: the A3 sheets, the architecture views and the use-case boards.
+# The PDFs built from the sources under illustrations/, one per set and one
+# directory level down: the A3 sheets, the architecture views and the use-case
+# boards.
 !/docs/*/*.pdf
+
+# The sources of those PDFs and of the article images cut from the same boards:
+# one HTML page per board, one directory level down, and the build script and
+# its README beside them.
+# Anchored and depth-bounded, so each rule admits exactly the files it names.
+!/illustrations/README.md
+!/illustrations/build.py
+!/illustrations/*/*.html
 
 # The documentation site. GitHub Pages builds docs/ with Jekyll, which needs
 # its configuration, its layouts, its includes and one stylesheet, each named
