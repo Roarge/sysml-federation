@@ -26,6 +26,10 @@ package Federation_ValidationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A reload of the viewer made every one of its eight requests to the one published port. */
         }
+        action <'record: 2026-09-14 SR-10'> renderWithTheHostOffline {
+            @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
+            doc /* With the host taken off the network, both apps reloaded and drew in full. */
+        }
         action <'record: 2026-08-28 SR-04'> pathsOnTheContainer {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The container answered the redirect, the three paths, a query and a held subscription on port 8080. */

@@ -427,7 +427,10 @@ fires on the router's own connection and both answered `101 Switching
 Protocols`. The check is live all the same: the same handshake sent by hand with
 `Origin: http://evil.example` was refused with `403 Forbidden` and `request
 Origin "evil.example" is not authorized for Host "127.0.0.1:3011"`, and the
-document service refused it the same way naming its own port.
+document service refused it the same way naming its own port. A browser was put
+to the same test on 2026-09-14, with a page served from another origin trying
+to open the socket, and the socket was refused. That run is the last row of the
+table under the two web apps below.
 
 ### The two web apps
 
@@ -471,6 +474,8 @@ the same way.
 | 2026-08-28 | SR-39 | PIPE-R1.2's throughput set to 1700 and PIPE-R1's limit to 1600 in the document, then parse to 1700 and indexA to 900 in the viewer | The document gave PIPE-R1.2 `PASS`, PIPE-R1 `FAIL capacity 1400 against 1500, limited by indexA, indexB`, and the viewer showed 1700 in the served text and `capacity 1400, bottleneck indexA, indexB` with no reload. The limit at 1600 put `1600` in the viewer's constraint literal. The edits made in the viewer gave the document `PASS capacity 1600 against 1500, limited by indexA, indexB`, PIPE-R1.3 `PASS` and PIPE-R1.4 `FAIL throughput 700 against 750` |
 | 2026-08-28 | Refusal text | `moveNode(id: "no-such-node", parentId: null, index: 0)` sent from the document's own client | The client threw with the message `no such node: no-such-node`, which is the whole of `errors[0].message` as the service wrote it |
 | 2026-08-28 | Depth limit | `Heading above` pressed four times on PIPE-R1, taking its children to the sixth level | Each row at the sixth level reads `The document is shown 6 levels deep, so this item cannot be nested any deeper.` and offers `Exclude` alone. Both `Add prose` and `Heading above` are withheld there, and they are present at every level above |
+| 2026-09-14 | SR-10 | Both apps reloaded on Ubuntu under WSL with the host taken off the network | Both drew in full |
+| 2026-09-14 | Same origin | A page served from another origin, opened in a browser on Ubuntu under WSL, tried to open the subscription socket | The socket was refused |
 
 A page left in a background tab for several minutes stops being updated, because
 the browser freezes the tab, and it shows no error while that lasts. Both apps
@@ -514,5 +519,6 @@ nothing on `127.0.0.1:8088`. Every connection open at the time was loopback to
 loopback.
 
 A container started with no network interface publishes no port, so nothing in
-this run reaches a browser, and the reload with the host offline that the
-request list under SR-10 leaves open is still open.
+this run reaches a browser. The reload with the host offline, which the request
+list under SR-10 left open, was run on its own on 2026-09-14 and is in the table
+under the two web apps above.
