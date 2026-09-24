@@ -34,7 +34,7 @@ How the demo was designed before any code was written, and what each round of re
 7. [Five views and twenty-six decisions](articles/06-five-views-and-twenty-six-decisions.md)  
    The architecture seen from five angles, each for a different reader, with a written record behind every choice that shaped it.
 8. [An A3 sheet for a fifteen-minute reader](articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md)  
-   Why the overview is one printed sheet, what the method behind it fixes and what it only suggests, and the two sheets drawn so far.
+   Why the overview is one printed sheet, what the A3 method forces on it, and the two sheets drawn so far.
 
 ### The build
 
