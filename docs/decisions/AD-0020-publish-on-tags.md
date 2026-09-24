@@ -161,8 +161,8 @@ cost the packaging research names and the design accepts. It can also
 lag the newest tag in the registry instead of tracking it. A failed gate or
 a failed leg leaves the version tag published and `latest` where it was, and a
 pre-release moves nothing, so an untagged pull returns the last full release
-that passed the gate and both legs rather than whatever went up most
-recently. Cutting a
+whose run passed every check the workflow held at the time, rather than
+whatever went up most recently. Cutting a
 release means reading the run rather than assuming that a tag in the registry
 is what `latest` names.
 
