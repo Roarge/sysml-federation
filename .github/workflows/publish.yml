@@ -38,8 +38,9 @@ jobs:
     permissions:
       contents: read
       packages: write
-    # The later jobs name the image by the digest the build reported, never by
-    # a tag, so it is handed on from here together with the version.
+    # The later jobs name the image they pull, run and tag by the digest the
+    # build reported rather than by the version tag, so it is handed on from
+    # here together with the version.
     outputs:
       digest: ${{ steps.build.outputs.digest }}
       version: ${{ steps.meta.outputs.version }}
@@ -274,9 +275,10 @@ jobs:
 
           # The supervisor binds the viewer's port only once the router has
           # reported ready, so a 200 there means the stack behind it is up. A
-          # refused connection is the ordinary answer while the container
-          # starts and counts as not yet. The bound is a deadline rather than a
-          # number of tries, since one try can take up to five seconds.
+          # connection that is refused or closed without an answer is the
+          # ordinary result while the container starts and counts as not yet.
+          # The bound is a deadline rather than a number of tries, since one
+          # try can take up to five seconds.
           deadline=$((started + 60))
           while :; do
             code="$(curl -s -o /dev/null -w '%{http_code}' -m 5 http://127.0.0.1:8080/viewer/ || true)"
@@ -395,8 +397,8 @@ jobs:
   # there on both architectures. Only then does latest move. If the gate or
   # either leg fails, this job does not run and latest keeps pointing where it
   # pointed, so an untagged pull never returns an image the gate rejected or
-  # one that did not start and serve natively on both architectures. The
-  # version tag itself is left in the registry and has to be deleted by hand.
+  # one that a leg failed. The version tag itself is left in the registry and
+  # has to be deleted by hand.
   latest:
     needs: [publish, smoke]
     runs-on: ubuntu-latest
