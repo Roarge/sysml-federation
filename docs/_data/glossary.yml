@@ -222,3 +222,67 @@
     service. Spans nest, so a trace reads as a tree of the work one request
     caused.
   link: https://opentelemetry.io/docs/concepts/signals/traces/
+
+- id: xmi
+  term: XMI
+  definition: >-
+    XML Metadata Interchange, the Object Management Group's XML format for
+    exchanging models between tools. In practice each vendor wrote it a little
+    differently, so a file one tool saved did not always read back cleanly in
+    another.
+  link: https://en.wikipedia.org/wiki/XML_Metadata_Interchange
+
+- id: plm
+  term: PLM
+  definition: >-
+    Product lifecycle management. The systems a manufacturer uses to hold a
+    product's parts, drawings, versions and changes from first design to
+    retirement.
+  link: https://en.wikipedia.org/wiki/Product_lifecycle_management
+
+- id: service-bus
+  term: Service bus
+  definition: >-
+    An enterprise service bus puts one integration platform in the middle of
+    an organisation's systems. Every system talks to the bus through an
+    adapter, and a central team owns the shared data model and the rules that
+    translate between systems.
+  link: https://en.wikipedia.org/wiki/Enterprise_service_bus
+
+- id: oslc
+  term: OSLC
+  definition: >-
+    Open Services for Lifecycle Collaboration, a set of specifications for
+    linking engineering tools through the web. Each tool publishes its objects
+    at URLs and describes them in a shared format, so another tool can link to
+    a requirement or a test without copying it.
+  link: https://en.wikipedia.org/wiki/Open_Services_for_Lifecycle_Collaboration
+
+- id: metamodel
+  term: Metamodel
+  definition: >-
+    The model of a modelling language: the kinds of element it has and how
+    they may relate. A tool that reads SysML v2 through its standard API gets
+    elements described in these general terms, so it has to understand the
+    metamodel before it can find something as ordinary as a requirement's
+    text.
+  link: https://en.wikipedia.org/wiki/Metamodeling
+
+- id: control-plane
+  term: Control plane
+  definition: >-
+    The central service of the Cosmo platform. Cosmo's command-line tool and
+    web console use it to manage graphs, and routers talk to it while they
+    run. This demo has none. I compose the schemas locally with the
+    command-line tool, commit the result, and the router starts from that
+    file.
+  link: https://cosmo-docs.wundergraph.com/control-plane/intro
+
+- id: race-detector
+  term: Race detector
+  definition: >-
+    A mode of Go's test tool that watches for data races, where two goroutines
+    reach the same memory at once, at least one of them writes, and nothing
+    orders the two. Tests run with it fail when a race happens, even if the
+    answers they check came out right.
+  link: https://go.dev/doc/articles/race_detector
