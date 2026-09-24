@@ -83,10 +83,10 @@ What is entity resolution between a model and a built system, and what is a sing
 
 ### Errors and measurement
 
-Why no resolver gets every link right, and what follows for how one is put to work.
+Why does no resolver get every link right, and what does that mean for how one is put to work?
 
 3. [Why no resolver gets every link right](articles/15-why-no-resolver-gets-every-link-right.md)  
-   One change to a made-up pipeline breaks three links nobody touched. Why some wrong links and missing ones are certain, and when a resolver can still be left to add links on its own.
+   One change to a made-up pipeline breaks three links nobody touched. Why are some wrong links and missing ones certain, and when can a resolver still be left to add links on its own?
 
 ## The repository
 
