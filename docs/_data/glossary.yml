@@ -32,6 +32,14 @@
     data.
   link: https://sebokwiki.org/wiki/Model-Based_Systems_Engineering_(MBSE)
 
+- id: part
+  term: Part
+  definition: >-
+    In SysML v2, an element of a systems model that stands for a piece of the
+    system, such as a server, a service or a pump. Each part is declared from
+    a part definition, which plays the role a type or a class plays in code.
+  link: https://www.omg.org/spec/SysML/2.0
+
 - id: router
   term: Router
   definition: >-
@@ -67,8 +75,8 @@
 - id: short-name
   term: Short name
   definition: >-
-    A second, shorter name a SysML v2 element can carry, written between angle
-    brackets and quotes, such as <'SR-22'>. This project uses short names as
+    A second, shorter name an element of a SysML v2 systems model can carry,
+    written between angle brackets and quotes, such as <'SR-22'>. This project uses short names as
     identifiers that people can type and that every service agrees on.
 
 - id: satisfy
@@ -82,8 +90,9 @@
   term: Verification case
   definition: >-
     A defined way of showing that a requirement is met, by test, analysis,
-    inspection or demonstration. In SysML v2 it is a model element that names
-    the requirement it verifies and the steps that make up the check.
+    inspection or demonstration. In SysML v2 it is an element of the systems
+    model that names the requirement it verifies and the steps that make up
+    the check.
   link: https://sebokwiki.org/wiki/System_Verification
 
 - id: validation-case
@@ -124,10 +133,10 @@
 - id: view
   term: View
   definition: >-
-    A selection from a model that answers one audience's concerns, such as a
-    deployment picture for the people who run the system. SysML v2 has views
-    as model elements, and the ISO/IEC/IEEE 42010 standard for architecture
-    descriptions defines views and the viewpoints that govern them.
+    A selection from a systems model that answers one audience's concerns,
+    such as a deployment picture for the people who run the system. SysML v2
+    treats views as elements of the systems model, and the ISO/IEC/IEEE 42010
+    standard for architecture descriptions defines views and the viewpoints that govern them.
   link: https://en.wikipedia.org/wiki/ISO/IEC_42010
 
 - id: pilot-implementation
@@ -303,10 +312,11 @@
 - id: entity-resolver
   term: Entity resolver
   definition: >-
-    The part of a federated service that answers for an object another
+    The code in a federated service that answers for an object another
     service has already found. The router hands it the object's key, plus any
     fields the service said it requires, and gets back the fields this
-    service adds to that object.
+    service adds to that object. Despite the name, it decides nothing,
+    because every service already agrees on the key.
   link: https://www.apollographql.com/docs/graphos/schema-design/federated-schemas/entities/intro
 
 - id: mutation
