@@ -4,11 +4,6 @@
 
 Part 1 of 13 in [Federating a systems model](../README.md), written for release v0.3.0.
 
-> [!IMPORTANT]
-> **Where this starts**
->
-> With a problem I keep running into. Engineering organisations describe one system in several documents that drift apart, and the modelling tools meant to fix that lock the model away. This part sets out the idea I think gets round it, and the small demo I built to show it. The rest of the series follows that demo from design to a published container.
-
 ## One system, many documents
 
 Every engineering organisation I've worked with keeps its system in several places at once. The requirements live in one file and the interface definitions in another. The power budget sits in a spreadsheet, and the hazard analysis is somewhere a third team controls. All of them describe the same machine. Keeping them in agreement is manual work that nobody enjoys and everybody puts off until a review forces the issue.
