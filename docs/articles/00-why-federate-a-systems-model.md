@@ -1,4 +1,4 @@
-# Why federate a systems model
+# Why federate a systems model?
 
 *Roar Georgsen, 27 August 2026*
 
