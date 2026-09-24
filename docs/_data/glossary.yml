@@ -346,3 +346,36 @@
     can load code split across files with import and export, with no bundler
     or build step in between.
   link: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
+
+- id: subgraph
+  term: Subgraph
+  definition: >-
+    One service's share of a federated GraphQL schema. Each subgraph is written
+    and run by its own team, and the router merges them into one graph that a
+    client queries as if it were a single service.
+  link: https://graphql.org/learn/federation/
+
+- id: opentofu
+  term: OpenTofu
+  definition: >-
+    An open-source tool for infrastructure as code. You describe servers,
+    networks and services in configuration files, and OpenTofu creates,
+    changes or destroys the real resources to match, keeping a record of what
+    it made under each resource's address.
+  link: https://opentofu.org/docs/
+
+- id: digital-thread
+  term: Digital thread
+  definition: >-
+    The connected record of a product's data across its whole life, from
+    requirements and design through manufacture to operation and repair, so
+    that information in one stage can be traced to its source in another.
+  link: https://ac.cto.mil/wp-content/uploads/2019/06/2018-Digital-Engineering-Strategy_Approved_PrintVersion.pdf
+
+- id: mqtt
+  term: MQTT
+  definition: >-
+    A lightweight publish and subscribe messaging protocol, common in
+    industrial and Internet of Things systems. Devices publish messages to
+    named topics, and anything subscribed to a topic receives them.
+  link: https://mqtt.org/

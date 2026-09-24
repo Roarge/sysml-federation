@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 424" width="720" height="424" role="img" aria-label="A model element on the left, PIPE-S2 parse, has dashed lines to four objects of an imagined built system on the right. They are an OpenTofu resource whose address contains parse, an OpenTelemetry service named query-parser, a Checkly check named parse-p95-latency and a Go test named TestParserRejectsEmptyQuery. None of the four carries the key PIPE-S2, and each box names the only evidence that connects it.">
+  <title>The parse stage and four candidates</title>
+  <rect width="720" height="424" fill="#faf8f5"/>
+  <g font-family="'Source Sans 3', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" fill="#1f2227">
+
+    <!-- The model element -->
+    <rect x="16" y="140" width="196" height="120" rx="3" fill="#e9e8e3" stroke="#777a80"/>
+    <text x="30" y="164" font-size="12" font-weight="600" letter-spacing="0.8" fill="#555960">THE MODEL</text>
+    <text x="30" y="194" font-size="20" font-weight="700" font-family="ui-monospace, Menlo, Consolas, monospace">PIPE-S2</text>
+    <text x="30" y="218" font-size="13" font-family="ui-monospace, Menlo, Consolas, monospace">part parse : Server</text>
+    <text x="30" y="242" font-size="13" fill="#555960">throughput 1200</text>
+
+    <!-- Candidate lines, dashed because nothing joins them yet -->
+    <g stroke="#555960" stroke-width="1.5" stroke-dasharray="5 4" fill="none">
+      <line x1="212" y1="176" x2="376" y2="52"/>
+      <line x1="212" y1="192" x2="376" y2="148"/>
+      <line x1="212" y1="208" x2="376" y2="244"/>
+      <line x1="212" y1="224" x2="376" y2="340"/>
+    </g>
+
+    <!-- The four candidates -->
+    <g fill="#faf8f5" stroke="#1f2227">
+      <rect x="376" y="10" width="328" height="88" rx="3"/>
+      <rect x="376" y="106" width="328" height="88" rx="3"/>
+      <rect x="376" y="202" width="328" height="88" rx="3"/>
+      <rect x="376" y="298" width="328" height="88" rx="3"/>
+    </g>
+    <g font-size="12" font-weight="600" letter-spacing="0.8" fill="#555960">
+      <text x="390" y="30">OPENTOFU RESOURCE</text>
+      <text x="390" y="126">OPENTELEMETRY SERVICE</text>
+      <text x="390" y="222">CHECKLY CHECK</text>
+      <text x="390" y="318">GO TEST</text>
+    </g>
+    <g font-size="13" font-family="ui-monospace, Menlo, Consolas, monospace">
+      <text x="390" y="52">module.pipeline.aws_ecs_service</text>
+      <text x="390" y="69">.stage["parse"]</text>
+      <text x="390" y="150">service.name = "query-parser"</text>
+      <text x="390" y="246">logicalId: parse-p95-latency</text>
+      <text x="390" y="342">TestParserRejectsEmptyQuery</text>
+    </g>
+    <g font-size="13" fill="#555960" font-style="italic">
+      <text x="390" y="89">the address says parse</text>
+      <text x="390" y="175">a similar name</text>
+      <text x="390" y="271">names the stage, measures the requirement</text>
+      <text x="390" y="367">the stage, or the query language?</text>
+    </g>
+    <text x="16" y="414" font-size="12" fill="#555960">Made-up counterparts. None of them carries the key PIPE-S2.</text>
+  </g>
+</svg>

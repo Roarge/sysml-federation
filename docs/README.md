@@ -4,7 +4,7 @@
 
 I want SysML v2 models to be easier to connect to everything else an engineering organisation runs, down to the spreadsheets that quietly hold the place together. My proposal is federation. The model's owners publish a small projection of it, chosen with SysML's own views and viewpoints, and other services attach their own data to the model's elements by agreeing on an identifier. Nobody else has to learn SysML to join in.
 
-This site is where I write up the experiments. It is a personal blog, so expect opinions and the occasional admission that I should have known better. The first series builds a proof of concept, a SysML v2 adapter behind a Cosmo router with one worked example, and follows it from the first sketch to a published container image. It is a demo and not a product.
+This site is where I write up the experiments. It is a personal blog, so expect opinions and the occasional admission that I should have known better. The first series builds a proof of concept, a SysML v2 adapter behind a Cosmo router with one worked example, and follows it from the first sketch to a published container image. It is a demo and not a product. The second series, still being written, asks how the model's links to everything else that gets built could be found and kept without anyone typing them.
 
 ## Federating a systems model
 
@@ -68,9 +68,16 @@ The boards, sheets and records the articles draw on, for anyone who wants the so
 - [The model of the demo](https://github.com/Roarge/sysml-federation/tree/main/model), the demo itself in SysML v2, with its stories, requirements, architecture, tests and views, validated by the two reference tools on every change.
 - [The check session](https://github.com/Roarge/sysml-federation/tree/main/checkly), the Checkly project that runs every story against a live instance through a tunnel, with a collector and a trace viewer. It needs your own Checkly account, since mine cannot ship with the image.
 
-## Coming next
+## Automating traceability
 
-A second series, on automating the schema federation process, is coming soon.
+In progress. The second series takes on automating the federation itself. Before the rest of a system's tools can join the graph, something has to decide which of their objects are which model elements, and in the demo that's still me, by hand. New parts appear here as they're published.
+
+### The task
+
+What entity resolution between a model and a built system is, and why a model needs it.
+
+1. [Why a model needs entity resolution](articles/13-why-a-model-needs-entity-resolution.md)  
+   Most of what gets built never carries the model's keys. What it takes to find a model element's counterparts anyway, why a model needs them, and why the finding never stops.
 
 ## The repository
 

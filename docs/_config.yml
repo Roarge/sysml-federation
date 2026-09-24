@@ -108,3 +108,12 @@ series:
         title: "A model of the demo itself"
         date: 2026-09-13
         dek: "I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every storyboard story against the live demo."
+  - title: "Automating traceability"
+    status: "In progress"
+    parts:
+      - { title: "The task", from: 0, count: 1, dek: "What entity resolution between a model and a built system is, and why a model needs it." }
+    articles:
+      - path: articles/13-why-a-model-needs-entity-resolution.md
+        title: "Why a model needs entity resolution"
+        date: 2026-09-24
+        dek: "Most of what gets built never carries the model's keys. What it takes to find a model element's counterparts anyway, why a model needs them, and why the finding never stops."
