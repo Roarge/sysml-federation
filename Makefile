@@ -51,7 +51,7 @@ NOINTERFACE := $(BIN)/nointerface
 # Only the directories .gitignore actually allowlists. Support trees are
 # deliberately untracked, so finding source in them is the intended state, not a
 # forgotten allowlist entry.
-override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly
+override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly illustrations
 override TEST_FLAGS := -race -shuffle=on -count=1 -timeout=120s
 
 # A floor, not a decoration. 'override' for the same reason as the rest: an
@@ -219,7 +219,7 @@ check-allowlist: ## Warn about source files on disk that .gitignore would not tr
 	   $(addsuffix /,$(ALLOWLIST_ROOTS)) 2>/dev/null \
 	   | tr '\0' '\n' \
 	   | grep -vE '/(node_modules|test-results|playwright-report|\.checkly)/' \
-	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json)$$' || true)"; \
+	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json|py)$$' || true)"; \
 	 if [ -n "$$missing" ]; then \
 	   printf 'source files on disk that .gitignore does not track:\n'; \
 	   printf '%s\n' "$$missing" | sed 's/^/    /'; \
@@ -346,6 +346,17 @@ image: ## Build the demo image from the repository root
 .PHONY: run
 run: ## Run the locally built image on port 8080
 	docker run --rm -p 8080:8080 $(IMAGE)
+
+# ---------------------------------------------------------- illustrations --
+# The PDFs under docs/ and the article images cut from the same boards are
+# built from the HTML sources under illustrations/, whose README lists each
+# output. The build needs Chrome, pdfunite and pdfinfo from poppler,
+# Pillow, and a network connection for the fonts, so it runs on request and
+# never as part of a gate.
+# illustrations/README.md has the options and the requirements.
+.PHONY: illustrations
+illustrations: ## Rebuild the PDFs and the drawn article images from illustrations/
+	python3 illustrations/build.py
 
 # ------------------------------------------------------------------ gates ---
 .PHONY: check

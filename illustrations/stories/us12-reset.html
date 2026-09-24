@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>US-12 Reset</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 960px; height: 640px; box-sizing: border-box; padding: 26px 30px; background: var(--paper); display: flex; flex-direction: column; gap: 14px; }
+    .head { display: flex; flex-direction: row; gap: 14px; align-items: baseline; }
+    .id { font-family: var(--display); font-size: 30px; line-height: 1; }
+    .title { font-family: var(--display); font-size: 30px; line-height: 1; margin: 0; flex: 1 1 auto; }
+    .who { font-size: 13px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 9px; background: var(--paper); }
+    .who.m { background: var(--shade); }
+    .who.d { background: var(--shade); border-style: dashed; }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .sketch { flex: 0 0 460px; display: flex; flex-direction: column; gap: 6px; }
+    .caption { font-size: 12px; color: var(--pencil); }
+    .text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .story { margin: 0; font-size: 15px; }
+    .story b { font-weight: 600; }
+    .text h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .crit { margin: 0; padding-left: 18px; font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
+    .crit li { margin: 0; }
+    .crit b { font-weight: 600; }
+    .none { font-size: 13px; color: var(--pencil); margin: 0; }
+    .trace { font-size: 12px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 6px; margin-top: auto; }
+  </style>
+  <style>
+    @page { size: 960px 640px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <span class="id">US-12</span>
+    <h2 class="title">Reset</h2>
+    <span class="who">the visitor</span>
+  </div>
+  <div class="body">
+    <div class="sketch">
+      <svg viewBox="0 0 460 470" width="460" height="470" font-family="Patrick Hand, cursive" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="6" y="6" width="448" height="458" rx="4"></rect>
+        <text x="20" y="30" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">both apps, after reset in either one</text>
+        <rect x="18" y="42" width="206" height="338" rx="3"></rect>
+        <text x="28" y="62" fill="oklch(25% 0.01 260)" stroke="none" font-size="15">model viewer</text>
+        <rect x="26" y="72" width="190" height="272" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="34" y="90" fill="oklch(58% 0.01 260)" stroke="none" font-size="13.5">editable values</text>
+        <g font-size="10.5" font-family="Source Sans 3, sans-serif">
+          <text x="34" y="112" fill="oklch(25% 0.01 260)" stroke="none">ingest</text>
+          <rect x="76" y="100" width="40" height="16" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(25% 0.01 260)"></rect>
+          <text x="96" y="112" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">2000</text>
+          <text x="122" y="112" fill="oklch(25% 0.01 260)" stroke="none">parse</text>
+          <rect x="166" y="100" width="40" height="16" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(25% 0.01 260)"></rect>
+          <text x="186" y="112" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">1200</text>
+          <text x="34" y="134" fill="oklch(25% 0.01 260)" stroke="none">indexA</text>
+          <rect x="76" y="122" width="40" height="16" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(25% 0.01 260)"></rect>
+          <text x="96" y="134" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">700</text>
+          <text x="122" y="134" fill="oklch(25% 0.01 260)" stroke="none">indexB</text>
+          <rect x="166" y="122" width="40" height="16" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(25% 0.01 260)"></rect>
+          <text x="186" y="134" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">700</text>
+          <text x="34" y="156" fill="oklch(25% 0.01 260)" stroke="none">serve</text>
+          <rect x="76" y="144" width="40" height="16" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(25% 0.01 260)"></rect>
+          <text x="96" y="156" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none">1800</text>
+        </g>
+        <path d="M34 168 L208 168" stroke="oklch(58% 0.01 260)" stroke-dasharray="4 3"></path>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="34" y="188">package Pipeline {</text>
+          <text x="42" y="204">part ingest : Server {</text>
+          <text x="50" y="220">throughput = 2000; }</text>
+          <text x="42" y="236">part parse : Server {</text>
+          <text x="50" y="252">throughput = 1200; }</text>
+          <text x="42" y="268">...</text>
+          <text x="42" y="284">part serve : Server {</text>
+          <text x="50" y="300">throughput = 1800; }</text>
+          <text x="34" y="320" fill="oklch(55% 0.19 25)">requirement PIPE-R1</text>
+          <text x="42" y="336" fill="oklch(55% 0.19 25)">capacity >= 1500   FAIL</text>
+        </g>
+        <text x="28" y="366" fill="oklch(25% 0.01 260)" stroke="none" font-size="13">capacity 1200</text>
+        <rect x="160" y="352" width="54" height="20" rx="3" fill="oklch(98% 0.005 90)"></rect>
+        <text x="187" y="366" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-family="Source Sans 3, sans-serif">reset</text>
+        <rect x="236" y="42" width="206" height="338" rx="3"></rect>
+        <text x="246" y="62" fill="oklch(25% 0.01 260)" stroke="none" font-size="15">requirements document</text>
+        <g stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="252" y="92" fill="oklch(58% 0.01 260)">prose paragraph, unnumbered</text>
+          <g fill="oklch(55% 0.19 25)">
+            <text x="252" y="114">1</text>
+            <text x="278" y="114">PIPE-R1</text>
+            <text x="388" y="114" text-anchor="end">1500</text>
+            <text x="428" y="114" text-anchor="end">FAIL</text>
+          </g>
+          <g fill="oklch(25% 0.01 260)">
+            <text x="260" y="134">1.1</text>
+            <text x="290" y="134">PIPE-R1.1</text>
+            <text x="388" y="134" text-anchor="end">2000</text>
+            <text x="428" y="134" text-anchor="end">PASS</text>
+          </g>
+          <g fill="oklch(55% 0.19 25)">
+            <text x="260" y="152">1.2</text>
+            <text x="290" y="152">PIPE-R1.2</text>
+            <text x="388" y="152" text-anchor="end">1200</text>
+            <text x="428" y="152" text-anchor="end">FAIL</text>
+            <text x="260" y="170">1.3</text>
+            <text x="290" y="170">PIPE-R1.3</text>
+            <text x="388" y="170" text-anchor="end">700</text>
+            <text x="428" y="170" text-anchor="end">FAIL</text>
+            <text x="260" y="188">1.4</text>
+            <text x="290" y="188">PIPE-R1.4</text>
+            <text x="388" y="188" text-anchor="end">700</text>
+            <text x="428" y="188" text-anchor="end">FAIL</text>
+          </g>
+          <g fill="oklch(25% 0.01 260)">
+            <text x="260" y="206">1.5</text>
+            <text x="290" y="206">PIPE-R1.5</text>
+            <text x="388" y="206" text-anchor="end">1800</text>
+            <text x="428" y="206" text-anchor="end">PASS</text>
+          </g>
+          <g fill="oklch(58% 0.01 260)">
+            <text x="252" y="228">2</text>
+            <text x="278" y="228">PIPE-R2</text>
+            <text x="428" y="228" text-anchor="end">INCONCLUSIVE</text>
+          </g>
+        </g>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="13">
+          <text x="252" y="258">before the reset:</text>
+          <text x="252" y="276">parse 1700, indexA 900,</text>
+          <text x="252" y="294">heading Performance at 1,</text>
+          <text x="252" y="312">PIPE-R1.5 moved first</text>
+        </g>
+        <rect x="378" y="352" width="54" height="20" rx="3" fill="oklch(98% 0.005 90)"></rect>
+        <text x="405" y="366" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-family="Source Sans 3, sans-serif">reset</text>
+        <path d="M 112 414 C 108 402, 112 392, 121 380" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <path d="M 348 414 C 352 402, 348 392, 339 380" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <text x="230" y="418" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="16">both apps, within two seconds</text>
+        <text x="230" y="444" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">ready to start again at US-02</text>
+      </svg>
+      <span class="caption">Sketch of both apps just after a reset, every value and number back to the shipped state.</span>
+    </div>
+    <div class="text">
+      <p class="story">As <b>the visitor</b>, I want to return the demo to its shipped state, so that I can show it again from the beginning.</p>
+      <h4>Acceptance</h4>
+      <ol class="crit">
+        <li><b>Given</b> values and the document structure have been edited, <b>when</b> the reset control is used in either app, <b>then</b> both apps show the shipped values and the shipped document structure within two seconds.</li>
+      </ol>
+      <h4>Why it matters</h4>
+      <p class="none">Without it the demo runs once per container start. One control in either app restoring both is the shared state of US-09 and US-10, shown a final time.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

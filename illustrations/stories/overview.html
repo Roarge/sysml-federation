@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Use cases, overview</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 1440px; height: 800px; box-sizing: border-box; padding: 32px 36px; background: var(--paper); display: flex; flex-direction: column; gap: 18px; }
+    .title { font-family: var(--display); font-size: 40px; line-height: 1; margin: 0; }
+    .sub { font-size: 16px; color: var(--pencil); margin: 0; max-width: 980px; }
+    .row { display: flex; flex-direction: row; gap: 28px; align-items: stretch; }
+    .card { border: 1.5px solid var(--ink); border-radius: 3px; padding: 12px 14px; background: var(--paper); display: flex; flex-direction: column; gap: 6px; }
+    .card h3 { font-family: var(--display); font-size: 22px; margin: 0; line-height: 1; }
+    .card p { margin: 0; font-size: 14px; }
+    .personas { flex: 0 0 360px; display: flex; flex-direction: column; gap: 10px; }
+    .journey { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; }
+    .journey h3 { font-family: var(--display); font-size: 22px; margin: 0; line-height: 1; }
+    .strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+    .step { border: 1.5px solid var(--ink); border-radius: 3px; padding: 8px 10px; display: flex; flex-direction: row; gap: 8px; align-items: baseline; background: var(--paper); }
+    .step .n { font-family: var(--display); font-size: 22px; line-height: 1; min-width: 26px; }
+    .step .t { font-size: 13px; line-height: 1.25; }
+    .step.who-v { border-color: var(--ink); }
+    .step.who-m { background: var(--shade); }
+    .step.who-d { background: var(--shade); border-style: dashed; }
+    .legend { display: flex; flex-direction: row; gap: 22px; align-items: center; font-size: 13px; color: var(--pencil); }
+    .legend .sw { display: inline-block; width: 26px; height: 14px; border: 1.5px solid var(--ink); border-radius: 2px; vertical-align: middle; margin-right: 6px; background: var(--paper); }
+    .legend .sw.m { background: var(--shade); }
+    .legend .sw.d { background: var(--shade); border-style: dashed; }
+    .legend .sw.r { border-color: var(--red); background: color-mix(in oklch, var(--red) 12%, var(--paper)); }
+    .legend .sw.b { border-color: var(--blue); background: color-mix(in oklch, var(--blue) 12%, var(--paper)); }
+  </style>
+  <style>
+    @page { size: 1440px 800px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <h1 class="title">Pipeline demo: what the visitor should experience</h1>
+  <p class="sub">Twelve stories for a demo that a curious person launches with one command. Three services that know nothing about each other stand behind one router, and two separate web apps in front of it show the same data changing. The moment that matters is a bottleneck moving.</p>
+  <div class="row">
+    <div class="personas">
+      <div class="card">
+        <h3>The visitor</h3>
+        <p>A developer or architect at a small engineering firm, evaluating whether federation could connect the tools they already have. Has Docker, a browser and fifteen minutes.</p>
+      </div>
+      <div class="card">
+        <h3>The model owner</h3>
+        <p>A systems engineer who writes the SysML v2 model and wants it to stay the source of truth.</p>
+      </div>
+      <div class="card">
+        <h3>The document owner</h3>
+        <p>A requirements engineer who owns ordering, numbering and inclusion in the document, and has never seen SysML.</p>
+      </div>
+    </div>
+    <div class="journey">
+      <h3>The journey, in order</h3>
+      <div class="strip">
+        <div class="step who-v"><span class="n">01</span><span class="t">Launch with one command</span></div>
+        <div class="step who-v"><span class="n">02</span><span class="t">Read the model: text and wiring</span></div>
+        <div class="step who-v"><span class="n">03</span><span class="t">Raise a server that is not the bottleneck: nothing moves</span></div>
+        <div class="step who-v"><span class="n">04</span><span class="t">Raise the bottleneck: it migrates, then the requirement passes</span></div>
+        <div class="step who-m"><span class="n">05</span><span class="t">Tighten the limit: red, with the servers responsible named</span></div>
+        <div class="step who-d"><span class="n">06</span><span class="t">Read the document: own numbering, model relationships, verdicts</span></div>
+        <div class="step who-d"><span class="n">07</span><span class="t">Reorder and nest, the model untouched</span></div>
+        <div class="step who-d"><span class="n">08</span><span class="t">Shape the document: headings, prose, exclude and restore</span></div>
+        <div class="step who-d"><span class="n">09</span><span class="t">Change a value from the document, the viewer follows</span></div>
+        <div class="step who-v"><span class="n">10</span><span class="t">Change from the viewer, watch the document</span></div>
+        <div class="step who-v"><span class="n">11</span><span class="t">Query the graph: three services in one answer</span></div>
+        <div class="step who-v"><span class="n">12</span><span class="t">Reset to the shipped state</span></div>
+      </div>
+      <svg viewBox="0 0 1000 250" width="960" height="240" font-family="Patrick Hand, cursive" font-size="17" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="20" y="40" width="300" height="170" rx="3"></rect>
+        <text x="34" y="66" fill="oklch(25% 0.01 260)" stroke="none" font-size="21">Model viewer</text>
+        <rect x="34" y="80" width="150" height="112" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="42" y="98" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">package Pipeline {</text>
+        <text x="50" y="116" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">part parse : Server {</text>
+        <text x="58" y="134" fill="oklch(25% 0.01 260)" stroke="none" font-size="13">throughput = [1200]</text>
+        <text x="42" y="160" fill="oklch(55% 0.19 25)" stroke="none" font-size="13">requirement PIPE-R1</text>
+        <text x="50" y="178" fill="oklch(55% 0.19 25)" stroke="none" font-size="13">>= 1500   FAIL</text>
+        <rect x="190" y="86" width="26" height="18" rx="2"></rect>
+        <rect x="222" y="86" width="26" height="18" rx="2" stroke="oklch(55% 0.19 25)"></rect>
+        <rect x="254" y="70" width="26" height="18" rx="2"></rect>
+        <rect x="254" y="102" width="26" height="18" rx="2"></rect>
+        <rect x="286" y="86" width="26" height="18" rx="2"></rect>
+        <path d="M216 95 L222 95 M248 95 L254 79 M248 95 L254 111 M280 79 L286 95 M280 111 L286 95" stroke="oklch(58% 0.01 260)"></path>
+        <text x="196" y="160" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">capacity 1200</text>
+        <rect x="680" y="40" width="300" height="170" rx="3"></rect>
+        <text x="694" y="66" fill="oklch(25% 0.01 260)" stroke="none" font-size="21">Requirements document</text>
+        <text x="700" y="96" fill="oklch(55% 0.19 25)" stroke="none" font-size="14">1  PIPE-R1  1500   FAIL, parse is the bottleneck at 1200</text>
+        <text x="716" y="116" fill="oklch(25% 0.01 260)" stroke="none" font-size="14">1.1  PIPE-R1.1  ingest   PASS</text>
+        <text x="716" y="136" fill="oklch(55% 0.19 25)" stroke="none" font-size="14">1.2  PIPE-R1.2  parse   FAIL</text>
+        <text x="716" y="156" fill="oklch(58% 0.01 260)" stroke="none" font-size="14">...</text>
+        <text x="700" y="184" fill="oklch(58% 0.01 260)" stroke="none" font-size="14">2  PIPE-R2  latency 200 ms   INCONCLUSIVE</text>
+        <rect x="430" y="100" width="140" height="50" rx="3" stroke="oklch(52% 0.12 250)" fill="color-mix(in oklch, oklch(52% 0.12 250) 10%, oklch(98% 0.005 90))"></rect>
+        <text x="500" y="131" text-anchor="middle" fill="oklch(52% 0.12 250)" stroke="none" font-size="19">router</text>
+        <path d="M320 125 C 360 125, 380 125, 430 125" stroke="oklch(52% 0.12 250)"></path>
+        <path d="M570 125 C 620 125, 640 125, 680 125" stroke="oklch(52% 0.12 250)"></path>
+        <path d="M500 150 L 500 200" stroke="oklch(52% 0.12 250)"></path>
+        <rect x="380" y="200" width="70" height="34" rx="2" stroke="oklch(52% 0.12 250)"></rect>
+        <rect x="465" y="200" width="70" height="34" rx="2" stroke="oklch(52% 0.12 250)"></rect>
+        <rect x="550" y="200" width="70" height="34" rx="2" stroke="oklch(52% 0.12 250)"></rect>
+        <path d="M415 200 L 500 200 L 585 200" stroke="oklch(52% 0.12 250)"></path>
+        <text x="415" y="222" text-anchor="middle" fill="oklch(52% 0.12 250)" stroke="none" font-size="14">model</text>
+        <text x="500" y="222" text-anchor="middle" fill="oklch(52% 0.12 250)" stroke="none" font-size="14">capacity</text>
+        <text x="585" y="222" text-anchor="middle" fill="oklch(52% 0.12 250)" stroke="none" font-size="14">document</text>
+        <text x="500" y="20" text-anchor="middle" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">two apps, one graph, three services that never meet</text>
+      </svg>
+    </div>
+  </div>
+  <div class="legend">
+    <span><span class="sw"></span>visitor story</span>
+    <span><span class="sw m"></span>model owner story</span>
+    <span><span class="sw d"></span>document owner story</span>
+    <span><span class="sw r"></span>a failing requirement or the bottleneck, the only red on any board</span>
+    <span><span class="sw b"></span>shared through the router</span>
+  </div>
+</div>
+</body>
+</html>

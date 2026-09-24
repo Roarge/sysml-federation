@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>US-01 Launch with one command</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 960px; height: 640px; box-sizing: border-box; padding: 26px 30px; background: var(--paper); display: flex; flex-direction: column; gap: 14px; }
+    .head { display: flex; flex-direction: row; gap: 14px; align-items: baseline; }
+    .id { font-family: var(--display); font-size: 30px; line-height: 1; }
+    .title { font-family: var(--display); font-size: 30px; line-height: 1; margin: 0; flex: 1 1 auto; }
+    .who { font-size: 13px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 9px; background: var(--paper); }
+    .who.m { background: var(--shade); }
+    .who.d { background: var(--shade); border-style: dashed; }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .sketch { flex: 0 0 460px; display: flex; flex-direction: column; gap: 6px; }
+    .caption { font-size: 12px; color: var(--pencil); }
+    .text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .story { margin: 0; font-size: 15px; }
+    .story b { font-weight: 600; }
+    .text h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .crit { margin: 0; padding-left: 18px; font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
+    .crit li { margin: 0; }
+    .crit b { font-weight: 600; }
+    .none { font-size: 13px; color: var(--pencil); margin: 0; }
+    .trace { font-size: 12px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 6px; margin-top: auto; }
+  </style>
+  <style>
+    @page { size: 960px 640px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <span class="id">US-01</span>
+    <h2 class="title">Launch with one command</h2>
+    <span class="who">the visitor</span>
+  </div>
+  <div class="body">
+    <div class="sketch">
+      <svg viewBox="0 0 460 470" width="460" height="470" font-family="Patrick Hand, cursive" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="6" y="6" width="448" height="458" rx="4"></rect>
+        <text x="20" y="30" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">one line in a terminal, then two tabs</text>
+        <rect x="18" y="42" width="424" height="116" rx="3" fill="oklch(93% 0.006 90)"></rect>
+        <path d="M18 60 L442 60" stroke="oklch(58% 0.01 260)"></path>
+        <g stroke="oklch(58% 0.01 260)">
+          <rect x="26" y="48" width="6" height="6" rx="2"></rect>
+          <rect x="36" y="48" width="6" height="6" rx="2"></rect>
+          <rect x="46" y="48" width="6" height="6" rx="2"></rect>
+        </g>
+        <text x="62" y="56" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">terminal</text>
+        <g stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="26" y="84" fill="oklch(58% 0.01 260)">$</text>
+          <text x="38" y="84" fill="oklch(25% 0.01 260)">docker run -p 8080:8080 ghcr.io/roarge/sysml-federation</text>
+          <text x="26" y="108" fill="oklch(58% 0.01 260)">router ready</text>
+          <text x="26" y="126" fill="oklch(58% 0.01 260)">model viewer at http://localhost:8080/viewer</text>
+          <text x="26" y="144" fill="oklch(58% 0.01 260)">requirements document at http://localhost:8080/document</text>
+        </g>
+        <text x="20" y="181" fill="oklch(58% 0.01 260)" stroke="none" font-size="14">ten seconds, no clone, no compose</text>
+        <path d="M 256 177 C 320 178, 398 176, 398 158" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <rect x="18" y="196" width="204" height="248" rx="3"></rect>
+        <rect x="24" y="201" width="90" height="17" rx="3" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="32" y="214" fill="oklch(25% 0.01 260)" stroke="none" font-size="13">model viewer</text>
+        <path d="M18 218 L222 218" stroke="oklch(58% 0.01 260)"></path>
+        <rect x="24" y="223" width="192" height="16" rx="3" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="30" y="235" fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">localhost:8080/viewer</text>
+        <rect x="24" y="246" width="192" height="104" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="30" y="265" fill="oklch(58% 0.01 260)" stroke="none" font-size="12">editable values</text>
+        <text x="112" y="265" fill="oklch(25% 0.01 260)" stroke="none" font-size="10.5" font-family="Source Sans 3, sans-serif">parse</text>
+        <rect x="148" y="252" width="60" height="17" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(25% 0.01 260)"></rect>
+        <text x="178" y="265" text-anchor="middle" fill="oklch(25% 0.01 260)" stroke="none" font-size="11.5" font-family="Source Sans 3, sans-serif">1200</text>
+        <path d="M30 276 L210 276" stroke="oklch(58% 0.01 260)" stroke-dasharray="4 3"></path>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="11" font-family="Source Sans 3, sans-serif">
+          <text x="30" y="291">package Pipeline {</text>
+          <text x="38" y="304">part parse : Server {</text>
+          <text x="46" y="317" fill="oklch(25% 0.01 260)">throughput = 1200; }</text>
+          <text x="30" y="330" fill="oklch(55% 0.19 25)">requirement PIPE-R1</text>
+          <text x="38" y="343" fill="oklch(55% 0.19 25)">capacity >= 1500   FAIL</text>
+        </g>
+        <g>
+          <rect x="34" y="378" width="26" height="18" rx="2"></rect>
+          <rect x="70" y="378" width="26" height="18" rx="2"></rect>
+          <rect x="106" y="358" width="26" height="18" rx="2"></rect>
+          <rect x="106" y="398" width="26" height="18" rx="2"></rect>
+          <rect x="142" y="378" width="26" height="18" rx="2"></rect>
+        </g>
+        <path d="M60 387 L70 387 M96 387 L106 367 M96 387 L106 407 M132 367 L142 387 M132 407 L142 387" stroke="oklch(58% 0.01 260)"></path>
+        <text x="34" y="434" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">capacity 1200</text>
+        <rect x="238" y="196" width="204" height="248" rx="3"></rect>
+        <rect x="244" y="201" width="146" height="17" rx="3" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="252" y="214" fill="oklch(25% 0.01 260)" stroke="none" font-size="13">requirements document</text>
+        <path d="M238 218 L442 218" stroke="oklch(58% 0.01 260)"></path>
+        <rect x="244" y="223" width="192" height="16" rx="3" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="250" y="235" fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">localhost:8080/document</text>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <text x="250" y="264" fill="oklch(55% 0.19 25)">1  PIPE-R1  1500  FAIL</text>
+          <text x="262" y="282">1.1  PIPE-R1.1  ingest</text>
+          <text x="262" y="300">1.2  PIPE-R1.2  parse</text>
+          <text x="262" y="318">1.3  PIPE-R1.3  indexA</text>
+          <text x="262" y="336">1.4  PIPE-R1.4  indexB</text>
+          <text x="262" y="354">1.5  PIPE-R1.5  serve</text>
+          <text x="250" y="380" fill="oklch(25% 0.01 260)">2  PIPE-R2  200 ms</text>
+          <text x="262" y="398">INCONCLUSIVE</text>
+          <text x="262" y="416">verified by PIPE-VC1</text>
+        </g>
+      </svg>
+      <span class="caption">Sketch of the terminal after the command, with the two tabs it names in their shipped state.</span>
+    </div>
+    <div class="text">
+      <p class="story">As <b>the visitor</b>, I want to start the whole demo with one command copied from the README, so that I can see it working before deciding whether to read on.</p>
+      <h4>Acceptance</h4>
+      <ol class="crit">
+        <li><b>Given</b> the image is already pulled, <b>when</b> the one docker run line from the README is executed, <b>then</b> within ten seconds both addresses named in the README render the model viewer and the requirements document when opened.</li>
+        <li><b>Given</b> the container is running with no route to the internet, <b>when</b> either app is opened, <b>then</b> it renders fully and every request it makes goes to the one published port.</li>
+      </ol>
+      <h4>Why it matters</h4>
+      <p class="none">The README makes an argument and this is where the visitor stops reading and starts looking. If the launch costs more than one line, the bottleneck moving is never seen.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

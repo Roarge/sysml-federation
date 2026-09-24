@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>V2 Composition</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 1440px; height: 900px; box-sizing: border-box; padding: 28px 36px; background: var(--paper); display: flex; flex-direction: column; gap: 12px; }
+    .head { display: flex; flex-direction: row; gap: 16px; align-items: baseline; }
+    .title { font-family: var(--display); font-size: 34px; line-height: 1; margin: 0; }
+    .scope { font-size: 14px; color: var(--pencil); }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .diagram { flex: 0 0 1000px; }
+    .aside { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; font-size: 13.5px; }
+    .aside h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .aside p { margin: 0; }
+    .aside .legend { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 8px; margin-top: auto; }
+    .aside .legend span .sw { display: inline-block; width: 22px; height: 12px; border: 1.5px solid var(--ink); border-radius: 2px; vertical-align: middle; margin-right: 6px; background: var(--paper); }
+    .aside .legend span .sw.s { background: var(--shade); }
+    .aside .legend span .sw.b { border-color: var(--blue); background: color-mix(in oklch, var(--blue) 12%, var(--paper)); }
+    .aside .legend span .sw.d { border-style: dashed; }
+  </style>
+  <style>
+    @page { size: 1440px 900px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <h2 class="title">V2 Composition</h2>
+    <span class="scope">three subgraphs, one merged graph, and what the services agree on</span>
+  </div>
+  <div class="body">
+    <div class="diagram">
+      <svg viewBox="0 0 1000 720" width="1000" height="720" font-family="Source Sans 3, sans-serif" font-size="12" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="oklch(25% 0.01 260)" stroke="none"></path></marker>
+          <marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="oklch(52% 0.12 250)" stroke="none"></path></marker>
+        </defs>
+        <text x="20" y="16" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="17">two clients, both of the router only (SR-40)</text>
+        <text x="680" y="16" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="17">the merged graph</text>
+        <rect x="20" y="26" width="290" height="60" rx="3"></rect>
+        <text x="30" y="46" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">model viewer</text>
+        <text x="30" y="61" fill="oklch(58% 0.01 260)" stroke="none">web app, HTML and ES modules</text>
+        <text x="30" y="75" fill="oklch(58% 0.01 260)" stroke="none">SSE: modelChanged</text>
+        <rect x="374" y="26" width="290" height="60" rx="3"></rect>
+        <text x="384" y="46" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">requirements document</text>
+        <text x="384" y="61" fill="oklch(58% 0.01 260)" stroke="none">web app, HTML and ES modules</text>
+        <text x="384" y="75" fill="oklch(58% 0.01 260)" stroke="none">SSE: modelChanged, documentChanged</text>
+        <path d="M165 86 L165 130" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="173" y="104" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">queries, mutations,</text>
+        <text x="173" y="118" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">SSE subscriptions</text>
+        <path d="M519 86 L519 130" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="527" y="104" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">queries, mutations,</text>
+        <text x="527" y="118" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">SSE subscriptions</text>
+        <rect x="20" y="130" width="644" height="52" rx="3" stroke="oklch(52% 0.12 250)" fill="color-mix(in oklch, oklch(52% 0.12 250) 12%, oklch(98% 0.005 90))"></rect>
+        <text x="30" y="150" fill="oklch(52% 0.12 250)" stroke="none" font-size="13" font-weight="600">router</text>
+        <text x="30" y="167" fill="oklch(52% 0.12 250)" stroke="none">Cosmo router, merged graph from config.json, plans every query across the three subgraphs</text>
+        <path d="M120 182 L120 228" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="128" y="208" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">fetch, first</text>
+        <path d="M352 182 L352 228" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="360" y="200" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">fetch, entity representations</text>
+        <text x="360" y="214" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">carrying the @requires fields</text>
+        <path d="M574 182 L574 228" stroke="oklch(52% 0.12 250)" marker-end="url(#ahb)"></path>
+        <text x="582" y="208" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">fetch by key</text>
+        <rect x="20" y="228" width="200" height="478" rx="3"></rect>
+        <text x="30" y="248" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">model (adapter)</text>
+        <text x="30" y="264" fill="oklch(58% 0.01 260)" stroke="none">gqlgen subgraph, :3011</text>
+        <text x="30" y="286" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Model</text>
+        <text x="30" y="300" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">version, text, roots, parts,</text>
+        <text x="30" y="314" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">requirements,</text>
+        <text x="30" y="328" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">verificationCases</text>
+        <text x="30" y="347" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Part</text>
+        <rect x="62" y="337" width="44" height="13" rx="6.5" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="84" y="346" fill="oklch(58% 0.01 260)" stroke="none" font-size="9" text-anchor="middle">@key id</text>
+        <text x="30" y="361" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">id, shortName, name,</text>
+        <text x="30" y="375" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">definition, doc, attributes,</text>
+        <text x="30" y="389" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">ports, parts, connections,</text>
+        <text x="30" y="403" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">satisfies</text>
+        <text x="30" y="422" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Attribute</text>
+        <text x="30" y="436" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">name, value, unit, editable,</text>
+        <text x="30" y="450" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">expression</text>
+        <text x="30" y="469" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Requirement</text>
+        <rect x="113" y="459" width="44" height="13" rx="6.5" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="135" y="468" fill="oklch(58% 0.01 260)" stroke="none" font-size="9" text-anchor="middle">@key id</text>
+        <text x="30" y="483" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">id, shortName, name, text,</text>
+        <text x="30" y="497" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">subject, quantity,</text>
+        <text x="30" y="511" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">comparison, limit, limitUnit,</text>
+        <text x="30" y="525" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">limitEditable, derivedFrom,</text>
+        <text x="30" y="539" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">derives, satisfiedBy,</text>
+        <text x="30" y="553" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">verifiedBy</text>
+        <text x="30" y="572" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">VerificationCase</text>
+        <rect x="150" y="562" width="44" height="13" rx="6.5" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="172" y="571" fill="oklch(58% 0.01 260)" stroke="none" font-size="9" text-anchor="middle">@key id</text>
+        <text x="30" y="586" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">id, shortName, name, verifies</text>
+        <text x="30" y="605" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Mutation</text>
+        <text x="30" y="619" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">setAttribute, setLimit,</text>
+        <text x="30" y="633" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">resetModel</text>
+        <text x="30" y="652" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Subscription</text>
+        <text x="30" y="666" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">modelChanged</text>
+        <text x="30" y="690" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">no example names (SR-17)</text>
+        <rect x="232" y="228" width="240" height="478" rx="3" fill="oklch(93% 0.006 90)"></rect>
+        <text x="242" y="248" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">capacity</text>
+        <text x="242" y="264" fill="oklch(58% 0.01 260)" stroke="none">gqlgen subgraph, :3012</text>
+        <text x="242" y="286" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Part</text>
+        <rect x="274" y="276" width="44" height="13" rx="6.5" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="296" y="285" fill="oklch(58% 0.01 260)" stroke="none" font-size="9" text-anchor="middle">@key id</text>
+        <text x="242" y="300" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">capacity, bottleneck</text>
+        <rect x="238" y="310" width="228" height="102" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="243" y="326" fill="oklch(58% 0.01 260)" stroke="none" font-size="10" font-weight="600">capacity @requires</text>
+        <text x="243" y="338" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">attributes { name value }</text>
+        <text x="243" y="350" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">parts { id name attributes { name value } }</text>
+        <text x="243" y="362" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">connections { from to }</text>
+        <text x="243" y="378" fill="oklch(58% 0.01 260)" stroke="none" font-size="10" font-weight="600">bottleneck @requires</text>
+        <text x="243" y="390" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">parts { id name attributes { name value } }</text>
+        <text x="243" y="402" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">connections { from to }</text>
+        <text x="242" y="432" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Requirement</text>
+        <rect x="325" y="422" width="44" height="13" rx="6.5" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="347" y="431" fill="oklch(58% 0.01 260)" stroke="none" font-size="9" text-anchor="middle">@key id</text>
+        <text x="242" y="446" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">verdict, verdictReason</text>
+        <rect x="238" y="456" width="228" height="88" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="243" y="472" fill="oklch(58% 0.01 260)" stroke="none" font-size="10" font-weight="600">verdict, verdictReason @requires</text>
+        <text x="243" y="484" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">quantity comparison limit</text>
+        <text x="243" y="496" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">verifiedBy { shortName }</text>
+        <text x="243" y="508" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">subject { id name attributes { name value }</text>
+        <text x="249" y="520" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">parts { id name attributes { name value } }</text>
+        <text x="249" y="532" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">connections { from to } }</text>
+        <rect x="238" y="556" width="228" height="52" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="243" y="570" fill="oklch(58% 0.01 260)" stroke="none" font-size="10" font-weight="600">configured</text>
+        <text x="243" y="583" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">capacity: the quantity it computes</text>
+        <text x="243" y="596" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">throughput: the attribute it reads</text>
+        <text x="242" y="640" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="14">agreement with the adapter:</text>
+        <text x="242" y="658" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="14">the entity key,</text>
+        <text x="242" y="676" fill="oklch(58% 0.01 260)" stroke="none" font-family="Patrick Hand, cursive" font-size="14">this field set, two names</text>
+        <rect x="484" y="228" width="180" height="478" rx="3" fill="oklch(93% 0.006 90)"></rect>
+        <text x="494" y="248" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">document</text>
+        <text x="494" y="264" fill="oklch(58% 0.01 260)" stroke="none">gqlgen subgraph, :3013</text>
+        <text x="494" y="286" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Document</text>
+        <text x="494" y="300" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">version, nodes</text>
+        <text x="494" y="319" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Node</text>
+        <text x="494" y="333" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">id, kind, number, text,</text>
+        <text x="494" y="347" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">requirement, children</text>
+        <text x="494" y="366" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Requirement</text>
+        <rect x="577" y="356" width="44" height="13" rx="6.5" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="599" y="365" fill="oklch(58% 0.01 260)" stroke="none" font-size="9" text-anchor="middle">@key id</text>
+        <text x="494" y="380" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">documentNumber, included</text>
+        <text x="494" y="399" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Mutation</text>
+        <text x="494" y="413" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">moveNode, insertHeading,</text>
+        <text x="494" y="427" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">addProse, editText,</text>
+        <text x="494" y="441" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">excludeRequirement,</text>
+        <text x="494" y="455" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">includeRequirement,</text>
+        <text x="494" y="469" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">resetDocument</text>
+        <text x="494" y="488" fill="oklch(25% 0.01 260)" stroke="none" font-weight="600">Subscription</text>
+        <text x="494" y="502" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">documentChanged</text>
+        <text x="492" y="528" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">never reads the model: its</text>
+        <text x="492" y="542" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">shipped tree names the</text>
+        <text x="492" y="556" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">example's requirement ids,</text>
+        <text x="492" y="570" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">the one place the example</text>
+        <text x="492" y="584" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">identifiers enter a service</text>
+        <text x="492" y="608" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">numbering is recomputed on</text>
+        <text x="492" y="622" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">every mutation and served</text>
+        <text x="492" y="636" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">on the nodes and, through</text>
+        <text x="492" y="650" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">the entity, on</text>
+        <text x="492" y="664" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">Requirement.documentNumber</text>
+        <text x="492" y="678" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">(SR-33)</text>
+        <rect x="680" y="26" width="300" height="570" rx="3" stroke="oklch(52% 0.12 250)" fill="color-mix(in oklch, oklch(52% 0.12 250) 12%, oklch(98% 0.005 90))"></rect>
+        <text x="690" y="46" fill="oklch(52% 0.12 250)" stroke="none" font-size="13" font-weight="600">Requirement, as the router serves it</text>
+        <text x="690" y="62" fill="oklch(52% 0.12 250)" stroke="none">one entity, three subgraphs, keyed on id</text>
+        <text x="690" y="86" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">id</text>
+        <rect x="902" y="75" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="86" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="102" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">shortName</text>
+        <rect x="902" y="91" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="102" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="118" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">name</text>
+        <rect x="902" y="107" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="118" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="134" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">text</text>
+        <rect x="902" y="123" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="134" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="150" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">subject</text>
+        <rect x="902" y="139" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="150" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="166" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">quantity</text>
+        <rect x="902" y="155" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="166" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="182" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">comparison</text>
+        <rect x="902" y="171" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="182" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="198" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">limit</text>
+        <rect x="902" y="187" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="198" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="214" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">limitUnit</text>
+        <rect x="902" y="203" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="214" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="230" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">limitEditable</text>
+        <rect x="902" y="219" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="230" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="246" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">derivedFrom</text>
+        <rect x="902" y="235" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="246" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="262" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">derives</text>
+        <rect x="902" y="251" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="262" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="278" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">satisfiedBy</text>
+        <rect x="902" y="267" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="278" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="294" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">verifiedBy</text>
+        <rect x="902" y="283" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(98% 0.005 90)"></rect>
+        <text x="935" y="294" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">adapter</text>
+        <text x="690" y="310" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">verdict</text>
+        <rect x="902" y="299" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(93% 0.006 90)"></rect>
+        <text x="935" y="310" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">capacity</text>
+        <text x="690" y="326" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">verdictReason</text>
+        <rect x="902" y="315" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(93% 0.006 90)"></rect>
+        <text x="935" y="326" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">capacity</text>
+        <text x="690" y="342" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">documentNumber</text>
+        <rect x="902" y="331" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(93% 0.006 90)"></rect>
+        <text x="935" y="342" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">document</text>
+        <text x="690" y="358" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">included</text>
+        <rect x="902" y="347" width="66" height="15" rx="7.5" stroke-width="1" fill="oklch(93% 0.006 90)"></rect>
+        <text x="935" y="358" fill="oklch(25% 0.01 260)" stroke="none" font-size="9.5" text-anchor="middle">document</text>
+        <text x="690" y="386" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">the playground query (SR-43)</text>
+        <rect x="690" y="394" width="280" height="108" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(58% 0.01 260)" stroke-width="1"></rect>
+        <text x="698" y="408" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">{</text>
+        <text x="708" y="420" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">requirement(id: "PIPE-R1") {</text>
+        <text x="718" y="432" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">text</text>
+        <text x="718" y="444" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">verdict</text>
+        <text x="718" y="456" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">verdictReason</text>
+        <text x="718" y="468" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">documentNumber</text>
+        <text x="708" y="480" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">}</text>
+        <text x="698" y="492" fill="oklch(25% 0.01 260)" stroke="none" font-size="10">}</text>
+        <text x="690" y="526" fill="oklch(58% 0.01 260)" stroke="none" font-size="11">the router resolves it with three fetches</text>
+        <text x="690" y="544" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">1 adapter: requirement plus @requires fields</text>
+        <text x="690" y="560" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">2 capacity: entity resolver with those fields</text>
+        <text x="690" y="576" fill="oklch(25% 0.01 260)" stroke="none" font-size="11">3 document: entity resolver with the key</text>
+        <rect x="680" y="636" width="300" height="70" rx="3" stroke-dasharray="4 3"></rect>
+        <text x="690" y="656" fill="oklch(25% 0.01 260)" stroke="none" font-size="13" font-weight="600">config.json</text>
+        <text x="690" y="672" fill="oklch(58% 0.01 260)" stroke="none">composed router configuration, committed</text>
+        <text x="690" y="687" fill="oklch(58% 0.01 260)" stroke="none">graph.yaml with wgc, drift test (SR-42)</text>
+      </svg>
+    </div>
+    <div class="aside">
+      <h4>Who owns what</h4>
+      <p>No service resolves a field another service resolves. The capacity service adds four fields to Part and Requirement, the document service two to Requirement, and every other field on those types is the adapter's. The entity types are Part, Requirement and VerificationCase, keyed on id, the SysML short name or, failing that, the qualified name (SR-21, AD-0018).</p>
+      <h4>What the capacity service agrees to</h4>
+      <p>It carries two configured names, capacity and throughput, and no other word of the model (SR-31). The rest of the agreement is the entity key and the field set its @requires declares, which the router fills from the adapter's answer and hands over as the representation. Its four fields are computed on read from the fields its @requires names (SR-28 to SR-32).</p>
+      <h4>The first spike</h4>
+      <p>Whether Cosmo composition and gqlgen accept a nested-list @requires, and where @external and @shareable go on the value types inside it, is the first implementation spike (C-15). The fallback keeps the same semantics behind one scalar: the adapter adds Part.wiring, a JSON document of the children and connections, and the capacity service requires subject { id name wiring } in place of the nested lists.</p>
+      <div class="legend">
+        <span><span class="sw"></span>a component of the demo, with its type and technology</span>
+        <span><span class="sw s"></span>owned by the example rather than the adapter</span>
+        <span><span class="sw b"></span>the router, and the merged graph as it serves it</span>
+        <span><span class="sw d"></span>content the demo reads</span>
+        <span>@key id marks an entity type, resolved across subgraphs by id</span>
+        <span>arrows are one-directional and labelled with their intent</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

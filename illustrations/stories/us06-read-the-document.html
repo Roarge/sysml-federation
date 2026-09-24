@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>US-06 Read the document</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Source+Sans+3:wght@400;600&display=swap">
+  <style>
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --shade: oklch(93% 0.006 90);
+      --red: oklch(55% 0.19 25);
+      --blue: oklch(52% 0.12 250);
+      --display: "Patrick Hand", "Segoe Print", "Bradley Hand", cursive;
+      --body: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.4; }
+    a { color: var(--blue); } a:hover { color: var(--ink); }
+    .board { width: 960px; height: 640px; box-sizing: border-box; padding: 26px 30px; background: var(--paper); display: flex; flex-direction: column; gap: 14px; }
+    .head { display: flex; flex-direction: row; gap: 14px; align-items: baseline; }
+    .id { font-family: var(--display); font-size: 30px; line-height: 1; }
+    .title { font-family: var(--display); font-size: 30px; line-height: 1; margin: 0; flex: 1 1 auto; }
+    .who { font-size: 13px; border: 1.5px solid var(--ink); border-radius: 3px; padding: 3px 9px; background: var(--paper); }
+    .who.m { background: var(--shade); }
+    .who.d { background: var(--shade); border-style: dashed; }
+    .body { display: flex; flex-direction: row; gap: 24px; flex: 1 1 auto; min-height: 0; }
+    .sketch { flex: 0 0 460px; display: flex; flex-direction: column; gap: 6px; }
+    .caption { font-size: 12px; color: var(--pencil); }
+    .text { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .story { margin: 0; font-size: 15px; }
+    .story b { font-weight: 600; }
+    .text h4 { font-family: var(--display); font-size: 20px; margin: 0; line-height: 1; }
+    .crit { margin: 0; padding-left: 18px; font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
+    .crit li { margin: 0; }
+    .crit b { font-weight: 600; }
+    .none { font-size: 13px; color: var(--pencil); margin: 0; }
+    .trace { font-size: 12px; color: var(--pencil); border-top: 1px dashed var(--pencil); padding-top: 6px; margin-top: auto; }
+  </style>
+  <style>
+    @page { size: 960px 640px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <div class="head">
+    <span class="id">US-06</span>
+    <h2 class="title">Read the document</h2>
+    <span class="who d">the document owner</span>
+  </div>
+  <div class="body">
+    <div class="sketch">
+      <svg viewBox="0 0 460 470" width="460" height="470" font-family="Patrick Hand, cursive" fill="none" stroke="oklch(25% 0.01 260)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="6" y="6" width="448" height="458" rx="4"></rect>
+        <text x="20" y="30" fill="oklch(58% 0.01 260)" stroke="none" font-size="15">requirements document, shipped state</text>
+        <rect x="18" y="42" width="424" height="250" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <text x="28" y="56" fill="oklch(58% 0.01 260)" stroke="none" font-size="11" font-family="Source Sans 3, sans-serif">prose, unnumbered: the rollup is idealised and says so</text>
+        <g transform="translate(0,12)" fill="oklch(25% 0.01 260)" stroke="none" font-size="12.5" font-family="Source Sans 3, sans-serif">
+          <g fill="oklch(55% 0.19 25)">
+            <text x="28" y="63">1</text>
+            <text x="50" y="63">PIPE-R1</text>
+            <text x="118" y="63">The pipeline shall sustain the required rate   1500</text>
+            <text x="118" y="81">FAIL, parse is the bottleneck at 1200</text>
+          </g>
+          <text x="28" y="127">1.1</text>
+          <text x="50" y="127">PIPE-R1.1</text>
+          <text x="118" y="127">ingest</text>
+          <text x="196" y="127" text-anchor="end">2000</text>
+          <text x="240" y="127" text-anchor="end">1500</text>
+          <text x="252" y="127">PASS</text>
+          <g fill="oklch(55% 0.19 25)">
+            <text x="28" y="145">1.2</text>
+            <text x="50" y="145">PIPE-R1.2</text>
+            <text x="118" y="145">parse</text>
+            <text x="196" y="145" text-anchor="end">1200</text>
+            <text x="240" y="145" text-anchor="end">1500</text>
+            <text x="252" y="145">FAIL</text>
+            <text x="28" y="163">1.3</text>
+            <text x="50" y="163">PIPE-R1.3</text>
+            <text x="118" y="163">indexA</text>
+            <text x="196" y="163" text-anchor="end">700</text>
+            <text x="240" y="163" text-anchor="end">750</text>
+            <text x="252" y="163">FAIL</text>
+            <text x="28" y="181">1.4</text>
+            <text x="50" y="181">PIPE-R1.4</text>
+            <text x="118" y="181">indexB</text>
+            <text x="196" y="181" text-anchor="end">700</text>
+            <text x="240" y="181" text-anchor="end">750</text>
+            <text x="252" y="181">FAIL</text>
+          </g>
+          <text x="28" y="199">1.5</text>
+          <text x="50" y="199">PIPE-R1.5</text>
+          <text x="118" y="199">serve</text>
+          <text x="196" y="199" text-anchor="end">1800</text>
+          <text x="240" y="199" text-anchor="end">1500</text>
+          <text x="252" y="199">PASS</text>
+          <g fill="oklch(58% 0.01 260)">
+            <text x="28" y="224">2</text>
+            <text x="50" y="224">PIPE-R2</text>
+            <text x="118" y="224">End-to-end latency 200 ms</text>
+            <text x="118" y="242">INCONCLUSIVE, no demo service runs PIPE-VC1</text>
+          </g>
+        </g>
+        <g transform="translate(0,12)" font-size="11" font-family="Source Sans 3, sans-serif">
+          <rect x="118" y="90" width="164" height="16" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(58% 0.01 260)"></rect>
+          <text x="125" y="102" fill="oklch(58% 0.01 260)" stroke="none">derives PIPE-R1.1 to R1.5</text>
+          <rect x="290" y="90" width="140" height="16" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(58% 0.01 260)"></rect>
+          <text x="297" y="102" fill="oklch(58% 0.01 260)" stroke="none">satisfied by pipeline</text>
+          <rect x="118" y="251" width="134" height="16" rx="2" fill="oklch(98% 0.005 90)" stroke="oklch(58% 0.01 260)"></rect>
+          <text x="125" y="263" fill="oklch(58% 0.01 260)" stroke="none">verified by PIPE-VC1</text>
+        </g>
+        <text x="260" y="275" fill="oklch(58% 0.01 260)" stroke="none" font-size="13">grey, not red, no check ran</text>
+        <text x="20" y="302" fill="oklch(25% 0.01 260)" stroke="none" font-size="17">row 1.2 enlarged, column by column:</text>
+        <rect x="18" y="312" width="424" height="34" rx="2" fill="oklch(93% 0.006 90)" stroke="oklch(58% 0.01 260)"></rect>
+        <g fill="oklch(55% 0.19 25)" stroke="none" font-size="13" font-family="Source Sans 3, sans-serif">
+          <text x="30" y="334">1.2</text>
+          <text x="92" y="334">PIPE-R1.2</text>
+          <text x="190" y="334">parse</text>
+          <text x="258" y="334">1200</text>
+          <text x="318" y="334">1500</text>
+          <text x="378" y="334">FAIL</text>
+        </g>
+        <path d="M40 346 L40 361 M124 346 L124 385 M208 346 L208 361 M272 346 L272 385 M332 346 L332 361 M392 346 L392 385" stroke="oklch(58% 0.01 260)" stroke-dasharray="3 3"></path>
+        <g fill="oklch(58% 0.01 260)" stroke="none" font-size="13">
+          <text x="22" y="372">document number</text>
+          <text x="124" y="396" text-anchor="middle">model short name</text>
+          <text x="208" y="372" text-anchor="middle">satisfied by</text>
+          <text x="272" y="396" text-anchor="middle">current value</text>
+          <text x="332" y="372" text-anchor="middle">derived limit</text>
+          <text x="392" y="396" text-anchor="middle">verdict</text>
+        </g>
+        <text x="20" y="428" fill="oklch(25% 0.01 260)" stroke="none" font-size="14">the document owns the numbers, the model owns the names</text>
+        <text x="20" y="447" fill="oklch(25% 0.01 260)" stroke="none" font-size="14">and the relationships, the analysis owns the verdicts</text>
+      </svg>
+      <span class="caption">Sketch of the document in the shipped state, with row 1.2 enlarged below it.</span>
+    </div>
+    <div class="text">
+      <p class="story">As <b>the document owner</b>, I want to read the requirements as a numbered document that also shows what the model knows about each one, so that I can review them without opening a modelling tool.</p>
+      <h4>Acceptance</h4>
+      <ol class="crit">
+        <li><b>Given</b> the shipped model and the shipped document structure, <b>when</b> the document opens, <b>then</b> it shows PIPE-R1 as section 1 with its derived requirements as 1.1 to 1.5 and PIPE-R2 as section 2, numbers that are the document's own and not the model's short names.</li>
+        <li><b>Given</b> the document is open, <b>when</b> a requirement is read, <b>then</b> it shows its short name, text, limit, the requirement it is derived from or the requirements derived from it, the part that satisfies it, the verification case that verifies it, the current value of the subject it is checked against, and its verdict with a reason.</li>
+        <li><b>Given</b> the document is open, <b>when</b> PIPE-R2 is read, <b>then</b> its verdict is INCONCLUSIVE with the reason "PIPE-VC1 is declared and no service runs it".</li>
+      </ol>
+      <h4>Why it matters</h4>
+      <p class="none">The document owner reads relationships from the model and verdicts from the analysis without opening a modelling tool, in a document whose numbering is its own. The service behind this document has never parsed a model file, which is the federation argument on one screen.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
