@@ -92,4 +92,4 @@ A Compose service and a traced service are different kinds of evidence, even whe
 
 ---
 
-Previous: [Why does a model need entity resolution?](13-why-a-model-needs-entity-resolution.md) · Index: [Automating traceability](../README.md) · Next: [Why no resolver gets every link right](15-why-no-resolver-gets-every-link-right.md)
+Previous: [Why does a systems model need entity resolution?](13-why-a-model-needs-entity-resolution.md) · Index: [Automating traceability](../README.md) · Next: [Why no resolver gets every link right](15-why-no-resolver-gets-every-link-right.md)

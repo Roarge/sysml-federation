@@ -111,7 +111,7 @@ series:
   - title: "Automating traceability"
     status: "In progress"
     parts:
-      - { title: "The task", from: 0, count: 2, dek: "What is entity resolution between a model and a built system, and what is a single task of it made of?" }
+      - { title: "The task", from: 0, count: 2, dek: "What is entity resolution between a systems model and a built system, and what is a single task of it made of?" }
       - { title: "Errors and measurement", from: 2, count: 1, dek: "Why does no resolver get every link right, and what does that mean for how one is put to work?" }
     articles:
       - path: articles/13-why-a-model-needs-entity-resolution.md
