@@ -301,8 +301,9 @@ package Federation_SystemStories {
         doc /* Rationale: a font, script or image fetched from elsewhere would
                break the second criterion of US-01 and the air-gap claim with no
                service at fault (AD-0011, AD-0017). The criterion
-               appsRenderWithTheHostOffline has no run behind it, as the release
-               notes in article 11 say. Allocated to: UI-MODEL, UI-DOC.
+               appsRenderWithTheHostOffline was run on 2026-09-14, both apps
+               reloaded with the host off the network, and the run is in the
+               example's verification record. Allocated to: UI-MODEL, UI-DOC.
                Upstream: US-01. */
     }
 

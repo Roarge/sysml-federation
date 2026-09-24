@@ -272,10 +272,9 @@ router's outbound paths or the module file, is an action of kind `analysis` or
 `inspection`. An inspection's location names the practice, `review checklist`,
 rather than a file in the repository.
 
-A case names only evidence that exists. Four stories ask for more than the
+A case names only evidence that exists. Three stories ask for more than the
 repository holds. SR-01's criterion `recordedOnThreePlatforms` has one platform
-recorded of three. SR-10's second criterion, the apps rendering with the host
-offline, has no recorded run. SR-40 and SR-43 name `Test` among their methods
+recorded of three. SR-40 and SR-43 name `Test` among their methods
 and have no test function of their own, so their cases carry the inspection and
 the recorded run alone. Each case claims what is there and nothing more.
 

@@ -13,30 +13,27 @@ said before gate 2 was where the direction of that edge came from.
 
 A SysML v2 `connect` has two ordered ends and no direction of its own. The
 reading at gate 2 found that the rollup's direction had been assumed rather
-than stated, and it went back to planning. The syntax of ports and
-connections was not settled at that point, because no research report had
-fetched OMG training folders 09 and 10, and a spike quotes them before the
-example is written. The decision therefore had to hold for whatever exact
-form those folders show, so long as a connect statement has a first end and
-a second.
+than stated, and it went back to planning. At that point the syntax of ports
+and connections was not settled, because no research report had fetched OMG
+training folders 09 and 10, and a spike quotes them before the example is
+written. The decision therefore had to hold for whatever exact form those
+folders show, so long as a connect statement has a first end and a second.
 
-Two signals are available in the source. Every server declares an `in` port
-and an `out` port, and every connect names one port at each end in a fixed
-order. The capacity model builds its
-network from the connections as edges from the out-node of the first end's
-part to the in-node of the second end's part, so the direction the adapter
-chooses is the direction the flow runs, and a reversed edge would change the
-result with no error raised anywhere.
+Two signals are available in the source. Every server declares an `in` port and
+an `out` port, and every connect names one port at each end in a fixed order.
+The capacity model builds its network from the connections as edges from the
+out-node of the first end's part to the in-node of the second end's part. The
+direction the adapter chooses is therefore the direction the flow runs, and a
+reversed edge would change the result with no error raised anywhere.
 
 ## Decision
 
-We will take the direction of a connection from the order of the ends of
-its `connect` statement, first end to second, and the adapter will refuse
-to start on a `connect` whose first end is not an `out` port or whose
-second end is not an `in` port (SR-20). The end order is the source of
-the direction and the port directions are the check, so the two must agree,
-and a disagreement is reported with file, line and column in the manner of
-SR-18.
+We will take the direction of a connection from the order of the ends of its
+`connect` statement, first end to second. The adapter will refuse to start on a
+`connect` whose first end is not an `out` port or whose second end is not an
+`in` port (SR-20). The end order is the source of the direction and the port
+directions are the check, so the two must agree, and a disagreement is reported
+with file, line and column in the manner of SR-18.
 
 ## Alternatives considered
 
@@ -63,7 +60,7 @@ than in a number. The capacity service is untouched by the rule: it
 receives `from` and `to` and builds its edges from them, and the direction
 is settled before the router carries anything.
 
-The rule ties the projection to ports with a declared direction. A port
+This rule ties the projection to ports with a declared direction. A port
 declared `inout`, which the projection's `Direction` enum admits, cannot
 stand at either end of a connect under this rule, so the example declares
 `in` and `out` on every port that takes part in the wiring. That narrows
@@ -82,4 +79,4 @@ refusal is exercised.
 SR-20, SR-28
 
 ## Sources
-The SysML 2.0 language specification on `connect` and its ordered ends, and the OMG training material for ports and connections. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for the flow network the direction feeds, and [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the syntax as the two reference tools accept it.
+The SysML 2.0 language specification on `connect` and its ordered ends, and the OMG training material for ports and connections. [The capacity model](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-capacity-model) in the example's README for the flow network the direction feeds, and [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the syntax as the two reference tools accept it.

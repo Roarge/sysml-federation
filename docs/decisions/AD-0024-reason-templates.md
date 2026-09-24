@@ -16,14 +16,13 @@ The README promises that a failing requirement is
 marked as failing with the stage responsible named, so the reason has to name
 the cut.
 
-The wording had drifted before it was fixed. The storyboard at gate 1
-carried the shipped failure reason four ways and was aligned on "parse is
-the bottleneck at 1200". The first
-templates on the capacity model page carried "capacity" and "server", which
-the second pass at gate 2 caught as words the service is not allowed to know,
-and the derived requirements had been given a template chosen by the
-requirement being derived, which the service cannot know. The board that
-quotes a reason was then aligned with the template.
+The wording had drifted before it was fixed. At gate 1 the storyboard carried
+the shipped failure reason four ways and was aligned on "parse is the
+bottleneck at 1200". The first templates on the capacity model page carried
+"capacity" and "server", which the second pass at gate 2 caught as words the
+service is not allowed to know. The derived requirements had also been given a
+template chosen by the requirement being derived, which the service cannot
+know. After that, the board that quotes a reason was aligned with the template.
 
 There was also the question of which service owns the sentence a document
 reader sees. The document knows the derivation, its shipped prose paragraph
@@ -34,17 +33,18 @@ The reading at gate 2 settled that ownership on the document.
 ## Decision
 
 We will build every verdict reason in the capacity service from one of the
-fixed templates on the capacity model page, whose only variable parts are the
-configured quantity and attribute names, numbers, the names of parts, the
-kind of fault an ERROR reports and the short name of a verification case, so
-that no template carries a word of the model. The template for a subject with children reads `<quantity>
-<value> against <limit>, limited by <cut>`, the leaf template reads
-`<attribute> <value> against <limit>` and is selected by the subject having
-no children, each INCONCLUSIVE case and the ERROR case has a template of
-its own, and a cut of several parts is listed in the order the router delivers the
-children, comma separated, in wording that avoids a verb that would have to
-agree in number. Words such as "allocated" belong to the document, which
-knows the derivation and may add them beside the reason.
+fixed templates on the capacity model page. Their only variable parts are the
+configured quantity and attribute names, numbers, the names of parts, the kind
+of fault an ERROR reports and the short name of a verification case. That way,
+no template carries a word of the model. The template for a subject with
+children reads `<quantity>
+<value> against <limit>, limited by <cut>`. The leaf template reads
+`<attribute> <value> against <limit>` and is selected by the subject having no
+children. Each INCONCLUSIVE case and the ERROR case has a template of its own.
+A cut of several parts is listed in the order the router delivers the children,
+comma separated, in wording that avoids a verb that would have to agree in
+number. Words such as "allocated" belong to the document, which knows the
+derivation and may add them beside the reason.
 
 ## Alternatives considered
 
@@ -68,11 +68,11 @@ where that word goes.
 
 ## Consequences
 
-The reasons are testable in isolation. SR-30's verification is one test
-case per verdict kind, per precedence rule and per reason template, and the
-templates are a table a reader can check against the worked example, where
-`PIPE-R1` fails with `capacity 1200 against 1500, limited by parse` and
-`PIPE-R1.4` fails with `throughput 700 against 750`. Both apps show the
+The reasons are testable in isolation. SR-30's verification is one test case
+per verdict kind, per precedence rule and per reason template. The templates
+are a table a reader can check against the worked example, where `PIPE-R1`
+fails with `capacity 1200 against 1500, limited by parse` and `PIPE-R1.4` fails
+with `throughput 700 against 750`. Both apps show the
 string unchanged and compute nothing, which is the demo's claim that the
 verdict a reader sees comes from a service that has never parsed a model
 file.
@@ -80,10 +80,10 @@ file.
 The cost is a plainer sentence than the example could have had. The reason
 does not say bottleneck, server or allocated, and a document reader who
 wants the word "allocated" finds it in the document's prose paragraph rather
-than in the reason. The order of a cut of several parts follows the router's
-delivery order of the children, which the service does not control, so the
-index pair reads `indexA, indexB` today and the service makes no promise
-about that order. For `PIPE-R2` the reason names `PIPE-VC1` as declared and
+than in the reason. A cut of several parts is listed in the router's delivery
+order of the children, which the service does not control, so the index pair
+reads `indexA, indexB` today and the service makes no promise about that order.
+For `PIPE-R2` the reason names `PIPE-VC1` as declared and
 run by no service, and the row shows no current value (SR-37).
 
 The INCONCLUSIVE reason for a requirement of another quantity depends on the
@@ -98,4 +98,4 @@ SR-30, SR-37
 
 ## Sources
 
-[From use cases to requirements](../articles/05-from-use-cases-to-requirements.md), which publishes the seven templates, the verdict precedence and the worked example they render for. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the reason as the storyboard first carried it. The SysML v2 Systems Library's `VerdictKind` for the four words a verdict may take.
+[The capacity model](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-capacity-model) in the example's README, which publishes the seven templates, the verdict precedence and the worked example they render for. [The use cases](../stories/README.md) for what the reason has to name in each use case. The SysML v2 Systems Library's `VerdictKind` for the four words a verdict may take. 

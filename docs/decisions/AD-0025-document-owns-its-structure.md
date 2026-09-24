@@ -24,14 +24,14 @@ PIPE-R1.
 
 We will make the document service the owner of an ordered tree of heading,
 prose and requirement nodes, numbered in dotted decimal from the tree alone,
-siblings counted from one in tree order and prose nodes unnumbered (SR-33).
-The service holds requirement keys and structure and no model data. Its
-shipped tree names the example's requirement ids in a configuration file,
-which is the one place the example's identifiers enter a service, and for
-an id it has never heard of its entity resolver answers `included: false`
-and `documentNumber: null`. Every operation of SR-34 is a mutation on the
-tree (SR-35), renumbering follows each, and none touches the model
-(SR-36). The reset restores the shipped tree.
+siblings counted from one in tree order and prose nodes unnumbered (SR-33). The
+service holds requirement keys and structure and no model data. Its shipped
+tree names the example's requirement ids in a configuration file, which is the
+one place the example's identifiers enter a service. For an id it has never
+heard of, its entity resolver answers `included: false` and
+`documentNumber: null`. Every operation of SR-34 is a mutation on the tree
+(SR-35), renumbering follows each, and none touches the model (SR-36). The
+reset restores the shipped tree.
 
 ## Alternatives considered
 
@@ -53,15 +53,14 @@ prose, so the node kinds became three.
 ## Consequences
 
 The document reads like a specification and every editorial change is one
-mutation, which the stories can exercise one operation at a time. The
-service is small, a tree with three node kinds and a numbering function,
-and holds no copy of the model (SR-36 is a one-line test). The cost is the
-stated limit: a requirement not in the shipped tree is not in the document,
-which the example README says plainly and the architecture's field table
-repeats. An adopter replaces the shipped
-tree along with the model. Excluded requirements keep their former parent
-in the service's own data, which is what makes restore (SR-35) possible
-without reading anything from the model.
+mutation, which the stories can exercise one operation at a time. A tree with
+three node kinds and a numbering function, the service is small and holds no
+copy of the model (SR-36 is a one-line test). The cost is the stated limit: a
+requirement not in the shipped tree is not in the document, which
+[the architecture page](../architecture/README.md) says plainly. An adopter
+replaces the shipped tree along with the model. Excluded requirements keep
+their former parent in the service's own data, which is what makes restore
+(SR-35) possible without reading anything from the model.
 
 ## Requirements affected
 
@@ -69,4 +68,4 @@ SR-27, SR-33, SR-34, SR-35, SR-36, SR-37, SR-44
 
 ## Sources
 
-The repository README, "Requirements and relationships". [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the operations and the shipped structure, [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the document service's schema and its answer for an unknown id, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the tree as it ships.
+The repository README, "Requirements and relationships". [The use cases](../stories/README.md) for the operations and the shipped structure, [the architecture views](../architecture/README.md) for the document service's schema and its answer for an unknown id, and [The demo as it shipped](../articles/10-the-demo-as-it-shipped.md) for the tree as it ships.

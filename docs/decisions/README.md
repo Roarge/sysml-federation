@@ -1,32 +1,12 @@
 # Decision records
 
-Thirty-one records in the Nygard form, each giving the context, the decision,
-the alternatives considered, the consequences, the requirements affected and
-its sources. All thirty-one are accepted. Twenty-six of them were written
-during the design phase, before any code, and copied here so that they can be
-read and challenged. AD-0027 and AD-0028 were written later, while the system
-was being built, the second replacing the first, and AD-0027 is marked as
-superseded below and names its replacement in its own status line, and
-AD-0029 to AD-0031 were added after the first release, when the demo's own
-model and the check session were built. Where building the system changed what
-a record decides, the record was amended and is marked as amended in the list
-below. Such a record keeps its number and the original date in its status
-line, with a line at its head giving the date of the amendment and saying what
-changed. A record's status is `accepted`, or `accepted` followed by whatever
-qualification the decision carries. A decision that replaces an earlier one
-gets its own number rather than overwriting it, and a number is never reused.
+Each record holds one decision the demo rests on: its context, the decision, the alternatives that lost, the consequences, the requirements it affects and its sources. The form is the one Michael Nygard proposed, with the alternatives, requirements and sources added. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) tells the story of the first twenty-six.
 
-Inside the records, `SR-nn` is a system requirement and `SC-nn` a design
-constraint, from the set of forty-five requirements and seven constraints
-that [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md)
-describes, with three more, SR-46 to SR-48, added when the demo's own model was
-built, and a name beginning `PIPE-` is a short name inside the example
-model. `C-nn` is an entry on the technical constraints card, a design-phase
-working document that is not published, so those references are there to show
-what a decision rested on rather than to be looked up. The four gates the
-records refer to are the design phase's own, and
-[How the design was run](../articles/02-how-the-design-was-run.md) says what
-each produced.
+There are thirty-one, all accepted. Twenty-six were written in the design phase, before any code. AD-0027 and AD-0028 came during the build, and the second replaced the first. AD-0029 to AD-0031 came after the first release, with the demo's own model and the check session.
+
+When building the system changed what a record decides, the record kept its number and its first date and gained a dated amendment line at its head. The list below marks those records as amended. A decision that replaces another gets a number of its own, and no number is ever reused.
+
+Inside the records, `SR-nn` is a system requirement and `SC-nn` a design constraint. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) describes the first forty-five requirements and the seven constraints, and SR-46 to SR-48 came with the demo's own model. A name beginning `PIPE-` is a short name in the example model. `C-nn` is an entry on the design phase's technical constraints card, which isn't published, so those references show what a decision rested on and aren't there to be looked up. The four gates are the design phase's own, and [How the design was run](../articles/02-how-the-design-was-run.md) says what each produced.
 
 ## The shape of the system
 

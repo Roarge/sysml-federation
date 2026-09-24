@@ -193,8 +193,9 @@ package Federation_VerificationCases {
     }
 
     verification def VC_SR_10 {
-        doc /* No resource from another origin: the embedded assets scanned, and
-               the request list of a reload read in a browser. */
+        doc /* No resource from another origin: the embedded assets scanned, the
+               request list of a reload read in a browser, and both apps
+               reloaded with the host offline. */
         subject demo : Demo;
         objective { verify SR_10_NoResourceFromAnotherOrigin.acceptance; }
         action <'TestSR10_NoResourceFromAnotherOrigin'> assetsScanned {
@@ -204,6 +205,10 @@ package Federation_VerificationCases {
         action <'record: 2026-08-28 SR-10'> requestListOnReload {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A reload of the viewer made eight requests, every one of them to the one published port, with no font and no other host. */
+        }
+        action <'record: 2026-09-14 SR-10'> renderWithTheHostOffline {
+            @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
+            doc /* With the host taken off the network, both apps reloaded and drew in full. */
         }
     }
 

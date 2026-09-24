@@ -20,26 +20,30 @@ SR-03 kept the router off the network. The image sets the variables that turn
 the router's telemetry off (AD-0013), so a request's trace went nowhere, and
 when a check failed there was nothing to read beyond the check's own log. The
 router is the one place a request is seen end to end, with the three fetches it
-fans out into, and it is the only service in the container that can emit a
+fans out into. It is also the only service in the container that can emit a
 span without a new dependency.
 
 ## Decision
 
 We will add a compose profile beside the demo, under `checkly/`, that starts a
 Cloudflare tunnel, an OpenTelemetry collector, a trace viewer and a runner. The
-runner tests, deploys and destroys a Checkly project against this instance: it
+runner tests, deploys and destroys a Checkly project against this instance. It
 runs the browser specs and records the run as a session, deploys the project
 for as long as the stack runs, and destroys it when the stack stops. The tunnel
 is a named one on the operator's own hostname when a token is supplied, and a
 quick one on a hostname the tunnel provider assigns otherwise.
 
-The router's tracing becomes an operator opt-in. A configuration file is
-handed to the router only when `SYSML_FEDERATION_ROUTER_CONFIG_PATH` names one,
-and the file's values then govern the router's telemetry, because the router's
-own rule makes a file win over the environment. The session names a file that
+The router's tracing becomes an operator opt-in. A configuration file is handed
+to the router only when `SYSML_FEDERATION_ROUTER_CONFIG_PATH` names one, and
+the file's values then govern the router's telemetry, because the router's own
+rule makes a file win over the environment. The session names a file that
 exports to the collector beside the demo, and the collector forwards every span
-to the viewer and, when an ingest key is supplied, only the spans a check
-marked as its own to the monitoring service.
+to the viewer. When an ingest key is supplied, it also forwards to the
+monitoring service, but only the spans a check marked as its own.
+
+The session runs on the operator's own Checkly account, supplied as an API key
+and an account id in `checkly/.env`, because the maintainer's credentials
+cannot ship inside a public image.
 
 Without credentials nothing changes. `docker run` runs the demo as before, the
 variable is unset, the router's environment is what the supervisor sets, and
@@ -87,13 +91,12 @@ rather than in `make check`, so the Go gate keeps its shape and its timing.
 the compose file and holds the demo service outside every profile.
 
 The session on a quick tunnel probes whether a subscription's events cross the
-tunnel before the checks run, and the seven story checks that depend on an
-event reaching the page skip, with the reason in their log, when none arrives.
-Quick tunnels are
-documented as carrying no streamed response, so on one the seven are expected
-to skip and the named tunnel on the operator's own zone is the route for all
-twelve. The record in `checkly/README.md` says which route each recorded run
-used.
+tunnel before the checks run. When none arrives, the seven story checks that
+depend on an event reaching the page skip, with the reason in their log. Quick
+tunnels are documented as carrying no streamed response, so on one the seven
+are expected to skip and the named tunnel on the operator's own zone is the
+route for all twelve. The record in `checkly/README.md` says which route each
+recorded run used.
 
 While a session runs the demo answers at a public hostname without
 authentication, for the session's duration. The demo holds no secret, so what
@@ -105,4 +108,4 @@ SR-03, SR-48, SC-01
 
 ## Sources
 
-[The check session](../../checkly/README.md) for the setup, the checks and the verification record. [The model of the demo](../../model/README.md) for the session composite and the check cases, in which every live check is a case of its own. The telemetry record (AD-0013), the version events record (AD-0014) and the vanilla web apps record (AD-0017), each amended by this decision.
+[The check session](https://github.com/Roarge/sysml-federation/blob/main/checkly/README.md) for the setup, the checks and the verification record. [The model of the demo](https://github.com/Roarge/sysml-federation/blob/main/model/README.md) for the session composite and the check cases, in which every live check is a case of its own. The telemetry record (AD-0013), the version events record (AD-0014) and the vanilla web apps record (AD-0017), each amended by this decision.

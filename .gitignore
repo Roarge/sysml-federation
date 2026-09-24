@@ -121,6 +121,12 @@
 !/docs/_includes/*.html
 !/docs/assets/*.css
 
+# The one script the site loads, which opens a term's definition in place, and
+# the data file it reads those definitions from. Jekyll reads _data at build
+# time and never publishes it as a page of its own.
+!/docs/assets/*.js
+!/docs/_data/*.yml
+
 # The custom domain. GitHub writes this file itself when the domain is set in
 # the repository settings, and that commit does not consult this allowlist, so
 # without a rule here the file is tracked and excluded at the same time and

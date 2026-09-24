@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 424" width="720" height="424" role="img" aria-label="Three services, each with what it owns. The adapter owns the model. The capacity service owns four computed fields and holds no copy of the model. The document service owns the structure of the document, an ordered tree, and never reads the model. Below them, the only things they agree on: the entity key, the field set the capacity service requires, and the capacity service's two configured names.">
+  <title>What the three services share</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#286cab"/>
+    </marker>
+  </defs>
+  <rect width="720" height="424" fill="#faf8f5"/>
+  <g font-family="'Source Sans 3', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" fill="#1f2227">
+
+    <!-- Adapter -->
+    <rect x="16" y="20" width="216" height="176" rx="3" fill="#faf8f5" stroke="#1f2227"/>
+    <text x="30" y="44" font-size="12" font-weight="600" letter-spacing="0.8" fill="#555960">ADAPTER</text>
+    <text x="30" y="70" font-size="17" font-weight="600">Owns the model</text>
+    <g font-size="14">
+      <text x="30" y="96">parts and their wiring</text>
+      <text x="30" y="116">requirements and limits</text>
+      <text x="30" y="136">verification cases</text>
+      <text x="30" y="156">the model's text and version</text>
+      <text x="30" y="176">the three edits</text>
+    </g>
+
+    <!-- Capacity service -->
+    <rect x="252" y="20" width="216" height="176" rx="3" fill="#faf8f5" stroke="#1f2227"/>
+    <text x="266" y="44" font-size="12" font-weight="600" letter-spacing="0.8" fill="#555960">CAPACITY SERVICE</text>
+    <text x="266" y="70" font-size="17" font-weight="600">Owns four fields</text>
+    <g font-size="14" font-family="ui-monospace, Menlo, Consolas, monospace">
+      <text x="266" y="96">capacity, bottleneck</text>
+      <text x="266" y="116">verdict, verdictReason</text>
+    </g>
+    <g font-size="14" fill="#555960">
+      <text x="266" y="148">computed on every read</text>
+      <text x="266" y="168">keeps no copy of the model</text>
+    </g>
+
+    <!-- Document service -->
+    <rect x="488" y="20" width="216" height="176" rx="3" fill="#faf8f5" stroke="#1f2227"/>
+    <text x="502" y="44" font-size="12" font-weight="600" letter-spacing="0.8" fill="#555960">DOCUMENT SERVICE</text>
+    <text x="502" y="70" font-size="17" font-weight="600">Owns the structure</text>
+    <g font-size="14">
+      <text x="502" y="96">an ordered tree</text>
+      <text x="502" y="116">numbering and prose</text>
+    </g>
+    <g font-size="14" fill="#555960">
+      <text x="502" y="148">names seven requirement ids</text>
+      <text x="502" y="168">never reads the model</text>
+    </g>
+
+    <!-- What they agree on -->
+    <rect x="16" y="256" width="688" height="152" rx="3" fill="#e2f0ff" stroke="#286cab" stroke-width="1.5"/>
+    <text x="32" y="282" font-size="12" font-weight="600" letter-spacing="0.8" fill="#1d4f80">ALL THEY AGREE ON</text>
+    <g font-size="15" fill="#1f2227">
+      <text x="32" y="312" font-weight="700" fill="#1d4f80">1</text>
+      <text x="52" y="312">The entity key, <tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-size="14">id</tspan> on Part, Requirement and VerificationCase,</text>
+      <text x="52" y="332">whose value is the SysML short name</text>
+      <text x="32" y="362" font-weight="700" fill="#1d4f80">2</text>
+      <text x="52" y="362">The fields the capacity service asks for with <tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-size="14">@requires</tspan></text>
+      <text x="32" y="392" font-weight="700" fill="#1d4f80">3</text>
+      <text x="52" y="392">The capacity service's two configured names, <tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-size="14">capacity</tspan> and <tspan font-family="ui-monospace, Menlo, Consolas, monospace" font-size="14">throughput</tspan></text>
+    </g>
+
+    <!-- Connectors -->
+    <g stroke="#286cab" stroke-width="1.5" fill="none">
+      <line x1="124" y1="196" x2="124" y2="254" marker-end="url(#arrow)"/>
+      <line x1="360" y1="196" x2="360" y2="254" marker-end="url(#arrow)"/>
+      <line x1="596" y1="196" x2="596" y2="254" marker-end="url(#arrow)"/>
+    </g>
+    <g font-size="13" fill="#555960">
+      <text x="134" y="230">projects the fields</text>
+      <text x="370" y="230">declares them</text>
+      <text x="606" y="230">uses the key</text>
+    </g>
+  </g>
+</svg>

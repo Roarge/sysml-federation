@@ -38,17 +38,73 @@ defaults:
   - scope: { path: "decisions" }
     values: { layout: record }
 
+# The article series, in the order they were written. Each series lists its
+# parts and its articles. A part names the index of its first article in
+# `articles` and how many follow, so the sidebar and the pager slice the one
+# list rather than keeping copies of it. `dek` is the standfirst under an
+# article's title, which docs/README.md repeats by hand for github.com, so the
+# two are kept word for word the same. `release` is the version a finished
+# series was written for. A later release that changes what an article says
+# gets a note in that article rather than a rewrite.
 series:
-  - { path: articles/00-why-federate-a-systems-model.md, title: "Why federate a systems model", date: 2026-08-27 }
-  - { path: articles/01-the-architecture-in-one-sitting.md, title: "The architecture in one sitting", date: 2026-08-27 }
-  - { path: articles/02-how-the-design-was-run.md, title: "How the design was run", date: 2026-08-27 }
-  - { path: articles/03-what-the-research-overturned.md, title: "What the research overturned", date: 2026-08-27 }
-  - { path: articles/04-twelve-use-cases-and-one-moving-bottleneck.md, title: "Twelve use cases and one moving bottleneck", date: 2026-08-27 }
-  - { path: articles/05-from-use-cases-to-requirements.md, title: "From use cases to requirements", date: 2026-08-27 }
-  - { path: articles/06-five-views-and-twenty-six-decisions.md, title: "Five views and twenty-six decisions", date: 2026-08-27 }
-  - { path: articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md, title: "An A3 sheet for a fifteen-minute reader", date: 2026-08-27 }
-  - { path: articles/08-planning-the-build.md, title: "Planning the build", date: 2026-08-27 }
-  - { path: articles/09-five-spikes-before-the-first-line.md, title: "Five spikes before the first line", date: 2026-08-27 }
-  - { path: articles/10-the-demo-as-it-shipped.md, title: "The demo as it shipped", date: 2026-08-27 }
-  - { path: articles/11-what-shipped-and-what-did-not.md, title: "What shipped, and what did not", date: 2026-08-29 }
-  - { path: articles/12-a-model-of-the-demo-itself.md, title: "A model of the demo itself", date: 2026-09-13 }
+  - title: "Federating a systems model"
+    status: "Complete"
+    release: "v0.3.0"
+    parts:
+      - { title: "The idea", from: 0, count: 2, dek: "Why models stay locked in their tools, and what federation changes." }
+      - { title: "The design", from: 2, count: 6, dek: "How the demo was designed before any code was written, and what each round of review caught." }
+      - { title: "The build", from: 8, count: 3, dek: "From the approved design to a published container image." }
+      - { title: "Looking back", from: 11, count: 2, dek: "What the finished demo proves and leaves open, and a model of the demo itself." }
+    articles:
+      - path: articles/00-why-federate-a-systems-model.md
+        title: "Why federate a systems model"
+        date: 2026-08-27
+        dek: "Models were meant to end the drift between an organisation's documents, and closed tools kept them out of reach. SysML v2 opens the model up, and federation lets other tools join it without learning SysML."
+      - path: articles/01-the-architecture-in-one-sitting.md
+        title: "The architecture in one sitting"
+        date: 2026-08-27
+        dek: "How one query collects its answer from three services that never talk to each other, and the decisions that put them all in one container."
+      - path: articles/02-how-the-design-was-run.md
+        title: "How the design was run"
+        date: 2026-08-27
+        dek: "Four approval gates stood between the idea and the first line of code. Reading each document back against its sources caught three design errors early."
+      - path: articles/03-what-the-research-overturned.md
+        title: "What the research overturned"
+        date: 2026-08-27
+        dek: "Before designing anything, I wrote down what I believed about the tools and tried to knock each belief over. Three of the six claims that mattered fell."
+      - path: articles/04-twelve-use-cases-and-one-moving-bottleneck.md
+        title: "Twelve use cases and one moving bottleneck"
+        date: 2026-08-27
+        dek: "The example pipeline and the twelve short stories a visitor walks through. Their one surprise is that raising the bottleneck moves it somewhere else."
+      - path: articles/05-from-use-cases-to-requirements.md
+        title: "From use cases to requirements"
+        date: 2026-08-27
+        dek: "Turning the stories into forty-five testable requirements exposed three holes in the design, and pinned down how the capacity number is computed."
+      - path: articles/06-five-views-and-twenty-six-decisions.md
+        title: "Five views and twenty-six decisions"
+        date: 2026-08-27
+        dek: "The architecture seen from five angles, each for a different reader, with a written record behind every choice that shaped it."
+      - path: articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md
+        title: "An A3 sheet for a fifteen-minute reader"
+        date: 2026-08-27
+        dek: "Why the overview is one printed sheet, what the A3 method forces on it, and the two sheets drawn so far."
+      - path: articles/08-planning-the-build.md
+        title: "Planning the build"
+        date: 2026-08-27
+        dek: "How the approved design became five phases of work, one pull request each and tests first, and the choices the design had left open."
+      - path: articles/09-five-spikes-before-the-first-line.md
+        title: "Five spikes before the first line"
+        date: 2026-08-27
+        dek: "Five small experiments tested the riskiest assumptions, four of them before any product code existed. None failed outright, and each of those four corrected the plan."
+      - path: articles/10-the-demo-as-it-shipped.md
+        title: "The demo as it shipped"
+        date: 2026-08-27
+        dek: "What the finished demo shows once it runs, the fifteen-minute walk a visitor takes through it, and what the build came to."
+      - path: articles/11-what-shipped-and-what-did-not.md
+        title: "What shipped, and what did not"
+        date: 2026-08-29
+        dek: "How big the published image is, how its release is guarded, what a run with no network proves, and where the demo has been run."
+      - path: articles/12-a-model-of-the-demo-itself.md
+        title: "A model of the demo itself"
+        date: 2026-09-13
+        dek: "I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every storyboard story against the live demo."

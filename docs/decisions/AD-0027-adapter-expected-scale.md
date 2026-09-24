@@ -52,9 +52,9 @@ by changing what the number means. The plainer count is the one a reader can
 reproduce with a single command, and it is the count SC-06 has always named.
 
 Cutting the size of the model package. Its size is the size of the projection,
-so a smaller package is a smaller projection, and that is a change to the
-syntax tree and to the model's own interface rather than to the amount of code
-written against them.
+so a smaller package is a smaller projection. That is a change to the syntax
+tree and to the model's own interface rather than to the amount of code written
+against them.
 
 ## Consequences
 

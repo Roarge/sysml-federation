@@ -17,17 +17,17 @@ to be checked. Nothing serves it. No fixture reads it, no service parses it,
 and the unit test that holds it to the repository reads names out of the file
 rather than judging its grammar. A register left half-written, a `satisfy`
 pointing at a requirement that was renamed, an import that no longer resolves:
-none of that shows until a validator is run by hand, and the model drifts
-silently between one such run and the next.
+none of that shows until a validator is run by hand. The model drifts silently
+between one such run and the next.
 
 ## Decision
 
 We will validate the demo's own model with both reference tools, the OMG pilot
 implementation release 2026-07 and OpenSysML v0.6.0, on every pull request and
-push to main that changes a file under `model/`, in a workflow of its own,
-`model.yml`, through the same `make model-check` a maintainer runs locally. The
-example model keeps its local-only validation under `make example-model-check`,
-and its record stays in the example README.
+push to main that changes a file under `model/`. The validation lives in a
+workflow of its own, `model.yml`, and uses the same `make model-check` a
+maintainer runs locally. The example model keeps its local-only validation
+under `make example-model-check`, and its record stays in the example README.
 
 ## Alternatives considered
 

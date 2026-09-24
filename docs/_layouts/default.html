@@ -1,6 +1,30 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang | default: 'en' }}">
 {%- include head.html %}
+{%- comment %}
+  The articles write their boxes in GitHub's alert syntax, so github.com draws
+  them natively. kramdown leaves the marker as literal text at the start of
+  the blockquote's first paragraph, and code blocks escape their angle
+  brackets, so replacing the paragraph's opening tag reaches the boxes and
+  nothing else. If kramdown ever changes that output, the replace matches
+  nothing and a box falls back to a plain quote.
+
+  CAUTION is kept for notes added after a series is finished, when a later
+  release changes something an article says. Written as
+
+    > [!CAUTION]
+    > **Changed in v0.4.0**
+    >
+    > What changed and why.
+
+  it renders as a box labelled Update, placed where the change applies.
+{%- endcomment %}
+{%- assign body = content
+  | replace: '<p>[!IMPORTANT]', '<p class="callout-head" data-callout="story">'
+  | replace: '<p>[!NOTE]', '<p class="callout-head" data-callout="note"><span class="callout-label">Key term</span>'
+  | replace: '<p>[!TIP]', '<p class="callout-head" data-callout="tip"><span class="callout-label">Try it yourself</span>'
+  | replace: '<p>[!WARNING]', '<p class="callout-head" data-callout="limit"><span class="callout-label">Limit</span>'
+  | replace: '<p>[!CAUTION]', '<p class="callout-head" data-callout="update"><span class="callout-label">Update</span>' %}
 <body class="layout-{{ page.layout | default: 'default' }}">
   <a class="skip-link" href="#content">Skip to content</a>
   {%- include header.html %}
@@ -10,12 +34,15 @@
       {%- if page.title %}
       <h1>{{ page.title }}</h1>
       {%- endif %}
-      {{ content }}
+      {{ body }}
     </article>
     {%- else %}
-    {{ content }}
+    {{ body }}
     {%- endif %}
   </main>
   {%- include footer.html %}
+  {%- if body contains 'class="term"' %}
+  <script type="application/json" id="glossary-data">{{ site.data.glossary | jsonify }}</script>
+  {%- endif %}
 </body>
 </html>

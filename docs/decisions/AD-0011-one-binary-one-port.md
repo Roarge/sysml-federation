@@ -24,47 +24,44 @@ per container a rule of thumb rather than a hard rule and allows several
 processes where the container has one concern.
 
 The port question is separate. The router listens on `localhost:3002` by
-default with the playground at `/` and the endpoint at `/graphql`.
-Go's `httputil.ReverseProxy` flushes `text/event-stream` immediately and
-proxies `101 Switching Protocols`, so SSE and WebSocket both pass through
-it, and one origin on one port needs no CORS configuration, whereas a
-two-port topology would depend on the router's CORS defaults, whose
-acceptance by browsers for credentialed requests was not checked.
-The research left the one-port or two-port choice as an open question,
-with the remark that one port simplifies the launch line and hides the
-router as a separately addressable component.
+default with the playground at `/` and the endpoint at `/graphql`. Go's
+`httputil.ReverseProxy` flushes `text/event-stream` immediately and proxies
+`101 Switching Protocols`, so SSE and WebSocket both pass through it. One
+origin on one port needs no CORS configuration, whereas a two-port topology
+would depend on the router's CORS defaults, whose acceptance by browsers for
+credentialed requests was not checked. The research left the one-port or
+two-port choice as an open question, with the remark that one port simplifies
+the launch line and hides the router as a separately addressable component.
 
-The reading at gate 2 settled where the UI server
-lives. The single UI server that serves both apps and proxies
-the router belongs to the image element, so the two apps are HTML, CSS and
-JavaScript and nothing else. The supervisor, with its UI server and command
-dispatch, is expected to run to about 700 lines.
+At gate 2, the reading settled where the UI server lives. The single UI server
+that serves both apps and proxies the router belongs to the image element, so
+the two apps are HTML, CSS and JavaScript and nothing else. The supervisor,
+with its UI server and command dispatch, is expected to run to about 700 lines.
 
 ## Decision
 
 We will ship one Go binary, `sysml-federation`, whose default `serve`
-subcommand is PID 1 and runs the three subgraphs as goroutines on loopback
-ports 3011, 3012 and 3013, starts the router as a child on 127.0.0.1:3002,
-and runs one UI server on 0.0.0.0:8080 that serves both apps from
-`embed.FS`, proxies `/graphql` and `/playground` to the router and
-redirects `/` to `/viewer`. The subcommands `adapter`,
-`capacity`, `document` and `ui` run one component each on a given address
-for anyone who wants the services apart, and `healthcheck` GETs the
-router's `/health/ready` on its loopback port and `/viewer` on the
-published port, exiting non-zero if either fails, for the image's
-`HEALTHCHECK`. The router's health path is not proxied.
+subcommand is PID 1. That subcommand runs the three subgraphs as goroutines on
+loopback ports 3011, 3012 and 3013 and starts the router as a child on
+127.0.0.1:3002. It also runs one UI server on 0.0.0.0:8080 that serves both
+apps from `embed.FS`, proxies `/graphql` and `/playground` to the router and
+redirects `/` to `/viewer`. The subcommands `adapter`, `capacity`, `document`
+and `ui` run one component each on a given address for anyone who wants the
+services apart. For the image's `HEALTHCHECK`, `healthcheck` GETs the router's
+`/health/ready` on its loopback port and `/viewer` on the published port, and
+exits non-zero if either fails. The router's health path is not proxied.
 
 ## Alternatives considered
 
 Docker Compose with one container per service against the official router
 image, the shape the vendor's own demos use and the lowest-risk one in the
-Cosmo research. Every subgraph is then a visibly separate service, which
-suits the README's argument. It lost because "one command" would be
-`docker compose up` after obtaining a file, which needs Compose and either
-a clone, a git-backed URL or an OCI artefact, and the routing URLs in the
-execution configuration would differ from the single-container layout, so
-a second configuration would be needed. One command is literally true only
-with a single image.
+Cosmo research. Every subgraph is then a visibly separate service, which suits
+the README's argument. It lost because "one command" would be
+`docker compose up` after obtaining a file, which needs Compose and either a
+clone, a git-backed URL or an OCI artefact. The routing URLs in the execution
+configuration would also differ from the single-container layout, so a second
+configuration would be needed. One command is literally true only with a single
+image.
 
 Both shapes at once, the same image started several times by a compose
 file beside the official router container. The packaging research
@@ -76,11 +73,11 @@ separation and closest to how an adopter would deploy, and the most
 artefacts to build, publish and carry across an air gap. Not taken for a
 demo.
 
-s6-overlay, supervisord or a shell wrapper as the in-container supervisor.
-Each needs a userland the distroless base does not have, and s6
-would add a supervision layer to explain in a repository meant to be read
-in an afternoon. tini or `docker run --init` supervises exactly one child
-and would put a flag in the launch line.
+s6-overlay, supervisord or a shell wrapper as the in-container supervisor. Each
+needs a userland the distroless base does not have. Adopting s6 would add a
+supervision layer to explain in a repository meant to be read in an afternoon.
+tini or `docker run --init` supervises exactly one child and would put a flag
+in the launch line.
 
 Two published ports, the router on 3002 and the apps on 8080. It keeps the
 router addressable on its own. It lost on the launch line, which would
@@ -117,4 +114,4 @@ it are reachable and the path itself is not.
 SR-01, SR-02, SR-04, SR-10, SR-40
 
 ## Sources
-Docker's guidance on running more than one process in a container, the distroless static base image, and the Cosmo router's default listen address and paths. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the deployment view and its process tree, and [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for what the router's readiness path proves.
+Docker's guidance on running more than one process in a container, the distroless static base image, and the Cosmo router's default listen address and paths. [The architecture views](../architecture/README.md) for the deployment view and its process tree, and [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for what the router's readiness path proves.

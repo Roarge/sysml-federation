@@ -1,12 +1,29 @@
-<nav class="series-nav" aria-label="The series">
-  <h2 class="series-nav-heading">The series</h2>
-  <ol>
-    {%- for item in site.series %}
-    {%- assign href = item.path | replace: '.md', '.html' | prepend: '/' %}
-    <li{% if item.path == page.path %} class="is-current"{% endif %}>
-      <span class="series-num" aria-hidden="true">{{ forloop.index }}</span>
-      <a href="{{ href | relative_url }}"{% if item.path == page.path %} aria-current="page"{% endif %}>{{ item.title }}</a>
-    </li>
-    {%- endfor %}
-  </ol>
+{%- comment %}
+  The series the current article belongs to, in its parts. The article layout
+  sets `current` to that series. Each part slices the series' articles by
+  position, so the list is written once, in _config.yml, and the numbers run
+  on from one part to the next.
+{%- endcomment %}
+<nav class="series-nav" aria-label="{{ current.title }}">
+  <div class="series-nav-head">
+    <h2 class="series-nav-heading">{{ current.title }}</h2>
+    {%- if current.release %}
+    <p class="series-nav-meta">{{ current.status }} &middot; written for release {{ current.release }}</p>
+    {%- endif %}
+  </div>
+  {%- for part in current.parts %}
+  <div class="series-part">
+    <p class="series-part-title">{{ part.title }}</p>
+    <ol start="{{ part.from | plus: 1 }}">
+      {%- for item in current.articles limit: part.count offset: part.from %}
+      {%- assign number = part.from | plus: forloop.index %}
+      {%- assign href = item.path | replace: '.md', '.html' | prepend: '/' %}
+      <li{% if item.path == page.path %} class="is-current"{% endif %}>
+        <span class="series-num" aria-hidden="true">{{ number }}</span>
+        <a href="{{ href | relative_url }}"{% if item.path == page.path %} aria-current="page"{% endif %}>{{ item.title }}</a>
+      </li>
+      {%- endfor %}
+    </ol>
+  </div>
+  {%- endfor %}
 </nav>

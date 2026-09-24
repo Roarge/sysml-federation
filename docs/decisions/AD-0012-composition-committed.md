@@ -3,7 +3,7 @@
 Status: accepted, amended once the graph was composed. Date: 2026-08-27.
 
 Amendment, 2026-08-27: the decision as first accepted had the compose input
-give both subscription subgraphs `ws` with subprotocol `auto`, leaving the
+give both subscription subgraphs `ws` with subprotocol `auto`, which left the
 socket to be negotiated. The input now names `graphql-transport-ws` outright,
 which is what those two subgraphs serve, and the third subgraph, which carries
 no subscriptions, is left to the tool's default.
@@ -18,45 +18,44 @@ loads the file through `EXECUTION_CONFIG_FILE_PATH` and takes the
 static-config branch before any poller is consulted. The vendor's
 compose page says "it is recommended to not use this for production", its
 CLI source directs production users to `router fetch`, and the router logs
-"Not recommended for Production" at every start without a token. The demo
+"Not recommended for Production" at every start without a token. This demo
 has no control plane to
 fetch from, and the README presents the static path as what makes the
 stack air-gappable, so the vendor's wording is quoted wherever the public
 text describes it.
 
-The question is where and when composition runs. The Go composition
-library was removed from the Cosmo repository on 2026-05-06, so composition
-means wgc or the TypeScript package, both of which need Node. The
-packaging research had suggested composing at container start or in a Go
-build step, and both suggestions died with that removal.
-CI runs `go build` and `go test` with read-only permissions and
-image publishing on version tags, and no Node toolchain (SC-07). wgc sends
-usage events unless `DO_NOT_TRACK=1` or `COSMO_TELEMETRY_DISABLED=true` is
-set, it declares no Node range, and whether it needs no network at all with
-schema files only was not established.
+The question is where and when composition runs. On 2026-05-06 the Go
+composition library was removed from the Cosmo repository, so composition means
+wgc or the TypeScript package, both of which need Node. The packaging research
+had suggested composing at container start or in a Go build step, and both
+suggestions died with that removal. CI runs `go build` and `go test` with
+read-only permissions and image publishing on version tags, and no Node
+toolchain (SC-07). Unless `DO_NOT_TRACK=1` or `COSMO_TELEMETRY_DISABLED=true`
+is set, wgc sends usage events. It declares no Node range, and whether it needs
+no network at all with schema files only was not established.
 
-The output carries a compatibility version that the router checks at
-start, wgc hard-codes it at 1, and the router 0.313.0 subscription overhaul
-renamed configuration keys, so the router tag and the wgc version are
-pinned and bumped together. The README's third condition for a
-projection, that the contract between producer and consumer is checked
-mechanically before deployment, is met by the repository rather than by the
-demo, through a test that fails when a subgraph schema and the composed
-configuration drift apart.
+The output carries a compatibility version that the router checks at start, and
+wgc hard-codes it at 1. Router 0.313.0's subscription overhaul also renamed
+configuration keys. The router tag and the wgc version are therefore pinned and
+bumped together. The README's third condition for a projection is that the
+contract between producer and consumer is checked mechanically before
+deployment. That condition is met by the repository rather than by the demo,
+through a test that fails when a subgraph schema and the composed configuration
+drift apart.
 
 ## Decision
 
-We will run composition as a maintainer step on a connected machine with
-the two telemetry variables set, from the compose input at
-`examples/pipeline/graph.yaml` to `examples/pipeline/config.json`, commit
-both, copy the configuration into the image at `/app/config.json`, and
-guard the committed output with a Go test that parses it and compares each
-embedded subgraph schema with the schema file it came from (SR-42). The
-compose input names the three subgraphs with
-loopback routing URLs on ports 3011 to 3013, a schema file for each, and
-`ws` with subprotocol `graphql-transport-ws` for the two that carry
-subscriptions, which is the subprotocol the subgraphs serve. The third is
-left to the tool's default, since it has no subscriptions to negotiate.
+We will run composition as a maintainer step on a connected machine with the
+two telemetry variables set, from the compose input at
+`examples/pipeline/graph.yaml` to `examples/pipeline/config.json`. Both files
+are committed, and the configuration is copied into the image at
+`/app/config.json`. A Go test guards the committed output by parsing it and
+comparing each embedded subgraph schema with the schema file it came from
+(SR-42). The compose input names the three subgraphs with loopback routing URLs
+on ports 3011 to 3013 and a schema file for each. For the two that carry
+subscriptions it gives `ws` with subprotocol `graphql-transport-ws`, which is
+the subprotocol the subgraphs serve. The third is left to the tool's default,
+since it has no subscriptions to negotiate.
 
 ## Alternatives considered
 
@@ -80,19 +79,19 @@ presented as air-gappable.
 
 ## Consequences
 
-CI stays Go only. The drift test is an ordinary unit test, so a schema
-change without a recompose fails on the pull request without Node in CI
-(SC-07), and the maintainer's recompose is a demonstration rather
-than a test (SR-42). The committed configuration is what the image ships,
-so what the router runs is reviewable in a pull request as a diff.
+CI stays Go only. The drift test is an ordinary unit test, so a schema change
+without a recompose fails on the pull request without Node in CI (SC-07), and
+the maintainer's recompose is a demonstration rather than a test (SR-42). Since
+the image ships the committed configuration, what the router runs is reviewable
+in a pull request as a diff.
 
-The maintainer's machine becomes the one place composition happens, with
-Node, a pinned wgc and the two telemetry variables. A contributor who edits
-a schema and cannot run wgc sees the drift test fail and has to ask the
-maintainer to recompose, which is a cost the demo accepts. The two file
-locations are fixed by the allowlist: `examples/*/*.yaml` and
-`examples/*/*.json` reach one level below `examples/`, so the files sit at
-`examples/pipeline/` rather than in a `router/` subdirectory (SC-04).
+The maintainer's machine becomes the one place composition happens, with Node,
+a pinned wgc and the two telemetry variables. A contributor who edits a schema
+and cannot run wgc sees the drift test fail and has to ask the maintainer to
+recompose, which is a cost the demo accepts. Both file locations are fixed by
+the allowlist: `examples/*/*.yaml` and `examples/*/*.json` reach one level
+below `examples/`, so the files sit at `examples/pipeline/` rather than in a
+`router/` subdirectory (SC-04).
 
 The router tag and the wgc version move together, so a router bump
 is a recompose and a rebuild, not a tag change alone. The configuration
@@ -111,4 +110,4 @@ the configuration is committed and tested for drift.
 SR-42, SC-07
 
 ## Sources
-The vendor's pages on `wgc router compose` and on the router's static execution configuration, and the commit that removed `composition-go` from wundergraph/cosmo. [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the composition runs and where the embedded schema sits in the output, and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the composition view.
+The vendor's pages on `wgc router compose` and on the router's static execution configuration, and the commit that removed `composition-go` from wundergraph/cosmo. [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the composition runs and where the embedded schema sits in the output, and [the architecture views](../architecture/README.md) for the composition view.

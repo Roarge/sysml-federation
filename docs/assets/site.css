@@ -230,10 +230,11 @@ main {
 }
 
 /* The byline and the series line are the first two paragraphs of an
-   article's markdown, and the artboard sets them upright and grey. A
-   record's status line is the same shape. */
-.layout-article .prose > h1 + p,
-.layout-article .prose > h1 + p + p,
+   article's markdown, straight after the header the layout draws, and the
+   artboard sets them upright and grey. A record's status line is the same
+   shape. */
+.layout-article .prose > .article-head + p,
+.layout-article .prose > .article-head + p + p,
 .layout-home .prose > h1 + p,
 .prose.is-record > h1 + p {
   font-size: 16px;
@@ -242,7 +243,7 @@ main {
   margin-bottom: 4px;
 }
 
-.layout-article .prose > h1 + p + p,
+.layout-article .prose > .article-head + p + p,
 .prose.is-record > h1 + p {
   margin-bottom: 24px;
 }
@@ -253,7 +254,7 @@ main {
   margin-bottom: 20px;
 }
 
-.layout-article .prose > h1 + p em,
+.layout-article .prose > .article-head + p em,
 .layout-home .prose > h1 + p em {
   font-style: normal;
 }
@@ -287,11 +288,15 @@ main {
 
 /* An image paragraph and the italic sentence beneath it are the figure and
    its caption. */
-.prose > p:has(> img) {
+/* A figure may be wrapped in a link to the full-size drawing, which is what
+   a phone reader taps to read the labels. */
+.prose > p:has(> img),
+.prose > p:has(> a > img) {
   margin: 40px 0 12px;
 }
 
-.prose > p:has(> img) + p {
+.prose > p:has(> img) + p,
+.prose > p:has(> a > img) + p {
   font-size: 16px;
   line-height: 1.5;
   color: var(--pencil);
@@ -314,6 +319,12 @@ pre {
   border-radius: 3px;
   padding: 16px 20px;
   overflow-x: auto;
+}
+
+/* A long identifier in running text breaks where it has to rather than
+   pushing the page wider than a phone. Code blocks scroll instead. */
+:not(pre) > code {
+  overflow-wrap: anywhere;
 }
 
 pre code {
@@ -344,6 +355,335 @@ pre code {
 .prose th {
   background: var(--shade);
   font-weight: 600;
+}
+
+/* ------------------------------------------------------ the article head */
+
+/* The layout draws the eyebrow, the title and the standfirst, and the
+   markdown's own byline and series line follow straight after. */
+.article-head .eyebrow {
+  margin: 0 0 16px;
+}
+
+.article-head h1 {
+  margin: 0 0 16px;
+}
+
+.dek {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* ---------------------------------------------------------------- callouts */
+
+/* An article writes its boxes in GitHub's alert syntax, and default.html
+   turns the marker into a class on the box's first paragraph. The second
+   colour of each box is taken from the palette the boards already use:
+   shade for a key term, blue for something to try, amber for a limit. */
+:root {
+  --blue-deep: oklch(45% 0.11 250);
+  --amber-tint: oklch(96% 0.035 80);
+  --amber-deep: oklch(46% 0.11 65);
+  --label-grey: oklch(48% 0.01 260);
+}
+
+.prose blockquote:has(> .callout-head) {
+  margin: 32px 0;
+  padding: 20px 24px 22px;
+  border-left: 0;
+  border-radius: 4px;
+  color: var(--ink);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.prose blockquote:has(> .callout-head) > * {
+  margin: 0 0 12px;
+}
+
+.prose blockquote:has(> .callout-head) > :last-child {
+  margin-bottom: 0;
+}
+
+.callout-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.callout-label {
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.callout-head strong {
+  font-size: 18px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.prose blockquote:has(> .callout-head[data-callout="note"]) {
+  background: var(--shade);
+}
+
+.callout-head[data-callout="note"] .callout-label {
+  color: var(--blue-deep);
+}
+
+.callout-head[data-callout="note"] strong {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.prose blockquote:has(> .callout-head[data-callout="note"]) code,
+.prose blockquote:has(> .callout-head[data-callout="note"]) pre {
+  background: var(--paper);
+}
+
+.prose blockquote:has(> .callout-head[data-callout="tip"]) {
+  border: 1px solid var(--blue);
+}
+
+.callout-head[data-callout="tip"] .callout-label {
+  color: var(--blue-deep);
+}
+
+.prose blockquote:has(> .callout-head[data-callout="limit"]) {
+  background: var(--amber-tint);
+}
+
+.callout-head[data-callout="limit"] .callout-label {
+  color: var(--amber-deep);
+}
+
+.prose blockquote:has(> .callout-head[data-callout="limit"]) code {
+  background: var(--paper);
+}
+
+/* A note added after a series is finished, when a later release changes
+   what the article says. Dashed, as the boards draw what sits outside the
+   demo, since the note sits outside the series as it was written. */
+.prose blockquote:has(> .callout-head[data-callout="update"]) {
+  border: 1px dashed var(--ink);
+}
+
+.callout-head[data-callout="update"] .callout-label {
+  color: var(--ink);
+}
+
+/* The story so far opens every article. It reads as the start of the
+   article rather than an aside, so it is set in the serif between two
+   rules, and its bold title becomes the label. */
+.prose blockquote:has(> .callout-head[data-callout="story"]) {
+  margin: 8px 0 40px;
+  padding: 20px 0 22px;
+  border-radius: 0;
+  border-top: var(--rule);
+  border-bottom: var(--rule);
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.callout-head[data-callout="story"] strong {
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--label-grey);
+}
+
+.prose blockquote:has(> .callout-head[data-callout="story"]) > .callout-head {
+  margin-bottom: 8px;
+}
+
+/* ------------------------------------------------------- under the bonnet */
+
+/* Detail a reader can skip without losing the story: exact log lines, flag
+   spellings, long enumerations. Closed by default, between two rules, and a
+   run of them shares one rule between each pair. */
+.prose details {
+  border-top: var(--rule);
+  border-bottom: var(--rule);
+}
+
+.prose details + details {
+  margin-top: -24px;
+  border-top: 0;
+}
+
+.prose summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 4px 0;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.prose summary::-webkit-details-marker {
+  display: none;
+}
+
+.prose summary::before {
+  content: "";
+  flex: 0 0 16px;
+  height: 16px;
+  background:
+    linear-gradient(var(--blue), var(--blue)) center / 12px 1.6px no-repeat,
+    linear-gradient(var(--blue), var(--blue)) center / 1.6px 12px no-repeat;
+}
+
+.prose details[open] > summary::before {
+  background: linear-gradient(var(--blue), var(--blue)) center / 12px 1.6px no-repeat;
+}
+
+.prose summary:hover {
+  color: var(--blue);
+}
+
+.prose details > :not(summary) {
+  margin: 0 0 16px 28px;
+  font-size: 17px;
+}
+
+.prose details > :last-child {
+  margin-bottom: 20px;
+}
+
+.prose details > p:has(> img) {
+  margin: 16px 0 12px 28px;
+}
+
+/* ------------------------------------------------------------------ terms */
+
+/* A term the reader can click for its definition. site.js turns the
+   article's marked span into this button, so without the script the word is
+   plain text and never looks clickable. */
+button.term {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: inherit;
+  text-decoration: underline dotted var(--pencil);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.2em;
+  border-radius: 2px;
+}
+
+button.term:hover,
+button.term[aria-expanded="true"] {
+  text-decoration-color: var(--blue);
+}
+
+button.term[aria-expanded="true"] {
+  background: var(--shade);
+  box-shadow: 0 0 0 3px var(--shade);
+}
+
+.term-pop {
+  position: absolute;
+  z-index: 20;
+  width: min(340px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 14px 16px 16px 18px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px oklch(25% 0.01 260 / 0.12);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.term-pop::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: calc(var(--caret-x, 40px) - 6px);
+  width: 12px;
+  height: 12px;
+  background: var(--paper);
+  border-left: 1px solid var(--ink);
+  border-top: 1px solid var(--ink);
+  transform: rotate(45deg);
+}
+
+.term-pop:focus {
+  outline: none;
+}
+
+.term-pop:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.term-pop-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.term-pop-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.term-pop-close {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: -8px -10px -8px 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 3px;
+  color: var(--label-grey);
+  cursor: pointer;
+}
+
+.term-pop-close:hover {
+  color: var(--ink);
+  background: var(--shade);
+}
+
+.term-pop-text {
+  margin: 0;
+}
+
+.term-pop-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 /* ------------------------------------------------- the index pages' lists */
@@ -389,12 +729,31 @@ pre code {
   margin-top: 56px;
 }
 
+/* The home page lists every series under its own heading, with the series'
+   parts beneath it. A series heading starts its numbering again at 1. */
 .layout-home .prose > h2 {
-  margin: 56px 0 8px;
+  margin: 72px 0 8px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.15;
+  counter-reset: article;
 }
 
 .layout-home .prose > h2 + p {
   margin-bottom: 28px;
+  color: var(--label-grey);
+}
+
+.layout-home .prose > h3 {
+  margin: 40px 0 4px;
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.layout-home .prose > h3 + p {
+  margin-bottom: 24px;
+  color: var(--label-grey);
 }
 
 .layout-home .prose > ol,
@@ -413,7 +772,9 @@ pre code {
   line-height: 1.5;
 }
 
-.layout-home .prose > ol {
+/* The series is split into four lists, one per part, and the numbers run
+   on across them. */
+.layout-home .prose {
   counter-reset: article;
 }
 
@@ -517,9 +878,42 @@ pre code {
   gap: 20px;
 }
 
+.series-part {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.series-part + .series-part {
+  margin-top: 6px;
+}
+
+.series-part-title {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--label-grey);
+}
+
+.series-nav-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.series-nav-meta {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--label-grey);
+}
+
 .series-nav-heading {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1.25;
   font-weight: 600;
   color: var(--ink);
@@ -654,9 +1048,17 @@ pre code {
     align-items: start;
   }
 
+  /* On a short screen the list scrolls inside the sidebar. The sidebar
+     reaches back over the numerals' column so that they hang inside its
+     own box and are not clipped by the scroll. */
   .sidebar {
     position: sticky;
     top: 56px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    margin-left: calc(0px - var(--hang));
+    padding-left: var(--hang);
+    padding-bottom: 8px;
   }
 
   /* Beside the article the numerals hang into the gap. */
@@ -734,7 +1136,13 @@ pre code {
   }
 
   .layout-home .prose > h2 {
-    margin: 32px 0 8px;
+    margin: 48px 0 8px;
+    font-size: 26px;
+  }
+
+  .layout-home .prose > h3 {
+    margin: 28px 0 4px;
+    font-size: 18px;
   }
 
   .prose h3 {
@@ -745,8 +1153,8 @@ pre code {
     margin-bottom: 12px;
   }
 
-  .layout-article .prose > h1 + p,
-  .layout-article .prose > h1 + p + p,
+  .layout-article .prose > .article-head + p,
+  .layout-article .prose > .article-head + p + p,
   .layout-home .prose > h1 + p,
   .prose.is-record > h1 + p {
     font-size: 15px;
@@ -760,11 +1168,13 @@ pre code {
     margin-bottom: 32px;
   }
 
-  .prose > p:has(> img) {
+  .prose > p:has(> img),
+  .prose > p:has(> a > img) {
     margin: 32px 0 10px;
   }
 
-  .prose > p:has(> img) + p {
+  .prose > p:has(> img) + p,
+  .prose > p:has(> a > img) + p {
     font-size: 15px;
     margin-bottom: 32px;
   }
@@ -880,5 +1290,50 @@ pre code {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------ the new article parts, phone */
+
+@media (max-width: 719px) {
+  .site-nav {
+    gap: 16px;
+  }
+
+  .dek {
+    font-size: 19px;
+  }
+
+  .prose blockquote:has(> .callout-head) {
+    margin: 24px 0;
+    padding: 16px 18px 18px;
+    font-size: 16px;
+  }
+
+  .prose blockquote:has(> .callout-head[data-callout="story"]) {
+    padding: 16px 0 18px;
+    font-size: 18px;
+  }
+
+  .callout-head[data-callout="note"] strong {
+    font-size: 20px;
+  }
+
+  .prose details + details {
+    margin-top: -20px;
+  }
+
+  .prose summary {
+    font-size: 16px;
+  }
+
+  .prose details > :not(summary) {
+    margin-left: 0;
+    font-size: 16px;
+  }
+
+  .term-pop-close {
+    width: 44px;
+    height: 44px;
   }
 }
