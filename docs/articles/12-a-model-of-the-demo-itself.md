@@ -4,101 +4,267 @@
 
 Part 13 of 13 in [Federating a systems model](../README.md).
 
-The [light requirements scheme](../decisions/AD-0023-light-requirements-scheme.md) put the repository's own requirements in Markdown tables and deferred a model of them. A reader judging a SysML adapter is not judging a way of working, the record said, and the question would return once the requirement count outgrew a screen. It outgrew a screen before the first line of code was written, and the question stayed deferred through the build.
+> [!IMPORTANT]
+> **The story so far**
+>
+> The demo shipped as one container. Inside it, a <span class="term" data-term="sysml-v2">SysML v2</span> model, a capacity analysis and a requirements document answer as one graph behind a single <span class="term" data-term="router">router</span>, with two web apps in front. Part 12 weighed the image and listed what nobody had run. This last part turns the series' own argument on the repository. If a systems model belongs at the centre of an organisation's engineering, the description of this demo should be a model too.
 
-What brought it back was drift. The published description came apart from the code more than once, a number, a file name, a count of tests, each true when written and wrong by the time a reader met it, and each found by somebody reading the two side by side. Reading is not a mechanism. A repository arguing that a systems model belongs at the centre of an organisation's engineering, while keeping its own description in prose that nothing checks, was making its case with the wrong example.
+## Prose that nothing checks
 
-The demo is now [modelled in SysML v2](../decisions/AD-0029-the-demos-own-model-in-sysml-v2.md), under [`model/`](https://github.com/Roarge/sysml-federation/tree/main/model), with a unit test that fails when the model and the repository disagree and both reference tools reading the model on every change. A check session came with it, because a model in which every story has a verification case and no story has anything that runs it on a schedule is a description with more structure.
+Early in the design I chose to keep the repository's own requirements as Markdown tables. The [light requirements scheme](../decisions/AD-0023-light-requirements-scheme.md) records why. Someone judging a SysML adapter is not judging a way of working, and a model of the requirements could wait until there were more of them than fit on a screen. There were more than that before the first line of code was written, and the model kept waiting all through the build.
 
-## Two models, one repository
+Drift is what brought it back. More than once the published description came apart from the code. A number, a file name or a count of tests was true when written and wrong by the time someone read it. Each time, a person caught it by reading the text and the code side by side, and reading is not a mechanism. It also left the repository making its case with the wrong example. It argued that a systems model should sit at the centre of engineering work, while it described itself in prose that nothing checked.
 
-The pipeline model is what the adapter serves. It lives in `examples/pipeline/model.sysml`, describes five servers wired in series and in parallel with a throughput each, a requirement on the whole pipeline and one derived from it for each server, and the adapter reads it at startup. Every board and every screenshot that shows `ingest`, `parse` or the model requirement `PIPE-R1` is showing that file's content.
+So the demo now has [a model of its own in SysML v2](../decisions/AD-0029-the-demos-own-model-in-sysml-v2.md), in the [`model/`](https://github.com/Roarge/sysml-federation/tree/main/model) directory. A unit test fails whenever the model and the repository disagree, and both reference tools for the language read the model on every change. The model also brought a check session with it. A model can give every story a test case, but if nothing runs those cases against the live demo on a schedule, it is still a description with more structure.
 
-The model of the demo describes the thing that serves it: the adapter, the capacity and document services beside it, the router that composes the three into one graph, the two web apps that read the graph, and the image they all ship in. Nothing of the pipeline is declared in it, and no service reads it.
+## Two models in one repository
 
-A reader tells them apart by the shape of the name. A short name beginning `PIPE-` belongs to the example, is written in code font, and is called a model requirement or a model element wherever it appears in prose. The demo's own identifiers are the light scheme's, `US-nn` for a story, `SR-nn` for a system requirement, `SC-nn` for a design constraint and `AD-nnnn` for a decision record, and in the model each is a short name, `<'SR-22'>`, over a qualified name that carries the number and a phrase, `SR_22_EditsPatchTheSource`, so that a satisfy or a verify reads as a sentence. The numbers were in the articles and the records before the model existed, and they stay as they are.
+The repository now holds two SysML v2 models, and they describe different things.
 
-A decision record is named by a metadata tag on the element it shaped, and a story's rationale cites the records it rests on, so a reader can go from an element to its reason without leaving the file.
+The **pipeline model** is the example the demo serves. It lives in `examples/pipeline/model.sysml` and describes five servers wired in series and in parallel, each with a throughput. It states one requirement on the whole pipeline and derives one from it for each server. The <span class="term" data-term="adapter">adapter</span> reads this file when it starts. Every board and screenshot that shows `ingest`, `parse` or the model requirement `PIPE-R1` is showing this file's content.
 
-## Stories, then system stories
+The **demo model** describes the thing doing the serving. It covers the adapter, the capacity and document services beside it, the router that joins the three into one graph, the two web apps that read the graph, and the image they all ship in. Nothing of the pipeline is declared in it, and no running service reads it.
 
-The twelve stories of the storyboard are the stakeholder stories, each a requirement usage with a role, a capability, a benefit, nested acceptance criteria and a status carried as metadata. Seven were added with the model, one for each requirement that traced to an obligation the project had set itself rather than to a use case: that the licences travel with what is copied, that nothing of the example is in the adapter, that a served model is never silently wrong, that the contract is checked before deployment, that the example is accepted by the reference tools, that the demo's own model is the record, and that the stories are exercised against a running instance.
+[![Two boxes. On the left, the pipeline model, read by the adapter at startup and served to the apps. On the right, the demo model, which describes the adapter, the services, the router, the apps and the image, and is read only by a unit test and two validators.](../figures/two-models.svg)](../figures/two-models.svg)
 
-Before the model those requirements traced to an obligation and not to anyone who wanted it, and a story with a role and a benefit says who does.
+*The pipeline model is content the demo serves. The demo model describes the demo, and only tests and validators read it.*
 
-The forty-five requirements of [From use cases to requirements](05-from-use-cases-to-requirements.md) are restated as system stories, with three more that came with the model: a unit test fails when the model and the repository disagree, both reference tools accept the model and continuous integration runs them, and the demo, given credentials, runs the check suite against itself through a tunnel and is unchanged given none. Each keeps its EARS statement as an attribute, `attribute statement : String = "..."`, so that the text a case verifies is the text the story carries and never a paraphrase.
+You can tell the two apart by the shape of a name. Anything from the example starts with `PIPE-`, is set in code font, and is always called a model requirement or a model element. The demo's own identifiers come from the light scheme, where each has a short prefix and a number.
 
-Three statements were amended with the model, the no-outbound-network requirement for the configuration-file opt-in the session needs, the constraint on dependencies for the check project, and the constraint on continuous integration for the model validation, and each amendment has a record behind it. Article 05 keeps its count of forty-five, which is the count at the second gate and reads as a statement about that gate.
+| Identifier | What it names | Example |
+|---|---|---|
+| `US-nn` | a story: who wants something from the demo, and why | `US-03` |
+| `SR-nn` | a system requirement, something the demo must do | `SR-22` |
+| `SC-nn` | a design constraint | `SC-07` |
+| `AD-nnnn` | a <span class="term" data-term="decision-record">decision record</span> | `AD-0029` |
 
-The traceability tables of that article, one hop each and maintained by hand, are now derivation connections, nineteen of them, one per stakeholder story, with the stakeholder story as the original end and every system story that follows from it as a derived end. Nothing was renumbered. A system story whose status is done must be a derived end of one of those connections, satisfied by a part in the architecture and verified by a case, and the `coverage` agreement names any that is not.
+In the model each identifier becomes a <span class="term" data-term="short-name">short name</span>, such as `<'SR-22'>`. It sits in front of a longer name that carries the number and a phrase, such as `SR_22_EditsPatchTheSource`, so that a relationship reads as a sentence: `satisfy SR_22_EditsPatchTheSource by adapter`. The numbers were in the articles and the decision records before the model existed, and they stayed as they were.
 
-## The tests are in the model
+Decision records appear in the model as well. A metadata tag on each element names the records that shaped it, and each story's rationale cites the records it rests on. From any element you can reach the reason for it without leaving the file.
 
-A verification case per system story and per constraint, and inside each case one action per piece of evidence, with the action's short name the evidence's own name. A Go test is named by its function, `action <'TestSR02_ReadyWithinTenSeconds'> readyWithinTenSeconds`, with the kind and the file on an evidence tag, and the file matters because two functions share a name across two packages. Sixty-nine actions name a Go test.
+## From a story to its evidence
 
-A recorded run of the demo is named by its row in the example README's verification record, `<'record: 2026-08-28 SR-02'>`, and one row stands under every story it bears on. The two validators are actions of kind `validator`, a make target is an action named as it is typed, `<'make check-tracked'>`, a workflow is named by its file and step, `<'publish.yml: Read the manifest back'>`, and what is read rather than run, the router's outbound paths or the module file, is an analysis or an inspection.
+> [!NOTE]
+> **Traceability**
+>
+> Traceability means you can follow any requirement up to the need that caused it, and down to the part that meets it and the test that shows it is met. Systems engineers keep these links so that a change anywhere shows what else it touches. In a SysML model the links are typed relationships that tools can check, rather than rows in a spreadsheet.
 
-A case names only evidence that exists. Four stories ask for more than the repository holds, one platform recorded of three, an offline render never run, two stories naming a test among their methods with no test of their own, and each of their cases claims what is there and nothing more.
+The demo model is built around chains of such links, and one real chain shows the shape.
 
-Every live check is a verification case of its own. The check project reads a manifest of thirty entries, and the check register carries thirty cases whose attributes equal the entries, the check's id, its kind, its frequency in minutes, its locations, whether it is deployed and whether it mutates, and whose actions are the check's own steps: post the join query for `PIPE-R1`, expect the three subgraphs to answer. A thirty-first case has no kind and is the session's own record, the trace of a check request found in the viewer beside the demo.
+`US-03` is the storyboard's third story. A visitor raises a server that is not the bottleneck and sees that nothing else changes. Several system requirements follow from it, and one is `SR-22`, "edits patch the source". When someone edits a number, the adapter must replace that exact number in the model text, rebuild what it serves and increase the version, and no query may ever see the text and the served values disagree. The model says the adapter <span class="term" data-term="satisfy">satisfies</span> `SR-22`. A <span class="term" data-term="verification-case">verification case</span>, `VC_SR_22`, lists the evidence: six Go tests across two packages and a recorded run of the demo from 28 August.
 
-The session is a composite in the logical architecture, the runner, the two tunnels of which one runs, the collector, the trace viewer, the optional container for a private location and a reference to the demo under test, each part carrying the name of the compose service it maps to. The runner's twelve steps are an action definition, and so is the path of one traced request, nine steps from the runner adding trace context to the trace shown beside the check result.
+[![A chain from left to right. Story US-03 derives system requirement SR-22. SR-22 is satisfied by the adapter and verified by case VC_SR_22. The case lists its evidence as actions: six Go tests and one recorded run.](../figures/story-to-evidence.svg)](../figures/story-to-evidence.svg)
 
-`TestSR46_ModelAndRepositoryAgree` in `internal/trace` is what keeps all of this true. It reads the registers as text and compares them with the repository around them, one subtest per agreement, and there are eight.
+*One chain through the model. A system requirement marked done must be derived, satisfied and verified.*
 
-Every short name the model writes is declared exactly once, every decision record it names exists and every record in the directory is named. Every requirement a record names as affected is a short name the model declares. The Go test functions carrying a requirement identifier and the ones the verification register names are the same set, counted per file. The check files under `checkly/__checks__` and the file names the case registers quote are the same set, and every browser spec is exercised by exactly one validation case. Every image under `docs/img` is named by exactly one view, and every image a view names exists. A system story that is done is verified, satisfied and derived, and a stakeholder story that is done has exactly one validation case. The check register and the manifest carry the same checks with the same fields, each constructed once. And the services the compose file starts are the parts the session composite carries, and nothing else.
+### The stories
 
-It runs in `make check` in a fraction of a second, and from the day it existed every edit to a check file, a manifest entry or a compose service was a model edit as well, or the gate went red.
+The twelve stories of the storyboard became the model's stakeholder stories. Each is a SysML requirement that names a role, a capability and a benefit, holds its acceptance criteria, and carries its status as metadata.
 
-## The boards and the views
+Seven more stories came with the model. Each belongs to a requirement that had traced to an obligation the project set itself, with no use case behind it:
 
-Every published board corresponds to a view. The five architecture views, the two A3 sheets, the storyboard, the five-views board and the app screenshots have a view each, ten in all, and an eleventh, the session, names no image. A view exposes what its board draws, `expose Federation_LogicalArchitecture::demo::**` for the parts of the demo, `expose Federation_FunctionalArchitecture::EditPropagation::**` for an edit's seven steps, and nothing is redrawn. The boards stay the hand-drawn PDFs the design phase produced, and no rendering is declared on any view, so the model says what each board is about and leaves the drawing where it was.
+- the licences travel with whatever is copied (`US-13`)
+- nothing of the example is in the adapter (`US-14`)
+- a served model is never silently wrong (`US-15`)
+- the contract between services is checked before deployment (`US-16`)
+- the reference tools accept the example (`US-17`)
+- the demo's own model is the record (`US-18`)
+- the stories are exercised against a running instance (`US-19`)
 
-The `images` subtest holds the naming both ways. What it cannot hold is that the drawing and the exposed elements agree, so each of the thirty-six images was opened once and read against its view's expose lines, and the model's README carries the correspondence as a table with the date of each reading, 12 September 2026.
+Before the model, those requirements traced to an obligation and not to anyone who wanted it. A story has a role and a benefit, so it says who does.
 
-Two patterns recur. The storyboard frames and the app screenshots draw the example's servers and requirements, which are content of the example model and no element of this one, and those rows say so. And several boards draw the parts of the demo on a page whose own view is about a functional package or a set of stories, so each of those views exposes the demo as well.
+### The system requirements
 
-The reading found three things drawn that the model did not carry. The runtime board draws three panels beneath the seven steps of an edit, and two of them, a document edit and a reset, had no action definition, so they have one now beside the one for nothing moving. The deployment board draws the image's HEALTHCHECK block, now the `healthcheck` attribute of the demo, with the subcommand it runs among the supervisor's. And the last screenshot shows the document's six-level depth limit, now an attribute of the requirements document, exposed by the view, with three validation cases recording a run against it. Each is a small thing. Each is also exactly what a description checked by reading had not caught.
+The forty-five requirements from [From use cases to requirements](05-from-use-cases-to-requirements.md) are restated as system stories. Three more came with the model:
 
-## Two tools on every change
+- `SR-46`: a unit test fails when the model and the repository disagree.
+- `SR-47`: both reference tools accept the model, and continuous integration runs them.
+- `SR-48`: given credentials, the demo runs its check suite against itself through a tunnel, and given none it is unchanged.
 
-`make model-check` puts the whole tree to both reference tools. The OMG pilot implementation, release 2026-07, runs in batch with the files concatenated in path order so that the imports between registers resolve, and passes on a root element line for every file and no line matching an error or a warning. OpenSysML v0.6.0 then runs `sysml -validate -strict` over the same files and passes on exit status zero with no warning line. A validator that is not installed fails the target, and nothing is skipped.
+Each story keeps its original <span class="term" data-term="ears">EARS</span> statement as an attribute, `attribute statement : String = "..."`. The text a case verifies is therefore the text the story carries, never a paraphrase of it.
 
-The same target runs [in continuous integration](../decisions/AD-0030-model-validation-in-continuous-integration.md) on every pull request and push that changes a file under `model/`, in a workflow of its own, with each tool installed from its release archive against a recorded checksum. The job is gated by paths and is not a required check, because a required check that never reports leaves a pull request pending for ever. The example model keeps its local check under `make example-model-check`, with its record in the example README, because the adapter's tests parse that file on every run and a broken example is caught in seconds anyway.
+Three statements were amended when the model arrived, and each amendment has a decision record behind it. The requirement that the container makes no outbound connection (`SR-03`) now allows for the configuration file the check session needs. The constraint on dependencies (`SC-01`) now covers the check project, and the constraint on continuous integration (`SC-07`) covers model validation. Article 05 still says forty-five, because that was the count at the design's second gate, and the sentence is about that gate.
 
-Nineteen forms the model meant to use were put to both tools in a probe file before the registers were written, and eighteen were accepted as written. The one refused by both was a view definition stating conformance with `satisfy viewpoint`, so a view definition owns a viewpoint usage instead.
+The traceability tables in article 05 were one hop each and kept by hand. They are now nineteen <span class="term" data-term="derivation">derivation connections</span>, one per stakeholder story. Each has the stakeholder story as its original end and every system story that follows from it as a derived end. Nothing was renumbered. The rule is strict. A system story whose status is done must be derived from a stakeholder story, satisfied by a part of the architecture and verified by a case. An agreement called `coverage` names any story that is not.
 
-Five more refusals came while the registers were written. `public` and `connector` are reserved words, so the tunnel edge's port is `publicSide` and the tunnel link's end is `tunnelConnector`. An interface whose two ports are not conjugate draws a warning from OpenSysML, and the gate treats a warning as a refusal, so the tunnel port carries the conjugate features of the HTTP client port and a twelfth port definition was added for the alerting interface. The pilot refused the satisfy that allocates the session requirement to the runner until the runner's part definition specialised the element type the story's subject has, because bound features must have conforming types.
+### The evidence
 
-A validator accepting a form is not a validator checking what the author meant by it, and the model's README says which acceptances carry that caveat. A `require constraint` holding a documentation comment where an expression would go is accepted by both and asserts nothing beyond its doc.
+Every system story and every design constraint has one verification case. Inside a case, each piece of evidence is an action, and the action's short name is the evidence's own name. The model points at each piece of evidence by the name it already has.
 
-## A session, when asked for
+| Evidence | How the model names it | Example |
+|---|---|---|
+| a Go test | its function name, with the kind and the file on an evidence tag | `action <'TestSR02_ReadyWithinTenSeconds'> readyWithinTenSeconds` |
+| a recorded run of the demo | its row in the example's verification record | `<'record: 2026-08-28 SR-02'>` |
+| a validator run | an action of kind `validator` | |
+| a <span class="term" data-term="make-target">make target</span> | as you would type it | `<'make check-tracked'>` |
+| a workflow step | its file and its step | `<'publish.yml: Read the manifest back'>` |
+| something read rather than run | an analysis or an inspection | the router's outbound paths, the module file |
 
-The [check session](../decisions/AD-0031-an-optional-check-session.md) is a compose profile beside the demo, under `checkly/`. With a Checkly account and `bash checkly/scripts/session.sh up`, the stack that starts is the demo, a tunnel, an OpenTelemetry collector, a trace viewer and a runner. The tunnel is a named one on the operator's own hostname when a token is supplied and a quick one on a hostname the tunnel provider assigns otherwise.
+Sixty-nine actions name a Go test. The file on the tag matters because two test functions share a name across two packages. One recorded run stands under every story it bears on.
 
-The runner walks twelve steps, each logged under its number and each an action in the model. It installs the project, resolves the demo's public address, waits for the viewer through the tunnel, probes whether a subscription's events cross it, reads the account's plan, publishes the address as an account variable, records a test session of every check against this instance, records the browser suite as a second session, deploys the project, triggers every deployed check once so the dashboard and the status page fill, pings a heartbeat every five minutes, and on stop destroys the project and exits with the test session's code.
+A case names only evidence the repository holds. Four stories ask for more than that. One asks for three platforms and has one on record. One needs an offline render that has no row in the record. Two list a test among their methods and have no test of their own. Each of their cases claims what is recorded and nothing more.
 
-Thirty checks and monitors sit in five groups, and the three groups that edit the demo's one in-memory state run from one location with no retries and no parallel locations, because a retried or a parallel run would edit it twice. Two of their checks due at the same moment can still overlap, since the service does not serialise them, and a check that meets another's edit fails and resets the state. Without credentials `docker run` runs the demo exactly as before, and nothing under `checkly/` is built, run or read.
+Every live check is a verification case too. The check project reads a manifest of thirty entries, and the model holds thirty matching check cases. Each case's attributes equal its manifest entry: the check's id, its kind, how often it runs in minutes, where it runs, whether it is deployed and whether it changes the demo's state. Its actions are the check's own steps, such as "post the join query for `PIPE-R1`" and "expect the three <span class="term" data-term="subgraph">subgraphs</span> to answer". A thirty-first case has no kind. It is the session's own record, the trace of a check request found in the trace viewer beside the demo.
 
-The trace is the part that was missing when a check failed. The router's tracing is an operator opt-in: a configuration file is handed to the router only when `SYSML_FEDERATION_ROUTER_CONFIG_PATH` names one, the session names a file whose one exporter is the collector on the compose network, and defining that exporter is what keeps the router's default one off. The collector forwards every span to Jaeger at `localhost:16686` and, with a tracing key, only the spans a check marked as its own to the monitoring service, where each is shown beside the check result that caused it.
+## The test that keeps the model honest
 
-One join query through the router gives a trace of thirteen spans: one server span at the root, six internal spans for reading the body and parsing, normalising, validating, planning and executing the operation, and three fetch spans named for the model, document and capacity subgraphs, each with the client span of its HTTP call beneath it. That is one request across the router and the three services, seen end to end, and the router is the only service in the container that could show it without a dependency the design constraints forbid.
+A model that nobody checks drifts just as prose does. What holds this one in place is a single Go test, `TestSR46_ModelAndRepositoryAgree` in `internal/trace`. It reads the model files as text, compares them with the repository around them, and runs one subtest for each of eight agreements.
 
-What has been run without credentials is on record in the [check session's README](https://github.com/Roarge/sysml-federation/tree/main/checkly). The demo alone through the compose file, with the published image and with a local build, answers as `docker run` does, and the router's environment carries no configuration path and its log no configuration-file line. With the file named, the router logs `Tracer enabled` once, with the collector's address and no other exporter.
+| Subtest | What must agree |
+|---|---|
+| `identifiers` | Every short name the model writes is declared exactly once. Every decision record it names exists, and every record in the directory is named. |
+| `requirementsAffected` | Every requirement a decision record lists as affected is a short name the model declares. |
+| `goTests` | The Go tests that carry a requirement identifier and the tests the model names are the same set, counted per file. |
+| `checkFiles` | The check files under `checkly/__checks__` and the file names the model quotes are the same set, and each browser test is exercised by exactly one <span class="term" data-term="validation-case">validation case</span>. |
+| `images` | Every image under `docs/img` is named by exactly one view, and every image a view names exists. |
+| `coverage` | A system story that is done is verified, satisfied and derived. A stakeholder story that is done has exactly one validation case. |
+| `checkInventory` | The model's check cases and the check manifest carry the same checks with the same fields, each defined once. |
+| `sessionParts` | The services the check session's compose file starts are the parts the model gives the session, and nothing else. |
 
-The stack came up under the quick profile, five containers, on a network whose access provider's resolver answers the tunnel service's name with a block page, so the tunnel exited and no hostname was assigned, and the collector and the viewer were verified with the demo reached directly on its port instead. The subscription probe's commands from the host saw the event frame after a second, and the runner's first four steps ran inside the container against a stand-in for the tunnel's metrics endpoint and stopped where a session without an account stops.
+The test runs under `make check` and takes a fraction of a second. From the day it existed, an edit to a check file, a manifest entry or a compose service was also a model edit, or the build went red.
 
-The join query's trace was read from Jaeger with the spans above. A request sent with a trace parent and a trace state carrying the mark the monitoring service's runners set came back under the id it was sent with and the mark on the router's span, and the second collector configuration passed the one marked span of three and refused a missing or a wrong token on its public port. The rows with credentials, the named tunnel, the two recorded sessions, the deploy and the destroy, the alerts and the trace beside a check result, are the owner's to add when the account exists.
+> [!TIP]
+> **Run the eight agreements yourself**
+>
+> From a clone of the repository, run the eight agreements on their own:
+>
+> ```
+> go test -run TestSR46 -v ./internal/trace/
+> ```
+>
+> Then rename any image under `docs/img` and run it again to watch the `images` agreement fail.
 
-## What is not there
+## The boards and their views
 
-The model carries no risk register and no priorities, and its stories carry a status and nothing else of a lifecycle. Allocation is expressed by `satisfy`, ninety-four of them in the components register, because the allocation keyword has no recorded validation run against either reference tool and a form neither has been seen to accept does not go into the model. No view declares a rendering, so nothing generates a diagram from the model and the boards are as they were drawn. The schema the services share is not modelled as elements. The interface definitions carry its payloads and the projection's doc names its types.
+A SysML <span class="term" data-term="view">view</span> picks out the part of a model that one audience cares about. Every board published in this series now has one. The five architecture views, the two A3 sheets, the storyboard, the five-views overview and the app screenshots each have a view, ten in all. An eleventh view, for the check session, names no image.
 
-Quick tunnels are documented as carrying no streamed response, so a page behind one is not expected to hear the server-sent event that would redraw it, and seven of the twelve story checks depend on that event: the three cross-app stories, and four whose own page must learn of an edit from the stream, the raise that moves nothing, the raise that moves the bottleneck, the tightened limit and the shaped document. On a quick-tunnel session they skip with the reason `live updates need the named tunnel` rather than fail, and a named tunnel runs all twelve.
+A view says what it covers with `expose`. For example, `expose Federation_LogicalArchitecture::demo::**` covers every part of the demo, and `expose Federation_FunctionalArchitecture::EditPropagation::**` covers the seven steps of an edit. Nothing is redrawn. The boards stay the hand-drawn PDFs the design phase produced, and no view declares a rendering. So the model says what each board is about, and leaves the drawing where it was.
 
-The private location, the monitoring service's runners placed beside the demo so that no tunnel is needed, is in the compose file behind a profile of its own and has not been run, because it needs a paid plan. Incident automation on the status page and a weekly maintenance window are written and gated behind flags for the same reason, so that the project deploys on the free tier as it stands.
+The `images` agreement checks the names in both directions. It cannot check that a drawing shows what its view exposes. So I opened each of the thirty-six images once and read it against its view's expose lines. The model's README keeps the result as a table, with the date of the reading, 12 September 2026.
 
-And while a session runs the demo answers at a public hostname without authentication. It holds no secret, so what a visitor can do in that window is edit a value and fail a check.
+Two patterns came up again and again. The storyboard frames and the app screenshots draw the example's servers and requirements, which belong to the pipeline model and not to this one, and their rows say so. Several boards also draw the demo's parts on a page whose own view is about something else, a group of functions or a set of stories, so those views expose the demo as well.
+
+The reading found three things drawn on the boards that the model did not yet hold.
+
+- The runtime board draws three panels beneath the seven steps of an edit. Two of them, a document edit and a reset, had no action definition. They have one now, beside the one for the edit where nothing moves.
+- The deployment board draws the image's HEALTHCHECK block. It is now the demo's `healthcheck` attribute, and the subcommand it runs sits among the supervisor's subcommands.
+- The last screenshot shows the document app's limit of six levels of nesting. The limit is now an attribute of the requirements document, exposed by the view, with three validation cases recording a run against it.
+
+Each is a small thing. Each is also exactly what a description checked by reading had not caught.
+
+## Two reference tools on every change
+
+A model is only worth checking against the repository if it is valid SysML in the first place. `make model-check` puts the whole model to both reference tools.
+
+The <span class="term" data-term="pilot-implementation">OMG pilot implementation</span>, release 2026-07, runs in batch, with the files joined in path order so that the imports between them resolve. It passes when it prints a root element line for every file and no line matching an error or a warning. <span class="term" data-term="opensysml">OpenSysML</span> v0.6.0 then runs `sysml -validate -strict` over the same files, and passes on exit status zero with no warning line. If either tool is missing, the target fails. Nothing is skipped.
+
+The same target runs in <span class="term" data-term="ci">continuous integration</span> on every pull request and push that changes a file under `model/`. It has [a workflow of its own](../decisions/AD-0030-model-validation-in-continuous-integration.md), which installs each tool from its release archive and checks it against a recorded checksum. Because the job only runs when those paths change, it is not a required check. A required check that never reports would leave a pull request pending for ever. The example model keeps its own local check, `make example-model-check`, with its record in the example's README. It needs no workflow, because the adapter's tests parse that file on every run, and a broken example fails within seconds anyway.
+
+Before the model was written, I put nineteen of the forms it would use to both tools in a probe file. Eighteen were accepted as written. Both tools refused a view definition that stated its conformance with `satisfy viewpoint`, so a view definition owns a viewpoint usage instead. Five more forms were refused while the model itself was being written, and the model's README records each one with the form used instead.
+
+<details markdown="1">
+<summary>Under the bonnet: the five refusals</summary>
+
+- `public` and `connector` are reserved words. The tunnel edge's port is called `publicSide`, and the tunnel link's end is called `tunnelConnector`.
+- An item and an interface cannot both be named `HeartbeatPing` under one wildcard import, so the interface is called `Heartbeating`.
+- OpenSysML warns about an interface whose two ports are not <span class="term" data-term="conjugate-port">conjugate</span>, and the gate treats a warning as a refusal. So `TunnelPort` carries the conjugate features of `HttpClientPort`, and a twelfth port definition, `AlertClientPort`, was added for the alerting interface.
+- The OMG pilot refused `satisfy SR_48_AnOptionalCheckSession by runner` until `SessionRunner` specialised `DemoElement`, because bound features must have conforming types.
+- Both tools refused `Federation_LogicalArchitecture::session`, because the session composite lives in a nested package. It is reached as `Federation_LogicalArchitecture::CheckSession::session`.
+
+</details>
+
+A tool that accepts a form has not checked what the author meant by it, and the model's README says which acceptances carry that caveat. One example is a `require constraint` that holds a documentation comment where an expression belongs. Both tools accept it, and it asserts nothing beyond its comment.
+
+## The check session: every story against the live demo
+
+The Go tests check the pieces. The demo as I ran it is also checked from outside. A <span class="term" data-term="checkly">Checkly</span> project runs every story against a live instance, with browser and API checks on a schedule, and every request the router handles is traced. This is the [check session](../decisions/AD-0031-an-optional-check-session.md). It lives under `checkly/` as a <span class="term" data-term="compose-profile">compose profile</span> beside the demo.
+
+The session needs a Checkly account, and my credentials cannot ship inside a public image. So the choice is yours. Bring your own account and you get the whole demo as I ran it, with its checks and traces. Leave it out and `docker run` starts the demo exactly as before, and nothing under `checkly/` is built, run or read.
+
+With an account, one script starts five containers: the demo, a <span class="term" data-term="tunnel">tunnel</span>, an <span class="term" data-term="opentelemetry">OpenTelemetry</span> collector, a trace viewer and a runner. The tunnel gives Checkly's runners, out on the internet, a way in to a demo running on your machine. With a token it is a named tunnel on your own hostname. Without one it is a quick tunnel, on a hostname the provider assigns for the length of the session.
+
+> [!TIP]
+> **Start a session of your own**
+>
+> Put `CHECKLY_API_KEY` and `CHECKLY_ACCOUNT_ID` in `checkly/.env`, then from the repository root run:
+>
+> ```
+> bash checkly/scripts/session.sh up
+> ```
+>
+> Add `TUNNEL_TOKEN` and `DEMO_HOSTNAME` for a named tunnel. With `SESSION_WITHOUT_ACCOUNT=1` instead of the two account values, the script brings up the stack and the subscription probe and deploys nothing. The [check session's README](https://github.com/Roarge/sysml-federation/tree/main/checkly) lists every setting.
+
+The runner walks twelve steps. Each is logged under its number, and each is an action in the model. Between them the steps install the project, record every check against your instance, deploy the checks to run on a schedule, keep a heartbeat going, and on stop remove everything they deployed.
+
+<details markdown="1">
+<summary>Under the bonnet: the runner's twelve steps</summary>
+
+1. Install the project.
+2. Resolve the demo's public address.
+3. Wait for the viewer through the tunnel.
+4. Probe whether a subscription's events cross the tunnel.
+5. Read the account's plan.
+6. Publish the address as an account variable.
+7. Record a test session of every check against this instance.
+8. Record the browser suite as a second session.
+9. Deploy the project.
+10. Trigger every deployed check once, so that the dashboard and the status page fill.
+11. Ping a <span class="term" data-term="heartbeat">heartbeat</span> every five minutes.
+12. On stop, destroy the project and exit with the test session's code.
+
+In the model the session is a composite part of the logical architecture. It holds the runner, the two tunnels of which one runs, the collector, the trace viewer, the container for a private location, which the session script never starts, and a reference to the demo under test. Each part carries the name of the compose service it maps to, which is what the `sessionParts` agreement compares. The runner's twelve steps are an action definition, and so is the path of one traced request, nine steps from the runner adding trace context to the trace shown beside the check result.
+
+</details>
+
+Thirty checks and monitors sit in five groups. Three of the groups change the demo's state, and the demo holds a single copy of it in memory. Those three run from one location, with no retries and no parallel locations, because a retried or parallel run would make the same edit twice. Two of their checks that fall due at the same moment can still overlap, since Checkly does not run them one at a time. A check that meets another's edit fails and resets the state.
+
+> [!WARNING]
+> **Quick tunnels may drop live updates**
+>
+> Quick tunnels are documented as carrying no streamed response, so a page behind one is not expected to hear the <span class="term" data-term="server-sent-events">server-sent event</span> that tells it to redraw. Seven of the twelve story checks depend on that event. Three are the stories that span both apps. The other four are stories whose own page must learn of an edit from the stream: the raise that moves nothing, the raise that moves the bottleneck, the tightened limit and the shaped document. The runner's fourth step settles it for each session. It holds a subscription open, makes an edit beside it and waits ten seconds for the event. If none arrives, those seven checks skip with the reason `live updates need the named tunnel` rather than fail. A named tunnel runs all twelve.
+
+### Following one request through the demo
+
+A failed check says that something is wrong. On its own it cannot say where inside the demo the request failed. A <span class="term" data-term="trace">trace</span> was the missing part.
+
+The router's tracing is off in the image, and turning it on is the operator's choice. It reads a configuration file only when `SYSML_FEDERATION_ROUTER_CONFIG_PATH` names one. In a session, that variable names a file whose one exporter is the collector on the compose network, and defining that exporter is also what keeps the router's default exporter off. The collector forwards every span to Jaeger, a trace viewer at `localhost:16686`. Given a tracing key, it also sends Checkly the spans that a check marked as its own, and Checkly shows each one beside the check result that caused it.
+
+One join query through the router gives a trace of thirteen <span class="term" data-term="span">spans</span>:
+
+- one server span at the root, for the request itself
+- six internal spans, for reading the body and for parsing, normalising, validating, planning and executing the operation
+- three fetch spans, one for each of the model, document and capacity subgraphs
+- beneath each fetch, the client span of its HTTP call
+
+[![The trace of one join query drawn as a tree. The server span sits at the root, with six internal spans beneath it for reading the body, parsing, normalising, validating, planning and executing. Under execute sit three fetch spans for the model, document and capacity subgraphs, each with an HTTP client span below it.](../figures/traced-request.svg)](../figures/traced-request.svg)
+
+*The thirteen spans of one join query, drawn to show which span contains which.*
+
+That is one request, seen end to end across the router and all three services. The router is the only service in the container that could show it without a dependency the design constraints forbid.
+
+### What has been run
+
+Every run of the session is dated in the [check session's record](https://github.com/Roarge/sysml-federation/tree/main/checkly).
+
+Without an account, the demo started through the compose file, from both the published image and a local build, answers exactly as `docker run` does. The router's environment holds no configuration path, and its log has no configuration-file line. With the file named, the router logs `Tracer enabled` once, with the collector's address and no other exporter.
+
+On 13 September the first full stack came up under the quick profile, with five containers. It ran on a network whose provider's resolver answers the tunnel service's name with a block page, so the tunnel exited without a hostname. The collector and the viewer were checked by reaching the demo directly on its port instead. From the host, the subscription probe's commands saw the event frame after a second. The runner's first four steps ran inside the container against a stand-in for the tunnel's metrics endpoint, and stopped where a session without an account stops.
+
+The join query's trace was read from Jaeger with the thirteen spans above. A request sent with its own trace context, marked the way Checkly's runners mark theirs, came back under the id it was sent with, and the mark showed on the router's span. The second collector configuration let through the one marked span of three, and refused a missing or wrong token on its public port.
+
+The runs in the record that need an account followed on 14 September, the day after this article was first written. They include a quick-tunnel session from a network that resolves the tunnel service, and a named-tunnel session that ran all twelve story checks. That record also covers the two recorded test sessions, the cycle of deploying and destroying the project, alerts arriving on a channel, and the router's spans shown beside a check result.
+
+## What the model leaves out
+
+The model has no risk register and no priorities. A story carries a status and nothing else from a lifecycle.
+
+Allocation, the link that says which part carries which requirement, is written with `satisfy`, and the components file holds ninety-four of them. SysML v2 has an allocation keyword of its own, but there is no recorded run of either reference tool accepting it, and a form neither tool has been seen to accept does not go into the model.
+
+No view declares a rendering, so nothing generates a diagram from the model and the boards stay as they were drawn. The schema the services share is not modelled as elements. The interface definitions carry its payloads, and the <span class="term" data-term="projection">projection</span>'s documentation names its types.
+
+Two parts of the check session have never run, both because they need a paid Checkly plan. One is a private location, which puts Checkly's runners beside the demo so that no tunnel is needed. It is in the compose file behind a profile of its own. The other is incident automation on the status page, together with a weekly maintenance window. Both are written and switched off behind flags, so that the project deploys on the free tier as it stands.
+
+One last thing before you start a session. While it runs, the demo answers on a public hostname with no authentication. It holds no secret, so the worst a visitor can do in that window is edit a value and fail a check.
 
 Decision records: [docs/decisions](../decisions/README.md) · Repository: https://github.com/Roarge/sysml-federation
 

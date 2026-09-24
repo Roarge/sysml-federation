@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" width="720" height="400" role="img" aria-label="The pipeline model is read by the adapter at startup and served by the demo. The demo model describes the demo, and only a unit test and two validators read it.">
+  <title>Two models in one repository</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1f2227"/>
+    </marker>
+  </defs>
+  <rect width="720" height="400" fill="#faf8f5"/>
+  <g font-family="'Source Sans 3', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" fill="#1f2227">
+
+    <!-- The pipeline model, top left -->
+    <rect x="20" y="24" width="300" height="104" rx="3" fill="#e9e8e3" stroke="#777a80"/>
+    <text x="36" y="54" font-size="18" font-weight="600">Pipeline model</text>
+    <text x="36" y="80" font-size="14" font-family="ui-monospace, Menlo, Consolas, monospace">examples/pipeline/model.sysml</text>
+    <text x="36" y="106" font-size="14" fill="#555960">five servers and their requirements</text>
+
+    <!-- Readers of the demo model, top right -->
+    <rect x="400" y="24" width="142" height="104" rx="3" fill="#faf8f5" stroke="#777a80"/>
+    <text x="414" y="52" font-size="16" font-weight="600">Unit test</text>
+    <text x="414" y="74" font-size="14" font-family="ui-monospace, Menlo, Consolas, monospace">TestSR46</text>
+    <text x="414" y="96" font-size="14" fill="#555960">checks it against</text>
+    <text x="414" y="115" font-size="14" fill="#555960">the repository</text>
+
+    <rect x="558" y="24" width="142" height="104" rx="3" fill="#faf8f5" stroke="#777a80"/>
+    <text x="572" y="52" font-size="16" font-weight="600">Two validators</text>
+    <text x="572" y="74" font-size="14" fill="#555960">OMG pilot</text>
+    <text x="572" y="96" font-size="14" fill="#555960">OpenSysML</text>
+    <text x="572" y="115" font-size="14" fill="#555960">on every change</text>
+
+    <!-- The running demo, bottom left -->
+    <rect x="20" y="176" width="300" height="204" rx="3" fill="none" stroke="#1f2227"/>
+    <text x="304" y="199" text-anchor="end" font-size="12" font-weight="600" letter-spacing="0.8" fill="#555960">THE DEMO, ONE IMAGE</text>
+    <g font-size="14">
+      <rect x="36" y="212" width="130" height="36" rx="3" fill="#faf8f5" stroke="#1f2227"/>
+      <text x="101" y="235" text-anchor="middle">Adapter</text>
+      <rect x="174" y="212" width="130" height="36" rx="3" fill="#e2f0ff" stroke="#286cab"/>
+      <text x="239" y="235" text-anchor="middle" fill="#1d4f80">Router</text>
+      <rect x="36" y="260" width="130" height="36" rx="3" fill="#faf8f5" stroke="#1f2227"/>
+      <text x="101" y="283" text-anchor="middle">Capacity service</text>
+      <rect x="174" y="260" width="130" height="36" rx="3" fill="#faf8f5" stroke="#1f2227"/>
+      <text x="239" y="283" text-anchor="middle">Document service</text>
+      <rect x="36" y="308" width="130" height="36" rx="3" fill="#faf8f5" stroke="#1f2227"/>
+      <text x="101" y="331" text-anchor="middle">Model viewer</text>
+      <rect x="174" y="308" width="130" height="36" rx="3" fill="#faf8f5" stroke="#1f2227"/>
+      <text x="239" y="331" text-anchor="middle">Document app</text>
+    </g>
+
+    <!-- The demo model, bottom right -->
+    <rect x="400" y="220" width="300" height="108" rx="3" fill="#e9e8e3" stroke="#777a80"/>
+    <text x="416" y="250" font-size="18" font-weight="600">Demo model</text>
+    <text x="416" y="274" font-size="14" font-family="ui-monospace, Menlo, Consolas, monospace">model/</text>
+    <text x="416" y="296" font-size="14" fill="#555960">stories, requirements, architecture,</text>
+    <text x="416" y="315" font-size="14" fill="#555960">evidence and views</text>
+
+    <!-- Arrows -->
+    <g stroke="#1f2227" stroke-width="1.5" fill="none">
+      <line x1="101" y1="128" x2="101" y2="210" marker-end="url(#arrow)"/>
+      <line x1="471" y1="128" x2="471" y2="218" marker-end="url(#arrow)"/>
+      <line x1="629" y1="128" x2="629" y2="218" marker-end="url(#arrow)"/>
+      <line x1="398" y1="274" x2="322" y2="274" marker-end="url(#arrow)" stroke-dasharray="5 4"/>
+    </g>
+    <g font-size="13" fill="#555960">
+      <text x="110" y="162">read at startup</text>
+      <text x="479" y="178">reads</text>
+      <text x="637" y="178">read</text>
+      <text x="360" y="264" text-anchor="middle">describes</text>
+    </g>
+  </g>
+</svg>
