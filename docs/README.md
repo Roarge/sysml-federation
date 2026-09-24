@@ -81,4 +81,4 @@ What entity resolution between a model and a built system is, and why a model ne
 
 ## The repository
 
-The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence. The same articles are rendered as a site at https://sysml-federation.org/.
+The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence.
