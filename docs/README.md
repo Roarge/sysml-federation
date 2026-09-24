@@ -83,12 +83,12 @@ What is entity resolution between a model and a built system, and what is a sing
 
 ### Errors and measurement
 
-Why no resolver gets every link right, and how to tell how good one is.
+Why does no resolver get every link right, and how can you tell how good one is?
 
 3. [Why no resolver gets every link right](articles/15-why-no-resolver-gets-every-link-right.md)  
-   One change to a made-up pipeline breaks three links nobody touched. Why some wrong links and missing ones are certain, and when a resolver can still be left to add links on its own.
+   One change to a made-up pipeline breaks three links nobody touched. Why are some wrong links and missing ones certain, and when can a resolver still be left to add links on its own?
 4. [Measuring a resolver](articles/16-measuring-a-resolver.md)  
-   Why a perfect score can prove nothing and 99% accuracy can mean linking nothing, and how to measure a resolver against right answers that keep changing.
+   How can a perfect score prove nothing, and 99% accuracy mean linking nothing? And how do you measure a resolver against right answers that keep changing?
 
 ## The repository
 
