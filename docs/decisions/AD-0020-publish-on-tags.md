@@ -51,7 +51,7 @@ We will publish the image from a second GitHub Actions workflow,
 `permissions: contents: read, packages: write`, logs in to GHCR with the
 workflow token, builds for linux/amd64 and linux/arm64 by Go
 cross-compilation with `CGO_ENABLED=0` and no QEMU, tags with
-`type=semver,pattern={{version}}` alone with the metadata action's `latest`
+<!-- {% raw %} -->`type=semver,pattern={{version}}`<!-- {% endraw %} --> alone with the metadata action's `latest`
 flavour turned off, sets `provenance: false`
 and `sbom: false`, and pushes that one tag. It then reads the manifest back
 and fails the job if either platform is missing or exceeds the size budget,
