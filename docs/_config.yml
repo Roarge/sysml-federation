@@ -95,15 +95,15 @@ series:
       - path: articles/09-five-spikes-before-the-first-line.md
         title: "Five spikes before the first line"
         date: 2026-08-27
-        dek: "Five small experiments tested the riskiest assumptions before any product code existed. None failed outright, and four of them corrected the plan."
+        dek: "Five small experiments tested the riskiest assumptions, four of them before any product code existed. None failed outright, and each of those four corrected the plan."
       - path: articles/10-the-demo-as-it-shipped.md
         title: "The demo as it shipped"
         date: 2026-08-27
-        dek: "What the finished demo does once it runs, package by package, and the fifteen-minute walk a visitor takes through it."
+        dek: "What the finished demo shows once it runs, the fifteen-minute walk a visitor takes through it, and what the build came to."
       - path: articles/11-what-shipped-and-what-did-not.md
         title: "What shipped, and what did not"
         date: 2026-08-29
-        dek: "What the published image weighs and how its release is guarded, with a list of what the running container does not prove."
+        dek: "What the published image weighs, how its release is guarded, what a run with no network proves, and where the demo has been run."
       - path: articles/12-a-model-of-the-demo-itself.md
         title: "A model of the demo itself"
         date: 2026-09-13

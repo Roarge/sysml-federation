@@ -43,16 +43,16 @@ From the approved design to a published container image.
 9. [Planning the build](articles/08-planning-the-build.md)  
    How the approved design became five phases of work, one pull request each and tests first, and the choices the design had left open.
 10. [Five spikes before the first line](articles/09-five-spikes-before-the-first-line.md)  
-    Five small experiments tested the riskiest assumptions before any product code existed. None failed outright, and four of them corrected the plan.
+    Five small experiments tested the riskiest assumptions, four of them before any product code existed. None failed outright, and each of those four corrected the plan.
 11. [The demo as it shipped](articles/10-the-demo-as-it-shipped.md)  
-    What the finished demo does once it runs, package by package, and the fifteen-minute walk a visitor takes through it.
+    What the finished demo shows once it runs, the fifteen-minute walk a visitor takes through it, and what the build came to.
 
 ### Looking back
 
 What the finished demo proves and leaves open, and a model of the demo itself.
 
 12. [What shipped, and what did not](articles/11-what-shipped-and-what-did-not.md)  
-    What the published image weighs and how its release is guarded, with a list of what the running container does not prove.
+    What the published image weighs, how its release is guarded, what a run with no network proves, and where the demo has been run.
 13. [A model of the demo itself](articles/12-a-model-of-the-demo-itself.md)  
     I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every story against the live demo.
 
