@@ -9,7 +9,7 @@ Part 4 of 6 in [Automating traceability](../README.md).
 >
 > [Part 3](15-why-no-resolver-gets-every-link-right.md) argued that every resolver gets some links wrong, and that which errors matter more depends on how it's put to work. Whether one resolver is good enough for one job is a question of measurement. This part asks what to measure it against, and with which numbers, when the right answers keep changing.
 
-My demo's model came with a ready-made test for a resolver, and I'm a little embarrassed by how well any resolver would do on it. The model's verification cases name 69 Go tests as evidence, spread over 32 cases, and I wrote every one of those links in by hand. Each of the 69 test names carries, right after `Test`, the key of the requirement its case verifies, so `TestSR22_SetAttributePatchesTextAndProjectionTogether` sits under the case for `SR-22`.
+My demo's own <span class="term" data-term="systems-model">systems model</span> came with a ready-made test for a resolver, and I'm a little embarrassed by how well any resolver would do on it. Its verification cases name 69 Go tests as evidence, spread over 32 cases, and I wrote every one of those links in by hand. Each of the 69 test names carries, right after `Test`, the key of the requirement its case verifies, so `TestSR22_SetAttributePatchesTextAndProjectionTogether` sits under the case for `SR-22`.
 
 A resolver that reads the requirement key in test names would find all 69 and nothing else. That's a perfect score, and it would prove nothing, because the links were findable by the very rule being scored. The 77 test functions without a key, which part 1 counted, are the ones a resolver is actually needed for. A score on the 69 says nothing about them, and nothing at all about <span class="term" data-term="opentofu">OpenTofu</span> resources or traces.
 
@@ -20,7 +20,7 @@ Links that someone has already made are a tempting thing to measure against anyw
 >
 > The links a resolver's output is measured against, each one checked by people. Traceability research calls it an answer set. It includes the elements that should get no link as well as those that should, and it holds only for the version of the system it was built from.
 
-In the terms of part 1, a gold set is the join the federation would make if every object had carried the model's keys from the start. Measuring a resolver means running it on every input the gold set covers and comparing what it proposes with what the gold set says, link by link. The comparison then gets turned into numbers. The rest is choosing which numbers, and building a gold set worth measuring against.
+In the terms of part 1, a gold set is the join the federation would make if every object had carried the systems model's keys from the start. Measuring a resolver means running it on every input the gold set covers and comparing what it proposes with what the gold set says, link by link. The comparison then gets turned into numbers. The rest is choosing which numbers, and building a gold set worth measuring against.
 
 ## Why accuracy flatters
 
@@ -53,7 +53,7 @@ Say, as a made-up example, that a resolver shows the top three tests for each of
 
 The same study offered bands for judging such numbers, with recall of 80% or more counted as excellent and precision between 30% and 49% as good. That puts the made-up resolver in decent company. The authors called the bands their "first attempt to 'draw a line in the sand'", based on the first author's industrial experience "in performing and validating many traces". The methods they judged read textual documents, so I'd treat the bands as a starting point. A resolver reading structured names from OpenTofu plans ought to beat them comfortably.
 
-In this way of working, the resolver's list is only half the story. What reaches the model is the list after a person has been through it, and part 1 described how people move what they're given in both directions. A simulation by [Hayes and colleagues](https://link.springer.com/article/10.1007/s00766-016-0260-8), which assumed analysts never make mistakes, still found that "the lowest effort does not always yield the highest quality matrix". So I'd measure the confirmed links as well as the suggested ones.
+In this way of working, the resolver's list is only half the story. What reaches the systems model is the list after a person has been through it, and part 1 described how people move what they're given in both directions. A simulation by [Hayes and colleagues](https://link.springer.com/article/10.1007/s00766-016-0260-8), which assumed analysts never make mistakes, still found that "the lowest effort does not always yield the highest quality matrix". So I'd measure the confirmed links as well as the suggested ones.
 
 ## What a useful gold set looks like
 
@@ -63,7 +63,7 @@ Here's the start of a gold set for part 2's OpenTofu task on the made-up pipelin
 |---|---|
 | `module.pipeline.aws_ecs_service.stage["ingest"]` | `PIPE-S1` |
 | `module.pipeline.aws_ecs_service.stage["parse"]` | `PIPE-S2` |
-| `module.pipeline.aws_ecs_service.stage["lex"]` | none, and flag the model as stale |
+| `module.pipeline.aws_ecs_service.stage["lex"]` | none, and flag the systems model as stale |
 
 Each row is a real input in the form the resolver reads it, beside what a careful person decided it should get. The third row matters as much as the other two. A gold set that only lists links can't catch a resolver that invents one, and an object that ought to resolve to nothing needs saying so. Some inputs should get several links, and unless the gold set records that, the cardinality on the task card goes untested.
 
@@ -81,9 +81,9 @@ For trace links, I'd keep three groups apart when scoring. A proposed link can b
 
 ## A gold set that moves
 
-My demo's gold set is less than a fortnight old and has already moved. In the model's first two days, the Go-test links grew from 67 to 69 as new tests arrived. On the evening of 13 September, the manifest that ties each <span class="term" data-term="checkly">Checkly</span> check to a story went from 15 entries to 30 in 31 minutes. The model itself was still being written at the time, which only makes the point more strongly.
+My demo's gold set is less than a fortnight old and has already moved. In the first two days of its systems model, the Go-test links grew from 67 to 69 as new tests arrived. On the evening of 13 September, the manifest that ties each <span class="term" data-term="checkly">Checkly</span> check to a story went from 15 entries to 30 in 31 minutes. The systems model itself was still being written at the time, which only makes the point more strongly.
 
-A score against last month's gold set describes last month's system. For a system that changes daily, I'd measure at every commit, against the gold set as it stood at that commit. The trend matters more than any single figure. Defect prediction research works the same way. [Bangash and colleagues](https://arxiv.org/abs/1911.06348) evaluate so that "models are trained only on the past, and evaluations are executed only on the future". They also warn that broad claims "might be contradicted by the next upcoming release". For trace links, [Rahimi and Cleland-Huang](https://link.springer.com/article/10.1007/s10664-017-9561-x) start from "a tendency for trace links to degrade over time as the system continually evolves". They then evaluated a tool that evolves links across 27 releases of the Cassandra database.
+A score against last month's gold set describes last month's system. For a system that changes daily, I'd measure at every commit, against the gold set as it stood at that commit. The trend matters more than any single figure. Defect prediction research tests its prediction models the same way. [Bangash and colleagues](https://arxiv.org/abs/1911.06348) evaluate so that "models are trained only on the past, and evaluations are executed only on the future". They also warn that broad claims "might be contradicted by the next upcoming release". For trace links, [Rahimi and Cleland-Huang](https://link.springer.com/article/10.1007/s10664-017-9561-x) start from "a tendency for trace links to degrade over time as the system continually evolves". They then evaluated a tool that evolves links across 27 releases of the Cassandra database.
 
 The gold set decays along with the links it describes, so it needs the same care. After part 3's split, the OpenTofu task's gold set gains the `lex` row above, and the telemetry task's gains `query-frontend` resolving to `PIPE-S2`. Without those updates, the next measurement marks the resolver down for being right.
 
