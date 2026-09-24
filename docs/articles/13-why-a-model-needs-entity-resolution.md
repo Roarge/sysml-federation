@@ -4,14 +4,9 @@
 
 Part 1 of 6 in [Automating traceability](../README.md).
 
-> [!IMPORTANT]
-> **Where this starts**
->
-> The first series, [Federating a systems model](00-why-federate-a-systems-model.md), built a demo in which a SysML v2 model and two other services answer as one graph, joined on keys they all share. In its last part the demo got a model of its own, and that model's links to tests and checks hold because I wrote the model's keys into their names. Most of what gets built never carries those keys. This part asks what it takes to find a model element's counterparts anyway, and why a model needs them found.
-
 ## One stage, four hunts
 
-Take the parse stage from the first series. In the example model it's `PIPE-S2`, a server with a throughput of 1200, and the model requirement `PIPE-R1.2` says it must sustain 1500. The pipeline was only ever modelled. Suppose it had been built, and a colleague asks which of the running things are parse, and which of them would tell us if `PIPE-R1.2` stopped holding.
+Take the parse stage from the pipeline in my first series, [Federating a systems model](00-why-federate-a-systems-model.md). In the example model it's `PIPE-S2`, a server with a throughput of 1200, and the model requirement `PIPE-R1.2` says it must sustain 1500. The pipeline was only ever modelled. Suppose it had been built, and a colleague asks which of the running things are parse, and which of them would tell us if `PIPE-R1.2` stopped holding.
 
 In this made-up case, a search of the built system turns up four candidates:
 
