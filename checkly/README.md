@@ -13,11 +13,16 @@ the router's environment is what the supervisor sets, and nothing under
 check here is a verification case of its own in
 [the model of the demo](../model/README.md).
 
-The router's tracing opt-in ships in release 0.2.0. Until that image is
-published, the session runs the demo from a local build: `make image` from the
-repository root builds `sysml-federation:dev`, and `DEMO_IMAGE=sysml-federation:dev`
-in the environment or in `checkly/.env` makes the compose file start it in
-place of `ghcr.io/roarge/sysml-federation`.
+The image of release 0.2.0 is the first published one that carries the
+router's tracing opt-in. With `DEMO_IMAGE` unset, the compose file starts
+`ghcr.io/roarge/sysml-federation`. `docker compose up` pulls it only when the
+host holds no image under that name, so a host that pulled the demo before
+release 0.2.0 still starts the older image, which ignores the opt-in and
+exports no traces, until one `docker pull ghcr.io/roarge/sysml-federation`
+replaces it. A local build can run in place of the published image.
+`make image` from the repository root builds `sysml-federation:dev`, and
+`DEMO_IMAGE=sysml-federation:dev` in the environment or in `checkly/.env` makes
+the compose file start that build instead.
 
 ## Running a session
 
@@ -29,7 +34,7 @@ rest are optional.
 |---|---|
 | `CHECKLY_API_KEY`, `CHECKLY_ACCOUNT_ID` | the account the project is tested, deployed and destroyed in, both required for a session |
 | `SESSION_WITHOUT_ACCOUNT` | `1` starts the stack, the tunnel and the subscription probe with no account at all, whatever the file carries, and deploys nothing |
-| `DEMO_IMAGE` | the demo's image, `sysml-federation:dev` until release 0.2.0 |
+| `DEMO_IMAGE` | the demo's image, `ghcr.io/roarge/sysml-federation` when unset, or `sysml-federation:dev` for the local build from `make image` |
 | `LOG_LEVEL` | the demo's log level, passed through to its container |
 | `TUNNEL_TOKEN` | the named tunnel's token. When set, the named tunnel runs in place of the quick one, and `DEMO_HOSTNAME` must be set with it |
 | `DEMO_HOSTNAME` | the named tunnel's public hostname, `demo.sysml-federation.org` for the owner's. It also constructs the three hostname monitors |

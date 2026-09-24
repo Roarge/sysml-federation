@@ -203,8 +203,8 @@ they are inert, because the supervisor hands the router child a complete
 environment of its own that sets the same five. They are in the image for anyone
 who runs `/router` out of it directly.
 
-Compressed as the registry counts them, the published manifests come to
-44,850,689 bytes for amd64 and 41,475,216 bytes for arm64, against a published
+Compressed as the registry counts them, the manifests of release 0.2.0 come to
+44,889,402 bytes for amd64 and 41,514,385 bytes for arm64, against a published
 ceiling of 80,000,000. Those figures are read from the registry rather than from
 a local build, because the publishing workflow pushes the version tag first,
 reads both platforms back, fails if either is over the ceiling, and moves
