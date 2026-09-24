@@ -116,7 +116,7 @@ series:
       - path: articles/13-why-a-model-needs-entity-resolution.md
         title: "Why does a systems model need entity resolution?"
         date: 2026-09-24
-        dek: "Hardly anything a team builds carries the keys from its systems model. What does it take to find the counterparts of each element anyway, and why is that job never quite finished?"
+        dek: "Hardly anything a team builds carries the keys from its systems model. What does it take to find the counterparts of each element of the systems model anyway, and why is that job never quite finished?"
       - path: articles/14-the-parts-of-a-resolution-task.md
         title: "The parts of a resolution task"
         date: 2026-09-24
