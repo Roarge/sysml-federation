@@ -74,10 +74,12 @@ In progress. The second series takes on automating the federation itself. Before
 
 ### The task
 
-What entity resolution between a model and a built system is, and why a model needs it.
+What entity resolution between a model and a built system is, and what a single task of it is made of.
 
 1. [Why a model needs entity resolution](articles/13-why-a-model-needs-entity-resolution.md)  
    Most of what gets built never carries the model's keys. What it takes to find a model element's counterparts anyway, and why that finding has to keep happening.
+2. [The parts of a resolution task](articles/14-the-parts-of-a-resolution-task.md)  
+   One resolution task taken apart, from what counts as a candidate to where the finished link lands, and why two tools disagree about whether a renamed thing is still the same thing.
 
 ## The repository
 

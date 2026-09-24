@@ -84,8 +84,8 @@ Cyber-physical systems make every part of this harder, because the counterpart o
 
 I want a model whose links out are found without anyone typing a key, and checked again whenever either side changes. I want those links served beside the model, through the same federation the first series built. Later in the series I'll build a small resolver for the demo to test these ideas against.
 
-Part 2, coming up next, takes a single resolution task apart, from what goes in to what comes out, and asks how precisely a task has to be stated before anyone tries to solve it.
+[Part 2](14-the-parts-of-a-resolution-task.md) takes a single resolution task apart, from what goes in to what comes out, and asks how precisely a task has to be stated before anyone tries to solve it.
 
 ---
 
-Previous: [A model of the demo itself](12-a-model-of-the-demo-itself.md), the last part of Federating a systems model · Index: [Automating traceability](../README.md)
+Previous: [A model of the demo itself](12-a-model-of-the-demo-itself.md), the last part of Federating a systems model · Index: [Automating traceability](../README.md) · Next: [The parts of a resolution task](14-the-parts-of-a-resolution-task.md)
