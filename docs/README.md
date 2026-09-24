@@ -14,7 +14,7 @@ Complete, in thirteen parts, written for release v0.3.0. If a later release chan
 
 Why models stay locked in their tools, and what federation changes.
 
-1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
+1. [Why federate a systems model?](articles/00-why-federate-a-systems-model.md)  
    Models were meant to end the drift between an organisation's documents, and closed tools kept them out of reach. SysML v2 opens the model up, and federation lets other tools join it without learning SysML.
 2. [The architecture in one sitting](articles/01-the-architecture-in-one-sitting.md)  
    How one query collects its answer from three services that never talk to each other, and the decisions that put them all in one container.
@@ -76,8 +76,8 @@ In progress. The second series takes on automating the federation itself. Before
 
 What entity resolution between a model and a built system is, and what a single task of it is made of.
 
-1. [Why a model needs entity resolution](articles/13-why-a-model-needs-entity-resolution.md)  
-   Most of what gets built never carries the model's keys. What it takes to find a model element's counterparts anyway, and why that finding has to keep happening.
+1. [Why does a model need entity resolution?](articles/13-why-a-model-needs-entity-resolution.md)  
+   Hardly anything a team builds carries its model's keys. What it takes to find a model element's counterparts anyway, and why that job is never quite finished.
 2. [The parts of a resolution task](articles/14-the-parts-of-a-resolution-task.md)  
    One resolution task taken apart, from what counts as a candidate to where the finished link lands, and why two tools disagree about whether a renamed thing is still the same thing.
 
