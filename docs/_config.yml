@@ -116,4 +116,4 @@ series:
       - path: articles/13-why-a-model-needs-entity-resolution.md
         title: "Why a model needs entity resolution"
         date: 2026-09-24
-        dek: "Most of what gets built never carries the model's keys. What it takes to find a model element's counterparts anyway, why a model needs them, and why the finding never stops."
+        dek: "Most of what gets built never carries the model's keys. What it takes to find a model element's counterparts anyway, and why that finding has to keep happening."

@@ -370,7 +370,7 @@
     The connected record of a product's data across its whole life, from
     requirements and design through manufacture to operation and repair, so
     that information in one stage can be traced to its source in another.
-  link: https://ac.cto.mil/wp-content/uploads/2019/06/2018-Digital-Engineering-Strategy_Approved_PrintVersion.pdf
+  link: https://www.osti.gov/pages/biblio/1611196
 
 - id: mqtt
   term: MQTT

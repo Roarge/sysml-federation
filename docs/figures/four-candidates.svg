@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 424" width="720" height="424" role="img" aria-label="A model element on the left, PIPE-S2 parse, has dashed lines to four objects of an imagined built system on the right. They are an OpenTofu resource whose address contains parse, an OpenTelemetry service named query-parser, a Checkly check named parse-p95-latency and a Go test named TestParserRejectsEmptyQuery. None of the four carries the key PIPE-S2, and each box names the only evidence that connects it.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 424" width="720" height="424" role="img" aria-label="A model element on the left, PIPE-S2 parse, has dashed lines to four objects of an imagined built system on the right. They are an OpenTofu resource whose address contains parse, an OpenTelemetry service named query-parser, a Checkly check named parse-sustained-qps and a Go test named TestParserRejectsEmptyQuery. None of the four carries the key PIPE-S2, and each box names the only evidence that connects it.">
   <title>The parse stage and four candidates</title>
   <rect width="720" height="424" fill="#faf8f5"/>
   <g font-family="'Source Sans 3', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" fill="#1f2227">
@@ -35,7 +35,7 @@
       <text x="390" y="52">module.pipeline.aws_ecs_service</text>
       <text x="390" y="69">.stage["parse"]</text>
       <text x="390" y="150">service.name = "query-parser"</text>
-      <text x="390" y="246">logicalId: parse-p95-latency</text>
+      <text x="390" y="246">logicalId: parse-sustained-qps</text>
       <text x="390" y="342">TestParserRejectsEmptyQuery</text>
     </g>
     <g font-size="13" fill="#555960" font-style="italic">
