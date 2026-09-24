@@ -151,12 +151,10 @@ in the image, so after editing a board look at the images taken from it and
 adjust the region when needed. The table `HTML_CROPS` takes the box around
 named elements and follows them wherever the layout puts them. Those crops
 depend on the class names `sketch`, `personas` and `journey`. The image of a
-single use case is the box of `div.sketch` alone, and its caption is in the
-image only because the caption sits inside that element, so a caption moved out
-of it drops out of the image without a warning. The second selector listed for these images,
-`div.caption`, matches nothing, since each caption is a `span`. A selector that
-matches nothing is skipped, and the build stops only when every selector of an
-image misses.
+single use case is the box of `div.sketch`, and its caption is in the image
+only because the caption sits inside that element, so a caption moved out of it
+drops out of the image without a warning. The build stops when the selector of
+an image matches nothing.
 
 ## Building
 

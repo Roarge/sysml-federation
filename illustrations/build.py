@@ -143,9 +143,9 @@ SVG_PANELS = [
     ("stories/overview.html", (0, 0, 1000, 250), "overview-sketch.png"),
 ]
 
-# Each use case's caption is a <span class="caption"> inside div.sketch, so
-# "div.caption" matches nothing and the image is the box of div.sketch alone.
-SKETCH = ["div.sketch", "div.caption"]
+# Each use case's caption is a <span class="caption"> inside div.sketch, so the
+# box of div.sketch takes the sketch and its caption together.
+SKETCH = ["div.sketch"]
 
 # (source, CSS selectors whose union box is cut from the board, image under img/).
 # A selector that matches nothing is skipped, and the build stops only when
