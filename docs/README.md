@@ -14,7 +14,7 @@ Complete, in thirteen parts, written for release v0.3.0. If a later release chan
 
 Why models stay locked in their tools, and what federation changes.
 
-1. [Why federate a systems model](articles/00-why-federate-a-systems-model.md)  
+1. [Why federate a systems model?](articles/00-why-federate-a-systems-model.md)  
    Models were meant to end the drift between an organisation's documents, and closed tools kept them out of reach. SysML v2 opens the model up, and federation lets other tools join it without learning SysML.
 2. [The architecture in one sitting](articles/01-the-architecture-in-one-sitting.md)  
    How one query collects its answer from three services that never talk to each other, and the decisions that put them all in one container.
