@@ -8,9 +8,10 @@
 #   docker compose -f checkly/compose.yml up demo    runs the demo alone
 #   bash checkly/scripts/session.sh up              is the entry for the session
 #
-# Every image is pinned by tag and digest. No credential, account id or
-# hostname is written here: the session reads them from the environment, and
-# checkly/.env when it exists.
+# Every image but the demo's is pinned by tag and digest. The demo's names no
+# tag, so it resolves to latest unless DEMO_IMAGE names another. No
+# credential, account id or hostname is written here: the session reads them
+# from the environment, and checkly/.env when it exists.
 
 services:
   # The demo, as docker run runs it. The two variables stay empty unless the
@@ -18,7 +19,8 @@ services:
   # session's variable points, so that the file is present and inert until it
   # is named. Release 0.2.0 is the first published image with the
   # configuration opt-in, and DEMO_IMAGE=sysml-federation:dev after make image
-  # starts a local build in its place. The healthcheck is the image's own.
+  # starts a local build in place of the published image. The healthcheck is
+  # the image's own.
   demo:
     image: ${DEMO_IMAGE:-ghcr.io/roarge/sysml-federation}
     ports:

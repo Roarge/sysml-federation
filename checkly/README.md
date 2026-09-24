@@ -15,7 +15,11 @@ check here is a verification case of its own in
 
 Release 0.2.0 is the first published image that carries the router's tracing
 opt-in. With `DEMO_IMAGE` unset, the compose file starts
-`ghcr.io/roarge/sysml-federation`. A local build can still run in its place.
+`ghcr.io/roarge/sysml-federation`. `docker compose up` pulls it only when the
+host holds no image under that name, so a host that pulled the demo before
+release 0.2.0 still starts the older image, which ignores the opt-in and
+exports no traces, until one `docker pull ghcr.io/roarge/sysml-federation`
+replaces it. A local build can still run in place of the published image.
 `make image` from the repository root builds `sysml-federation:dev`, and
 `DEMO_IMAGE=sysml-federation:dev` in the environment or in `checkly/.env` makes
 the compose file start that build instead.
