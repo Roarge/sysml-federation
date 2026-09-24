@@ -112,6 +112,7 @@ series:
     status: "In progress"
     parts:
       - { title: "The task", from: 0, count: 2, dek: "What entity resolution between a model and a built system is, and what a single task of it is made of." }
+      - { title: "Errors and measurement", from: 2, count: 1, dek: "Why no resolver gets every link right, and what follows for how one is put to work." }
     articles:
       - path: articles/13-why-a-model-needs-entity-resolution.md
         title: "Why a model needs entity resolution"
@@ -121,3 +122,7 @@ series:
         title: "The parts of a resolution task"
         date: 2026-09-24
         dek: "One resolution task taken apart, from what counts as a candidate to where the finished link lands, and why two tools disagree about whether a renamed thing is still the same thing."
+      - path: articles/15-why-no-resolver-gets-every-link-right.md
+        title: "Why no resolver gets every link right"
+        date: 2026-09-24
+        dek: "One change to a made-up pipeline breaks three links nobody touched. Why some wrong links and missing ones are certain, and when a resolver can still be left to add links on its own."
