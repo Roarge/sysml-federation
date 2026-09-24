@@ -54,7 +54,7 @@ What the finished demo proves and leaves open, and a model of the demo itself.
 12. [What shipped, and what did not](articles/11-what-shipped-and-what-did-not.md)  
     What the published image weighs and how its release is guarded, with a list of what the running container does not prove.
 13. [A model of the demo itself](articles/12-a-model-of-the-demo-itself.md)  
-    The repository takes its own advice. The demo is described as a SysML v2 model that a test keeps in step with the code, and a Checkly session runs every story against the live demo.
+    I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every story against the live demo.
 
 ### The documents behind it
 

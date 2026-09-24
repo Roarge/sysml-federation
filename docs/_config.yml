@@ -107,4 +107,4 @@ series:
       - path: articles/12-a-model-of-the-demo-itself.md
         title: "A model of the demo itself"
         date: 2026-09-13
-        dek: "The repository takes its own advice. The demo is described as a SysML v2 model that a test keeps in step with the code, and a Checkly session runs every story against the live demo."
+        dek: "I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every story against the live demo."
