@@ -119,4 +119,4 @@ absent takes both apps down with it, which SR-40's test relies on.
 SR-40, SR-41, SR-43
 
 ## Sources
-The repository README, "Nobody outside systems engineering should need to know what SysML is", "Federation, for the systems engineers" and "Why Cosmo, and not simply GraphQL". [Why federate a systems model](../articles/00-why-federate-a-systems-model.md) for the argument and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the composition view this record describes. The Cosmo documentation on entity keys, `@requires` and subscription support per subgraph transport, at router 0.343.1.
+The repository README, "Nobody outside systems engineering should need to know what SysML is", "Federation, for the systems engineers" and "Why Cosmo, and not simply GraphQL". [Why federate a systems model](../articles/00-why-federate-a-systems-model.md) for the argument and [the architecture views](../architecture/README.md) for the composition view this record describes. The Cosmo documentation on entity keys, `@requires` and subscription support per subgraph transport, at router 0.343.1.

@@ -71,4 +71,4 @@ SR-46, SC-03, SC-04
 
 ## Sources
 
-`internal/assert/assert.go` and `internal/tabletest/tabletest.go` as they stand in the repository, and the `.gitignore` and Makefile rules named above. [How the design was run](../articles/02-how-the-design-was-run.md) for the allowlist and the empty-interface rule, and [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for the conflict that made the decision necessary.
+`internal/assert/assert.go` and `internal/tabletest/tabletest.go` as they stand in the repository, and the `.gitignore` and Makefile rules named above. [How the design was run](../articles/02-how-the-design-was-run.md) for the allowlist, the empty-interface rule and the conflict that made the decision necessary.

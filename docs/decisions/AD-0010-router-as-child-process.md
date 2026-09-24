@@ -138,4 +138,4 @@ and no router extension is loaded, and no tini is added.
 SR-03, SR-05, SR-06, SR-07, SR-24, SR-25
 
 ## Sources
-The Cosmo router image and its LICENSE at 0.343.1, the router module's release tags and the `replace` block its examples repository requires, and the vendor's pages on running the router from environment and a static execution configuration. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the runtime and deployment views, and [What the research overturned](../articles/03-what-the-research-overturned.md) for the embedding claim as it was checked.
+The Cosmo router image and its LICENSE at 0.343.1, the router module's release tags and the `replace` block its examples repository requires, and the vendor's pages on running the router from environment and a static execution configuration. [The architecture views](../architecture/README.md) for the runtime and deployment views, and [What the research overturned](../articles/03-what-the-research-overturned.md) for the embedding claim as it was checked.

@@ -104,4 +104,4 @@ SR-19, SR-30, SR-31
 
 ## Sources
 
-The repository README, "Nobody outside systems engineering should need to know what SysML is". The SysML 2.0 language specification on the body of a requirement definition and usage, the OMG training material for `require constraint` and the bound limit, and the Systems Library's `VerdictKind`. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for the verdict rules and their precedence.
+The repository README, "Nobody outside systems engineering should need to know what SysML is". The SysML 2.0 language specification on the body of a requirement definition and usage, the OMG training material for `require constraint` and the bound limit, and the Systems Library's `VerdictKind`. [The capacity model](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-capacity-model) in the example's README for the verdict rules and their precedence.

@@ -124,4 +124,4 @@ service, which has no subscription, is untouched by it.
 SR-26, SR-27, SR-32, SR-39
 
 ## Sources
-The Cosmo documentation on subscription transports per subgraph, on serving subscriptions to clients over SSE and WebSocket, and on Cosmo Streams. gqlgen's WebSocket transport. [What the research overturned](../articles/03-what-the-research-overturned.md) for what was confirmed about subscriptions without a broker and what stayed loose, and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the runtime view.
+The Cosmo documentation on subscription transports per subgraph, on serving subscriptions to clients over SSE and WebSocket, and on Cosmo Streams. gqlgen's WebSocket transport. [What the research overturned](../articles/03-what-the-research-overturned.md) for what was confirmed about subscriptions without a broker and what stayed loose, and [the architecture views](../architecture/README.md) for the runtime view.

@@ -131,7 +131,9 @@ and merges the answers on that key.
 This section is the capacity model page that [an idealised capacity
 model](../../docs/decisions/AD-0006-idealised-capacity-model.md) asks for: what
 the capacity service computes, the assumptions it rests on, the limits of the
-number, and the absence of any estimate of its uncertainty.
+number, and the absence of any estimate of its uncertainty. The model is
+deliberately simple. It exists to show where a number is computed in a federated
+graph, and is not meant for real-world capacity work.
 
 #### What is computed
 

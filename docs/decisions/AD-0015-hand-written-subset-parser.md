@@ -117,4 +117,4 @@ says keeps a later swap a source change rather than a schema change.
 SR-16, SR-18, SR-22, SR-23, SR-45
 
 ## Sources
-The public repositories named above, with their licences and their own README statements: Open-MBEE/OpenSysML, mycr0ft/gosysml, dVoo/gosysml2, antlr/grammars-v4 and nomograph-ai/tree-sitter-sysml. Syside's licence terms. [What the research overturned](../articles/03-what-the-research-overturned.md) for the claim as it was checked and corrected, and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the adapter view.
+The public repositories named above, with their licences and their own README statements: Open-MBEE/OpenSysML, mycr0ft/gosysml, dVoo/gosysml2, antlr/grammars-v4 and nomograph-ai/tree-sitter-sysml. Syside's licence terms. [What the research overturned](../articles/03-what-the-research-overturned.md) for the claim as it was checked and corrected, and [the architecture views](../architecture/README.md) for the adapter view.

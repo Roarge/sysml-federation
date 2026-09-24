@@ -61,7 +61,7 @@ The wiring runs from ingest to parse, from parse to both index servers in parall
 >
 > The server, or set of servers, that holds the whole pipeline's capacity down. Where stages run one after another, it's the slowest stage. Where a stage is split across parallel servers, those servers count together, so two index servers at 700 each act as one stage of 1400. The capacity service finds it as a minimum cut, the cheapest set of servers that, taken away, would leave no path from the start of the pipeline to the end.
 
-The model states the requirements and never the arithmetic. Working the number out is the capacity service's job, and [From use cases to requirements](05-from-use-cases-to-requirements.md) shows how. That arithmetic is [idealised](../decisions/AD-0006-idealised-capacity-model.md), chosen to make a point about federation, and nobody should plan capacity with it.
+The model states the requirements and never the arithmetic. Working the number out is the capacity service's job, and [From use cases to requirements](05-from-use-cases-to-requirements.md) shows how. That arithmetic is [deliberately simple](../decisions/AD-0006-idealised-capacity-model.md), chosen to make a point about federation, and not meant for real-world use.
 
 ## The moving bottleneck
 

@@ -111,4 +111,4 @@ the configuration is committed and tested for drift.
 SR-42, SC-07
 
 ## Sources
-The vendor's pages on `wgc router compose` and on the router's static execution configuration, and the commit that removed `composition-go` from wundergraph/cosmo. [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the composition runs and where the embedded schema sits in the output, and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the composition view.
+The vendor's pages on `wgc router compose` and on the router's static execution configuration, and the commit that removed `composition-go` from wundergraph/cosmo. [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the composition runs and where the embedded schema sits in the output, and [the architecture views](../architecture/README.md) for the composition view.

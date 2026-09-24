@@ -99,4 +99,4 @@ SR-21
 
 ## Sources
 
-The repository README, "Federation, for the systems engineers". The SysML 2.0 language specification on short names, and the Systems Modeling API and Services 1.0 OpenAPI for `elementId` and the absence of an element-level alias. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the example's short names, and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the composition view and the merged graph.
+The repository README, "Federation, for the systems engineers". The SysML 2.0 language specification on short names, and the Systems Modeling API and Services 1.0 OpenAPI for `elementId` and the absence of an element-level alias. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the example's short names, and [the architecture views](../architecture/README.md) for the composition view and the merged graph.
