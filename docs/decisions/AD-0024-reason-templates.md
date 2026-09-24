@@ -98,4 +98,4 @@ SR-30, SR-37
 
 ## Sources
 
-[From use cases to requirements](../articles/05-from-use-cases-to-requirements.md), which publishes the seven templates, the verdict precedence and the worked example they render for. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the reason as the storyboard first carried it. The SysML v2 Systems Library's `VerdictKind` for the four words a verdict may take.
+[The capacity model](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-capacity-model) in the example's README, which publishes the seven templates, the verdict precedence and the worked example they render for. [The storyboard](../stories/README.md) for the reason as the boards first carried it. The SysML v2 Systems Library's `VerdictKind` for the four words a verdict may take.

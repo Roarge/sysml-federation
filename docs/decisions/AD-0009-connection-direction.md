@@ -82,4 +82,4 @@ refusal is exercised.
 SR-20, SR-28
 
 ## Sources
-The SysML 2.0 language specification on `connect` and its ordered ends, and the OMG training material for ports and connections. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for the flow network the direction feeds, and [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the syntax as the two reference tools accept it.
+The SysML 2.0 language specification on `connect` and its ordered ends, and the OMG training material for ports and connections. [The capacity model](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-capacity-model) in the example's README for the flow network the direction feeds, and [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for the syntax as the two reference tools accept it.

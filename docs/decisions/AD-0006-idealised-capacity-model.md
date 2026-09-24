@@ -107,4 +107,4 @@ SR-28, SR-30
 
 ## Sources
 
-The repository README, "The pipeline example" and "Placeholders". NASA-STD-7009B on reporting a computed result and its uncertainty. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md), which publishes the capacity model page in full, its assumptions and its limits of validity.
+The repository README, "The pipeline example" and "Placeholders". NASA-STD-7009B on reporting a computed result and its uncertainty. [The capacity model](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-capacity-model) in the example's README, which is the capacity model page in full, with its assumptions and its limits of validity.

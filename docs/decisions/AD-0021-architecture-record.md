@@ -1,11 +1,16 @@
 # AD-0021 The Markdown architecture description as the record, A3 sheets as the overview
 
-Status: accepted, amended once the demo was modelled. Date: 2026-08-27.
+Status: accepted, amended once the demo was modelled and again when the views left the articles. Date: 2026-08-27.
 
 Amendment, 2026-09-12: the model of the demo under `model/` is now the record
 of the architecture's structure and traces, and the Markdown description
 remains the narrative that explains it. The A3 sheets stay the overview. See
 [the demo's own model](AD-0029-the-demos-own-model-in-sysml-v2.md).
+
+Amendment, 2026-09-24: the text form of each view moved out of the article
+series into [the architecture views page](../architecture/README.md), which
+with these records and the model is now the Markdown description. The articles
+tell the story around it and link there. The sheets stay the overview.
 
 ## Context
 
@@ -102,4 +107,4 @@ none
 
 ## Sources
 
-Borches and Bonnema, A3 architecture overviews (INCOSE 2010), and Borches' 2009 cookbook, for the format's scope and what it is not for. The arc42 template and the C4 model, for the two alternatives weighed against it. [An A3 sheet for a fifteen-minute reader](../articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md) for the sheets themselves, and [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the description they condense.
+Borches and Bonnema, A3 architecture overviews (INCOSE 2010), and Borches' 2009 cookbook, for the format's scope and what it is not for. The arc42 template and the C4 model, for the two alternatives weighed against it. [An A3 sheet for a fifteen-minute reader](../articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md) for the sheets themselves, and [The architecture views](../architecture/README.md) for the description they condense.

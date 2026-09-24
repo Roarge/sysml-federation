@@ -126,30 +126,159 @@ is the document service's. All three declare `Requirement` with the same entity
 key, `id`. The router works out which service holds which field, calls each one
 and merges the answers on that key.
 
-### The rollup
+### The capacity model
 
-The capacity of the pipeline is the largest sustained query rate the wiring can
-carry from the servers that receive queries to the servers that deliver results.
+This section is the capacity model page that [an idealised capacity
+model](../../docs/decisions/AD-0006-idealised-capacity-model.md) asks for: what
+the capacity service computes, the assumptions it rests on, the limits of the
+number, and the absence of any estimate of its uncertainty.
+
+#### What is computed
+
+A pipeline part owns servers, which are its child parts, and a wiring, which is a
+set of directed connections between them. Each server carries one numeric
+attribute, `throughput`, in queries per second. The capacity of the pipeline is
+the largest sustained query rate the wiring can carry from the servers that
+receive queries to the servers that deliver results. The service computes that
+number, names the servers that limit it, and returns a verdict for every
+requirement that constrains a quantity it computes. It is configured with two
+names only, `capacity` for the quantity and `throughput` for the attribute it
+reads from each child, and never sees the words "server" or "pipeline".
+
 As arithmetic that is a minimum along a chain and a sum across parallel branches,
 which is the version a reader can check by hand. The service computes a maximum
-flow instead. Each child part becomes two nodes joined by an edge of its
-attribute value, each connection becomes an edge with no limit of its own, a
-super-source feeds every child nobody feeds and a super-sink drains every child
-that feeds nobody, and the capacity is the maximum flow between the two. The
-bottleneck is the minimum cut taken on the source side, which is the saturated
-servers nearest the entry and is the same set for every maximum flow, so the
-answer does not depend on the order the algorithm found its paths in. Flow and
-the two rules agree wherever the two rules apply, and flow still answers where
-they do not, such as a fan-in from branches that were never forked at the same
-point.
+flow instead ([rollup as maximum
+flow](../../docs/decisions/AD-0007-rollup-as-maximum-flow.md)):
 
-The arithmetic is exact for an idealised pipeline and for nothing else. Work is
-taken to be evenly partitionable across parallel branches, load balancing to be
-perfect, load to be stationary and connections to be unlimited, and there is no
-queueing anywhere in the model. A real pipeline that neither drops nor
-duplicates queries departs from those assumptions in one direction only, so the
-number then reads as an upper bound. It must not be used for capacity planning.
-The arithmetic was chosen to make a point about federation.
+- Every server becomes an in-node and an out-node, joined by one edge whose
+  capacity is the server's throughput.
+- Every connection becomes an edge with no limit, from the out-node of its first
+  end to the in-node of its second, the direction the adapter takes from the
+  order of the ends.
+- A super-source feeds every server nobody feeds, and every server that feeds
+  nobody drains into a super-sink. A server with no connections, or one the flow
+  cannot reach from an entry or leave by an exit, is left out and named in no
+  reason.
+
+The capacity is the maximum flow from the super-source to the super-sink, found
+with Dinic's algorithm. Because connection edges carry no limit, every finite cut is made of server
+edges. So the same number is the smallest total throughput of any set of servers
+whose removal would cut every path from an entry to an exit.
+
+    capacity(P) = max flow from s to t in N(P)
+                = min over server sets C that separate every entry server
+                  from every exit server of  sum of throughput(v), v in C
+
+Flow and the two hand rules agree wherever the hand rules apply. A chain can carry no more than its smallest throughput, and can carry that much.
+Parallel branches that share one fork, one join and no server can all run at
+their own maximum at once, so their capacities add. A differential test in the capacity
+package checks the flow against the two rules on series-parallel wirings. Flow
+still answers where the rules do not, such as a fan-in from branches never forked
+at the same point, a cycle, or several entries or exits.
+
+#### The bottleneck
+
+A network can have several minimum cuts, so the reported one is defined. It is
+the source-side canonical cut: the servers whose in-node the super-source can
+still reach in the residual network of a maximum flow and whose out-node it
+cannot. Those are the saturated servers nearest the entry. The set the
+super-source can reach is the same for every maximum flow, so the answer does not
+depend on the order the algorithm found its paths in.
+
+Raising a server outside the cut changes nothing. Raising one inside it raises the
+capacity by the same amount until some other set becomes the cheapest cut, and
+from then on further increases to the first server have no effect. The shipped
+values keep every step of the worked example below free of ties. Had parse been
+raised to 1600 instead of 1700, the last step would have left parse and the index
+pair both at 1600, and the source-side rule would have named parse.
+
+#### Verdicts and reasons
+
+A requirement reaches the service with its subject, the quantity its constraint
+names, the comparison, the limit and, where the model declares one, the short
+name of its verification case. The router carries all of it across from the
+adapter's projection. The verdicts are the four words of `VerdictKind` in the
+SysML v2 Systems Library, decided in this order:
+
+1. INCONCLUSIVE if the constrained quantity is not the one the service computes,
+   before anything else is looked at, so a latency requirement never reports a
+   bad child value.
+2. ERROR if a child's attribute is missing or negative, naming the child.
+3. INCONCLUSIVE if the subject is empty, or the wiring has no entry part or no
+   exit part.
+4. PASS if the subject's capacity satisfies the constraint's own comparison
+   against the limit, and FAIL otherwise.
+
+In every INCONCLUSIVE case the capacity is absent rather than zero. A leaf, a part
+with the configured attribute and no children, has its own attribute value as its
+capacity and an empty bottleneck, so a derived requirement on one server is
+judged by the same rule. For that the servers declare `capacity` as well as
+`throughput`, through an abstract part definition the pipeline shares.
+
+Every reason is built from one of seven templates ([verdict reasons built from
+templates](../../docs/decisions/AD-0024-reason-templates.md)). The words in angle
+brackets are the only parts that vary, and `<quantity>` and `<attribute>` are the
+two configured names, so no template carries a word of the model. A cut of
+several servers is listed in the order the router delivers the children.
+
+| Case | Template |
+|---|---|
+| PASS or FAIL, subject with children | `<quantity> <value> against <limit>, limited by <cut>` |
+| PASS or FAIL, leaf subject | `<attribute> <value> against <limit>` |
+| INCONCLUSIVE, other quantity, verification case declared | `<verification case> is declared and no service runs it` |
+| INCONCLUSIVE, other quantity, no verification case | `no service computes <quantity>` |
+| INCONCLUSIVE, empty subject | `no children to analyse` |
+| INCONCLUSIVE, no entry or no exit | `no entry part` or `no exit part` |
+| ERROR | `<child> has <missing / negative> <attribute>` |
+
+The leaf template is chosen because the subject has no children, not because the
+requirement is derived, which the service cannot know. Words such as "allocated"
+belong to the document, which does know.
+
+#### Derived limits and the worked example
+
+The derived limits are expressions over the limit of PIPE-R1 in the model, and
+the adapter evaluates them. The rule gives the whole rate to each server on the
+serial path, ingest, parse and serve, and half to each index server. A derived
+requirement can fail while the pipeline passes, because the pipeline counts what
+the parallel pair delivers in total and one branch can cover for the other. The
+shipped document says so in its unnumbered first paragraph.
+
+| State | Capacity | PIPE-R1 | Cut | Derived: ingest, parse, indexA, indexB, serve |
+|---|---|---|---|---|
+| Shipped | 1200 | FAIL | parse | PASS, FAIL, FAIL, FAIL, PASS |
+| ingest to 3000 | 1200 | FAIL | parse | PASS, FAIL, FAIL, FAIL, PASS |
+| parse to 1700 | 1400 | FAIL | indexA, indexB | PASS, PASS, FAIL, FAIL, PASS |
+| then indexA to 900 | 1600 | PASS | indexA, indexB | PASS, PASS, PASS, FAIL, PASS |
+
+#### Assumptions and limits
+
+The number is exact for a pipeline that meets these assumptions and for nothing
+else:
+
+1. Every query takes exactly one path from an entry to an exit, and no server
+   duplicates, drops or multiplies queries, so flow is conserved and a fork
+   splits the queries between its branches.
+2. Work can be split evenly across parallel branches.
+3. Load balancing is perfect.
+4. There is no queueing and no coupling through latency.
+5. Load is a sustained rate, with no bursts.
+6. Connections have unlimited capacity.
+7. A server's throughput does not depend on the mix of queries it receives.
+8. Entries and exits are read from the wiring.
+
+A real pipeline that meets the first assumption departs from the others in one
+direction only, so the number then reads as an upper bound. A server that
+duplicates or drops queries can move the real rate either way. The service sees
+only throughputs and connections and cannot detect any departure. No quantitative
+estimate of the uncertainty is available, and the number must not be used for
+capacity planning. The arithmetic was chosen to make a point about federation.
+
+The edge cases follow from the rules. A throughput of zero is valid and gives
+capacity 0 and FAIL with that server as the cut. A negative or missing throughput
+in the file gives ERROR, and since the adapter refuses such a value on edit, ERROR
+can only come from the source. Cycles need no special handling. Both a wiring
+with no entry or no exit and an empty subject give INCONCLUSIVE with no capacity.
 
 ### The router
 

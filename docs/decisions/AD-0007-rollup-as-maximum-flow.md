@@ -113,4 +113,4 @@ SR-28, SR-29
 
 ## Sources
 
-The repository README, "The pipeline example". [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md), which publishes the capacity model in full: the flow network, why it equals the README's arithmetic, the source-side cut and the worked example. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the tie that made the cut definition necessary. The max-flow min-cut theorem and Dinic's algorithm.
+The repository README, "The pipeline example". [The capacity model](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-capacity-model) in the example's README, which publishes the capacity model in full: the flow network, why it equals the README's arithmetic, the source-side cut and the worked example. [Twelve use cases and one moving bottleneck](../articles/04-twelve-use-cases-and-one-moving-bottleneck.md) for the tie that made the cut definition necessary. The max-flow min-cut theorem and Dinic's algorithm.

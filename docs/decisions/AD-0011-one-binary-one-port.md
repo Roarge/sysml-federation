@@ -117,4 +117,4 @@ it are reachable and the path itself is not.
 SR-01, SR-02, SR-04, SR-10, SR-40
 
 ## Sources
-Docker's guidance on running more than one process in a container, the distroless static base image, and the Cosmo router's default listen address and paths. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) for the deployment view and its process tree, and [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for what the router's readiness path proves.
+Docker's guidance on running more than one process in a container, the distroless static base image, and the Cosmo router's default listen address and paths. [The architecture views](../architecture/README.md) for the deployment view and its process tree, and [Five spikes before the first line](../articles/09-five-spikes-before-the-first-line.md) for what the router's readiness path proves.
