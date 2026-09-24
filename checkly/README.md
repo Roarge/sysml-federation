@@ -324,10 +324,8 @@ them with the published image as well. The rows on the project itself, its
 construction, its type check, its specs and its API requests, were run from
 `checkly/`, against a local container of the same build where one was
 needed. Every row is of the branch as committed, except where a row says
-which correction came after its run. The rows with a date have been observed.
-The pending rows need an account, a token or a network that resolves the
-tunnel service, and are the owner's to add when they have run the setup
-steps.
+which correction came after its run. Every row has been observed on the
+date it gives.
 
 | date | what | how | observed |
 |---|---|---|---|

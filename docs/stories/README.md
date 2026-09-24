@@ -14,7 +14,7 @@ Values follow the design brief: ingest 2000, parse 1200, indexA 700, indexB 700,
 
 Exactly six numbers are editable in the apps: the five server throughputs and the limit of PIPE-R1. Everything else is read-only in both apps. The adapter's mutation accepts any literal in the source, including the 200 ms of PIPE-R2, which the playground can reach. Edits land in the served model text and its version counter, never on disk ([editing as scaffolding](../decisions/AD-0004-editing-as-scaffolding.md)).
 
-A throughput that is not a number, or is negative, is rejected and the previous value stands.
+A throughput that isn't a finite number, or is negative, is refused and the previous value stands.
 
 ## The twelve use cases
 

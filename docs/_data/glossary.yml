@@ -30,14 +30,6 @@
     the Cosmo router from WunderGraph.
   link: https://cosmo-docs.wundergraph.com/router/intro
 
-- id: subgraph
-  term: Subgraph
-  definition: >-
-    One service's share of a federated GraphQL schema. Each subgraph is written
-    and run by its own team, and the router merges them into one graph that a
-    client queries as if it were a single service.
-  link: https://graphql.org/learn/federation/
-
 - id: adapter
   term: Adapter
   definition: >-
@@ -152,13 +144,6 @@
     runs its continuous integration on GitHub Actions.
   link: https://en.wikipedia.org/wiki/Continuous_integration
 
-- id: conjugate-port
-  term: Conjugate port
-  definition: >-
-    A SysML v2 port definition says what flows in and out at a connection
-    point. Its conjugate is the mirror image, with every input turned into an
-    output and every output into an input, so two conjugate ports fit together.
-
 - id: checkly
   term: Checkly
   definition: >-
@@ -191,13 +176,6 @@
     from software. Its collector is a separate process that receives this data
     and forwards it to wherever it is stored or shown.
   link: https://opentelemetry.io/docs/collector/
-
-- id: heartbeat
-  term: Heartbeat
-  definition: >-
-    A monitor that expects a regular ping from the thing it watches and raises
-    an alert when the pings stop. It catches a process that has quietly died.
-  link: https://www.checklyhq.com/docs/detect/uptime-monitoring/heartbeat-monitors/overview/
 
 - id: server-sent-events
   term: Server-sent events
@@ -278,15 +256,6 @@
     file.
   link: https://cosmo-docs.wundergraph.com/control-plane/intro
 
-- id: race-detector
-  term: Race detector
-  definition: >-
-    A mode of Go's test tool that watches for data races, where two goroutines
-    reach the same memory at once, at least one of them writes, and nothing
-    orders the two. Tests run with it fail when a race happens, even if the
-    answers they check came out right.
-  link: https://go.dev/doc/articles/race_detector
-
 - id: goroutine
   term: Goroutine
   definition: >-
@@ -345,14 +314,6 @@
     one to announce that their version number has changed.
   link: https://graphql.org/learn/subscriptions/
 
-- id: cgo
-  term: cgo
-  definition: >-
-    Go's bridge for calling C code. Using it ties a build to a C compiler for
-    each target platform, while a Go program built with CGO_ENABLED=0 can be
-    cross-compiled for another processor from one machine.
-  link: https://pkg.go.dev/cmd/cgo
-
 - id: traceability
   term: Traceability
   definition: >-
@@ -370,23 +331,6 @@
     pushed updates, and servers use it between themselves too.
   link: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
 
-- id: qemu
-  term: QEMU
-  definition: >-
-    An emulator that can run programs built for one processor on another. A
-    container build often uses it to produce an arm64 image on an amd64
-    machine. A pure Go build can cross-compile instead and needs no
-    emulator.
-  link: https://en.wikipedia.org/wiki/QEMU
-
-- id: incose
-  term: INCOSE
-  definition: >-
-    The International Council on Systems Engineering, the professional body
-    for systems engineers. The paper that introduced the A3 architecture
-    overview was published in its 2010 proceedings.
-  link: https://en.wikipedia.org/wiki/International_Council_on_Systems_Engineering
-
 - id: gqlgen
   term: gqlgen
   definition: >-
@@ -394,32 +338,6 @@
     All three of the demo's services are built with it, and it supports the
     federation directives and subscriptions they need.
   link: https://gqlgen.com/
-
-- id: semver
-  term: Semantic versioning
-  definition: >-
-    A convention for version numbers of the form major.minor.patch, such as
-    0.3.0, where each part says how big a change is. A suffix such as -rc.1
-    marks a pre-release.
-  link: https://semver.org/
-
-- id: residual-network
-  term: Residual network
-  definition: >-
-    For a given flow, the network of what could still change. Each edge keeps
-    whatever capacity the flow hasn't used, and gains a reverse edge for the
-    flow it carries, since that flow could be pushed back. A node the source
-    can still reach in it is one more flow could get to.
-  link: https://en.wikipedia.org/wiki/Flow_network
-
-- id: a3-overview
-  term: A3 architecture overview
-  definition: >-
-    A way of summarising one aspect of a system's architecture on a single
-    two-sided sheet of A3 paper, from Borches and Bonnema, developed at
-    Philips Healthcare. One side carries models of the system and the other a
-    short text summary.
-  link: https://www.gaudisite.nl/BorchesCookbookA3architectureOverview.pdf
 
 - id: es-modules
   term: ES modules

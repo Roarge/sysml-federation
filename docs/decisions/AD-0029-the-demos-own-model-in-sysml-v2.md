@@ -17,8 +17,9 @@ tracked tests could import them (AD-0022).
 
 The demo has never been modelled. Its stories live as prose and as boards
 published beside the articles, its use cases as a PDF, its requirements and
-design constraints as tables in article 05, its decisions as the records in
-this directory. Nothing joins those but a reader's attention. The traceability
+design constraints as Markdown tables in the design phase's requirements
+document, which article 05 describes, and its decisions as the records in this
+directory. Nothing joins those but a reader's attention. The traceability
 self-check AD-0023 planned, a Go test reading `docs/` and failing on a dangling
 identifier, was never built, so every table has been checked by being read at a
 gate. The repository argues that a systems model belongs at the centre of an

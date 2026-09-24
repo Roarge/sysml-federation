@@ -41,6 +41,10 @@ exports to the collector beside the demo, and the collector forwards every span
 to the viewer and, when an ingest key is supplied, only the spans a check
 marked as its own to the monitoring service.
 
+The session runs on the operator's own Checkly account, supplied as an API key
+and an account id in `checkly/.env`, because the maintainer's credentials
+cannot ship inside a public image.
+
 Without credentials nothing changes. `docker run` runs the demo as before, the
 variable is unset, the router's environment is what the supervisor sets, and
 nothing under `checkly/` is built, run or read.
@@ -105,4 +109,4 @@ SR-03, SR-48, SC-01
 
 ## Sources
 
-[The check session](../../checkly/README.md) for the setup, the checks and the verification record. [The model of the demo](../../model/README.md) for the session composite and the check cases, in which every live check is a case of its own. The telemetry record (AD-0013), the version events record (AD-0014) and the vanilla web apps record (AD-0017), each amended by this decision.
+[The check session](https://github.com/Roarge/sysml-federation/blob/main/checkly/README.md) for the setup, the checks and the verification record. [The model of the demo](https://github.com/Roarge/sysml-federation/blob/main/model/README.md) for the session composite and the check cases, in which every live check is a case of its own. The telemetry record (AD-0013), the version events record (AD-0014) and the vanilla web apps record (AD-0017), each amended by this decision.

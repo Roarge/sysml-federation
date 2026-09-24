@@ -1,6 +1,6 @@
 # A3 architecture overviews
 
-Each sheet takes one aspect of the demo and gives it a model side and a summary side, laid out for a reader with a quarter of an hour. The model side draws the aspect and the summary side says what it means, so that a reader who finishes a sheet can answer its goal question without opening anything else.
+Each sheet takes one aspect of the demo and fits it on one A3 page, for a reader with a quarter of an hour. A reader who finishes a sheet should be able to answer its goal question without opening anything else. [An A3 sheet for a fifteen-minute reader](../articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md) says why the overview takes this form.
 
 | Sheet | Title | Goal question | Status |
 |---|---|---|---|
@@ -9,7 +9,7 @@ Each sheet takes one aspect of the demo and gives it a model side and a summary 
 | L2a | Adapter: projecting SysML v2 | How does a model file become a subgraph, and where does the adapter stop? | Not drafted, outstanding work |
 | L2b | [Pipeline example: capacity and verdicts](L2b-pipeline-example-capacity-and-verdicts.pdf) | Why does raising one server change nothing and raising another change everything? | Approved without external review |
 
-Layout after the A3 architecture overview cookbook of Borches and Bonnema. No artwork from the cookbook is reproduced.
+The layout follows the A3 architecture overview cookbook of Borches and Bonnema, taken for what it forces on a sheet rather than followed step by step. No artwork from the cookbook is reproduced. The mistakes known on the two published sheets are listed in [issue 34](https://github.com/Roarge/sysml-federation/issues/34), to be corrected at their next re-issue.
 
 Owner: Roar Georgsen
 
