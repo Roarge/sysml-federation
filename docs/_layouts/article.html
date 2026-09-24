@@ -1,15 +1,22 @@
 ---
 layout: default
 ---
-{%- assign total = site.series | size %}
-{%- assign last = total | minus: 1 %}
+{%- comment %}
+  Find the series that holds this page, and the page's place in it. The
+  sidebar include reads `current` and `idx` from here.
+{%- endcomment %}
+{%- assign current = nil %}
 {%- assign idx = -1 %}
-{%- for item in site.series %}{% if item.path == page.path %}{% assign idx = forloop.index0 %}{% endif %}{% endfor %}
+{%- for s in site.series %}
+{%- for item in s.articles %}{% if item.path == page.path %}{% assign current = s %}{% assign idx = forloop.index0 %}{% endif %}{% endfor %}
+{%- endfor %}
 {%- assign part = nil %}
-{%- for p in site.parts %}
+{%- if current %}
+{%- for p in current.parts %}
 {%- assign part_end = p.from | plus: p.count %}
 {%- if idx >= p.from and idx < part_end %}{% assign part = p %}{% endif %}
 {%- endfor %}
+{%- endif %}
 {%- comment %} A reader's pace of about 220 words a minute, rounded up. {% endcomment %}
 {%- assign words = content | strip_html | number_of_words %}
 {%- assign minutes = words | divided_by: 220 | plus: 1 %}
@@ -18,24 +25,25 @@ layout: default
     <header class="article-head">
       <p class="eyebrow">{% if part %}{{ part.title }} &middot; {% endif %}{{ minutes }} min read</p>
       <h1>{{ page.title }}</h1>
-      {%- if idx >= 0 and site.series[idx].dek %}
-      <p class="dek">{{ site.series[idx].dek }}</p>
+      {%- if current and current.articles[idx].dek %}
+      <p class="dek">{{ current.articles[idx].dek }}</p>
       {%- endif %}
     </header>
     {{ content }}
-    {%- if idx >= 0 %}
+    {%- if current %}
+    {%- assign last = current.articles | size | minus: 1 %}
     <nav class="pager" aria-label="Series navigation">
       <ul>
         {%- if idx > 0 %}
         {%- assign previous_index = idx | minus: 1 %}
-        {%- assign previous = site.series[previous_index] %}
+        {%- assign previous = current.articles[previous_index] %}
         {%- assign previous_href = previous.path | replace: '.md', '.html' | prepend: '/' %}
         <li class="pager-previous"><a href="{{ previous_href | relative_url }}"><span class="pager-label">Previous</span><span class="pager-title">{{ previous.title }}</span></a></li>
         {%- endif %}
-        <li class="pager-index"><a href="{{ '/' | relative_url }}"><span class="pager-label">Index</span><span class="pager-title">{{ site.title }}</span></a></li>
+        <li class="pager-index"><a href="{{ '/' | relative_url }}"><span class="pager-label">Index</span><span class="pager-title">{{ current.title }}</span></a></li>
         {%- if idx < last %}
         {%- assign next_index = idx | plus: 1 %}
-        {%- assign next = site.series[next_index] %}
+        {%- assign next = current.articles[next_index] %}
         {%- assign next_href = next.path | replace: '.md', '.html' | prepend: '/' %}
         <li class="pager-next"><a href="{{ next_href | relative_url }}"><span class="pager-label">Next</span><span class="pager-title">{{ next.title }}</span></a></li>
         {%- endif %}
@@ -43,7 +51,9 @@ layout: default
     </nav>
     {%- endif %}
   </article>
+  {%- if current %}
   <aside class="sidebar">
     {%- include series-nav.html %}
   </aside>
+  {%- endif %}
 </div>

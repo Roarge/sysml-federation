@@ -1,15 +1,21 @@
 {%- comment %}
-  The series in its four parts. Each part slices site.series by position, so
-  the list itself is written once, in _config.yml, and the numbers run on
-  from one part to the next.
+  The series the current article belongs to, in its parts. The article layout
+  sets `current` to that series. Each part slices the series' articles by
+  position, so the list is written once, in _config.yml, and the numbers run
+  on from one part to the next.
 {%- endcomment %}
-<nav class="series-nav" aria-label="The series">
-  <h2 class="series-nav-heading">The series</h2>
-  {%- for part in site.parts %}
+<nav class="series-nav" aria-label="{{ current.title }}">
+  <div class="series-nav-head">
+    <h2 class="series-nav-heading">{{ current.title }}</h2>
+    {%- if current.release %}
+    <p class="series-nav-meta">{{ current.status }} &middot; written for release {{ current.release }}</p>
+    {%- endif %}
+  </div>
+  {%- for part in current.parts %}
   <div class="series-part">
     <p class="series-part-title">{{ part.title }}</p>
     <ol start="{{ part.from | plus: 1 }}">
-      {%- for item in site.series limit: part.count offset: part.from %}
+      {%- for item in current.articles limit: part.count offset: part.from %}
       {%- assign number = part.from | plus: forloop.index %}
       {%- assign href = item.path | replace: '.md', '.html' | prepend: '/' %}
       <li{% if item.path == page.path %} class="is-current"{% endif %}>

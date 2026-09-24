@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026, revised 29 August 2026*
 
-Part 11 of 13 in [Federating a systems model](../README.md).
+Part 11 of 13 in [Federating a systems model](../README.md), written for release v0.3.0.
 
 The demo is a SysML v2 model of a five-server query pipeline, published as a live GraphQL projection and joined at a federation router by a capacity service and a document service. A projection, here, is the small plainly typed view a consumer meets instead of the metamodel. Two web apps sit in front, and the whole thing ships as one container image that a single `docker run` starts. What follows describes it in the present tense. An earlier version of this article was written before any of it ran, from the design [Planning the build](08-planning-the-build.md) sets out, and it promised a revision once the image shipped. This is that revision.
 

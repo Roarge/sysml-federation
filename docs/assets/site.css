@@ -467,6 +467,17 @@ pre code {
   background: var(--paper);
 }
 
+/* A note added after a series is finished, when a later release changes
+   what the article says. Dashed, as the boards draw what sits outside the
+   demo, since the note sits outside the series as it was written. */
+.prose blockquote:has(> .callout-head[data-callout="update"]) {
+  border: 1px dashed var(--ink);
+}
+
+.callout-head[data-callout="update"] .callout-label {
+  color: var(--ink);
+}
+
 /* The story so far opens every article. It reads as the start of the
    article rather than an aside, so it is set in the serif between two
    rules, and its bold title becomes the label. */
@@ -718,12 +729,30 @@ button.term[aria-expanded="true"] {
   margin-top: 56px;
 }
 
+/* The home page lists every series under its own heading, with the series'
+   parts beneath it. A series heading starts its numbering again at 1. */
 .layout-home .prose > h2 {
-  margin: 56px 0 8px;
+  margin: 72px 0 8px;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 1.15;
+  counter-reset: article;
 }
 
 .layout-home .prose > h2 + p {
   margin-bottom: 28px;
+  color: var(--label-grey);
+}
+
+.layout-home .prose > h3 {
+  margin: 40px 0 4px;
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.layout-home .prose > h3 + p {
+  margin-bottom: 24px;
   color: var(--label-grey);
 }
 
@@ -869,9 +898,22 @@ button.term[aria-expanded="true"] {
   color: var(--label-grey);
 }
 
+.series-nav-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.series-nav-meta {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--label-grey);
+}
+
 .series-nav-heading {
   margin: 0;
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1.25;
   font-weight: 600;
   color: var(--ink);
@@ -1094,7 +1136,13 @@ button.term[aria-expanded="true"] {
   }
 
   .layout-home .prose > h2 {
-    margin: 32px 0 8px;
+    margin: 48px 0 8px;
+    font-size: 26px;
+  }
+
+  .layout-home .prose > h3 {
+    margin: 28px 0 4px;
+    font-size: 18px;
   }
 
   .prose h3 {

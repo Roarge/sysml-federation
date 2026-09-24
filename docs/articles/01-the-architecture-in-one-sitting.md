@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 27 August 2026*
 
-Part 2 of 13 in [Federating a systems model](../README.md).
+Part 2 of 13 in [Federating a systems model](../README.md), written for release v0.3.0.
 
 The demo publishes a SysML v2 model of a five-server query pipeline through a federated GraphQL router, so that a capacity analysis and a requirements document, neither of which has ever read a line of SysML, can attach their own data to the model's parts and requirements. All of it runs in one container.
 

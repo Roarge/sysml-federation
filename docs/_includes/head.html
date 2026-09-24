@@ -7,7 +7,7 @@
   <title>{{ site.title }}</title>
   {%- endif %}
   {%- assign description = page.description | default: site.description %}
-  {%- for item in site.series %}{% if item.path == page.path and item.dek %}{% assign description = item.dek %}{% endif %}{% endfor %}
+  {%- for s in site.series %}{% for item in s.articles %}{% if item.path == page.path and item.dek %}{% assign description = item.dek %}{% endif %}{% endfor %}{% endfor %}
   <meta name="description" content="{{ description | escape }}">
   <meta name="author" content="{{ site.author | escape }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">

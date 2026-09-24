@@ -2,7 +2,7 @@
 
 *Roar Georgsen, 13 September 2026*
 
-Part 13 of 13 in [Federating a systems model](../README.md).
+Part 13 of 13 in [Federating a systems model](../README.md), written for release v0.3.0.
 
 > [!IMPORTANT]
 > **The story so far**
