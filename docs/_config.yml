@@ -111,12 +111,12 @@ series:
   - title: "Automating traceability"
     status: "In progress"
     parts:
-      - { title: "The task", from: 0, count: 2, dek: "What is entity resolution between a model and a built system, and what is a single task of it made of?" }
+      - { title: "The task", from: 0, count: 2, dek: "What is entity resolution between a systems model and a built system, and what is a single task of it made of?" }
     articles:
       - path: articles/13-why-a-model-needs-entity-resolution.md
         title: "Why does a systems model need entity resolution?"
         date: 2026-09-24
-        dek: "Hardly anything a team builds carries its model's keys. What does it take to find a model element's counterparts anyway, and why is that job never quite finished?"
+        dek: "Hardly anything a team builds carries the keys from its systems model. What does it take to find the counterparts of each element anyway, and why is that job never quite finished?"
       - path: articles/14-the-parts-of-a-resolution-task.md
         title: "The parts of a resolution task"
         date: 2026-09-24
