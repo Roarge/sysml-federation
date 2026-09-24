@@ -16,9 +16,9 @@ services:
   # The demo, as docker run runs it. The two variables stay empty unless the
   # session sets them, and the router configuration is mounted where the
   # session's variable points, so that the file is present and inert until it
-  # is named. The published image before 0.2.0 lacks the configuration opt-in,
-  # so the session uses DEMO_IMAGE=sysml-federation:dev from make image until
-  # that release. The healthcheck is the image's own.
+  # is named. Release 0.2.0 is the first published image with the
+  # configuration opt-in, and DEMO_IMAGE=sysml-federation:dev after make image
+  # starts a local build in its place. The healthcheck is the image's own.
   demo:
     image: ${DEMO_IMAGE:-ghcr.io/roarge/sysml-federation}
     ports:

@@ -6,11 +6,11 @@ Part 12 of 13 in [Federating a systems model](../README.md).
 
 `docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation` pulls about 45 million bytes on amd64, or 41.5 million on arm64, and answers on port 8080 roughly two seconds after the container starts. The package is public, so there is no account to make and no login to run, and the index behind that name carries one manifest for `linux/amd64` and one for `linux/arm64` and nothing else. [The demo as it shipped](10-the-demo-as-it-shipped.md) walks through what the port then serves.
 
-There is a trap in the tags, and it catches anyone who types a version. The release is tagged `v0.1.0` in git, the image is tagged `0.1.0` in the registry, and the two are not the same string. The metadata step turns `refs/tags/v1.2.3` into `1.2.3`, dropping the leading letter on the way, so a pull of `ghcr.io/roarge/sysml-federation:v0.1.0` finds nothing at all. The untagged form the launch line uses avoids the question, and what it returns is `latest`.
+There is a trap in the tags, and it catches anyone who types a version. The first release is tagged `v0.1.0` in git, the image is tagged `0.1.0` in the registry, and the two are not the same string. The metadata step turns `refs/tags/v1.2.3` into `1.2.3`, dropping the leading letter on the way, so a pull of `ghcr.io/roarge/sysml-federation:v0.1.0` finds nothing at all. The untagged form the launch line uses avoids the question, and what it returns is `latest`.
 
 ## What it weighs
 
-Read back from the registry, compressed the way the registry counts, the published image is 44,850,689 bytes on amd64 and 41,475,216 on arm64. The ceiling the publishing job enforces is 80,000,000 per platform, so both sit a little over half way into their budget.
+Read back from the registry, compressed the way the registry counts, the first release's image is 44,850,689 bytes on amd64 and 41,475,216 on arm64. The ceiling the publishing job enforces is 80,000,000 per platform, so both sit a little over half way into their budget.
 
 Almost all of that is somebody else's binary. The vendor's router accounts for 39,987,546 bytes of the amd64 total, near enough 40 MB, which leaves under 5 million bytes for the distroless base, the Go supervisor with both web apps embedded in it, the composed router configuration and the model file together. A size budget written for this demo is therefore mostly a budget for the router, and the number it guards moves when the vendor's next release does.
 
