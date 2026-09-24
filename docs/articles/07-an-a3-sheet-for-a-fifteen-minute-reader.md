@@ -49,7 +49,7 @@ I drew L0 and L2b first, because they carry the argument and the memorable momen
 
 ## L0, the argument on one page
 
-![The model side of the L0 sheet](../img/a3-l0-model-side.png)
+![The L0 sheet](../img/a3-l0-model-side.png)
 
 *The L0 sheet: the argument as eight numbered boxes on the left, what the services agree on and what's in the box top right, the container bottom right. The whole sheet is [L0, Federating a systems model](../a3/L0-federating-a-systems-model.pdf).*
 
@@ -70,7 +70,7 @@ I first drew L0 with the numbers the design could only estimate, and re-issued i
 
 ## L2b, how the number is made
 
-![The model side of the L2b sheet](../img/a3-l2b-model-side.png)
+![The L2b sheet](../img/a3-l2b-model-side.png)
 
 *The L2b sheet: seven numbered boxes, the wiring in three states beside them, the arithmetic and its table top right. The whole sheet is [L2b, Pipeline example: capacity and verdicts](../a3/L2b-pipeline-example-capacity-and-verdicts.pdf).*
 

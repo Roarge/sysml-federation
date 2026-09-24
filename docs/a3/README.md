@@ -9,7 +9,7 @@ Each sheet takes one aspect of the demo and fits it on one A3 page, for a reader
 | L2a | Adapter: projecting SysML v2 | How does a model file become a subgraph, and where does the adapter stop? | Not drafted, outstanding work |
 | L2b | [Pipeline example: capacity and verdicts](L2b-pipeline-example-capacity-and-verdicts.pdf) | Why does raising one server change nothing and raising another change everything? | Approved without external review |
 
-The layout follows the A3 architecture overview cookbook of Borches and Bonnema, taken for what it forces on a sheet rather than followed step by step. No artwork from the cookbook is reproduced. The mistakes known on the two published sheets are listed in [issue 34](https://github.com/Roarge/sysml-federation/issues/34), to be corrected at their next re-issue.
+The layout follows the A3 architecture overview cookbook of Borches and Bonnema, taken for what it forces on a sheet rather than followed step by step. No artwork from the cookbook is reproduced.
 
 Owner: Roar Georgsen
 
