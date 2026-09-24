@@ -286,3 +286,102 @@
     orders the two. Tests run with it fail when a race happens, even if the
     answers they check came out right.
   link: https://go.dev/doc/articles/race_detector
+
+- id: goroutine
+  term: Goroutine
+  definition: >-
+    A lightweight thread of execution in Go. One Go program can run thousands
+    of them side by side, so the demo runs its three services as goroutines
+    inside a single binary rather than as three separate programs.
+  link: https://go.dev/tour/concurrency/1
+
+- id: loopback
+  term: Loopback
+  definition: >-
+    The network address a machine uses to talk to itself, 127.0.0.1 or
+    localhost. A service listening only on loopback can be reached from inside
+    the same container and from nowhere else.
+  link: https://en.wikipedia.org/wiki/Localhost
+
+- id: distroless
+  term: Distroless
+  definition: >-
+    A family of minimal container base images from Google. They hold what a
+    program needs to run and leave out the rest of a Linux distribution,
+    including the shell and tools such as curl.
+  link: https://github.com/GoogleContainerTools/distroless
+
+- id: reverse-proxy
+  term: Reverse proxy
+  definition: >-
+    A server that takes requests from outside and passes them on to a service
+    behind it, returning that service's answer as if it were its own. Here the
+    UI server does this for the router, so the router never has to be
+    reachable itself.
+  link: https://en.wikipedia.org/wiki/Reverse_proxy
+
+- id: entity-resolver
+  term: Entity resolver
+  definition: >-
+    The part of a federated service that answers for an object another
+    service has already found. The router hands it the object's key, plus any
+    fields the service said it requires, and gets back the fields this
+    service adds to that object.
+  link: https://www.apollographql.com/docs/graphos/schema-design/federated-schemas/entities/intro
+
+- id: mutation
+  term: Mutation
+  definition: >-
+    A GraphQL operation that changes data, as opposed to a query, which only
+    reads it. Each mutation is a named field on the schema's Mutation type,
+    with arguments saying what to change.
+  link: https://graphql.org/learn/mutations/
+
+- id: subscription
+  term: Subscription
+  definition: >-
+    A GraphQL operation that stays open and pushes a new result to the client
+    each time something happens on the server. Two of the demo's services use
+    one to announce that their version number has changed.
+  link: https://graphql.org/learn/subscriptions/
+
+- id: cgo
+  term: cgo
+  definition: >-
+    Go's bridge for calling C code. Using it ties a build to a C compiler for
+    each target platform, while a Go program built with CGO_ENABLED=0 can be
+    cross-compiled for another processor from one machine.
+  link: https://pkg.go.dev/cmd/cgo
+
+- id: traceability
+  term: Traceability
+  definition: >-
+    Being able to follow each requirement back to the need it came from and
+    forward to the design that meets it and the way it will be verified. A traceability table
+    lists those links, so a requirement with nothing behind it or nothing
+    testing it shows up as a gap.
+  link: https://en.wikipedia.org/wiki/Requirements_traceability
+
+- id: websocket
+  term: WebSocket
+  definition: >-
+    A browser protocol that keeps one connection open in both directions, so
+    a server can push messages to a page without the page asking each time.
+  link: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
+
+- id: qemu
+  term: QEMU
+  definition: >-
+    An emulator that can run programs built for one processor on another. A
+    container build often uses it to produce an arm64 image on an amd64
+    machine, which is slow. A pure Go build can cross-compile instead and
+    needs no emulator.
+  link: https://en.wikipedia.org/wiki/QEMU
+
+- id: incose
+  term: INCOSE
+  definition: >-
+    The International Council on Systems Engineering, the professional body
+    for systems engineers. Its annual symposium is where much of the field's
+    method research is first published.
+  link: https://en.wikipedia.org/wiki/International_Council_on_Systems_Engineering
