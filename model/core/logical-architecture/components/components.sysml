@@ -428,9 +428,11 @@ package Federation_LogicalArchitecture {
                    workflow builds the image for both platforms by
                    cross-compilation, pushes it to the registry under the semver
                    version alone, and reads the manifest back, failing the job if
-                   either platform is missing or over budget. The moving tag
-                   follows only once both platforms have passed and only for a
-                   version with no pre-release suffix. */
+                   either platform is missing or over budget. A runner of each
+                   architecture then pulls the image with no credential, starts
+                   it and checks what it serves. The moving tag follows only
+                   once both platforms have passed the gate and run natively,
+                   and only for a version with no pre-release suffix. */
             @DecisionRecord { id = "AD-0012"; title = "Composition as a maintainer step with committed output and a drift test"; }
             @DecisionRecord { id = "AD-0016"; title = "Generated code exempt from the empty-interface rule"; }
             @DecisionRecord { id = "AD-0020"; title = "The image published by a tag-triggered workflow to GHCR"; }

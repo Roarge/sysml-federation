@@ -20,8 +20,9 @@ integration layer for open MBSE."
 Then open `http://localhost:8080/`. The image is published for `linux/amd64` and
 `linux/arm64`, the package is public, and a host with no registry credentials
 pulls it. An untagged pull returns `latest`, which the publishing workflow moves
-onto a version only after reading both platforms back from the registry and
-finding each inside the size ceiling. From a checkout, `make image && make run`
+onto a version only after reading both platforms back from the registry,
+finding each inside the size ceiling, and running each on a native runner of
+its own architecture. From a checkout, `make image && make run`
 builds the same Dockerfile for the host's own architecture and runs the result on
 the same port.
 
@@ -207,9 +208,10 @@ Compressed as the registry counts them, the manifests of release 0.2.0 come to
 44,889,402 bytes for amd64 and 41,514,385 bytes for arm64, against a published
 ceiling of 80,000,000. Those figures are read from the registry rather than from
 a local build, because the publishing workflow pushes the version tag first,
-reads both platforms back, fails if either is over the ceiling, and moves
-`latest` only after that. An untagged pull therefore returns bytes that were
-measured where they landed.
+reads both platforms back and fails if either is over the ceiling. It then pulls
+the pushed image with no credential on a runner of each architecture, starts it
+and checks what it serves, and moves `latest` only once both runs have passed.
+An untagged pull therefore returns bytes that were measured where they landed.
 
 ## The model
 
