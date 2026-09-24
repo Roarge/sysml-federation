@@ -26,7 +26,7 @@ How the demo was designed before any code was written, and what each round of re
 3. [How the design was run](articles/02-how-the-design-was-run.md)  
    Four approval gates stood between the idea and the first line of code. Reading each document back against its sources caught three design errors early.
 4. [What the research overturned](articles/03-what-the-research-overturned.md)  
-   Before designing anything, I wrote down what I believed about the tools and tried to knock each belief over. Four of the seven claims that mattered fell.
+   Before designing anything, I wrote down what I believed about the tools and tried to knock each belief over. Three of the six claims that mattered fell.
 5. [Twelve use cases and one moving bottleneck](articles/04-twelve-use-cases-and-one-moving-bottleneck.md)  
    The example pipeline and the twelve short stories a visitor walks through. Their one surprise is that raising the bottleneck moves it somewhere else.
 6. [From use cases to requirements](articles/05-from-use-cases-to-requirements.md)  

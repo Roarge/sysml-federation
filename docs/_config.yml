@@ -71,7 +71,7 @@ series:
       - path: articles/03-what-the-research-overturned.md
         title: "What the research overturned"
         date: 2026-08-27
-        dek: "Before designing anything, I wrote down what I believed about the tools and tried to knock each belief over. Four of the seven claims that mattered fell."
+        dek: "Before designing anything, I wrote down what I believed about the tools and tried to knock each belief over. Three of the six claims that mattered fell."
       - path: articles/04-twelve-use-cases-and-one-moving-bottleneck.md
         title: "Twelve use cases and one moving bottleneck"
         date: 2026-08-27
