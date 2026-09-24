@@ -386,3 +386,28 @@
     for systems engineers. The paper that introduced the A3 architecture
     overview was published in its 2010 proceedings.
   link: https://en.wikipedia.org/wiki/International_Council_on_Systems_Engineering
+
+- id: gqlgen
+  term: gqlgen
+  definition: >-
+    A Go library that generates the code of a GraphQL server from its schema.
+    All three of the demo's services are built with it, and it supports the
+    federation directives and subscriptions they need.
+  link: https://gqlgen.com/
+
+- id: semver
+  term: Semantic versioning
+  definition: >-
+    A convention for version numbers of the form major.minor.patch, such as
+    0.3.0, where each part says how big a change is. A suffix such as -rc.1
+    marks a pre-release.
+  link: https://semver.org/
+
+- id: residual-network
+  term: Residual network
+  definition: >-
+    For a given flow, the network of what could still change. Each edge keeps
+    whatever capacity the flow hasn't used, and gains a reverse edge for the
+    flow it carries, since that flow could be pushed back. A node the source
+    can still reach in it is one more flow could get to.
+  link: https://en.wikipedia.org/wiki/Flow_network
