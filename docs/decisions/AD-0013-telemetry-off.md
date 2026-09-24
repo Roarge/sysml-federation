@@ -4,17 +4,17 @@ Status: accepted, amended twice, once when the image was built and once when the
 
 Amendment, 2026-08-29: the decision as first accepted named four `ENV` lines
 for the image and left `PROMETHEUS_ENABLED=false` to the router child's
-environment alone, so the scrape endpoint stayed open for anyone who ran the
-router binary out of the image directly. The image now carries that variable
-as a fifth `ENV` line beside the four, and it is no part of SR-03.
+environment alone. The scrape endpoint therefore stayed open for anyone who ran
+the router binary out of the image directly. The image now carries that
+variable as a fifth `ENV` line beside the four, and it is no part of SR-03.
 
 Amendment, 2026-09-13: the router's telemetry stays off by environment. When
 the operator names a router configuration file in
 `SYSML_FEDERATION_ROUTER_CONFIG_PATH`, the supervisor hands it to the child as
-`CONFIG_PATH` and the file governs the router's telemetry, because the router's
-own rule makes a file's values win over the environment's. The check session
-uses that to send the router's traces to a collector beside the demo (AD-0031).
-With the variable unset nothing changes.
+`CONFIG_PATH`. The file then governs the router's telemetry, because the
+router's own rule makes a file's values win over the environment's. The check
+session uses that to send the router's traces to a collector beside the demo
+(AD-0031). With the variable unset nothing changes.
 
 ## Context
 
@@ -44,29 +44,29 @@ reach it, and readiness therefore proves nothing about attempts.
 
 The router runs as a child process from the copied vendor binary, driven by
 configuration and environment alone (AD-0010). The variables are set in the
-image. The README's air-gap sentence gains the qualification and names the
-image's variables. What remained to record is the mechanism and
-where it lives.
+image. In the README, the air-gap sentence gains the qualification and names
+the image's variables. What remained to record is the mechanism and where it
+lives.
 
 ## Decision
 
 We will disable every outbound path of the router by setting `DO_NOT_TRACK=1`,
 `COSMO_TELEMETRY_DISABLED=true`, `TRACING_ENABLED=false` and
-`METRICS_OTLP_ENABLED=false` as `ENV` instructions in the Dockerfile, so that
-the variables are part of the image rather than of any launch command, and we
-will set no graph token, so that the router's own token check disables the
-Cosmo Cloud exporters, schema usage tracking and persisted operations as
-well. The supervisor passes the four variables into the router child's
-environment beside `LISTEN_ADDR`, `PLAYGROUND_PATH` and
-`EXECUTION_CONFIG_FILE_PATH`, and SR-03 states them as an obligation on the
-image and the router rather than as a rationale.
+`METRICS_OTLP_ENABLED=false` as `ENV` instructions in the Dockerfile. That way
+the variables are part of the image rather than of any launch command. We will
+set no graph token, so that the router's own token check disables the Cosmo
+Cloud exporters, schema usage tracking and persisted operations as well. The
+supervisor passes the four variables into the router child's environment beside
+`LISTEN_ADDR`, `PLAYGROUND_PATH` and `EXECUTION_CONFIG_FILE_PATH`, and SR-03
+states them as an obligation on the image and the router rather than as a
+rationale.
 
 A fifth `ENV` line sits beside those four, so the Dockerfile carries five.
 `PROMETHEUS_ENABLED=false` closes the scrape endpoint the router opens on
 loopback by default, which the supervisor also closes in the child's
-environment. It is a listener rather than an outbound path, so it is no part
-of SR-03, and its place in the image is for anyone who runs the router binary
-out of the image directly, where nothing builds an environment on their behalf.
+environment. It is a listener rather than an outbound path, so it is no part of
+SR-03. Its place in the image is for anyone who runs the router binary out of
+the image directly, where nothing builds an environment on their behalf.
 
 ## Alternatives considered
 
@@ -90,10 +90,10 @@ that will be forgotten, which is what baking them into the image rules out.
 
 The container makes no outbound connection while it runs, which is what the
 context view states and SR-03 requires, and the README sentence can be
-qualified rather than withdrawn. The four names appear in the Dockerfile, in
+qualified rather than withdrawn. All four names appear in the Dockerfile, in
 the supervisor's environment for the child and in the public text that
-describes static composition, so an organisation building its own image
-around the adapter knows what to set.
+describes static composition, so an organisation building its own image around
+the adapter knows what to set.
 
 The router also serves a Prometheus scrape endpoint, on `127.0.0.1:8088` unless
 it is told otherwise. That is a different mechanism from the exporters this
@@ -110,23 +110,24 @@ the router binary's help lists no environment variables at all, so a release
 that renames one, changes a default or adds a second tracker would announce it
 nowhere. Nor would anything here notice. The test that guards SR-03 asserts the
 environment the supervisor builds for the child, not what the router does with
-it, so a name the router has stopped reading passes it unchanged while the
-container goes back to reporting usage or to opening a scrape port. The router
-version is pinned together with wgc, and every bump means reading the release
-notes and `router/.env.example` for all three names, then starting the
-container at debug level and confirming from its log that usage tracking is
-off and that nothing listens on `127.0.0.1:8088`. AD-0010 sets a fourth
+it. A name the router has stopped reading therefore passes it unchanged while
+the container goes back to reporting usage or to opening a scrape port. The
+router version is pinned together with wgc. Every bump means reading the
+release notes and `router/.env.example` for all three names, then starting the
+container at debug level and confirming from its log that usage tracking is off
+and that nothing listens on `127.0.0.1:8088`. AD-0010 sets a fourth
 undocumented name for a purpose of its own and carries the same obligation, so
 the two are checked in one pass. This is maintenance the demo would not
 otherwise carry.
 
 The claim is only as good as its verification, and readiness is not it. SR-03
-therefore has three parts: a test that the router process's environment
+therefore has three parts. One is a test that the router process's environment
 contains the four variables and that the execution configuration names only
-loopback addresses, an analysis of the paths that could open a connection, and
-a demonstration that runs the container under `docker run --network none` at
-debug log level and watches for connection attempts. The demonstration is a
-spike, and it must pass before the air-gap sentence goes public.
+loopback addresses. Another is an analysis of the paths that could open a
+connection. The third is a demonstration that runs the container under
+`docker run --network none` at debug log level and watches for connection
+attempts. The demonstration is a spike, and it must pass before the air-gap
+sentence goes public.
 
 wgc itself sends usage events unless the same two variables
 are set. Composition is a maintainer step on a connected machine
@@ -137,4 +138,4 @@ image, and this record does not cover it.
 SR-03
 
 ## Sources
-The vendor's `router/.env.example`, which is the one place `DO_NOT_TRACK` and `COSMO_TELEMETRY_DISABLED` are named, and the vendor's pages on tracing and metrics exporters and on running without a graph token. [What the research overturned](../articles/03-what-the-research-overturned.md) for the finding, first inferred from the router's code and later run, and [The image](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-image) in the example's README for the five `ENV` lines, and its verification record for the air-gap demonstration.
+The vendor's `router/.env.example`, which is the one place `DO_NOT_TRACK` and `COSMO_TELEMETRY_DISABLED` are named. The vendor's pages on tracing and metrics exporters and on running without a graph token. [What the research overturned](../articles/03-what-the-research-overturned.md) for the finding, first inferred from the router's code and later run, and [The image](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-image) in the example's README for the five `ENV` lines, and its verification record for the air-gap demonstration.

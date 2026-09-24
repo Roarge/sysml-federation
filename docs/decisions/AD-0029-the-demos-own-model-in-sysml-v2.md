@@ -16,8 +16,8 @@ record of the architecture, with the A3 sheets as the overview for a newcomer
 tracked tests could import them (AD-0022).
 
 The demo has never been modelled. Its stories live as prose and as boards
-published beside the articles, its use cases as a PDF, its requirements and
-design constraints as Markdown tables in the design phase's requirements
+published beside the articles, and its use cases as a PDF. Its requirements and
+design constraints live as Markdown tables in the design phase's requirements
 document, which article 05 describes, and its decisions as the records in this
 directory. Nothing joins those but a reader's attention. The traceability
 self-check AD-0023 planned, a Go test reading `docs/` and failing on a dangling
@@ -28,17 +28,18 @@ organisation's engineering, and keeps its own in prose.
 ## Decision
 
 We will model the demo itself in SysML v2 under `model/`, in a tailored subset
-of a story-driven agile MBSE layout: stakeholders, concerns, the twelve
-storyboard stories and seven added with the model, the forty-five requirements
-restated as system stories with their statements kept, the seven design
-constraints, the architecture and its interfaces, and a verification register
-in which every Go test that carries a requirement identifier, every recorded
-demonstration, the two validators, the make targets, the workflows and every
-live check are actions or cases of their own. The published boards correspond
-to named views. The identifiers of the light scheme are the model's short
-names. A unit test in `internal/trace` fails when the model and the repository
-disagree on an identifier, a test name, a check file, a published image, a
-check's inventory or a compose service.
+of a story-driven agile MBSE layout. The subset covers stakeholders, concerns,
+the twelve storyboard stories and seven added with the model, and the
+forty-five requirements restated as system stories with their statements kept.
+It also covers the seven design constraints, the architecture and its
+interfaces, and a verification register. In that register, every Go test that
+carries a requirement identifier, every recorded demonstration, the two
+validators, the make targets, the workflows and every live check are actions or
+cases of their own. The published boards correspond to named views. The
+identifiers of the light scheme are the model's short names. A unit test in
+`internal/trace` fails when the model and the repository disagree on an
+identifier, a test name, a check file, a published image, a check's inventory
+or a compose service.
 
 ## Alternatives considered
 
@@ -62,8 +63,8 @@ pipeline example and not for the demo that ships it.
 
 ## Consequences
 
-The model is the record of structure and traces. The articles stay the
-narrative and these records stay the rationale, so AD-0021 is amended rather
+The model is the record of structure and traces. These records stay the
+rationale and the articles stay the narrative, so AD-0021 is amended rather
 than replaced, and the A3 sheets keep their place as the overview.
 
 Seven stories and three requirements were added with the model. The stories are
@@ -90,6 +91,11 @@ SR-46, SR-47
 ## Sources
 
 The light requirements scheme (AD-0023), whose identifiers the model reuses as
-short names, the architecture record decision (AD-0021) for what the Markdown
+short names. The architecture record decision (AD-0021) for what the Markdown
 description is, and the tracked helpers decision (AD-0022) for the tree the
-check package joins. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for the forty-five requirements and the traceability as published, and [A model of the demo itself](../articles/12-a-model-of-the-demo-itself.md) for the model as built.
+check package joins. [From use cases to
+requirements](../articles/05-from-use-cases-to-requirements.md) for how the
+forty-five requirements and their traceability were written, [the model of the
+demo](https://github.com/Roarge/sysml-federation/blob/main/model/README.md) for
+the requirements restated as system stories, and [A model of the demo
+itself](../articles/12-a-model-of-the-demo-itself.md) for the model as built.

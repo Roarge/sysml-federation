@@ -14,13 +14,12 @@ on the cover. Those are the vote, the listing and the publication
 rather than a contradiction, and the public text picks one phrasing
 with the press release as its citation and the document number beside it.
 
-The reference tooling has already moved on. The OMG pilot release 2026-07
-conforms to KerML 1.1 Beta 2
-and SysML 2.1 Beta 2, and OpenSysML pins 2.1 Beta 1. The research
-put the question plainly: target the formal 2.0 the README cites, or the
-2.1 Beta 2 the tools implement. On the evidence of the training files it
-judged the constructs the example uses unchanged between the two, and it
-did not read the 2.1 change list.
+The reference tooling has already moved on. Release 2026-07 of the OMG pilot
+conforms to KerML 1.1 Beta 2 and SysML 2.1 Beta 2, and OpenSysML pins
+2.1 Beta 1. The research put the question plainly: target the formal 2.0 the
+README cites, or the 2.1 Beta 2 the tools implement. On the evidence of the
+training files it judged the constructs the example uses unchanged between
+the two, and it did not read the 2.1 change list.
 
 The adapter is a hand-written strict subset parser (AD-0015). A subset
 parser cannot prove conformance, and a SysML-literate reader will load the
@@ -34,21 +33,20 @@ command line needs a paid plan.
 
 Two details of the example are settled only by running a tool. Throughput
 is `attribute throughput : Real` documented as queries per second, because
-hertz is not the unit of an event rate, and the latency requirement uses an
-ISQ duration whose literal form, `200[ms]` or whatever the pilot accepts,
-is quoted from no official file. The plain numeric binding on a Real
-attribute is grammatically a usage declaration plus a value part and was
-not found in an official example either.
+hertz is not the unit of an event rate. The latency requirement uses an ISQ
+duration whose literal form, `200[ms]` or whatever the pilot accepts, is quoted
+from no official file. The plain numeric binding on a Real attribute is
+grammatically a usage declaration plus a value part and was not found in an
+official example either.
 
 ## Decision
 
-We will target SysML 2.0 formal, document formal/26-03-02, in the adapter
-and the example, and validate the example `.sysml` with the OMG pilot
-release 2026-07 and with the OpenSysML command line before any parser test
-uses it as a fixture. Both runs happen locally and
-never in CI, and the example README records the releases used and the
-result. SR-45 states the obligation: the file is accepted without error by
-both tools.
+We will target SysML 2.0 formal, document formal/26-03-02, in the adapter and
+the example. Before any parser test uses the example `.sysml` as a fixture, we
+will validate it with the OMG pilot release 2026-07 and with the OpenSysML
+command line. Both runs happen locally and never in CI, and the example README
+records the releases used and the result. SR-45 states the obligation: the file
+is accepted without error by both tools.
 
 ## Alternatives considered
 
@@ -82,12 +80,12 @@ step the repository otherwise has no use for. OpenSysML is a Go binary and
 costs nothing extra.
 
 Three spikes hang off this record, and the validation run is where they
-close. The first reads the 2.1 Beta 2 change list for requirement
-usage, satisfy, derivation, verification, ports and connections before the
-run. The second settles the `[ms]` literal for the latency requirement. The
-plain numeric binding is confirmed by the same run. Until those are done
-the claim that nothing the example uses changed between 2.0 and 2.1 Beta
-rests on the training files alone.
+close. Before the run, the first reads the 2.1 Beta 2 change list for
+requirement usage, satisfy, derivation, verification, ports and connections.
+The second settles the `[ms]` literal for the latency requirement. The plain
+numeric binding is confirmed by the same run. Until those are done the claim
+that nothing the example uses changed between 2.0 and 2.1 Beta rests on the
+training files alone.
 
 The claim the public text can make is bounded. The adapter and the example
 say 2.0 formal, the validation says the reference tools accept the file,

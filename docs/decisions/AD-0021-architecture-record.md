@@ -14,12 +14,12 @@ tell the story around it and link there. The sheets stay the overview.
 
 ## Context
 
-The repository publishes its design documentation under `docs/`, written for
-someone deciding whether the approach fits their organisation. The README argues for
-federation as the missing integration layer for open MBSE and says nothing
-about where the architecture is written down. The plan closes the design
-phase with public A3 architecture overviews at gate 4, so two documents about
-the same architecture will exist, a Markdown description with views and
+Under `docs/` the repository publishes its design documentation, written for
+someone deciding whether the approach fits their organisation. The README
+argues for federation as the missing integration layer for open MBSE and says
+nothing about where the architecture is written down. The plan closes the
+design phase with public A3 architecture overviews at gate 4, so two documents
+about the same architecture will exist, a Markdown description with views and
 decision records, and a set of A3 sheets. One of them has to be the record.
 
 An A3 architecture overview (Borches 2010)
@@ -29,10 +29,10 @@ recommends four sheets on three levels for this repository, L0, L1, L2a and
 L2b, and says to start with L0 and L2b. Its cookbook is firm about density:
 at most five colours, 14 pt body at A3, "you can't put everything you know in
 this A3, so do not try",
-and a link to another sheet instead of cramming. The same report records
-that every published case ran a review loop of two to four weeks with several
-stakeholders, that a small content change can restructure a sheet, and that a
-public repository maintained by one person has none of that machinery.
+and a link to another sheet instead of cramming. The same report records that
+every published case ran a review loop of two to four weeks with several
+stakeholders, and that a small content change can restructure a sheet. A public
+repository maintained by one person, it notes, has none of that machinery.
 
 The report also names what the format is not for: a decision log, code-level
 detail, normative or contractual description, and content that changes faster
@@ -41,10 +41,10 @@ this repository. The L0 sheet overlaps the README, so one of the two must
 become the summary of the other, and numbers on L1 and L2b drift from the
 code unless they are generated.
 
-Against that stands the architecture description, which carries five views
-each with a text form, the draft subgraph schemas, the process tree, the
-Dockerfile, the exact allowlist and Makefile additions the implementation
-phase makes, and an index of these decision records. That is the material a
+Against that stands the architecture description. It carries five views each
+with a text form, the draft subgraph schemas, the process tree, the Dockerfile,
+the exact allowlist and Makefile additions the implementation phase makes, and
+an index of these decision records. That is the material a
 contributor or an evaluating organisation needs verbatim, and it changes at
 every gate. The plan took its position on Borches' own scope for the format.
 
@@ -52,11 +52,10 @@ every gate. The plan took its position on Borches' own scope for the format.
 
 We will treat the Markdown architecture description, published in the article
 series, together with these decision records, as the record of the
-architecture, and we will treat the A3 sheets designed at gate 4 as the
-overview for a newcomer, and each sheet points back to the record. Every view
-keeps a text form in the description, every decision has an AD record with
-context and consequences,
-and a sheet carries neither a decision log nor normative detail.
+architecture. The A3 sheets designed at gate 4 will serve as the overview for a
+newcomer, and each sheet points back to the record. Every view keeps a text
+form in the description, every decision has an AD record with context and
+consequences, and a sheet carries neither a decision log nor normative detail.
 
 ## Alternatives considered
 
@@ -70,9 +69,9 @@ two to four week review loop to keep such a sheet honest.
 
 A full arc42 template as the record. It maps onto ISO/IEC/IEEE 42010 and
 covers constraints, quality scenarios, decisions and risks in full. Twelve
-sections is heavier than a proof of concept readable in an afternoon
-warrants, many of them would read as ceremony, and the template does not
-compress to a wall sheet, so it would not have replaced the A3 sheets either.
+sections is heavier than a proof of concept readable in an afternoon warrants,
+and many of them would read as ceremony. The template does not compress to a
+wall sheet, so it would not have replaced the A3 sheets either.
 
 C4 diagrams as the record. C4 gives a developer the software decomposition
 with a review checklist and can serve as the physical view inside a sheet.
@@ -89,8 +88,8 @@ reaches a sheet at its next re-issue, so a sheet may lag and its status block
 has to say so. Two documents about one architecture still exist and the
 research's drift warning stands. The L1 field-ownership table and the L2b
 worked numbers are the candidates for generation from the running example
-rather than typing, which gate 4 settles, and the L0 sheet condenses the
-README rather than the README condensing the sheet.
+rather than typing, which gate 4 settles. At L0 the sheet condenses the README
+rather than the README condensing the sheet.
 
 The decision records carry the rationale, which is where the 42010 concepts
 of decision and rationale land without a conformance claim. Each record costs

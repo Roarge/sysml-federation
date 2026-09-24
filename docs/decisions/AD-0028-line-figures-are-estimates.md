@@ -15,12 +15,12 @@ document that carried the number, and the raised figure was itself overtaken,
 which took a second round of the same (AD-0027).
 
 The bookkeeping was the smaller cost. A figure written as a limit pushes in the
-wrong direction at exactly the wrong moment, because the cheapest lines to give
-up are the doc comments the linter asks for, the positioned refusals that make
-the adapter honest, and the guards that keep a refusal from being reached by
-accident. Those are the parts a reader in an afternoon most needs, and they are
-also where a correctness fix lands. A refusal that is missing is repaired by
-writing more of it and never by writing less.
+wrong direction at exactly the wrong moment. That is because the cheapest lines
+to give up are the doc comments the linter asks for, the positioned refusals
+that make the adapter honest, and the guards that keep a refusal from being
+reached by accident. Those are the parts a reader in an afternoon most needs,
+and they are also where a correctness fix lands. A refusal that is missing is
+repaired by writing more of it and never by writing less.
 
 ## Decision
 

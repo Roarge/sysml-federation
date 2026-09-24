@@ -2,10 +2,10 @@
 
 Status: accepted, amended once the viewer was built. Date: 2026-08-27.
 
-Amendment, 2026-08-28: the decision as first accepted put the editable
-numbers inline at the literals' own positions, and it was revised to the
-edit panel described below once the projection turned out to publish no
-source spans for an inline input to anchor to.
+Amendment, 2026-08-28: the decision as first accepted put the editable numbers
+inline at the literals' own positions. It was revised to the edit panel
+described below once the projection turned out to publish no source spans for
+an inline input to anchor to.
 
 ## Context
 
@@ -20,25 +20,24 @@ apps are plain HTML and ES modules with no build step (AD-0017).
 
 ## Decision
 
-We will make the model viewer a text pane and a sketch side by side. The
-text pane renders the model's source with keywords, names, literals,
-strings and comments distinguished by a small tokeniser whose keyword table
-cites the specification's reserved words (SR-11). The editable set, the
-throughput of each server and the limit of the global throughput
-requirement, is offered in an edit panel inside the text pane, above the
-model text. The panel carries a control for each editable attribute of the
-parts directly inside a root part, and every editable throughput sits
-there. A requirement's limit gets one only when the projection marks it
-editable and the requirement has reached a verdict. Nothing computes
-latency, so the latency requirement stands inconclusive and its limit gets
-no control even though the projection publishes that limit as editable.
-Every other value is read-only and the text itself is not editable (SR-13).
-The sketch is drawn from the model's connections as a left-to-right graph
-showing each server's throughput, the pipeline's capacity and the
-bottleneck servers marked in red (SR-12). Each requirement shows its
-verdict and reason (SR-14), and a failing requirement block is red, the
-only colour accent in the viewer (SR-15). Everything the viewer shows
-arrives through the router, and it computes nothing.
+We will make the model viewer a text pane and a sketch side by side. The text
+pane renders the model's source with keywords, names, literals, strings and
+comments distinguished by a small tokeniser whose keyword table cites the
+specification's reserved words (SR-11). The editable set, the throughput of
+each server and the limit of the global throughput requirement, is offered in
+an edit panel inside the text pane, above the model text. Each editable
+attribute of the parts directly inside a root part gets a control in the panel,
+and every editable throughput sits there. A requirement's limit gets one only
+when the projection marks it editable and the requirement has reached a
+verdict. Nothing computes latency, so the latency requirement stands
+inconclusive and its limit gets no control even though the projection publishes
+that limit as editable. Every other value is read-only and the text itself is
+not editable (SR-13). The sketch is drawn from the model's connections as a
+left-to-right graph showing each server's throughput, the pipeline's capacity
+and the bottleneck servers marked in red (SR-12). Each requirement shows its
+verdict and reason (SR-14), and a failing requirement block is red, the only
+colour accent in the viewer (SR-15). Everything the viewer shows arrives
+through the router, and it computes nothing.
 
 ## Alternatives considered
 
@@ -64,16 +63,15 @@ most visual, the furthest from a SysML viewer, and the most drawing work.
 
 The viewer carries two renderers, a tokeniser of roughly forty lines and a
 layered left-to-right layout of a small graph, both hand-written and both
-within the scale SC-06 expects. The text pane and the projection can never
-disagree, because the adapter patches edited literals into the served text
-(SR-22) and the viewer renders that text. The sketch shows the capacity and the
+within the scale SC-06 expects. Because the adapter patches edited literals
+into the served text (SR-22) and the viewer renders that text, the text pane
+and the projection can never disagree. The sketch shows the capacity and the
 bottleneck exactly as the capacity service returns them, so the viewer is a
-faithful client and never a second implementation of the rollup. The
-tokeniser is not a parser. SR-11 is verified by demonstration and
-inspection, and the tokeniser is a pure function that needs no browser, so
-checks assert its token kinds, its byte spans, its escaping and its keyword
-table directly. The gate runs those checks where Node is present and skips
-them where it is not.
+faithful client and never a second implementation of the rollup. The tokeniser
+is not a parser. SR-11 is verified by demonstration and inspection, and the
+tokeniser is a pure function that needs no browser, so checks assert its token
+kinds, its byte spans, its escaping and its keyword table directly. The gate
+runs those checks where Node is present and skips them where it is not.
 
 An input at a literal's own position stays out of reach while the projection
 carries no source spans. Placing one would mean searching the served text for

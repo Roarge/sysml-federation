@@ -21,17 +21,17 @@ holding data the model does not contain can attach that data to the model's
 objects without either side knowing about the other. And the contract
 between producer and consumer must be checked mechanically before
 deployment. The brief restates the demo's purpose in the README's words,
-that federation is the missing integration layer for open MBSE, and notes
-that the demo shows the first two conditions while the repository shows
-the third through a test that fails when a subgraph schema and the composed
+that federation is the missing integration layer for open MBSE. It notes
+that the demo shows the first two conditions while the repository shows the
+third through a test that fails when a subgraph schema and the composed
 configuration drift apart.
 
 The audience fixes what an acceptable answer may cost. Organisations with
 fewer than twenty-five engineers have nobody employed to do integration
-full time, which is the assumption both the service bus generation and
-OSLC carried and the reason those answers stayed the preserve of
-organisations that could staff them. A central component every team
-changes together fails the same test.
+full time. Both the service bus generation and OSLC carried the assumption
+of a full-time integrator, and that assumption is the reason those answers
+stayed the preserve of organisations that could staff them. A central
+component every team changes together fails the same test.
 
 Three further decisions sit on top of that. Every read, write and
 subscription from the two apps goes through the router. The adapter's
@@ -51,14 +51,14 @@ AD-0011's.
 
 We will publish the SysML model, the capacity analysis and the document
 structure as three independently owned federated subgraphs behind one
-router, with no service importing, calling or reading the data of another,
-and with every query, mutation and subscription from the two apps sent to
-the router. The adapter declares `Part`, `Requirement` and
-`VerificationCase` as entities keyed on `id`, the capacity service
-contributes `capacity`, `bottleneck`, `verdict` and `verdictReason` to
-those entities from the fields its `@requires` names, the document service
-contributes `documentNumber` and `included`, and composition merges the
-three schemas into the one the router serves.
+router. No service will import, call or read the data of another, and every
+query, mutation and subscription from the two apps will be sent to the
+router. The adapter declares `Part`, `Requirement` and `VerificationCase`
+as entities keyed on `id`. From the fields its `@requires` names, the
+capacity service contributes `capacity`, `bottleneck`, `verdict` and
+`verdictReason` to those entities. The document service contributes
+`documentNumber` and `included`, and composition merges the three schemas
+into the one the router serves.
 
 ## Alternatives considered
 
@@ -99,7 +99,7 @@ it understands in the notation suited to it, and the only thing anyone has
 to agree on is keys. The demo makes this visible in the playground, where
 one query returns a requirement's text from the adapter, its verdict from
 the capacity service and its document number from the document service in
-one response (SR-43), and the apps prove it by being pure clients of the
+one response (SR-43). Both apps prove it by being pure clients of the
 router (SR-40) that compute nothing.
 
 The costs are real. Federation is a platform problem, so the choice commits
@@ -108,12 +108,12 @@ that is AD-0002. The agreement between adapter and capacity service is
 larger than the word "keys" suggests. The field set in the service's
 `@requires` is a structural dependency on the generic projection, and SR-31
 states it as such so nobody mistakes the contract for smaller than it is.
-The nested-list `@requires` the capacity service needs is the one
-federation feature the design leans on that has not been exercised, and the
-spike that settles it runs first in the implementation phase. Three services and a
-router are four servers where a single service would be one, which is
-what forces the single-image supervisor of AD-0011, and a router that is
-absent takes both apps down with it, which SR-40's test relies on.
+Of the federation features the design leans on, the nested-list `@requires`
+the capacity service needs is the one that has not been exercised, and the
+spike that settles it runs first in the implementation phase. Three
+services and a router are four servers where a single service would be one,
+which is what forces the single-image supervisor of AD-0011. A router that
+is absent takes both apps down with it, which SR-40's test relies on.
 
 ## Requirements affected
 SR-40, SR-41, SR-43

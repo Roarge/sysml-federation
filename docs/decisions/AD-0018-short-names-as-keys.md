@@ -10,25 +10,23 @@ declare the same key, and the router merges on it without either service
 importing the other. Adding a twelfth model, the README goes on, needs no
 renegotiation with the other eleven "because the only thing anyone has to
 agree on is keys". What the key is for a SysML v2 model it does not say.
-The question has to be answered once, because three services share the
-answer: the adapter publishes the key, the capacity service resolves
-entities by it, and the document service stores it as a foreign key in its
-shipped tree.
+Because three services share the answer, the question has to be answered once.
+The adapter publishes the key, the capacity service resolves entities by it,
+and the document service stores it as a foreign key in its shipped tree.
 
 The language offers one author-controlled identifier. Any definition or
 usage may carry a short name in angle brackets before its name, as in
 `<'PIPE-R1'>`, and the official files use both the quoted and the unquoted
-form. At the API level an element's `elementId` is a UUID assigned
-by the tool, the API 1.0 OpenAPI has `alias` arrays on Project and Commit
-and no `humanId` field on elements, and short names are optional per
-element. Whether the pilot's serialiser produces the same
-`elementId` for the same text on two runs is not verifiable from public
-documents.
+form. At the API level an element's `elementId` is a UUID assigned by the tool.
+The API 1.0 OpenAPI has `alias` arrays on Project and Commit and no `humanId`
+field on elements, and short names are optional per element. Whether the
+pilot's serialiser produces the same `elementId` for the same text on two runs
+is not verifiable from public documents.
 
 The brief's example table gives every server, the pipeline, every
 requirement and the verification case a short name in the PIPE family, and
 states that "short names are the entity keys and are shown in both apps".
-The adapter reads files rather than fronting a repository (AD-0003), so no
+Because the adapter reads files rather than fronting a repository (AD-0003), no
 tool-assigned identifier exists at all until a conforming repository stands
 behind it.
 
@@ -38,9 +36,9 @@ identifiers seen in both apps, and SR-21 was added.
 
 ## Decision
 
-We will identify every projected element by its declared SysML short name,
-and by its qualified name where the element declares none, and use that
-identifier as the `id` field and the `@key` of `Part`, `Requirement` and
+We will identify every projected element by its declared SysML short name, and
+by its qualified name where the element declares none. That identifier serves
+as the `id` field and the `@key` of `Part`, `Requirement` and
 `VerificationCase` in the adapter's schema. The capacity service and the
 document service declare the same key and nothing else about identity.
 Every published element in the example carries a short name, so the
@@ -60,10 +58,10 @@ typed into the playground.
 
 The qualified name for every element. The research placed it beside the
 short name as the other author-controlled and stable identifier, and the
-design keeps it as the fallback. It lost first place because the brief
-shows the short name in both apps and the playground query in the
-architecture asks for `requirement(id: "PIPE-R1")`, so the key a reader
-meets in the document, the viewer and the playground is the short one.
+design keeps it as the fallback. It lost first place because the brief shows
+the short name in both apps and the playground query in the architecture asks
+for `requirement(id: "PIPE-R1")`. The key a reader meets in the document, the
+viewer and the playground is therefore the short one.
 
 An alias or human id from the API. None exists at element level in API
 1.0, so there was nothing to choose.
@@ -85,8 +83,8 @@ name.
 
 Renaming a short name is a breaking change for every service that stores
 it, and the demo does not handle it. The document service's shipped tree
-would name an id the adapter no longer serves. The brief lists renames as
-out of scope.
+would name an id the adapter no longer serves. Renames are listed as out of
+scope in the brief.
 
 The research adds that a projection keyed on a value the model text
 carries, rather than on anything a tool assigns, makes a later swap to a

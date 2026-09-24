@@ -1,10 +1,15 @@
 # AD-0014 Subscriptions as version events with client refetch
 
-Status: accepted, amended once the check session was added. Date: 2026-08-27.
+Status: accepted, amended twice, once when the check session was added and
+once when the compose input's subprotocol was corrected. Date: 2026-08-27.
 
 Amendment, 2026-09-13: the sentence on browser automation was corrected when
 the check session added browser specs that run on the monitoring service's
 runners.
+
+Amendment, 2026-09-24: the Decision said the compose input registers both
+services with subprotocol `auto`. The input names `graphql-transport-ws`, as
+the amendment to AD-0012 records, and the Decision now says so.
 
 ## Context
 
@@ -32,29 +37,29 @@ mutation increments it, and the document service keeps its own (AD-0003).
 
 On the browser side the vendor's SSE page documents a fetch POST with
 `Accept: text/event-stream` read through a `ReadableStream`, with no retry
-logic in its example, and says of `EventSource` that a compatible interface
-"is not very difficult to add, but we haven't seen the need for it yet".
-One SSE subscription is one HTTP connection, and an HTTP/1 browser
-allows about six per origin, so two open tabs, the viewer with one
-subscription and the document with two, hold three against it. Both
-apps share one origin through the UI server's reverse proxy, which flushes
-`text/event-stream` at once and proxies WebSocket upgrades (AD-0011).
+logic in its example. It says of `EventSource` that a compatible interface
+"is not very difficult to add, but we haven't seen the need for it yet". One
+SSE subscription is one HTTP connection, and an HTTP/1 browser allows about six
+per origin, so two open tabs, the viewer with one subscription and the document
+with two, hold three against it. Both apps share one origin through the UI
+server's reverse proxy, which flushes `text/event-stream` at once and proxies
+WebSocket upgrades (AD-0011).
 
 ## Decision
 
-We will make each subscription carry nothing but a version number and make
-each app refetch its whole query when one arrives. The adapter exposes
+We will make each subscription carry nothing but a version number and make each
+app refetch its whole query when one arrives. The adapter exposes
 `Subscription.modelChanged: Int!` and emits the new `Model.version` after every
-accepted mutation, the document service exposes
-`Subscription.documentChanged: Int!` and does the same for its own counter, and
-on every event the viewer and the document re-run their ordinary query against
-the router, which plans it across the three subgraphs as it would any other
-read. Towards the router both services serve subscriptions through gqlgen's
-WebSocket transport, registered in the compose input with protocol `ws` and
-subprotocol `auto`. Towards the browser the shared `graphql.js` module opens
-SSE over fetch POST with `Accept: text/event-stream`, reads the stream with a
-`ReadableStream` reader that parses `event:` and `data:` lines, and reconnects
-on drop.
+accepted mutation. The document service exposes `Subscription.documentChanged:
+Int!` and does the same for its own counter. On every event the viewer and the
+document re-run their ordinary query against the router, which plans it across
+the three subgraphs as it would any other read. Towards the router both
+services serve subscriptions through gqlgen's WebSocket transport, registered
+in the compose input with protocol `ws` and subprotocol `graphql-transport-ws`,
+the one gqlgen serves ([AD-0012](AD-0012-composition-committed.md)). Towards
+the browser the shared `graphql.js` module opens SSE over fetch POST with
+`Accept: text/event-stream`, reads the stream with a `ReadableStream` reader
+that parses `event:` and `data:` lines, and reconnects on drop.
 
 ## Alternatives considered
 

@@ -5,12 +5,12 @@ Status: accepted. Date: 2026-08-27.
 ## Context
 
 The coding rules forbid the empty interface in any value position: not
-`interface{}` and not `any`, in parameters, results, struct fields, variables,
-map, slice, array, channel and pointer element types, type arguments, named
-types, aliases or constraint type sets, with `any` permitted only as a
-type-parameter constraint. The rule governs what this code
-declares and not what a dependency accepts, which is why go-cmp is allowed
-despite its own signatures.
+`interface{}` and not `any`. That covers parameters, results, struct fields,
+variables, map, slice, array, channel and pointer element types, type
+arguments, named types, aliases and constraint type sets. They permit `any`
+only as a type-parameter constraint. The rule governs what this code declares
+and not what a dependency accepts, which is why go-cmp is allowed despite its
+own signatures.
 
 The three subgraphs are federated GraphQL services, two of them with
 subscriptions (AD-0001, AD-0014). gqlgen is the only credible Go library for
@@ -48,10 +48,10 @@ that `go generate` rewrites does not survive the next regeneration.
 
 The rule keeps its force where it was meant to apply. Every hand-written file
 under `adapter/`, `examples/` and `cmd/` is checked as before, and the one
-foreseeable exception is named in advance, so its
-appearance in a pull request is expected rather than negotiated. gqlgen's
-output carries the standard header, so no file has to be listed by name and
-regeneration does not disturb the configuration.
+foreseeable exception is named in advance, so its appearance in a pull request
+is expected rather than negotiated. Because gqlgen's output carries the
+standard header, no file has to be listed by name and regeneration does not
+disturb the configuration.
 
 The exemption rests on a one-line header, which proves nothing on its own. A
 hand-written file that copied it would escape the rule, and only review would

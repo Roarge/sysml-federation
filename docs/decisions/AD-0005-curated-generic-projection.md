@@ -16,43 +16,44 @@ and the things that satisfy it, and nothing else is visible.
 The README also sets the adapter a goal that pulls the other way. Coverage of
 the whole language, so that any conforming model can be served without the
 adapter knowing what it models, points towards generating a few hundred types
-mechanically from KerML, which would land the consumer back in the abstract
+mechanically from KerML. Doing so would land the consumer back in the abstract
 syntax the projection exists to spare them. The README states its current
 view, that coverage should grow as curated domain projections one at a time
-with a generic escape hatch for elements nobody has projected yet, and adds
+with a generic escape hatch for elements nobody has projected yet. It adds
 that this is the part of the design most likely to change. That is the
 question this record inherits.
 
 Two facts bound the answer for this phase. The adapter reads the textual
 notation through a hand-written strict subset parser (AD-0015) that owns a
-small AST, which is what keeps the projection plainly typed, and the
-repository forbids the empty interface in any value position of hand-written
-code, so a type that holds whatever an element happens to carry has no
-natural home. The only author-controlled stable identifier in the language is
-the declared short name, which AD-0018 makes the entity key.
+small AST, which is what keeps the projection plainly typed. Alongside that,
+the repository forbids the empty interface in any value position of
+hand-written code, so a type that holds whatever an element happens to carry
+has no natural home. The only author-controlled stable identifier in the
+language is the declared short name, which AD-0018 makes the entity key.
 
-The rollup fixed the field set. To compute a capacity the analysis needs
-parts with a numeric attribute, directed connections between sibling parts,
-and a requirement with a subject, a constrained quantity, a comparison and a
-limit, and the plan observes that this set is generic. The resulting
-projection is parts, attributes, ports, connections, requirements with their
-relationships and verification cases, the model's text and version, and with
-it comes the whole of what the capacity service and the adapter agree on: the
-entity key, the field set in the service's `@requires`, and two configured
-names. The words "server" and "pipeline" stay in the example and the two apps.
+The rollup fixed the field set. To compute a capacity the analysis needs parts
+with a numeric attribute, directed connections between sibling parts, and a
+requirement with a subject, a constrained quantity, a comparison and a limit.
+The plan observes that this set is generic. The resulting projection is parts,
+attributes, ports, connections, requirements with their relationships and
+verification cases, and the model's text and version. With it comes the whole
+of what the capacity service and the adapter agree on: the entity key, the
+field set in the service's `@requires`, and two configured names. The words
+"server" and "pipeline" stay in the example and the two apps.
 
 ## Decision
 
 We will publish the model through a curated set of plainly typed GraphQL
 types, `Model`, `Part`, `Attribute`, `Port`, `Connection`, `Requirement` and
-`VerificationCase`, chosen by what the services downstream need to read
-rather than generated from the metamodel, with no identifier from the example
-anywhere in the adapter. The schema lives in `adapter/schema.graphql`, the
-subset parser produces an AST with source spans, and the projection package
-maps resolved elements onto those types and holds nothing the schema does not
-show. A construct outside the subset is refused at start with its file, line
-and column rather than served through a generic type, and the escape hatch
-the README describes stays open as a question for a later phase.
+`VerificationCase`. They are chosen by what the services downstream need to
+read rather than generated from the metamodel, and no identifier from the
+example appears anywhere in the adapter. The schema lives in
+`adapter/schema.graphql`, the subset parser produces an AST with source spans,
+and the projection package maps resolved elements onto those types and holds
+nothing the schema does not show. A construct outside the subset is refused at
+start with its file, line and column rather than served through a generic
+type, and the escape hatch the README describes stays open as a question for a
+later phase.
 
 ## Alternatives considered
 
@@ -83,13 +84,13 @@ smaller than it is (SR-31).
 
 A consumer of the graph meets a requirement with an id, a name, text, a
 subject, a quantity, a comparison and a limit, and never a usage or an owned
-membership. The adapter contains no identifier from the example (SR-17), a
-second fixture model with other names and wiring is part of its tests
-(SR-16), and every element is identified by its short name with the qualified
-name as fallback (SR-21). The contract between the adapter and the capacity
-service fits on the L1 sheet as its quantification block. Because every
-projected field has a declared type, the empty-interface rule holds in the
-adapter's hand-written code without an exception.
+membership. The adapter contains no identifier from the example (SR-17), and a
+second fixture model with other names and wiring is part of its tests (SR-16).
+Every element is identified by its short name with the qualified name as
+fallback (SR-21). The contract between the adapter and the capacity service
+fits on the L1 sheet as its quantification block. Because every projected
+field has a declared type, the empty-interface rule holds in the adapter's
+hand-written code without an exception.
 
 The cost is coverage. What the adapter serves today is a fraction of the
 language, every new construct is adapter work, and a model that uses

@@ -49,7 +49,7 @@ capacity: Float
 
 The value types carry `@external` on the fields the selections read and no `@shareable`. `VerificationCase` is keyed `resolvable: false`, because the capacity service only reads it. The first spike of the build confirmed that Cosmo composition and gqlgen's `explicit_requires` carry this nested shape intact.
 
-The document service's shipped tree names the example's requirement ids in a configuration file, the one place the example's identifiers enter a service. It never reads the model. For an id it has never heard of, its entity resolver answers `included: false` and `documentNumber: null` ([the document owns its structure](../decisions/AD-0025-document-owns-its-structure.md)).
+The document service's shipped tree names the example's requirement ids in a configuration file, the one place the example's identifiers enter a service. It never reads the model. For an id it has never heard of, its entity resolver answers `included: false` and `documentNumber: null` ([the document owns its structure](../decisions/AD-0025-document-owns-its-structure.md)). So a requirement that isn't in the shipped tree isn't in the document.
 
 In the merged schema, `Requirement` carries text and limit from the adapter, verdict and reason from the capacity service, and number and inclusion from the document service. The router resolves `requirement(id: "PIPE-R1") { text verdict verdictReason documentNumber }` with three fetches. It asks the adapter for the requirement and every field the capacity service requires, then the capacity service's entity resolver with those fields as the representation, then the document service's entity resolver with the key.
 

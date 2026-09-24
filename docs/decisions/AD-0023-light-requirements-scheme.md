@@ -15,9 +15,8 @@ its services, its image and its repository. The other is the pipeline the
 example model describes, whose requirements are declared inside the `.sysml`
 file with short names such as `PIPE-R1`. The research notes on requirements
 practice observe that a reader meets both in the same document and that a
-mix-up has to be visible from the shape of the identifier alone. The README
-says nothing about how the repository's own requirements are written or
-numbered.
+mix-up has to be visible from the shape of the identifier alone. Nothing in the
+README says how the repository's own requirements are written or numbered.
 
 A heavier systems engineering methodology, with its own identifier shapes and
 file rules, was the alternative. The repository is public and meant to be read
@@ -25,23 +24,23 @@ in an afternoon (SC-06), and `docs/` is written for someone deciding whether
 the approach fits their organisation, which argues against a page of
 conventions before the first requirement.
 
-The research recommended persona-first stories with Given/When/Then
-criteria, EARS statements for behaviour with a plain shall form for
-constraints, shape-distinct identifiers plus the fixed phrase "model
-requirement", decision records with four-digit numbers and Nygard sections,
-and hand-maintained one-hop Markdown traceability tables. Gate 2 added the
+The research recommended persona-first stories with Given/When/Then criteria,
+and EARS statements for behaviour with a plain shall form for constraints. It
+also recommended shape-distinct identifiers plus the fixed phrase "model
+requirement", decision records with four-digit numbers and Nygard sections, and
+hand-maintained one-hop Markdown traceability tables. Gate 2 added the
 `SC-nn` prefix for design constraints, after the requirements document
 had separated design constraints, which take a plain statement, from
 behaviour, which takes EARS.
 
 ## Decision
 
-We will number the repository's own artefacts with a light scheme: `US-nn`
-for user stories, `SR-nn` for system requirements written in EARS form,
-`SC-nn` for design constraints written as plain statements, `AD-nnnn` for
-decision records, and `C-nn` for the entries on the technical constraints
-card, while a requirement that lives inside the example model is shown by its
-SysML short name, in code font, and is always called a model requirement.
+We will number the repository's own artefacts with a light scheme: `US-nn` for
+user stories, `SR-nn` for system requirements written in EARS form, and `SC-nn`
+for design constraints written as plain statements. Decision records take
+`AD-nnnn`, and the entries on the technical constraints card take `C-nn`. A
+requirement that lives inside the example model is instead shown by its SysML
+short name, in code font, and is always called a model requirement.
 Traceability is one hop per table, an identifier is never reused once
 retired, and a withdrawn constraint keeps its number with a note saying why.
 
@@ -92,4 +91,4 @@ none
 
 ## Sources
 
-Mavin's EARS patterns and ISO/IEC/IEEE 29148:2018 on traceability, which fix the requirement syntax and the shape of the tables. [What the research overturned](../articles/03-what-the-research-overturned.md) for the practice this scheme is drawn from, and [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for the forty-five requirements and the traceability as published.
+Mavin's EARS patterns and ISO/IEC/IEEE 29148:2018 on traceability, which fix the requirement syntax and the shape of the tables. [What the research overturned](../articles/03-what-the-research-overturned.md) for the practice this scheme is drawn from, and [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) for how the forty-five requirements and their traceability were written. 

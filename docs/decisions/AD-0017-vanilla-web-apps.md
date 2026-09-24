@@ -8,15 +8,14 @@ runners.
 
 ## Context
 
-The demo puts two web apps in front of the router so that the sharing of
-data is seen rather than asserted: a model viewer that renders the SysML v2
-source with editable numbers beside a sketch drawn from the wiring
-(AD-0026), and a requirements document whose owner reorders, nests and
-annotates it (AD-0025).
-The README says of the interface for making a change that it "is not
-settled yet and does not matter to the argument", and it closes with the
-promise of "something small enough to read in an afternoon". Every
-line of browser code counts against that promise.
+The demo puts two web apps in front of the router so that the sharing of data
+is seen rather than asserted. One is a model viewer that renders the SysML v2
+source with editable numbers beside a sketch drawn from the wiring (AD-0026).
+The other is a requirements document whose owner reorders, nests and annotates
+it (AD-0025). The README says of the interface for making a change that it "is
+not settled yet and does not matter to the argument", and it closes with the
+promise of "something small enough to read in an afternoon". Every line of
+browser code counts against that promise.
 
 The repository is a Go module with one dependency and no Node toolchain.
 CI runs the unit tests and an image publish on version tags, and nothing
@@ -25,34 +24,33 @@ also have to work with the host offline, because a font or script fetched
 from another origin would break the launch story and the air-gap claim
 without any service being at fault (SR-10).
 
-The research settled what a browser can do here without a library. No SysML
-v2 text renderer exists that can be vendored as one permissively licensed
-file. Drag and drop over nested lists is the one place where
-hand-written code would run to sixty lines at the least and a hundred and
-fifty at the most, and SortableJS 1.15.7 covers it in a single MIT file of
-45,478 bytes with no dependencies. Live updates reach a browser from
-the Cosmo router over SSE on a fetch POST, the path the vendor documents.
-Go's standard library serves an embedded directory with correct MIME
-types and no cache headers, and its reverse proxy carries event streams and
-WebSocket upgrades, so one origin needs no CORS configuration.
-Native ES modules do not load from file URLs, HTML5 drag and drop is
-missing from two mobile browsers and the brief states desktop first,
-and one SSE subscription holds one of the six HTTP/1 connections a browser
-allows per origin.
+The research settled what a browser can do here without a library. No SysML v2
+text renderer exists that can be vendored as one permissively licensed file.
+Drag and drop over nested lists is the one place where hand-written code would
+run to sixty lines at the least and a hundred and fifty at the most.
+SortableJS 1.15.7 covers it in a single MIT file of 45,478 bytes with no
+dependencies. Live updates reach a browser from the Cosmo router over SSE on a
+fetch POST, the path the vendor documents. Go's standard library serves an
+embedded directory with correct MIME types and no cache headers, and its
+reverse proxy carries event streams and WebSocket upgrades, so one origin needs
+no CORS configuration. Native ES modules do not load from file URLs. HTML5
+drag and drop is missing from two mobile browsers, and the brief states
+desktop first. One SSE subscription holds one of the six HTTP/1 connections a
+browser allows per origin.
 
 ## Decision
 
-We will write both apps as plain HTML, CSS and native ES modules with no
-build step and no node_modules, embed them in the Go binary and serve them
-from `embed.FS` through a wrapping handler that sets `Cache-Control:
-no-cache`, send queries and mutations by fetch POST, read live updates
-over SSE on a fetch POST with a reconnecting ReadableStream reader, draw
-the sketch as inline SVG, render the model text with a hand-written
-tokeniser of about forty lines, and vendor exactly one third-party file,
-SortableJS 1.15.7 under MIT, for drag and drop in the document app. The UI
-server that serves both apps and proxies the router belongs to the image
-rather than to either app, and the apps are clients of the router
-and of nothing else (SR-40).
+We will write both apps as plain HTML, CSS and native ES modules with no build
+step and no node_modules. Both are embedded in the Go binary and served from
+`embed.FS` through a wrapping handler that sets `Cache-Control:
+no-cache`. The apps send queries and mutations by fetch POST and read live
+updates over SSE on a fetch POST with a reconnecting ReadableStream reader.
+They draw the sketch as inline SVG and render the model text with a
+hand-written tokeniser of about forty lines. We will vendor exactly one
+third-party file, SortableJS 1.15.7 under MIT, for drag and drop in the
+document app. The UI server that serves both apps and proxies the router
+belongs to the image rather than to either app, and the apps are clients of the
+router and of nothing else (SR-40).
 
 ## Alternatives considered
 
