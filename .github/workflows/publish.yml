@@ -4,9 +4,11 @@ on:
   push:
     tags: ['v*']
 
-permissions:
-  contents: read
-  packages: write
+# Each job is granted its own scopes. The publish job checks out and pushes
+# under contents: read and packages: write, the latest job moves a tag under
+# the same two, and the smoke legs hold no scope at all, because they pull the
+# image the way a stranger would.
+permissions: {}
 
 # One publish at a time. The group deliberately leaves the ref out, because two
 # version tags are two different refs and a per-ref group would let them run
@@ -32,8 +34,17 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     # A two-platform build that hangs would otherwise hold a runner for six
-    # hours. The build and the two read-backs take a few minutes.
+    # hours. The build and the manifest read-back take a few minutes.
     timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    # The later jobs name the image they pull, run and tag by the digest the
+    # build reported rather than by the version tag, so it is handed on from
+    # here together with the version.
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+      version: ${{ steps.meta.outputs.version }}
     steps:
       # Every action is pinned to a commit, because this job holds packages:
       # write and a registry credential, and a re-pointed major tag would run
@@ -57,9 +68,10 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
           # No latest tag from here, by decision rather than by omission. This
-          # step runs before the image has been measured, and latest is what an
-          # untagged pull returns, so it is moved by a later step that runs only
-          # once the size gate has passed and only for a full release.
+          # step runs before the image has been measured or run, and latest is
+          # what an untagged pull returns, so it is moved by a later job, only
+          # once the size gate and both native runs have passed and only for a
+          # full release.
           flavor: |
             latest=false
 
@@ -103,8 +115,9 @@ jobs:
           repo="$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')"
           # The build step reports the digest of the index it pushed. A tag is
           # a mutable pointer and re-resolving one would measure whatever it
-          # names by the time this step runs, so the gate and the latest move
-          # both name the digest and are talking about the same bytes by
+          # names by the time this step runs, so the gate, the native runs and
+          # the latest move all name the digest, which the later jobs receive
+          # as an output of this job, and are talking about the same bytes by
           # construction. An absent digest is caught here rather than becoming
           # a malformed reference below.
           case "$DIGEST" in
@@ -166,19 +179,267 @@ jobs:
             fi
           done
 
-      # Registry-counted sizes cannot be had without pushing, so the image goes
-      # up under its version tag first and is measured where it landed. Only now
-      # does latest move. A gate that fails takes the job down before this step,
-      # and latest keeps pointing where it pointed, so an untagged pull never
-      # returns an image the gate rejected. The version tag itself is left in
-      # the registry and has to be deleted by hand.
-      - name: Move latest to the measured image (SR-01)
+  # Docker Desktop on Windows and macOS runs Linux containers in a virtual
+  # machine of the host's own architecture, and pulls the manifest that
+  # matches it: linux/amd64 on an x86-64 PC or an Intel Mac, linux/arm64 on
+  # Apple silicon. Each leg here is a Linux runner of one of those two
+  # architectures, which pulls and runs the manifest such a host pulls. A leg
+  # that passes shows that the image its architecture pulls starts and serves
+  # the demo. It shows nothing about Docker Desktop itself, and it does not
+  # hold the start to the ten-second budget, which SR-02 measures with the
+  # supervisor's own startup test on its reference host.
+  smoke:
+    needs: publish
+    strategy:
+      # A red leg leaves the other running, so one run reports both.
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+            machine: x86_64
+            elf: x86-64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            machine: aarch64
+            elf: ARM aarch64
+    # Both labels name the Ubuntu release rather than a moving alias, so the
+    # two legs differ in architecture and not in release.
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    permissions: {}
+    steps:
+      # The step uses no action and no checkout. It is a shell script over
+      # docker, curl, jq and file, all four on both runner images, and it
+      # reads no file from the repository, no secret and no token.
+      - name: Run the image natively (SR-01, SR-04, SR-05)
         env:
-          VERSION: ${{ steps.meta.outputs.version }}
-          DIGEST: ${{ steps.build.outputs.digest }}
+          DIGEST: ${{ needs.publish.outputs.digest }}
+          PLATFORM: ${{ matrix.platform }}
+          MACHINE: ${{ matrix.machine }}
+          ELF: ${{ matrix.elf }}
         run: |
           set -euo pipefail
           repo="$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')"
+          # The digest arrives as an output of the publish job. One that
+          # arrived empty is caught here rather than becoming a malformed
+          # reference below.
+          case "$DIGEST" in
+            sha256:*) ;;
+            *)
+              echo "::error::the publish job reported no image digest, got '$DIGEST'"
+              exit 1
+              ;;
+          esac
+
+          # A fresh, empty Docker configuration holds no credential, so the
+          # pull is the anonymous one a stranger makes, and a package that is
+          # not public fails here. There is no --platform either: Docker picks
+          # the variant for the host's architecture, as on a user's machine.
+          DOCKER_CONFIG="$(mktemp -d "$RUNNER_TEMP/docker-config.XXXXXX")"
+          export DOCKER_CONFIG
+          if ! docker pull "$repo@$DIGEST"; then
+            echo "::error::$repo@$DIGEST could not be pulled without a credential"
+            exit 1
+          fi
+
+          # The leg has to be the architecture it claims and the pull has to
+          # have chosen that architecture's variant. Otherwise every check
+          # below would be about some other image than the one named.
+          hardware="$(uname -m)"
+          if [ "$hardware" != "$MACHINE" ]; then
+            echo "::error::this leg runs on $hardware, expected $MACHINE"
+            exit 1
+          fi
+          pulled="$(docker image inspect -f '{{.Os}}/{{.Architecture}}' "$repo@$DIGEST")"
+          if [ "$pulled" != "$PLATFORM" ]; then
+            echo "::error::the pull selected $pulled, expected $PLATFORM"
+            exit 1
+          fi
+
+          # The container's log is printed when anything below fails, and the
+          # container is removed whatever the outcome.
+          cleanup() {
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              docker logs demo || true
+            fi
+            docker rm -f demo >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          # The container runs the image's own entrypoint and default command,
+          # with no argument, volume or variable added, which is the shape of
+          # the one command.
+          started=$SECONDS
+          docker run -d --name demo -p 8080:8080 "$repo@$DIGEST"
+
+          # The supervisor binds the viewer's port only once the router has
+          # reported ready, so a 200 there means the stack behind it is up. A
+          # connection that is refused or closed without an answer is the
+          # ordinary result while the container starts and counts as not yet.
+          # The bound is a deadline rather than a number of tries, since one
+          # try can take up to five seconds.
+          deadline=$((started + 60))
+          while :; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' -m 5 http://127.0.0.1:8080/viewer/ || true)"
+            if [ "$code" = 200 ]; then
+              break
+            fi
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              echo "::error::GET /viewer/ did not answer 200 within 60 seconds of the start, last answer '$code'"
+              exit 1
+            fi
+            sleep 1
+          done
+          elapsed=$((SECONDS - started))
+          echo "the viewer answered 200 about $elapsed seconds after the container was started"
+
+          # Every check runs even after one has failed, so a single run names
+          # every path that is broken. A failure is counted, and the step
+          # fails after the last check.
+          base=http://127.0.0.1:8080
+          failures=0
+          fail() {
+            echo "::error::$1"
+            failures=$((failures + 1))
+          }
+          # Status and header come from one request, and the redirect is not
+          # followed, so both are the path's own.
+          expect_redirect() {
+            got="$(curl -s -o /dev/null -m 10 -w '%{http_code} %header{location}' "$base$1" || true)"
+            if [ "$got" != "302 $2" ]; then
+              fail "GET $1 answered '$got', expected '302 $2'"
+            fi
+          }
+          expect_html() {
+            got="$(curl -s -o /dev/null -m 10 -w '%{http_code} %{content_type}' "$base$1" || true)"
+            case "$got" in
+              '200 text/html'*) ;;
+              *) fail "GET $1 answered '$got', expected 200 with a text/html content type" ;;
+            esac
+          }
+          expect_status() {
+            got="$(curl -s -o /dev/null -m 10 -w '%{http_code}' "$base$1" || true)"
+            if [ "$got" != "$2" ]; then
+              fail "GET $1 answered '$got', expected $2"
+            fi
+          }
+          # The answer is compared as JSON rather than as a string, so neither
+          # the order of keys nor the spelling of a number can fail it.
+          expect_query() {
+            body="$(jq -nc --arg q "$1" '{query: $q}')"
+            got="$(curl -s -m 10 -H 'Content-Type: application/json' --data-raw "$body" "$base/graphql" || true)"
+            if ! jq -e "$2" >/dev/null 2>&1 <<<"$got"; then
+              fail "POST /graphql $1 answered '$got', expected $2"
+            fi
+          }
+
+          expect_redirect / /viewer/
+          expect_html /viewer/
+          expect_html /document/
+
+          # The playground is HTML only to a client that asks for it, and
+          # without the header the router answers 200 with an empty body. The
+          # body is written to a file and read from there, because grep -q
+          # stopping early on a pipe would fail curl under pipefail.
+          page="$RUNNER_TEMP/playground.html"
+          code="$(curl -s -o "$page" -m 10 -w '%{http_code}' -H 'Accept: text/html' "$base/playground" || true)"
+          if [ "$code" != 200 ]; then
+            fail "GET /playground with Accept: text/html answered '$code', expected 200"
+          elif ! grep -qi '<html' "$page"; then
+            fail "GET /playground with Accept: text/html answered 200 with no <html in the body"
+          fi
+
+          expect_status /shared/graphql.js 200
+          expect_status /shared/ 404
+          expect_status /health/ready 404
+
+          expect_query '{ model { version } }' \
+            '. == {"data":{"model":{"version":1}}}'
+          expect_query '{ requirement(id: "PIPE-R1") { text verdict verdictReason documentNumber } }' \
+            '. == {"data":{"requirement":{"text":"The pipeline shall sustain the required query rate","verdict":"FAIL","verdictReason":"capacity 1200 against 1500, limited by parse","documentNumber":"1"}}}'
+          expect_query '{ part(id: "PIPE-P1") { capacity bottleneck { name } } }' \
+            '.data.part.capacity == 1200 and .data.part.bottleneck == [{"name":"parse"}]'
+
+          # The image declares this command as its health check, and Docker
+          # runs it the same way.
+          exited=0
+          docker exec demo /sysml-federation healthcheck || exited=$?
+          if [ "$exited" -ne 0 ]; then
+            fail "/sysml-federation healthcheck exited $exited, expected 0"
+          fi
+
+          # On a runner with an emulator registered, a router built for the
+          # other architecture would still run and serve, so serving alone does
+          # not show which router came out of the multi-platform index. Both
+          # binaries are copied out of the container and read instead.
+          binaries="$(mktemp -d "$RUNNER_TEMP/binaries.XXXXXX")"
+          for binary in router sysml-federation; do
+            if docker cp "demo:/$binary" "$binaries/$binary"; then
+              kind="$(file -b "$binaries/$binary" || true)"
+              case "$kind" in
+                *"$ELF"*) ;;
+                *) fail "/$binary is '$kind', expected $ELF" ;;
+              esac
+            else
+              fail "/$binary could not be copied out of the container"
+            fi
+          done
+
+          if [ "$failures" -ne 0 ]; then
+            echo "::error::$failures of the checks failed on $PLATFORM"
+            exit 1
+          fi
+          echo "$PLATFORM ran $repo@$DIGEST, the viewer answering 200 about $elapsed seconds after the start"
+
+  # Registry-counted sizes cannot be had without pushing, so the image goes up
+  # under its version tag first, is measured where it landed, and is run from
+  # there on both architectures. Only then does latest move. If the gate or
+  # either leg fails, this job does not run and latest keeps pointing where it
+  # pointed, so a run never moves latest onto an image that its gate rejected
+  # or that one of its legs failed. The version tag itself is left in the
+  # registry and has to be deleted by hand.
+  latest:
+    needs: [publish, smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The two scopes the move ran under while it was a step of the publish
+    # job, which are the two that publishing from a workflow is documented
+    # to need.
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      # Pinned to the same commits as in the publish job, for the same reason:
+      # this job holds packages: write and a registry credential as well.
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # The move and the read-back are buildx imagetools commands, so buildx
+      # is set up here as it is in the publish job.
+      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      - name: Move latest to the measured image (SR-01)
+        env:
+          VERSION: ${{ needs.publish.outputs.version }}
+          DIGEST: ${{ needs.publish.outputs.digest }}
+        run: |
+          set -euo pipefail
+          repo="$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')"
+          # The digest arrives as an output of the publish job. One that
+          # arrived empty is caught here rather than becoming a malformed
+          # reference below.
+          case "$DIGEST" in
+            sha256:*) ;;
+            *)
+              echo "::error::the publish job reported no image digest, got '$DIGEST'"
+              exit 1
+              ;;
+          esac
           # A hyphen after the patch number is semver's pre-release marker and
           # {{version}} carries it through, so v0.1.0-rc1 arrives here as
           # 0.1.0-rc1 and is recognised rather than assumed away.
@@ -190,13 +451,15 @@ jobs:
           esac
           # A second tag over the index that is already published, so nothing is
           # rebuilt and no blob is uploaded again. The source is the digest the
-          # step above measured rather than the version tag, so latest lands on
-          # those bytes and on no others.
+          # publish job measured and the smoke legs ran, handed on as its output
+          # rather than read from the version tag, so latest lands on those
+          # bytes and on no others.
           docker buildx imagetools create --tag "$repo:latest" "$repo@$DIGEST"
           # A tag is a mutable pointer, so what latest names is read back rather
           # than reported from the command that moved it. It has to resolve to
-          # the digest the gate above measured, and a run that finds anything
-          # else fails here with both digests in the message.
+          # the digest the publish job measured and the smoke legs ran, and a
+          # run that finds anything else fails here with both digests in the
+          # message.
           moved="$(docker buildx imagetools inspect --format '{{.Manifest.Digest}}' "$repo:latest")"
           if [ "$moved" != "$DIGEST" ]; then
             echo "::error::$repo:latest resolves to $moved, expected $DIGEST"
