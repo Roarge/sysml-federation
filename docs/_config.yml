@@ -103,8 +103,8 @@ series:
       - path: articles/11-what-shipped-and-what-did-not.md
         title: "What shipped, and what did not"
         date: 2026-08-29
-        dek: "What the published image weighs, how its release is guarded, what a run with no network proves, and where the demo has been run."
+        dek: "How big the published image is, how its release is guarded, what a run with no network proves, and where the demo has been run."
       - path: articles/12-a-model-of-the-demo-itself.md
         title: "A model of the demo itself"
         date: 2026-09-13
-        dek: "I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every story against the live demo."
+        dek: "I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every storyboard story against the live demo."

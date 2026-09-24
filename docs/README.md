@@ -52,9 +52,9 @@ From the approved design to a published container image.
 What the finished demo proves and leaves open, and a model of the demo itself.
 
 12. [What shipped, and what did not](articles/11-what-shipped-and-what-did-not.md)  
-    What the published image weighs, how its release is guarded, what a run with no network proves, and where the demo has been run.
+    How big the published image is, how its release is guarded, what a run with no network proves, and where the demo has been run.
 13. [A model of the demo itself](articles/12-a-model-of-the-demo-itself.md)  
-    I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every story against the live demo.
+    I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every storyboard story against the live demo.
 
 ### The documents behind it
 

@@ -118,7 +118,7 @@ The adapter is the only part over its figure, by 54 lines, and it's also the onl
 
 Tests keep the adapter honest about being generic: no source under `adapter/` may contain the example's names, and the capacity service is walked against a list of its own. The packages and how they fit together are on [the architecture page](../architecture/README.md), and the image, its environment and the publishing workflow are in [the example's README](https://github.com/Roarge/sysml-federation/blob/main/examples/pipeline/README.md#the-image).
 
-The next part weighs the image, and says what running it does and doesn't prove.
+The next part gives the image's size, and says what running it does and doesn't prove.
 
 ---
 

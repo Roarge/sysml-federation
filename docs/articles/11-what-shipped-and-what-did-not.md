@@ -7,13 +7,13 @@ Part 12 of 13 in [Federating a systems model](../README.md), written for release
 > [!IMPORTANT]
 > **The story so far**
 >
-> The demo shipped as one container. In it, a SysML v2 model, a capacity analysis and a requirements document answer as one graph behind a single router, with two web apps in front. [The demo as it shipped](10-the-demo-as-it-shipped.md) walked through it. This part weighs the image, says how a release is guarded, and says what running it does and doesn't prove.
+> The demo shipped as one container. Inside it was a SysML v2 model, a capacity analysis and a requirements document, answering as one graph behind a single router, with two web apps in front. [The demo as it shipped](10-the-demo-as-it-shipped.md) walked through it. This part gives the image's size, says how a release is guarded, and says what running it does and doesn't prove.
 
-## What it weighs
+## How big it is
 
 `docker run --rm -p 8080:8080 ghcr.io/roarge/sysml-federation` pulls about 45 MB on amd64, or 41.5 MB on arm64, and answers on port 8080 roughly two seconds after the container starts. There's no account to make and no login to run.
 
-Read back from the registry, the first release weighed 44,850,689 bytes on amd64 and 41,475,216 on arm64, and release 0.2.0 came in about 39,000 bytes heavier on each. The ceiling the publishing job enforces is 80,000,000 bytes per platform, so both sit a little over half way into their budget.
+Read back from the registry, the first release came to 44,850,689 bytes on amd64 and 41,475,216 on arm64, and release 0.2.0 came in about 39,000 bytes heavier on each. The ceiling the publishing job enforces is 80,000,000 bytes per platform, so both sit a little over half way into their budget.
 
 ![The image, layer by layer, base at the bottom](../img/v4-image-layers.png)
 

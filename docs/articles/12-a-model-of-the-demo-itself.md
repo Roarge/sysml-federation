@@ -7,7 +7,7 @@ Part 13 of 13 in [Federating a systems model](../README.md), written for release
 > [!IMPORTANT]
 > **The story so far**
 >
-> The demo shipped as one container. Inside it was a <span class="term" data-term="sysml-v2">SysML v2</span> model, a capacity analysis and a requirements document. They answer as one graph behind a single <span class="term" data-term="router">router</span>, with two web apps in front. Part 12 measured the published image and listed what it does and does not prove. This last part turns the series' argument on the demo itself. If a systems model belongs at the centre of an organisation's engineering, the demo should have one too.
+> The demo shipped as one container. Inside it was a <span class="term" data-term="sysml-v2">SysML v2</span> model, a capacity analysis and a requirements document. They answer as one graph behind a single <span class="term" data-term="router">router</span>, with two web apps in front. Part 12 gave the size of the published image and said what running it does and doesn't prove. This last part turns the series' argument on the demo itself. If a systems model belongs at the centre of an organisation's engineering, the demo should have one too.
 
 ## I should have known better
 
