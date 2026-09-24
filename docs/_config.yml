@@ -57,7 +57,7 @@ series:
       - { title: "Looking back", from: 11, count: 2, dek: "What the finished demo proves and leaves open, and a model of the demo itself." }
     articles:
       - path: articles/00-why-federate-a-systems-model.md
-        title: "Why federate a systems model"
+        title: "Why federate a systems model?"
         date: 2026-08-27
         dek: "Models were meant to end the drift between an organisation's documents, and closed tools kept them out of reach. SysML v2 opens the model up, and federation lets other tools join it without learning SysML."
       - path: articles/01-the-architecture-in-one-sitting.md
@@ -108,3 +108,12 @@ series:
         title: "A model of the demo itself"
         date: 2026-09-13
         dek: "I take my own advice at last. This article describes the demo as a SysML v2 model that a test keeps in step with the code, with a Checkly session that runs every storyboard story against the live demo."
+  - title: "Automating traceability"
+    status: "In progress"
+    parts:
+      - { title: "The task", from: 0, count: 1, dek: "What is entity resolution between a systems model and a built system, and why does a systems model need it?" }
+    articles:
+      - path: articles/13-why-a-model-needs-entity-resolution.md
+        title: "Why does a systems model need entity resolution?"
+        date: 2026-09-24
+        dek: "Hardly anything a team builds carries the keys from its systems model. What does it take to find the counterparts of each element of the systems model anyway, and why is that job never quite finished?"

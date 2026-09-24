@@ -15,10 +15,29 @@
   term: SysML v2
   definition: >-
     The second version of the Systems Modeling Language, the Object Management
-    Group's standard for describing a system as a model: its parts, the
+    Group's standard for describing a system as a systems model: its parts, the
     properties they carry, the requirements they must meet and the links
-    between them. Version 2 has its own textual notation, so a model can live
+    between them. Version 2 has its own textual notation, so a systems model can live
     as text files in Git.
+  link: https://www.omg.org/spec/SysML/2.0
+
+- id: systems-model
+  term: Systems model
+  definition: >-
+    A structured description of a system being engineered, written in a
+    modelling language such as SysML v2, so that tools can read it. It holds
+    the system's parts, what each must do and how they connect. It's a
+    different thing from a data model or database schema, which describes the
+    shape of records, and from a machine learning model, which is trained on
+    data.
+  link: https://sebokwiki.org/wiki/Model-Based_Systems_Engineering_(MBSE)
+
+- id: part
+  term: Part
+  definition: >-
+    In SysML v2, an element of a systems model that stands for a piece of the
+    system, such as a server, a service or a pump. Each part is declared from
+    a part definition, which plays the role a type or a class plays in code.
   link: https://www.omg.org/spec/SysML/2.0
 
 - id: router
@@ -33,9 +52,9 @@
 - id: adapter
   term: Adapter
   definition: >-
-    This project's service that reads a SysML v2 model from its text files and
+    This project's service that reads a SysML v2 systems model from its text files and
     publishes it as a GraphQL subgraph. It knows the language and nothing about
-    any particular model.
+    any particular systems model.
   link: https://github.com/Roarge/sysml-federation/tree/main/adapter
 
 - id: projection
@@ -56,8 +75,8 @@
 - id: short-name
   term: Short name
   definition: >-
-    A second, shorter name a SysML v2 element can carry, written between angle
-    brackets and quotes, such as <'SR-22'>. This project uses short names as
+    A second, shorter name an element of a SysML v2 systems model can carry,
+    written between angle brackets and quotes, such as <'SR-22'>. This project uses short names as
     identifiers that people can type and that every service agrees on.
 
 - id: satisfy
@@ -71,8 +90,9 @@
   term: Verification case
   definition: >-
     A defined way of showing that a requirement is met, by test, analysis,
-    inspection or demonstration. In SysML v2 it is a model element that names
-    the requirement it verifies and the steps that make up the check.
+    inspection or demonstration. In SysML v2 it is an element of the systems
+    model that names the requirement it verifies and the steps that make up
+    the check.
   link: https://sebokwiki.org/wiki/System_Verification
 
 - id: validation-case
@@ -113,10 +133,10 @@
 - id: view
   term: View
   definition: >-
-    A selection from a model that answers one audience's concerns, such as a
-    deployment picture for the people who run the system. SysML v2 has views
-    as model elements, and the ISO/IEC/IEEE 42010 standard for architecture
-    descriptions defines views and the viewpoints that govern them.
+    A selection from a systems model that answers one audience's concerns,
+    such as a deployment picture for the people who run the system. SysML v2
+    treats views as elements of the systems model, and the ISO/IEC/IEEE 42010
+    standard for architecture descriptions defines views and the viewpoints that govern them.
   link: https://en.wikipedia.org/wiki/ISO/IEC_42010
 
 - id: pilot-implementation
@@ -292,10 +312,11 @@
 - id: entity-resolver
   term: Entity resolver
   definition: >-
-    The part of a federated service that answers for an object another
+    The code in a federated service that answers for an object another
     service has already found. The router hands it the object's key, plus any
     fields the service said it requires, and gets back the fields this
-    service adds to that object.
+    service adds to that object. Despite the name, it decides nothing,
+    because every service already agrees on the key.
   link: https://www.apollographql.com/docs/graphos/schema-design/federated-schemas/entities/intro
 
 - id: mutation
@@ -346,3 +367,36 @@
     can load code split across files with import and export, with no bundler
     or build step in between.
   link: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules
+
+- id: subgraph
+  term: Subgraph
+  definition: >-
+    One service's share of a federated GraphQL schema. Each subgraph is written
+    and run by its own team, and the router merges them into one graph that a
+    client queries as if it were a single service.
+  link: https://graphql.org/learn/federation/
+
+- id: opentofu
+  term: OpenTofu
+  definition: >-
+    An open-source tool for infrastructure as code. You describe servers,
+    networks and services in configuration files, and OpenTofu creates,
+    changes or destroys the real resources to match, keeping a record of what
+    it made under each resource's address.
+  link: https://opentofu.org/docs/
+
+- id: digital-thread
+  term: Digital thread
+  definition: >-
+    The connected record of a product's data across its whole life, from
+    requirements and design through manufacture to operation and repair, so
+    that information in one stage can be traced to its source in another.
+  link: https://www.osti.gov/pages/biblio/1611196
+
+- id: mqtt
+  term: MQTT
+  definition: >-
+    A lightweight publish and subscribe messaging protocol, common in
+    industrial and Internet of Things systems. Devices publish messages to
+    named topics, and anything subscribed to a topic receives them.
+  link: https://mqtt.org/
