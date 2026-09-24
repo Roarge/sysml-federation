@@ -365,8 +365,9 @@
 - id: websocket
   term: WebSocket
   definition: >-
-    A browser protocol that keeps one connection open in both directions, so
-    a server can push messages to a page without the page asking each time.
+    A protocol that keeps one connection open in both directions, so either
+    end can send a message whenever it has one. Browsers use it to receive
+    pushed updates, and servers use it between themselves too.
   link: https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API
 
 - id: qemu
@@ -374,14 +375,14 @@
   definition: >-
     An emulator that can run programs built for one processor on another. A
     container build often uses it to produce an arm64 image on an amd64
-    machine, which is slow. A pure Go build can cross-compile instead and
-    needs no emulator.
+    machine. A pure Go build can cross-compile instead and needs no
+    emulator.
   link: https://en.wikipedia.org/wiki/QEMU
 
 - id: incose
   term: INCOSE
   definition: >-
     The International Council on Systems Engineering, the professional body
-    for systems engineers. Its annual symposium is where much of the field's
-    method research is first published.
+    for systems engineers. The paper that introduced the A3 architecture
+    overview was published in its 2010 proceedings.
   link: https://en.wikipedia.org/wiki/International_Council_on_Systems_Engineering
