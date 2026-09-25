@@ -2,7 +2,7 @@
 
 Each record holds one decision the demo rests on: its context, the decision, the alternatives that lost, the consequences, the requirements it affects and its sources. The form is the one Michael Nygard proposed, with the alternatives, requirements and sources added. [Five views and twenty-six decisions](../articles/06-five-views-and-twenty-six-decisions.md) tells the story of the first twenty-six.
 
-There are thirty-one, all accepted. Twenty-six were written in the design phase, before any code. AD-0027 and AD-0028 came during the build, and the second replaced the first. AD-0029 to AD-0031 came after the first release, with the demo's own model and the check session.
+There are thirty-two, all accepted. Twenty-six were written in the design phase, before any code. AD-0027 and AD-0028 came during the build, and the second replaced the first. AD-0029 to AD-0032 came after the first release, with the demo's own model, the check session and the language model experiment.
 
 When building the system changed what a record decides, the record kept its number and its first date and gained a dated amendment line at its head. The list below marks those records as amended. A decision that replaces another gets a number of its own, and no number is ever reused.
 
@@ -53,3 +53,4 @@ Inside the records, `SR-nn` is a system requirement and `SC-nn` a design constra
 - <span class="rec-id">AD-0029</span> [The demo's own model in SysML v2](AD-0029-the-demos-own-model-in-sysml-v2.md)
 - <span class="rec-id">AD-0030</span> [Model validation in continuous integration](AD-0030-model-validation-in-continuous-integration.md)
 - <span class="rec-id">AD-0031</span> [An optional check session through a tunnel, with traces](AD-0031-an-optional-check-session.md)
+- <span class="rec-id">AD-0032</span> [A language model experiment kept outside the product](AD-0032-a-language-model-experiment-outside-the-product.md)

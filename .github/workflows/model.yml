@@ -7,6 +7,10 @@
 # pointing at a requirement that was renamed or an import that no longer
 # resolves would sit on main until somebody ran a validator by hand (AD-0030).
 #
+# The language model experiment's model under experiments/llm-resolution/model
+# is put to the same two tools, with the demo's library it reuses, through
+# `make experiment-model-check` (AD-0032).
+#
 # The example model is not validated here. The adapter's tests parse it on every
 # run, so a file the reference tools would refuse is usually a file those tests
 # refuse first, and its two runs stay local under `make example-model-check`
@@ -23,12 +27,14 @@ on:
   pull_request:
     paths:
       - 'model/**'
+      - 'experiments/*/model/**'
       - 'Makefile'
       - '.github/workflows/model.yml'
   push:
     branches: [main]
     paths:
       - 'model/**'
+      - 'experiments/*/model/**'
       - 'Makefile'
       - '.github/workflows/model.yml'
 
@@ -104,3 +110,11 @@ jobs:
 
       - name: Validate the model
         run: make model-check
+
+      - name: Validate the experiment's model
+        run: make experiment-model-check
+
+      # OpenSysML can run a state machine. The supervisor's is driven through
+      # a start and a router exit, and has to end in stopped, as serve.go does.
+      - name: Run the supervisor's state machine
+        run: make model-state-check

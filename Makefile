@@ -51,7 +51,7 @@ NOINTERFACE := $(BIN)/nointerface
 # Only the directories .gitignore actually allowlists. Support trees are
 # deliberately untracked, so finding source in them is the intended state, not a
 # forgotten allowlist entry.
-override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly illustrations
+override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly illustrations experiments
 override TEST_FLAGS := -race -shuffle=on -count=1 -timeout=120s
 
 # A floor, not a decoration. 'override' for the same reason as the rest: an
@@ -152,6 +152,10 @@ $(GOTESTSUM):
 .PHONY: test-watch
 test-watch: $(GOTESTSUM) ## Red-green-refactor loop
 	$(GOTESTSUM) --watch --format testname -- $(TEST_FLAGS) ./...
+
+.PHONY: experiment-test
+experiment-test: ## Run the language model experiment's own tests (AD-0032)
+	cd experiments/llm-resolution && $(GO) test $(TEST_FLAGS) ./...
 
 .PHONY: cover
 cover: ## Run the suite with coverage and enforce the floor
@@ -301,6 +305,43 @@ model-check: ## Put model/ to both SysML v2 reference tools
 	 fi; \
 	 pilot_check $$files; \
 	 opensysml_check $$files
+
+.PHONY: experiment-model-check
+experiment-model-check: ## Put the experiment's model, with the library it uses, to both tools
+	@$(SYSML_TOOLS); \
+	 files="$$(git ls-files --cached --others --exclude-standard -- \
+	   ':(glob)model/library/*.sysml' ':(glob)experiments/*/model/*.sysml' | sort)"; \
+	 case "$$files" in *experiments/*) ;; *) \
+	   printf 'experiment-model-check: no .sysml file under experiments/*/model/ -- nothing to validate\n' >&2; exit 1;; \
+	 esac; \
+	 pilot_check $$files; \
+	 opensysml_check $$files
+
+.PHONY: model-state-check
+model-state-check: ## Run the supervisor's state machine through a router exit in OpenSysML
+	@if ! command -v sysml >/dev/null 2>&1; then \
+	   printf 'sysml is not on the PATH -- install OpenSysML v0.6.0 (see examples/pipeline/README.md)\n' >&2; exit 1; \
+	 fi; \
+	 files="$$(git ls-files --cached --others --exclude-standard -- \
+	   'model/*.sysml' 'model/**/*.sysml' | sort)"; \
+	 n=Federation_FunctionalArchitecture::Supervision; \
+	 out="$$(printf '%s\n' \
+	   '%instantiate Federation_LogicalArchitecture::Supervisor' \
+	   "%state $$n::SupervisorStates #1" \
+	   "%send $$n::SubgraphsHealthy" '%step' \
+	   "%send $$n::RouterReady" '%step' \
+	   "%send $$n::PortOpen" '%step' \
+	   "%send $$n::RouterExited" '%step' '%step' '%step' \
+	   '%current' '%exit' \
+	   | timeout 120 sysml $$files 2>&1)"; \
+	 if grep -q 'transition onRouterExit fires' <<< "$$out" \
+	   && grep -q '^Current state: stopped' <<< "$$out" \
+	   && ! grep -q '^error:' <<< "$$out"; then \
+	   printf 'model-state-check: SupervisorStates goes from serving to stopped on a router exit\n'; \
+	 else \
+	   grep -vE '^(✓ package|  model/|loaded )' <<< "$$out" >&2; \
+	   printf 'model-state-check: SupervisorStates did not reach stopped on a router exit\n' >&2; exit 1; \
+	 fi
 
 .PHONY: example-model-check
 example-model-check: ## Put the two example models to both tools, one at a time
