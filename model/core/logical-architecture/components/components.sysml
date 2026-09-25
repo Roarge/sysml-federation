@@ -98,6 +98,9 @@ package Federation_LogicalArchitecture {
         attribute subgraphName : String = "capacity";
         attribute quantity : String = "capacity";
         attribute attributeRead : String = "throughput";
+        calc capacityOf : Federation_FunctionalArchitecture::VerdictComputation::MaximumFlow;
+        calc bottleneckOf : Federation_FunctionalArchitecture::VerdictComputation::SourceSideCut;
+        constraint meetsItsLimit : Federation_FunctionalArchitecture::VerdictComputation::MeetsItsLimit;
     }
 
     part def DocumentService :> DemoElement {
@@ -152,6 +155,11 @@ package Federation_LogicalArchitecture {
                the router as a child process, waits for the router to report
                itself ready, and only then opens port 8080. */
         attribute subcommands : String = "serve, adapter, capacity, document, ui, healthcheck";
+        ref part routerChild : Router {
+            doc /* The router the supervisor starts as its child process and
+                   waits on. Its exit is one of the three ways serving ends. */
+        }
+        exhibit state lifecycle : Federation_FunctionalArchitecture::Supervision::SupervisorStates;
     }
 
     // ------------------------------------------------------- the two apps --
@@ -309,11 +317,26 @@ package Federation_LogicalArchitecture {
         part capacity : CapacityService;
         part document : DocumentService;
         part exampleModel : ExampleModel;
+        bind supervisor.routerChild = router;
         interface toRouter : UiProxy connect uiServer.upstream to router.listen;
         interface modelFetch : RouterToSubgraph connect router.subgraphs to adapter.listen;
         interface capacityFetch : RouterToSubgraph connect router.subgraphs to capacity.listen;
         interface documentFetch : RouterToSubgraph connect router.subgraphs to document.listen;
         flow versionEvents of VersionEvent from adapter.listen.events to router.subgraphs.events;
+
+        // The edit of the V3 runtime board, each step allocated to the parts
+        // that carry it out, as the step's own description names them.
+        perform action propagateAnEdit : Federation_FunctionalArchitecture::EditPropagation::PropagateAnEdit;
+        allocate propagateAnEdit.mutate to viewer;
+        allocate propagateAnEdit.proxyAndPlan to uiServer;
+        allocate propagateAnEdit.proxyAndPlan to router;
+        allocate propagateAnEdit.validatePatchRebuild to adapter;
+        allocate propagateAnEdit.pushVersionEvent to router;
+        allocate propagateAnEdit.refetch to viewer;
+        allocate propagateAnEdit.refetch to documentApp;
+        allocate propagateAnEdit.recomputeVerdict to capacity;
+        allocate propagateAnEdit.renderTheView to viewer;
+        allocate propagateAnEdit.renderTheView to documentApp;
 
         // IMAGE, the demo as a whole.
         satisfy SR_01_OneCommand by demo;
@@ -541,14 +564,20 @@ package Federation_LogicalArchitecture {
             @DecisionRecord { id = "AD-0031"; title = "An optional check session through a tunnel, with traces"; }
             part runner : SessionRunner {
                 attribute composeService : String = "checkly";
+                perform action runASession : Federation_FunctionalArchitecture::Session::RunASession;
             }
-            part namedTunnel : TunnelConnector[0..1] {
-                attribute composeService : String = "tunnel-named";
-                :>> mode = "named";
-            }
-            part quickTunnel : TunnelConnector[0..1] {
-                attribute composeService : String = "tunnel-quick";
-                :>> mode = "quick";
+            variation part tunnelConnector : TunnelConnector {
+                doc /* Exactly one of the two runs: the named tunnel when a
+                       tunnel token is set, the quick tunnel otherwise. The
+                       compose file starts each under a profile of its own. */
+                variant part named {
+                    attribute composeService : String = "tunnel-named";
+                    :>> mode = "named";
+                }
+                variant part quick {
+                    attribute composeService : String = "tunnel-quick";
+                    :>> mode = "quick";
+                }
             }
             part collector : TraceCollector {
                 attribute composeService : String = "otel-collector";
@@ -566,8 +595,8 @@ package Federation_LogicalArchitecture {
             ref part edge : Federation_Context::CheckSession::TunnelEdge;
             ref part receiver : Federation_Context::CheckSession::AlertReceiver;
             interface traffic : CheckTraffic connect checkly.runners to edge.publicSide;
-            interface tunnel : TunnelLink connect edge.origin to namedTunnel.edge;
-            interface toDemo : HttpOnOnePort connect namedTunnel.origin to demo.web;
+            interface tunnel : TunnelLink connect edge.origin to tunnelConnector.edge;
+            interface toDemo : HttpOnOnePort connect tunnelConnector.origin to demo.web;
             interface export : TraceExport connect demo.router.traces to collector.receive;
             interface toViewer : TraceForward connect collector.toViewer to viewer.receive;
             interface toIngest : TraceForward connect collector.toIngest to checkly.ingest;
@@ -576,6 +605,20 @@ package Federation_LogicalArchitecture {
             interface alerting : Alerting connect checkly.alerts to receiver.webhook;
             flow routerSpans of Span from demo.router.traces to collector.receive;
             satisfy SR_48_AnOptionalCheckSession by runner;
+
+            // One traced request, each step allocated to the part that
+            // carries it out.
+            perform action traceOneRequest : Federation_FunctionalArchitecture::Session::TraceOneCheckRequest;
+            allocate traceOneRequest.injectTraceContext to checkly;
+            allocate traceOneRequest.crossTheTunnel to edge;
+            allocate traceOneRequest.crossTheTunnel to tunnelConnector;
+            allocate traceOneRequest.proxyToTheRouter to demo.uiServer;
+            allocate traceOneRequest.openTheRouterSpan to demo.router;
+            allocate traceOneRequest.fetchThreeSubgraphs to demo.router;
+            allocate traceOneRequest.exportToTheCollector to demo.router;
+            allocate traceOneRequest.keepCheckMarkedSpans to collector;
+            allocate traceOneRequest.showInTheViewer to viewer;
+            allocate traceOneRequest.ingestBesideTheCheckResult to checkly;
         }
     }
 }
