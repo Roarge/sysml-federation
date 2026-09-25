@@ -146,3 +146,6 @@ func shared(a, b map[string]float64) []string {
 	}
 	return ts
 }
+
+// Weight is not built yet.
+func (b *Baseline) Weight(term string) float64 { return 0 }

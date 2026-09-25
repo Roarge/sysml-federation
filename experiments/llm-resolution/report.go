@@ -55,9 +55,32 @@ type ResolverScore struct {
 type ProbeRate struct {
 	Probe   string `json:"probe"`
 	Changed Rate   `json:"changed"`
+	ToNone  int    `json:"to_none"`
+	ToOther int    `json:"to_another"`
 	Skipped int    `json:"skipped"`
 	Errors  int    `json:"errors"`
 }
+
+// PairedComparison counts the keyed tests by which hidden-key resolver got
+// each right: the language model, or the word overlap's best-ranked answer.
+type PairedComparison struct {
+	BothRight         int     `json:"both_right"`
+	OnlyLanguageModel int     `json:"only_language_model"`
+	OnlyWordOverlap   int     `json:"only_word_overlap"`
+	NeitherRight      int     `json:"neither_right"`
+	McNemarP          float64 `json:"mcnemar_exact_p"`
+}
+
+// BlindItem is one proposal for an unkeyed test, with nothing to say who
+// proposed it or why.
+type BlindItem struct {
+	Number int    `json:"number"`
+	Test   string `json:"test"`
+	Pick   string `json:"pick"`
+}
+
+// mcnemarExact is not built yet.
+func mcnemarExact(b, c int) float64 { return 0 }
 
 // Proposal is a link proposed for a test that carries no key. Nobody recorded
 // an answer for these, so they are listed for a person to judge.
@@ -80,16 +103,18 @@ type ProbeTiming struct {
 
 // Summary is the report on one results file.
 type Summary struct {
-	Header       RunHeader       `json:"-"`
-	Tests        int             `json:"tests"`
-	Keyed        int             `json:"keyed_tests"`
-	Resolvers    []ResolverScore `json:"resolvers"`
-	Probes       []ProbeRate     `json:"probes"`
-	Grounded     Rate            `json:"evidence_grounded"`
-	OrderOverlap float64         `json:"order_evidence_overlap"`
-	Proposals    []Proposal      `json:"proposals"`
-	Timing       []ProbeTiming   `json:"timing"`
-	BaseErrors   int             `json:"base_errors"`
+	Header       RunHeader        `json:"-"`
+	Tests        int              `json:"tests"`
+	Keyed        int              `json:"keyed_tests"`
+	Resolvers    []ResolverScore  `json:"resolvers"`
+	Probes       []ProbeRate      `json:"probes"`
+	Grounded     Rate             `json:"evidence_grounded"`
+	OrderOverlap float64          `json:"order_evidence_overlap"`
+	Proposals    []Proposal       `json:"proposals"`
+	Blind        []BlindItem      `json:"blind"`
+	Paired       PairedComparison `json:"paired"`
+	Timing       []ProbeTiming    `json:"timing"`
+	BaseErrors   int              `json:"base_errors"`
 }
 
 // Summarise computes the report from a results file's contents alone

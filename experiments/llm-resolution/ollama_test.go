@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 	"testing"
 )
@@ -67,5 +68,17 @@ func TestEXPSR04_AReplyThatIsNotTheAskedJSONIsAnError(t *testing.T) {
 	reply, err = NewClient(f.URL, DefaultSettings(), []string{"SR-01"}).Chat(context.Background(), "s", "name: ParsesTokens")
 	if err != nil || reply.Answer.Requirement != "SR-01" || len(reply.Answer.Evidence) != 1 {
 		t.Fatalf("a well-formed reply gave %+v, %v", reply.Answer, err)
+	}
+}
+
+func TestEXPSR04_TheSchemaAsksForTheAnswerBeforeItsEvidence(t *testing.T) {
+	data, err := json.Marshal(newAnswerSchema([]string{"SR-01"}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	props := string(data)[strings.Index(string(data), `"properties"`):]
+	r, e, why := strings.Index(props, `"requirement"`), strings.Index(props, `"evidence"`), strings.Index(props, `"reason"`)
+	if r < 0 || e < 0 || why < 0 || !(r < e && e < why) {
+		t.Fatalf("the schema doesn't list requirement, evidence and reason in that order: %s", data)
 	}
 }

@@ -13,13 +13,14 @@ const (
 	ProbeBase           = "base"           // the test as it is
 	ProbeDeletion       = "deletion"       // the words the model cited, deleted
 	ProbeControl        = "control"        // as many other words, deleted at random
+	ProbeRareShared     = "rare-shared"    // as many shared uncited words, rarest first
 	ProbeReconstruction = "reconstruction" // the test replaced by the cited words alone
 	ProbeOrder          = "order"          // the requirements in a shuffled order
 	ProbeRepeat         = "repeat"         // the base question, asked again unchanged
 )
 
 // AllProbes lists them in the order a run makes them.
-var AllProbes = []string{ProbeBase, ProbeDeletion, ProbeControl, ProbeReconstruction, ProbeOrder, ProbeRepeat}
+var AllProbes = []string{ProbeBase, ProbeDeletion, ProbeControl, ProbeRareShared, ProbeReconstruction, ProbeOrder, ProbeRepeat}
 
 // Variant is one question: the requirements as listed and the test as shown.
 type Variant struct {
@@ -227,4 +228,9 @@ func jaccard(a, b []string) float64 {
 		}
 	}
 	return float64(inter) / float64(len(x)+len(y)-inter)
+}
+
+// rareSharedVariant is not built yet.
+func rareSharedVariant(reqs []Requirement, t Test, base Answer, b *Baseline) Variant {
+	return Variant{}
 }

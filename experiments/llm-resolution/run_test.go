@@ -17,8 +17,10 @@ import (
 
 // The fixture has eight tests, and the stand-in links seven of them, so a
 // full run asks 8 base questions, 7 for each of the four probes that follow
-// a link, and 2 repeats: 38 in all.
-const fixtureQuestions = 38
+// a link and ask whatever the evidence, 6 for the rare-shared control (the
+// Health test shares no uncited word with its requirement), and 2 repeats:
+// 44 in all.
+const fixtureQuestions = 44
 
 func TestEXPSR05_NothingToDeleteIsRecordedAndNotAsked(t *testing.T) {
 	f := newFakeServer(t)
@@ -41,7 +43,7 @@ func TestEXPSR05_NothingToDeleteIsRecordedAndNotAsked(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, probe := range []string{"deletion", "control"} {
+	for _, probe := range []string{"deletion", "control", "rare-shared"} {
 		lines := callsWithProbe(c, probe)
 		if len(lines) != 7 {
 			t.Fatalf("%d %s lines, want 7", len(lines), probe)
@@ -52,7 +54,7 @@ func TestEXPSR05_NothingToDeleteIsRecordedAndNotAsked(t *testing.T) {
 			}
 		}
 	}
-	if got, want := len(f.chats()), fixtureQuestions-14; got != want {
+	if got, want := len(f.chats()), fixtureQuestions-20; got != want {
 		t.Errorf("%d questions asked, want %d", got, want)
 	}
 }
