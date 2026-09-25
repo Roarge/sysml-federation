@@ -55,3 +55,19 @@ func TestEXPSR03_TheReasonIsTheSharedWords(t *testing.T) {
 		t.Errorf("gold %q ranked %d, want R-1 ranked 1", got.Gold, got.Rank)
 	}
 }
+
+func TestEXPSR03_AnAcronymsPluralStaysOneWord(t *testing.T) {
+	cases := map[string]string{
+		"RoutingURLsAreLoopback": "Routing URLs Are Loopback",
+		"IDsAndAPIs":             "IDs And APIs",
+		"HTTPServer":             "HTTP Server",
+		"parseURL":               "parse URL",
+		"the routing URLs":       "the routing URLs",
+		"ReadsRequirements":      "Reads Requirements",
+	}
+	for in, want := range cases {
+		if got := strings.Join(splitIdentifier(in), " "); got != want {
+			t.Errorf("splitIdentifier(%q) = %q, want %q", in, got, want)
+		}
+	}
+}

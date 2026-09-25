@@ -58,6 +58,10 @@ package Experiment_VerificationCases {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/baseline_test.go"; }
             doc /* The reason is the shared words, heaviest first. */
         }
+        action <'TestEXPSR03_AnAcronymsPluralStaysOneWord'> acronymPlural {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/baseline_test.go"; }
+            doc /* URLs, IDs and APIs are one word each when identifiers are split, not UR and Ls. */
+        }
     }
 
     verification def VC_EXP_SR_04 {
