@@ -103,9 +103,9 @@
 # boards.
 !/docs/*/*.pdf
 
-# The sources of those PDFs and of the article images cut from the same boards:
-# one HTML page per board, one directory level down, and the build script and
-# its README beside them.
+# The sources of those PDFs, of the article images cut from the same boards and
+# of the site's share card: one HTML page per board, one directory level down,
+# and the build script and its README beside them.
 # Anchored and depth-bounded, so each rule admits exactly the files it names.
 !/illustrations/README.md
 !/illustrations/build.py
