@@ -448,6 +448,7 @@ package Federation_LogicalArchitecture {
             @DecisionRecord { id = "AD-0022"; title = "Track internal/assert and internal/tabletest"; }
             @DecisionRecord { id = "AD-0023"; title = "The light requirements scheme"; }
             @DecisionRecord { id = "AD-0029"; title = "The demo's own model in SysML v2"; }
+            @DecisionRecord { id = "AD-0032"; title = "A language model experiment kept outside the product"; }
         }
         part checkSuite : CheckSuiteProject {
             doc /* The optional check project, which drives the demo through a

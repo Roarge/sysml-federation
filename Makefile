@@ -51,7 +51,7 @@ NOINTERFACE := $(BIN)/nointerface
 # Only the directories .gitignore actually allowlists. Support trees are
 # deliberately untracked, so finding source in them is the intended state, not a
 # forgotten allowlist entry.
-override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly illustrations
+override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly illustrations experiments
 override TEST_FLAGS := -race -shuffle=on -count=1 -timeout=120s
 
 # A floor, not a decoration. 'override' for the same reason as the rest: an
@@ -152,6 +152,10 @@ $(GOTESTSUM):
 .PHONY: test-watch
 test-watch: $(GOTESTSUM) ## Red-green-refactor loop
 	$(GOTESTSUM) --watch --format testname -- $(TEST_FLAGS) ./...
+
+.PHONY: experiment-test
+experiment-test: ## Run the language model experiment's own tests (AD-0032)
+	cd experiments/llm-resolution && $(GO) test $(TEST_FLAGS) ./...
 
 .PHONY: cover
 cover: ## Run the suite with coverage and enforce the floor
@@ -299,6 +303,17 @@ model-check: ## Put model/ to both SysML v2 reference tools
 	 if [ -z "$$files" ]; then \
 	   printf 'model-check: no .sysml file under model/ -- nothing to validate\n' >&2; exit 1; \
 	 fi; \
+	 pilot_check $$files; \
+	 opensysml_check $$files
+
+.PHONY: experiment-model-check
+experiment-model-check: ## Put the experiment's model, with the library it uses, to both tools
+	@$(SYSML_TOOLS); \
+	 files="$$(git ls-files --cached --others --exclude-standard -- \
+	   'model/library/*.sysml' 'experiments/*/model/*.sysml' | sort)"; \
+	 case "$$files" in *experiments/*) ;; *) \
+	   printf 'experiment-model-check: no .sysml file under experiments/*/model/ -- nothing to validate\n' >&2; exit 1;; \
+	 esac; \
 	 pilot_check $$files; \
 	 opensysml_check $$files
 
