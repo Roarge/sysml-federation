@@ -51,10 +51,10 @@ series:
     status: "Complete"
     release: "v0.3.0"
     parts:
-      - { title: "The idea", from: 0, count: 2, dek: "Why models stay locked in their tools, and what federation changes." }
-      - { title: "The design", from: 2, count: 6, dek: "How the demo was designed before any code was written, and what each round of review caught." }
-      - { title: "The build", from: 8, count: 3, dek: "From the approved design to a published container image." }
-      - { title: "Looking back", from: 11, count: 2, dek: "What the finished demo proves and leaves open, and a model of the demo itself." }
+      - { title: "The idea", from: 0, count: 2, dek: "Why do models stay locked in their tools, and what does federation change?" }
+      - { title: "The design", from: 2, count: 6, dek: "How was the demo designed before any code was written, and what did each round of review catch?" }
+      - { title: "The build", from: 8, count: 3, dek: "How did the approved design become a published container image?" }
+      - { title: "Looking back", from: 11, count: 2, dek: "What does the finished demo prove and leave open, and why does it now have a systems model of its own?" }
     articles:
       - path: articles/00-why-federate-a-systems-model.md
         title: "Why federate a systems model?"
@@ -63,7 +63,7 @@ series:
       - path: articles/01-the-architecture-in-one-sitting.md
         title: "The architecture in one sitting"
         date: 2026-08-27
-        dek: "How one query collects its answer from three services that never talk to each other, and the decisions that put them all in one container."
+        dek: "How does one query collect its answer from three services that never talk to each other, and which decisions put them all in one container?"
       - path: articles/02-how-the-design-was-run.md
         title: "How the design was run"
         date: 2026-08-27
@@ -87,11 +87,11 @@ series:
       - path: articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md
         title: "An A3 sheet for a fifteen-minute reader"
         date: 2026-08-27
-        dek: "Why the overview is one printed sheet, what the A3 method forces on it, and the two sheets drawn so far."
+        dek: "Why is the overview one printed sheet, what does the A3 method force on it, and what do the two sheets drawn so far show?"
       - path: articles/08-planning-the-build.md
         title: "Planning the build"
         date: 2026-08-27
-        dek: "How the approved design became five phases of work, one pull request each and tests first, and the choices the design had left open."
+        dek: "How did the approved design become five phases of work, one pull request each and tests first? And which choices did the design leave for the plan?"
       - path: articles/09-five-spikes-before-the-first-line.md
         title: "Five spikes before the first line"
         date: 2026-08-27
@@ -99,11 +99,11 @@ series:
       - path: articles/10-the-demo-as-it-shipped.md
         title: "The demo as it shipped"
         date: 2026-08-27
-        dek: "What the finished demo shows once it runs, the fifteen-minute walk a visitor takes through it, and what the build came to."
+        dek: "What does the finished demo show once it runs, how does a visitor's fifteen-minute walk through it go, and what did the build come to?"
       - path: articles/11-what-shipped-and-what-did-not.md
         title: "What shipped, and what did not"
         date: 2026-08-29
-        dek: "How big the published image is, how its release is guarded, what a run with no network proves, and where the demo has been run."
+        dek: "How big is the published image, how is its release guarded, what does a run with no network prove, and where has the demo been run?"
       - path: articles/12-a-model-of-the-demo-itself.md
         title: "A model of the demo itself"
         date: 2026-09-13
