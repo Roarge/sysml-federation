@@ -317,6 +317,32 @@ experiment-model-check: ## Put the experiment's model, with the library it uses,
 	 pilot_check $$files; \
 	 opensysml_check $$files
 
+.PHONY: model-state-check
+model-state-check: ## Run the supervisor's state machine through a router exit in OpenSysML
+	@if ! command -v sysml >/dev/null 2>&1; then \
+	   printf 'sysml is not on the PATH -- install OpenSysML v0.6.0 (see examples/pipeline/README.md)\n' >&2; exit 1; \
+	 fi; \
+	 files="$$(git ls-files --cached --others --exclude-standard -- \
+	   'model/*.sysml' 'model/**/*.sysml' | sort)"; \
+	 n=Federation_FunctionalArchitecture::Supervision; \
+	 out="$$(printf '%s\n' \
+	   '%instantiate Federation_LogicalArchitecture::Supervisor' \
+	   "%state $$n::SupervisorStates #1" \
+	   "%send $$n::SubgraphsHealthy" '%step' \
+	   "%send $$n::RouterReady" '%step' \
+	   "%send $$n::PortOpen" '%step' \
+	   "%send $$n::RouterExited" '%step' '%step' '%step' \
+	   '%current' '%exit' \
+	   | timeout 120 sysml $$files 2>&1)"; \
+	 if grep -q 'transition onRouterExit fires' <<< "$$out" \
+	   && grep -q '^Current state: stopped' <<< "$$out" \
+	   && ! grep -q '^error:' <<< "$$out"; then \
+	   printf 'model-state-check: SupervisorStates goes from serving to stopped on a router exit\n'; \
+	 else \
+	   grep -vE '^(✓ package|  model/|loaded )' <<< "$$out" >&2; \
+	   printf 'model-state-check: SupervisorStates did not reach stopped on a router exit\n' >&2; exit 1; \
+	 fi
+
 .PHONY: example-model-check
 example-model-check: ## Put the two example models to both tools, one at a time
 	@$(SYSML_TOOLS); \

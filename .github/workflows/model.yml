@@ -113,3 +113,8 @@ jobs:
 
       - name: Validate the experiment's model
         run: make experiment-model-check
+
+      # OpenSysML can run a state machine. The supervisor's is driven through
+      # a start and a router exit, and has to end in stopped, as serve.go does.
+      - name: Run the supervisor's state machine
+        run: make model-state-check

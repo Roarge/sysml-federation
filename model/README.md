@@ -24,9 +24,9 @@ One register per file, and the root imports every one of them.
 | [`core/stories/system/`](core/stories/system/system-stories.sysml) | forty-eight system stories, SR-01 to SR-48, each restating one requirement, and their derivation from the stakeholder stories |
 | [`core/constraints/`](core/constraints/design-constraints.sysml) | seven design constraints, SC-01 to SC-07, each with a plain statement |
 | [`core/use-cases/`](core/use-cases/use-cases.sysml) | thirteen use cases, one per storyboard story and one for the check session |
-| [`core/functional-architecture/`](core/functional-architecture/functional-architecture.sysml) | what the demo does, an edit's seven steps, the verdict arithmetic, the argument in eight steps and the check session's behaviour |
+| [`core/functional-architecture/`](core/functional-architecture/functional-architecture.sysml) | what the demo does, an edit's seven steps, the verdict arithmetic with its two calculations and its verdict rule, the argument in eight steps, how the supervisor starts and stops everything, and the check session's behaviour |
 | [`core/logical-architecture/interface-types/`](core/logical-architecture/interface-types/interfaces.sysml) | the port and interface definitions, each conjugate written out |
-| [`core/logical-architecture/components/`](core/logical-architecture/components/components.sysml) | what the demo is made of, the project around it, the check session, every allocation as a `satisfy` and the decision records as tags |
+| [`core/logical-architecture/components/`](core/logical-architecture/components/components.sysml) | what the demo is made of, the project around it, the check session with its two tunnels as one variation, every allocation of a requirement as a `satisfy`, the steps of an edit and of a traced request allocated to the parts that carry them out, and the decision records as tags |
 | [`core/verification-validation/verification-cases/`](core/verification-validation/verification-cases/verification-cases.sysml) | one verification case per system story and per constraint, with the evidence as actions |
 | [`core/verification-validation/validation-cases/`](core/verification-validation/validation-cases/validation-cases.sysml) | one validation case per stakeholder story, with the recorded runs as actions |
 | [`core/verification-validation/check-cases/`](core/verification-validation/check-cases/check-cases.sysml) | one case per check and monitor of the check project, its attributes equal to the manifest's entry and its actions the check's own steps |
@@ -189,6 +189,24 @@ must have conforming types. And both validators refused
 `Federation_LogicalArchitecture::session`, because the composite lives in the
 nested package and is reached as
 `Federation_LogicalArchitecture::CheckSession::session`.
+
+## Forms added on 25 September 2026
+
+Four things the code does were added to the model on 25 September 2026. They are the supervisor's start and stop, the steps of an edit and of a traced request allocated to the parts that carry them out, the choice between the two tunnels, and the capacity service's calculations and verdict rule. Before, the model said how the supervisor starts things and nothing about how it stops them, and the session carried the two tunnels as two optional usages, with only the named one connected. Each new form was put to both tools in a probe file first, and the model uses the accepted form of each.
+
+| Form | Pilot | OpenSysML | Form used |
+|---|---|---|---|
+| `state def S { entry; then a; state a; state b; transition t first a accept Signal then b; }` with `item def Signal`, exhibited as `exhibit state lifecycle : S;` in a part definition | accepted | accepted, exit 0 | the probed form |
+| `perform action p : A;` in a composite part usage, then `allocate p.step to part;` | accepted | accepted, exit 0 | the probed form |
+| `action p : A;` without `perform`, then `allocate p.step to part;` | refused: `ERROR:Must be an accessible feature (use dot notation for nesting)` | accepted, exit 0 | `perform action`, the row above |
+| `allocate A::step to part;`, naming the step through its action definition | refused, with the same error | refused: did not analyse cleanly | `perform action`, the second row |
+| `variation part t : TunnelConnector { variant part named { ... } variant part quick { ... } }`, with the interfaces connecting `t.edge` and `t.origin` | accepted | accepted, exit 0 | the probed form |
+| `calc def C { in network : FlowNetwork; return capacity : Real; }`, used as `calc capacityOf : C;` in a part definition | accepted | accepted, exit 0 | the probed form |
+| `constraint def K { in capacity : Real; in limit : Real; capacity >= limit }`, used as `constraint meetsItsLimit : K;` | accepted | accepted, exit 0 | the probed form |
+| `decide d; if not tunnelToken then a; else m;` and `merge m;` among the successions of an action definition with `in tunnelToken : Boolean;` | accepted | accepted, exit 0 | the probed form |
+| `ref part routerChild : Router;` in a part definition, and `bind supervisor.routerChild = router;` in the composite | accepted | accepted, exit 0 | the probed form |
+
+OpenSysML also runs state machines. `make model-state-check` drives `SupervisorStates` through a start and a router exit, and requires it to end in `stopped`, as `supervisor.run` does, and the `model` workflow runs it after the validators. Two forms that both validators accept could not be run. An entry action whose body is only a doc comment stops the run with `*ast.Documentation in a body is not executable`, and an entry action with no body stops it with `performs no action`. So the stop order is written as the doc of the `stopping` state, which has no entry action.
 
 ## Correspondence with the published boards
 
