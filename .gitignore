@@ -121,9 +121,10 @@
 !/docs/_includes/*.html
 !/docs/assets/*.css
 
-# The one script the site loads, which opens a term's definition in place, and
-# the data file it reads those definitions from. Jekyll reads _data at build
-# time and never publishes it as a page of its own.
+# The one script the site loads, which opens a term's definition in place and
+# copies an article's address, and the data files Jekyll reads at build time,
+# the glossary and the author's profiles. Jekyll never publishes _data as a
+# page of its own.
 !/docs/assets/*.js
 !/docs/_data/*.yml
 
