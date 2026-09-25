@@ -11,7 +11,7 @@ Each sheet takes one aspect of the demo and fits it on one A3 page, for a reader
 
 The layout follows the A3 architecture overview cookbook of Borches and Bonnema, taken for what it forces on a sheet rather than followed step by step. No artwork from the cookbook is reproduced.
 
-Owner: Roar Georgsen
+Owner: Roar Elias Georgsen
 
 Each published sheet is built from an HTML source in the repository, which a reader who finds an error can correct as described in [`illustrations/`](https://github.com/Roarge/sysml-federation/tree/main/illustrations).
 

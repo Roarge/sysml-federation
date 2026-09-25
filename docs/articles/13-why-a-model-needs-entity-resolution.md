@@ -1,6 +1,6 @@
 # Why does a systems model need entity resolution?
 
-*Roar Georgsen, 24 September 2026*
+*Roar Elias Georgsen, 24 September 2026*
 
 Part 1 of 6 in [Automating traceability](../README.md).
 

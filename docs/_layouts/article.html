@@ -17,6 +17,20 @@ layout: default
 {%- if idx >= p.from and idx < part_end %}{% assign part = p %}{% endif %}
 {%- endfor %}
 {%- endif %}
+{%- comment %}
+  What the share links under the article send: the title and standfirst from
+  the series list, which are plain text, and the page's full address. Each is
+  set first to its fallback, as current is above. page.title comes from the
+  heading through markdownify, so the fallback turns its escaped &, < and >
+  back into plain text, with &amp; last.
+{%- endcomment %}
+{%- assign share_title = page.title | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' %}
+{%- assign share_dek = site.description %}
+{%- if current %}
+{%- assign share_title = current.articles[idx].title %}
+{%- assign share_dek = current.articles[idx].dek | default: site.description %}
+{%- endif %}
+{%- assign share_url = page.url | absolute_url %}
 {%- comment %} A reader's pace of about 220 words a minute, rounded up. {% endcomment %}
 {%- assign words = content | strip_html | number_of_words %}
 {%- assign minutes = words | divided_by: 220 | plus: 1 %}
@@ -50,6 +64,16 @@ layout: default
       </ul>
     </nav>
     {%- endif %}
+    {%- comment %}
+      The article's foot comes after the pager and never before it, since the
+      stylesheet hides the markdown's own pager only while it sits straight in
+      front of nav.pager. It sits outside the series test so that every
+      article has it.
+    {%- endcomment %}
+    <footer class="article-foot">
+      {%- include share.html title=share_title dek=share_dek url=share_url %}
+      {%- include author.html %}
+    </footer>
   </article>
   {%- if current %}
   <aside class="sidebar">

@@ -348,14 +348,14 @@ run: ## Run the locally built image on port 8080
 	docker run --rm -p 8080:8080 $(IMAGE)
 
 # ---------------------------------------------------------- illustrations --
-# The PDFs under docs/ and the article images cut from the same boards are
-# built from the HTML sources under illustrations/, whose README lists each
-# output. The build needs Chrome, pdfunite and pdfinfo from poppler,
-# Pillow, and a network connection for the fonts, so it runs on request and
-# never as part of a gate.
+# The PDFs under docs/, the article images cut from the same boards and the
+# site's share card are built from the HTML sources under illustrations/, whose
+# README lists each output. The build needs Chrome, pdfunite and pdfinfo from
+# poppler, Pillow, and a network connection for the fonts, so it runs on
+# request and never as part of a gate.
 # illustrations/README.md has the options and the requirements.
 .PHONY: illustrations
-illustrations: ## Rebuild the PDFs and the drawn article images from illustrations/
+illustrations: ## Rebuild the PDFs, the drawn article images and the share card from illustrations/
 	python3 illustrations/build.py
 
 # ------------------------------------------------------------------ gates ---

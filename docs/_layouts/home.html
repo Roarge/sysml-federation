@@ -1,7 +1,29 @@
 ---
 layout: default
 ---
+{%- comment %}
+  docs/README.md breaks its byline onto a second line of the author's
+  profiles, written as plain markdown links so that github.com shows them too.
+  Here each link whose address and name match an entry of _data/profiles.yml
+  is drawn as the header and the author card draw it, with its mark. The
+  byline stays the one paragraph after the heading, so its styles hold. A
+  link that stops matching its entry stays a plain link, and so does every
+  link if kramdown ever writes them differently.
+
+  A link and the dot after it are kept together, so that a phone, where each
+  link is a block of its own inline, wraps the line after a dot and never
+  before one.
+{%- endcomment %}
+{%- assign home_body = content %}
+{%- for profile in site.data.profiles %}
+{%- capture home_plain %}<a href="{{ profile.url | escape }}">{{ profile.label }}</a>{% endcapture %}
+{%- capture home_drawn %}{% include profile-link.html profile=profile %}{% endcapture %}
+{%- assign home_drawn = home_drawn | strip %}
+{%- assign home_plain_dot = home_plain | append: " ·" %}
+{%- capture home_drawn_dot %}<span class="keep-together">{{ home_drawn }} ·</span>{% endcapture %}
+{%- assign home_body = home_body | replace: home_plain_dot, home_drawn_dot | replace: home_plain, home_drawn %}
+{%- endfor -%}
 <article class="prose">
   <h1>{{ page.title }}</h1>
-  {{ content }}
+  {{ home_body }}
 </article>

@@ -1,0 +1,28 @@
+{%- comment -%}
+  The share links under an article. Each is a plain link to the service's own
+  page for sharing, so nothing from LinkedIn, Bluesky or X loads until a
+  reader follows one. The article layout passes the title and standfirst as
+  plain text, and the page's full address.
+
+  url_encode writes a space as "+". The intents read that as a space, but a
+  mail program shows a plus sign, so every "+" left after encoding, which can
+  only have been a space, becomes %20. A line break in a mailto body is
+  %0D%0A. LinkedIn takes the address alone and reads the title and picture
+  from the page's Open Graph tags. Bluesky takes one text. X takes the text
+  and the address apart.
+
+  Copy link needs site.js, so its item stays hidden until the script shows it.
+{%- endcomment -%}
+{%- assign share_q_url = include.url | url_encode | replace: '+', '%20' -%}
+{%- assign share_q_title = include.title | url_encode | replace: '+', '%20' -%}
+{%- assign share_q_dek = include.dek | url_encode | replace: '+', '%20' -%}
+<div class="share">
+  <h2 class="foot-label">Share this article</h2>
+  <ul class="link-row">
+    <li><a class="icon-link" href="https://www.linkedin.com/sharing/share-offsite/?url={{ share_q_url }}" target="_blank" rel="noopener">{% include icon.html name="linkedin" %}<span class="visually-hidden">Share on </span>LinkedIn<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+    <li><a class="icon-link" href="https://bsky.app/intent/compose?text={{ share_q_title }}%20{{ share_q_url }}" target="_blank" rel="noopener">{% include icon.html name="bluesky" %}<span class="visually-hidden">Share on </span>Bluesky<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+    <li><a class="icon-link" href="https://x.com/intent/tweet?text={{ share_q_title }}&amp;url={{ share_q_url }}" target="_blank" rel="noopener">{% include icon.html name="x" %}<span class="visually-hidden">Share on </span>X<span class="visually-hidden"> (opens in a new tab)</span></a></li>
+    <li><a class="icon-link" href="mailto:?subject={{ share_q_title }}&amp;body={{ share_q_dek }}%0D%0A%0D%0A{{ share_q_url }}">{% include icon.html name="email" %}<span class="visually-hidden">Share by </span>Email</a></li>
+    <li class="share-copy" hidden><button class="icon-link" type="button" data-copy-url="{{ include.url }}">{% include icon.html name="link" %}Copy link</button><span class="share-status" role="status"></span></li>
+  </ul>
+</div>

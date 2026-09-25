@@ -1,0 +1,7 @@
+{%- comment -%}
+  One of the author's profiles from _data/profiles.yml, as a link with its
+  mark before its name. Pass the entry as profile. With detail=true the
+  handle or iD the entry gives follows the name inside the link, as the
+  author card shows it.
+{%- endcomment -%}
+<a class="icon-link" href="{{ include.profile.url | escape }}" rel="me">{% include icon.html name=include.profile.icon %}{{ include.profile.label }}{% if include.detail and include.profile.detail %} <span class="profile-detail">{{ include.profile.detail }}</span>{% endif %}</a>
