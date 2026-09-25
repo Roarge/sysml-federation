@@ -78,6 +78,7 @@ package Experiment_SystemStories {
             requirement schemaAdmitsOnlyKeys { doc /* The schema's requirement field admits the keys and none, and nothing else. */ }
             requirement sharedPrefix { doc /* The system message is the same for every unaltered question, so the server can cache it. */ }
             requirement malformedReplyIsAnError { doc /* A reply that is not the JSON asked for is recorded as an error. */ }
+            requirement answerFirst { doc /* The reply schema lists the requirement before the evidence and the reason, so the evidence is written after the answer. */ }
         }
     }
 
@@ -85,15 +86,16 @@ package Experiment_SystemStories {
         @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
-        attribute statement : String = "When the language model has linked a test to a requirement, the experiment shall ask again with every word of the cited evidence deleted from the test and from that requirement, and again with as many other words deleted at random from the same places.";
+        attribute statement : String = "When the language model has linked a test to a requirement, the experiment shall ask again with every word of the cited evidence deleted from the test and from that requirement, again with as many other words deleted at random from the same places, and again with the uncited words the test and that requirement share deleted, the rarest first, until at least as many words are gone.";
         attribute pattern : EarsPattern = EarsPattern::EventDriven;
         attribute verificationMethods : VerificationMethod[1..*] = (VerificationMethod::Test);
-        attribute :>> capability = "see whether deleting the cited words changes the answer more than deleting others";
+        attribute :>> capability = "see whether deleting the cited words changes the answer more than deleting others, including others just as distinctive";
         attribute :>> benefit    = "an explanation that names the real reasons can be told from one that does not";
         frame concern : ExplanationsNameTheReasons;
         requirement :>> acceptance {
             requirement citedWordsDeleted { doc /* Every occurrence of the cited words is deleted from the test and the picked requirement, and nothing else. */ }
             requirement controlMatchesTheCount { doc /* The control deletes the same number of other words, chosen with a fixed seed. */ }
+            requirement rareSharedControl { doc /* The second control deletes uncited words the test and the picked requirement share, the rarest first, until at least as many words are gone as the deletion took. */ }
             requirement nothingToDelete { doc /* When none of the cited words occurs, no question is asked and the reason is recorded. */ }
         }
     }
@@ -180,7 +182,7 @@ package Experiment_SystemStories {
         @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
-        attribute statement : String = "The experiment shall report, for each resolver, precision and recall over the tests that carry a key, and for each probe, the share of changed answers, each with its 95% Wilson interval, and shall list every link proposed for a test that carries no key, unscored.";
+        attribute statement : String = "The experiment shall report, for each resolver, precision and recall over the tests that carry a key, and for each probe, the share of changed answers on all links and on correct links alone, split into changes to none and to another requirement, each with its 95% Wilson interval. It shall compare the two hidden-key resolvers test by test with McNemar's exact test, count as found only evidence that occurs as written in what the language model was shown, and list every link proposed for a test that carries no key, unscored, once with its reasons and once without them for blind judgement.";
         attribute pattern : EarsPattern = EarsPattern::Ubiquitous;
         attribute verificationMethods : VerificationMethod[1..*] = (VerificationMethod::Test);
         attribute :>> capability = "read the scores with their uncertainty, and the unjudged links apart";
@@ -190,6 +192,11 @@ package Experiment_SystemStories {
             requirement wilsonIntervals { doc /* The interval for 8 of 10 is 0.49 to 0.94, as in the Wilson formula. */ }
             requirement onlyKeyedTestsScored { doc /* Tests with no key never enter precision or recall. */ }
             requirement probesAndProposalsReported { doc /* Each probe's rate and every proposal for an unkeyed test appear in the report. */ }
+            requirement pairedComparison { doc /* The keyed tests are counted by which hidden-key resolver got each right, McNemar's exact p is given, and the word overlap's best-ranked answer is scored as well as its thresholded one. */ }
+            requirement changesSplit { doc /* A changed answer is counted as a change to none or to another requirement. */ }
+            requirement correctLinksOnly { doc /* Every probe is also reported on the links that were right. */ }
+            requirement blindList { doc /* The proposals for unkeyed tests are listed a second time, shuffled, without the resolver or its reason. */ }
+            requirement groundedAsWritten { doc /* A piece of evidence counts as found only if it occurs, apart from case, in the test's fields or the picked requirement. */ }
         }
     }
 

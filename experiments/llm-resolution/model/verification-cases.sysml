@@ -80,10 +80,14 @@ package Experiment_VerificationCases {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/ollama_test.go"; }
             doc /* A reply that is not the JSON asked for comes back as an error with its text kept. */
         }
+        action <'TestEXPSR04_TheSchemaAsksForTheAnswerBeforeItsEvidence'> answerFirst {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/ollama_test.go"; }
+            doc /* The schema sent lists requirement, evidence and reason in that order. */
+        }
     }
 
     verification def VC_EXP_SR_05 {
-        doc /* Deleting the cited words, and the control beside it. */
+        doc /* Deleting the cited words, and the two controls beside it. */
         subject experiment : Experiment;
         objective { verify EXP_SR_05_DeleteTheCitedWords.acceptance; }
         action <'TestEXPSR05_DeletionRemovesTheCitedWordsFromBothSides'> citedWordsDeleted {
@@ -93,6 +97,10 @@ package Experiment_VerificationCases {
         action <'TestEXPSR05_ControlRemovesAsManyOtherWords'> controlMatchesTheCount {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/probes_test.go"; }
             doc /* The control deletes as many words, none of them cited, the same ones on every run. */
+        }
+        action <'TestEXPSR05_TheRareSharedControlDeletesSharedWordsRarestFirst'> rareSharedControl {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/probes_test.go"; }
+            doc /* Uncited words the test and the requirement share go, the rarest first, until at least as many are gone as the deletion took. */
         }
         action <'TestEXPSR05_NothingToDeleteIsRecordedAndNotAsked'> nothingToDelete {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/run_test.go"; }
@@ -173,6 +181,26 @@ package Experiment_VerificationCases {
         action <'TestEXPSR11_ProbeRatesAndProposalsAreReported'> probesAndProposals {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
             doc /* Each probe's changed-answer rate and every unkeyed proposal appear. */
+        }
+        action <'TestEXPSR11_TheResolversAreComparedTestByTest'> pairedComparison {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* Both right, only one right, neither: counted per keyed test, with McNemar's exact p and the best-ranked baseline row. */
+        }
+        action <'TestEXPSR11_ChangedAnswersAreSplitIntoNoneAndAnother'> changesSplit {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* A change to none and a change to another requirement are counted apart. */
+        }
+        action <'TestEXPSR11_EveryProbeIsAlsoReportedOnCorrectLinks'> correctLinksOnly {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* Each probe has a row for the links that were right. */
+        }
+        action <'TestEXPSR11_UnkeyedProposalsAreListedForBlindJudgement'> blindList {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* The proposals appear again, shuffled, without resolver or reason. */
+        }
+        action <'TestEXPSR11_EvidenceCountsAsFoundOnlyAsWritten'> groundedAsWritten {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* Evidence found only word by word, or only in the question's fixed wording, does not count. */
         }
     }
 
