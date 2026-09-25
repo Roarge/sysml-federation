@@ -310,7 +310,7 @@ model-check: ## Put model/ to both SysML v2 reference tools
 experiment-model-check: ## Put the experiment's model, with the library it uses, to both tools
 	@$(SYSML_TOOLS); \
 	 files="$$(git ls-files --cached --others --exclude-standard -- \
-	   'model/library/*.sysml' 'experiments/*/model/*.sysml' | sort)"; \
+	   ':(glob)model/library/*.sysml' ':(glob)experiments/*/model/*.sysml' | sort)"; \
 	 case "$$files" in *experiments/*) ;; *) \
 	   printf 'experiment-model-check: no .sysml file under experiments/*/model/ -- nothing to validate\n' >&2; exit 1;; \
 	 esac; \
