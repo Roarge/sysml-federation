@@ -312,7 +312,7 @@ func (s Summary) Markdown() string {
 	var b strings.Builder
 	h := s.Header
 	b.WriteString("# Language model experiment: report\n\n")
-	fmt.Fprintf(&b, "Run started %s on commit `%s`. Model `%s` (digest `%s`, %s, %s) on Ollama %s.\n",
+	fmt.Fprintf(&b, "Run started %s on commit `%s`. Language model `%s` (digest `%s`, %s, %s) on Ollama %s.\n",
 		orUnknown(h.Started), orUnknown(h.Commit), h.Settings.Model, orUnknown(h.Server.Digest),
 		orUnknown(h.Server.ParameterSize), orUnknown(h.Server.Quantization), orUnknown(h.Server.Version))
 	fmt.Fprintf(&b, "Temperature %g, seed %d, context %d tokens. %d tests, %d of them carrying a key, and %d requirements.",
@@ -336,7 +336,7 @@ func (s Summary) Markdown() string {
 		meaning := probeMeaning[strings.TrimSuffix(p.Probe, ", correct links only")]
 		fmt.Fprintf(&b, "| %s | %s | %d | %s | %d | %d |\n", p.Probe, meaning, p.Changed.N, p.Changed, p.Skipped, p.Errors)
 	}
-	fmt.Fprintf(&b, "\nEvidence found in what the model was shown: %d of %d pieces, %s.\n", s.Grounded.K, s.Grounded.N, s.Grounded)
+	fmt.Fprintf(&b, "\nEvidence found in what the language model was shown: %d of %d pieces, %s.\n", s.Grounded.K, s.Grounded.N, s.Grounded)
 	fmt.Fprintf(&b, "Mean overlap of the cited words before and after the shuffle (Jaccard): %.2f.\n", s.OrderOverlap)
 	b.WriteString("\n## Links proposed for tests with no key\n\n")
 	b.WriteString("Nobody recorded an answer for these tests, so these are for a person to judge and count in no score.\n\n")
