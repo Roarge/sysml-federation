@@ -1,13 +1,13 @@
 # The parts of a resolution task
 
-*Roar Georgsen, 24 September 2026*
+*Roar Georgsen, 25 September 2026*
 
 Part 2 of 6 in [Automating traceability](../README.md).
 
 > [!IMPORTANT]
 > **The story so far**
 >
-> [Part 1](13-why-a-model-needs-entity-resolution.md) called the job entity resolution: deciding which things in a built system are the same as an element of its systems model, so that trace links between them can be found and kept. Its example was a made-up pipeline whose parse stage turned up under a different name in each of four tools. This part takes a single resolution task apart, and asks how exactly it needs stating before anyone builds something to do it.
+> [Part 1](13-why-a-model-needs-entity-resolution.md) called the job entity resolution: deciding which things in a built system are the same as an element of its systems model, so that trace links between them can be found and maintained. Its example was a made-up pipeline whose parse stage turned up under a different name in each of four tools. This part takes a single resolution task apart, and asks how exactly it needs stating before anyone builds something to do it.
 
 "Link the parse stage to the running system" sounds like a clear enough request, right up until someone sits down to do it. One engineer might start from the <span class="term" data-term="systems-model">systems model</span> and go through the infrastructure code for anything that deploys parse. Another might start from the traces and work out which element of the systems model each service belongs to. Both are doing entity resolution, and they're doing different jobs. The first can come back with any number of resources. The second has to pick, for each service, at most one element of the systems model, such as a <span class="term" data-term="part">part</span> or a requirement, out of the whole model. A wrong answer to the first is an extra resource or a missing one, and a wrong answer to the second files a service under the wrong part.
 
