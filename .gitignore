@@ -114,13 +114,15 @@
 !/illustrations/*/*.html
 
 # The language model experiment, a Go module of its own outside the product
-# (AD-0032): its module file, its README, the script that runs it and the
-# fixture tree its tests read. Its model's .sysml files and its .go files are
-# admitted by the unanchored rules above. What a run writes under results/
-# matches none of these rules and stays untracked (EXP-SC-04).
+# (AD-0032): its module file, its README, the script that runs it, the
+# incident's key and the fixture tree its tests read. Its model's .sysml files
+# and its .go files are admitted by the unanchored rules above. What a run
+# writes under results/ matches none of these rules and stays untracked
+# (EXP-SC-04).
 !/experiments/*/go.mod
 !/experiments/*/README.md
 !/experiments/*/*.sh
+!/experiments/*/incident-key.json
 
 # The documentation site. GitHub Pages builds docs/ with Jekyll, which needs
 # its configuration, its layouts, its includes and one stylesheet, each named

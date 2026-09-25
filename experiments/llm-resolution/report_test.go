@@ -30,8 +30,14 @@ func TestEXPSR11_WilsonIntervalsMatchKnownValues(t *testing.T) {
 	}
 }
 
-func reply(pick string, evidence ...string) *Reply {
-	return &Reply{Answer: Answer{Requirement: pick, Evidence: evidence, Reason: "r"}, Raw: `{"requirement":"` + pick + `"}`}
+// final is a browse's final line for a test, linked to pick alone.
+func final(probe, test, gold, basePick, pick string, evidence ...string) CallLine {
+	a := &TestAnswer{Links: []LinkAnswer{}, Evidence: evidence, Reason: "r"}
+	if pick != "none" {
+		a.Links = []LinkAnswer{{ID: pick, Relation: "verifies"}}
+	}
+	return CallLine{Probe: probe, Test: test, Gold: gold, BasePick: basePick, Final: true, Pick: pick,
+		Reply: &Reply{Raw: `{"links":"` + pick + `"}`}, Answer: a}
 }
 
 func findResolver(s Summary, name string) (ResolverScore, bool) {
@@ -51,9 +57,9 @@ func TestEXPSR11_OnlyKeyedTestsAreScored(t *testing.T) {
 			{Test: "C", Pick: "SR-01"},
 		},
 		Calls: []CallLine{
-			{Probe: "base", Test: "A", Gold: "SR-01", Reply: reply("SR-01")},
-			{Probe: "base", Test: "B", Gold: "SR-02", Reply: reply("none")},
-			{Probe: "base", Test: "C", Reply: reply("SR-02")},
+			final("base", "A", "SR-01", "", "SR-01"),
+			final("base", "B", "SR-02", "", "none"),
+			final("base", "C", "", "", "SR-02"),
 		},
 	}
 	s := Summarise(c)
@@ -75,23 +81,22 @@ func TestEXPSR11_OnlyKeyedTestsAreScored(t *testing.T) {
 }
 
 func TestEXPSR11_ProbeRatesAndProposalsAreReported(t *testing.T) {
-	same := reply("SR-01", "empty")
 	c := Contents{
 		Baseline: []BaselineResult{{Test: "A", Gold: "SR-01", Pick: "SR-01"}, {Test: "C", Pick: "SR-01"}},
 		Calls: []CallLine{
-			{Probe: "base", Test: "A", Gold: "SR-01", Reply: same},
-			{Probe: "base", Test: "C", Reply: reply("SR-02")},
-			{Probe: "reconstruction", Test: "A", BasePick: "SR-01", Reply: reply("none")},
-			{Probe: "reconstruction", Test: "C", BasePick: "SR-02", Note: "the model cited no evidence"},
-			{Probe: "repeat", Test: "A", Reply: same},
-			{Probe: "deletion", Test: "A", BasePick: "SR-01", Reply: reply("SR-02")},
-			{Probe: "control", Test: "A", BasePick: "SR-01", Reply: reply("SR-01")},
-			{Probe: "order", Test: "A", BasePick: "SR-01", Reply: reply("SR-01", "empty")},
+			final("base", "A", "SR-01", "", "SR-01", "empty"),
+			final("base", "C", "", "", "SR-02"),
+			final("reconstruction", "A", "SR-01", "SR-01", "none"),
+			{Probe: "reconstruction", Test: "C", BasePick: "SR-02", Final: true, Note: "the model cited no evidence"},
+			final("repeat", "A", "SR-01", "SR-01", "SR-01", "empty"),
+			final("deletion", "A", "SR-01", "SR-01", "SR-02"),
+			final("control", "A", "SR-01", "SR-01", "SR-01"),
+			final("rare-shared", "A", "SR-01", "SR-01", "SR-01"),
 		},
 	}
 	s := Summarise(c)
 	want := map[string][3]int{ // changed, asked, skipped
-		"deletion": {1, 1, 0}, "control": {0, 1, 0}, "reconstruction": {1, 1, 1}, "order": {0, 1, 0}, "repeat": {0, 1, 0},
+		"deletion": {1, 1, 0}, "control": {0, 1, 0}, "reconstruction": {1, 1, 1}, "rare-shared": {0, 1, 0}, "repeat": {0, 1, 0},
 	}
 	seen := map[string]bool{}
 	for _, p := range s.Probes {
@@ -138,10 +143,10 @@ func TestEXPSR11_TheResolversAreComparedTestByTest(t *testing.T) {
 			{Test: "D", Gold: "SR-04", Pick: "SR-01", Top: top("SR-01")},
 		},
 		Calls: []CallLine{
-			{Probe: "base", Test: "A", Gold: "SR-01", Reply: reply("SR-01")},
-			{Probe: "base", Test: "B", Gold: "SR-02", Reply: reply("SR-02")},
-			{Probe: "base", Test: "C", Gold: "SR-03", Reply: reply("none")},
-			{Probe: "base", Test: "D", Gold: "SR-04", Reply: reply("SR-05")},
+			final("base", "A", "SR-01", "", "SR-01"),
+			final("base", "B", "SR-02", "", "SR-02"),
+			final("base", "C", "SR-03", "", "none"),
+			final("base", "D", "SR-04", "", "SR-05"),
 		},
 	}
 	s := Summarise(c)
@@ -177,10 +182,10 @@ func TestEXPSR11_ChangedAnswersAreSplitIntoNoneAndAnother(t *testing.T) {
 	c := Contents{
 		Baseline: []BaselineResult{{Test: "A", Gold: "SR-01", Pick: "SR-01"}},
 		Calls: []CallLine{
-			{Probe: "base", Test: "A", Gold: "SR-01", Reply: reply("SR-01")},
-			{Probe: "reconstruction", Test: "A", BasePick: "SR-01", Reply: reply("none")},
-			{Probe: "deletion", Test: "A", BasePick: "SR-01", Reply: reply("SR-02")},
-			{Probe: "control", Test: "A", BasePick: "SR-01", Reply: reply("SR-01")},
+			final("base", "A", "SR-01", "", "SR-01"),
+			final("reconstruction", "A", "SR-01", "SR-01", "none"),
+			final("deletion", "A", "SR-01", "SR-01", "SR-02"),
+			final("control", "A", "SR-01", "SR-01", "SR-01"),
 		},
 	}
 	s := Summarise(c)
@@ -199,17 +204,15 @@ func TestEXPSR11_EveryProbeIsAlsoReportedOnCorrectLinks(t *testing.T) {
 	c := Contents{
 		Baseline: []BaselineResult{{Test: "A", Gold: "SR-01", Pick: "SR-01"}, {Test: "C", Pick: "SR-01"}},
 		Calls: []CallLine{
-			{Probe: "base", Test: "A", Gold: "SR-01", Reply: reply("SR-01")},
-			{Probe: "base", Test: "C", Reply: reply("SR-02")},
+			final("base", "A", "SR-01", "", "SR-01"),
+			final("base", "C", "", "", "SR-02"),
 		},
 	}
-	for _, p := range []string{"deletion", "control", "rare-shared", "reconstruction", "order"} {
-		c.Calls = append(c.Calls,
-			CallLine{Probe: p, Test: "A", BasePick: "SR-01", Reply: reply("SR-03")},
-			CallLine{Probe: p, Test: "C", BasePick: "SR-02", Reply: reply("SR-03")})
+	for _, p := range []string{"deletion", "control", "rare-shared", "reconstruction"} {
+		c.Calls = append(c.Calls, final(p, "A", "SR-01", "SR-01", "SR-03"), final(p, "C", "", "SR-02", "SR-03"))
 	}
 	s := Summarise(c)
-	for _, p := range []string{"deletion", "control", "rare-shared", "reconstruction", "order"} {
+	for _, p := range []string{"deletion", "control", "rare-shared", "reconstruction"} {
 		all, ok1 := findProbe(s, p)
 		right, ok2 := findProbe(s, p+", correct links only")
 		if !ok1 || !ok2 || all.Changed.N != 2 || right.Changed.N != 1 || right.Changed.K != 1 {
@@ -227,10 +230,10 @@ func TestEXPSR11_UnkeyedProposalsAreListedForBlindJudgement(t *testing.T) {
 			{Test: "U3", Pick: "none"},
 		},
 		Calls: []CallLine{
-			{Probe: "base", Test: "K", Gold: "SR-01", Reply: reply("SR-01")},
-			{Probe: "base", Test: "U1", Reply: &Reply{Answer: Answer{Requirement: "SR-01", Reason: "a telling sentence"}}},
-			{Probe: "base", Test: "U2", Reply: &Reply{Answer: Answer{Requirement: "SR-03", Reason: "another sentence"}}},
-			{Probe: "base", Test: "U3", Reply: reply("none")},
+			final("base", "K", "SR-01", "", "SR-01"),
+			{Probe: "base", Test: "U1", Final: true, Pick: "SR-01", Reply: &Reply{Raw: "{}"}, Answer: &TestAnswer{Links: []LinkAnswer{{ID: "SR-01", Relation: "verifies"}}, Reason: "a telling sentence"}},
+			{Probe: "base", Test: "U2", Final: true, Pick: "SR-03", Reply: &Reply{Raw: "{}"}, Answer: &TestAnswer{Links: []LinkAnswer{{ID: "SR-03", Relation: "verifies"}}, Reason: "another sentence"}},
+			final("base", "U3", "", "", "none"),
 		},
 	}
 	s := Summarise(c)
@@ -258,18 +261,67 @@ func TestEXPSR11_UnkeyedProposalsAreListedForBlindJudgement(t *testing.T) {
 }
 
 func TestEXPSR11_EvidenceCountsAsFoundOnlyAsWritten(t *testing.T) {
-	user := userPrompt(TestView{Name: "RejectsAnEmptyQuery", Package: "parse", File: "a/parse_test.go", Doc: "an empty query is refused"})
+	task := TestTask(Test{Name: "RejectsAnEmptyQuery", Package: "parse", File: "a/parse_test.go", Doc: "an empty query is refused"})
+	line := final("base", "A", "SR-01", "", "SR-01",
+		// found in the doc, found in the name, only in the question's fixed
+		// wording, the right words in the wrong order, found only in SR-01
+		"Empty Query", "Rejects", "requirement", "query empty", "parser shall reject")
+	line.Task = task.Text
 	c := Contents{
-		Header:   RunHeader{RequirementList: "SR-01 Parse queries: The parser shall reject an empty query.\nSR-02 Serve: Other.\n"},
 		Baseline: []BaselineResult{{Test: "A", Gold: "SR-01", Pick: "SR-01"}},
-		Calls: []CallLine{{Probe: "base", Test: "A", Gold: "SR-01", User: user, Reply: &Reply{Answer: Answer{
-			Requirement: "SR-01",
-			// found in the doc, found in the name, only in the question's fixed
-			// wording, the right words in the wrong order, found in SR-01
-			Evidence: []string{"Empty Query", "Rejects", "verify", "query empty", "parser shall reject"},
-		}}}},
+		Calls:    []CallLine{line},
 	}
-	if g := Summarise(c).Grounded; g.K != 3 || g.N != 5 {
-		t.Errorf("grounded %d of %d, want 3 of 5", g.K, g.N)
+	if g := Summarise(c).Grounded; g.K != 2 || g.N != 5 {
+		t.Errorf("grounded %d of %d, want 2 of 5", g.K, g.N)
+	}
+}
+
+func TestEXPSR11_OtherKindsAreMeasuredAgainstABaseRate(t *testing.T) {
+	a := final("base", "A", "SR-01", "", "SR-01")
+	a.Facts = []LinkFact{{ID: "SR-01", Kind: "requirement", Requirement: true}, {ID: "demo::x", Kind: "part", Near: true}, {ID: "Act", Kind: "action"}}
+	a.BaseRate = 0.25
+	b := final("base", "B", "SR-02", "", "SR-02")
+	b.Facts = []LinkFact{{ID: "SR-02", Kind: "requirement", Requirement: true}, {ID: "P2", Kind: "part", Near: true}}
+	b.BaseRate = 0.35
+	u := final("base", "C", "", "", "SR-02")
+	u.Facts = []LinkFact{{ID: "Q", Kind: "part"}}
+	s := Summarise(Contents{
+		Baseline: []BaselineResult{{Test: "A", Gold: "SR-01"}, {Test: "B", Gold: "SR-02"}, {Test: "C"}},
+		Calls:    []CallLine{a, b, u},
+	})
+	got := map[string][2]int{}
+	for _, k := range s.OtherKinds {
+		got[k.Kind] = [2]int{k.Links, k.Near}
+	}
+	if !reflect.DeepEqual(got, map[string][2]int{"part": {2, 2}, "action": {1, 0}}) {
+		t.Errorf("other kinds = %+v", s.OtherKinds)
+	}
+	if s.OtherNear.K != 2 || s.OtherNear.N != 3 || !near(s.BaseRate, 0.30) {
+		t.Errorf("near %+v, base rate %v", s.OtherNear, s.BaseRate)
+	}
+	md := s.Markdown()
+	for _, want := range []string{"part", "action", "within three links", "every element"} {
+		if !strings.Contains(md, want) {
+			t.Errorf("the report lacks %q", want)
+		}
+	}
+}
+
+func TestEXPSR21_SuspectedMismatchesAreListed(t *testing.T) {
+	a := final("base", "A", "SR-01", "", "SR-01")
+	a.Answer.Mismatches = []Mismatch{{ID: "Adapter::serve", ModelSays: "the store is in serve", SystemShows: "store.go is in projection", Why: "the file sits elsewhere"}}
+	inc := CallLine{Probe: ProbeIncident, Test: "incident", Variant: VariantReported, Final: true, Reply: &Reply{Raw: "{}"},
+		Account: &IncidentAnswer{Mismatches: []Mismatch{{ID: "SupervisorStates", ModelSays: "nothing restarts it", SystemShows: "no restart policy", Why: "compose.yml"}}},
+		Items:   []KeyResult{{Item: "the router is the cause", Found: true}, {Item: "the transition", Found: false}}}
+	s := Summarise(Contents{Baseline: []BaselineResult{{Test: "A", Gold: "SR-01"}}, Calls: []CallLine{a, inc}})
+	if len(s.Mismatches) != 2 {
+		t.Fatalf("mismatches = %+v", s.Mismatches)
+	}
+	md := s.Markdown()
+	for _, want := range []string{"Adapter::serve", "the store is in serve", "store.go is in projection", "the file sits elsewhere",
+		"SupervisorStates", "no restart policy", "the router is the cause", VariantReported} {
+		if !strings.Contains(md, want) {
+			t.Errorf("the report lacks %q", want)
+		}
 	}
 }

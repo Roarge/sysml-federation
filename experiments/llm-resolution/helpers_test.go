@@ -41,7 +41,7 @@ func fixtureRoot(t *testing.T) string {
 	if err := os.MkdirAll(hidden, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	src := "package hidden\n\nimport \"testing\"\n\nfunc TestSR01_InAHiddenFolderIsSkipped(t *testing.T) {}\n"
+	src := "package hidden\n\nimport \"testing\"\n\n// quokka\nfunc TestSR01_InAHiddenFolderIsSkipped(t *testing.T) {}\n"
 	if err := os.WriteFile(filepath.Join(hidden, "hidden_test.go"), []byte(src), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -59,6 +59,53 @@ func repoRoot(t *testing.T) string {
 		t.Skip("not inside the sysml-federation checkout")
 	}
 	return root
+}
+
+// fixtureKey is the incident key written for the fixture tree.
+const fixtureKey = "testdata/fixture-incident-key.json"
+
+// fixtureWiki reads the fixture tree's systems model.
+func fixtureWiki(t *testing.T) (*Wiki, string) {
+	t.Helper()
+	root := fixtureRoot(t)
+	w, err := LoadWiki(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return w, root
+}
+
+// realWiki reads the checkout's systems model once per test binary.
+var (
+	realOnce  sync.Once
+	realModel *Wiki
+	realErr   error
+)
+
+func realWiki(t *testing.T) *Wiki {
+	t.Helper()
+	root := repoRoot(t)
+	realOnce.Do(func() { realModel, realErr = LoadWiki(root) })
+	if realErr != nil {
+		t.Fatal(realErr)
+	}
+	return realModel
+}
+
+// fixtureKit gives the tools for one task over the fixture tree.
+func fixtureKit(t *testing.T, task string, sc Scope) (*ToolKit, *Wiki, string) {
+	t.Helper()
+	w, root := fixtureWiki(t)
+	code, err := LoadCode(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	corpus, err := LoadCorpus(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sc.Task = task
+	return NewToolKit(w, code, corpus.Requirements, sc), w, root
 }
 
 // ---- a stand-in for the Ollama server ------------------------------------------
@@ -79,9 +126,35 @@ type capturedRequest struct {
 	Model     string            `json:"model"`
 	Messages  []capturedMessage `json:"messages"`
 	Stream    bool              `json:"stream"`
-	Format    answerSchema      `json:"format"`
+	Format    json.RawMessage   `json:"format"`
 	Options   capturedOptions   `json:"options"`
 	KeepAlive string            `json:"keep_alive"`
+}
+
+func (r capturedRequest) system() string { return r.message("system") }
+func (r capturedRequest) user() string   { return r.message("user") }
+
+func (r capturedRequest) message(role string) string {
+	for _, m := range r.Messages {
+		if m.Role == role {
+			return m.Content
+		}
+	}
+	return ""
+}
+
+// schemaProperties are the property names of a reply schema as sent.
+type schemaProperties struct {
+	Properties map[string]json.RawMessage `json:"properties"`
+}
+
+func (r capturedRequest) asks(property string) bool {
+	var s schemaProperties
+	if json.Unmarshal(r.Format, &s) != nil {
+		return false
+	}
+	_, ok := s.Properties[property]
+	return ok
 }
 
 type fakeMessage struct {
@@ -123,7 +196,7 @@ type fakeServer struct {
 	requests []capturedRequest
 	models   []string
 	// reply returns the message content for one question.
-	reply func(system, user string) string
+	reply func(q capturedRequest) string
 	// before runs before each chat reply, with the number of chats so far.
 	before func(n int)
 }
@@ -160,17 +233,8 @@ func (f *fakeServer) handle(w http.ResponseWriter, r *http.Request) {
 		if f.before != nil {
 			f.before(n)
 		}
-		system, user := "", ""
-		for _, m := range req.Messages {
-			switch m.Role {
-			case "system":
-				system = m.Content
-			case "user":
-				user = m.Content
-			}
-		}
 		_ = json.NewEncoder(w).Encode(fakeChatReply{
-			Model: req.Model, Message: fakeMessage{Role: "assistant", Content: f.reply(system, user)},
+			Model: req.Model, Message: fakeMessage{Role: "assistant", Content: f.reply(req)},
 			Done: true, TotalDuration: 1_000_000, PromptEvalCount: 100, EvalCount: 20,
 		})
 	default:
@@ -186,28 +250,97 @@ func (f *fakeServer) chats() []capturedRequest {
 
 var nameLineRE = regexp.MustCompile(`(?m)^name: (.*)$`)
 
-// fixtureAnswers are what the stand-in answers for the fixture's tests,
-// looked up by the name the question shows. A name it doesn't know, such as
-// one with words deleted, gets "none".
-var fixtureAnswers = map[string]Answer{
-	"RejectsAnEmptyQuery":           {Requirement: "SR-01", Evidence: []string{"empty query"}, Reason: "It rejects an empty query."},
-	"ParsesTokens":                  {Requirement: "SR-01", Evidence: []string{"tokens"}, Reason: "It parses tokens."},
-	"ReturnsARankedPage":            {Requirement: "SR-02", Evidence: []string{"ranked page"}, Reason: "It returns a ranked page."},
-	"ReportsLatency":                {Requirement: "SR-03", Evidence: []string{"latency"}, Reason: "It reports latency."},
-	"ImportsOnlyTheStandardLibrary": {Requirement: "SC-01", Evidence: []string{"standard library"}, Reason: "It checks the imports."},
-	"ServesTopResults":              {Requirement: "SR-02", Evidence: []string{"top results"}, Reason: "It serves the top results."},
-	"Health":                        {Requirement: "SR-03", Evidence: []string{"page"}, Reason: "A health check reads a page."},
+// fixtureLink is what the stand-in links a fixture test to, by the name the
+// task shows. A name it doesn't know, such as one with words deleted, is
+// linked to nothing.
+type fixtureLink struct {
+	id       string
+	evidence []string
 }
 
-func fixturePolicy(system, user string) string {
-	a := Answer{Requirement: "none", Evidence: []string{}, Reason: "Nothing fits."}
+var fixtureLinks = map[string]fixtureLink{
+	"RejectsAnEmptyQuery":           {"SR-01", []string{"empty query"}},
+	"ParsesTokens":                  {"SR-01", []string{"tokens"}},
+	"ReturnsARankedPage":            {"SR-02", []string{"ranked page"}},
+	"ReportsLatency":                {"SR-03", []string{"latency"}},
+	"ImportsOnlyTheStandardLibrary": {"SC-01", []string{"standard library"}},
+	"ServesTopResults":              {"SR-02", []string{"top results"}},
+	"Health":                        {"SR-03", []string{"page"}},
+}
+
+// taskName is the test name a question's task shows, or "" for the incident.
+func taskName(user string) string {
 	if m := nameLineRE.FindStringSubmatch(user); m != nil {
-		if known, ok := fixtureAnswers[strings.TrimSpace(m[1])]; ok {
-			a = known
-		}
+		return strings.TrimSpace(m[1])
 	}
+	return ""
+}
+
+func stepJSON(s Step) string {
+	data, _ := json.Marshal(s)
+	return string(data)
+}
+
+func testAnswerJSON(a TestAnswer) string {
 	data, _ := json.Marshal(a)
 	return string(data)
+}
+
+func incidentAnswerJSON(a IncidentAnswer) string {
+	data, _ := json.Marshal(a)
+	return string(data)
+}
+
+// fixturePolicy browses every task in two steps and then answers. A test's
+// first step searches the requirements for its name and the second exposes
+// the requirement it knows and stops. The incident's first step reads the
+// links of the server's state machine and the second exposes it and stops.
+func fixturePolicy(q capturedRequest) string {
+	user := q.user()
+	name := taskName(user)
+	incident := name == "" && !strings.Contains(user, "name: ")
+	known, ok := fixtureLinks[name]
+	switch {
+	case q.asks("tool"):
+		s := Step{Viewpoint: "Which requirement does this test verify?", Expose: []Exposure{}, Prune: []string{}}
+		if incident {
+			s.Viewpoint = "Why is the query page down?"
+		}
+		switch {
+		case strings.Contains(user, "Last call: none") && incident:
+			s.Tool, s.Arg = "links", "ServerStates"
+		case strings.Contains(user, "Last call: none"):
+			s.Tool, s.Arg, s.Arg2 = "find", name, "requirement"
+		case incident:
+			s.Tool = "done"
+			s.Expose = []Exposure{{ID: "ServerStates", Note: "stops the server when the parser exits"}}
+		default:
+			s.Tool = "done"
+			if ok {
+				s.Expose = []Exposure{{ID: known.id, Note: "the requirement it verifies"}}
+			}
+		}
+		return stepJSON(s)
+	case q.asks("links"):
+		a := TestAnswer{Links: []LinkAnswer{}, Evidence: []string{}, Reason: "Nothing fits.", Mismatches: []Mismatch{}}
+		if ok {
+			a.Links = []LinkAnswer{{ID: known.id, Relation: "verifies"}}
+			a.Evidence = known.evidence
+			a.Reason = "The test checks what " + known.id + " asks for."
+		}
+		return testAnswerJSON(a)
+	case q.asks("cause"):
+		return incidentAnswerJSON(IncidentAnswer{
+			Cause:        []string{"system::parser"},
+			Mechanism:    []string{"ServerStates::onParserExit"},
+			Code:         []string{"adapter/serve/serve.go"},
+			Consequences: []string{"SR-01", "SR-02"},
+			Path:         []string{"SR-02", "system::server", "Server", "ServerStates", "ServerStates::onParserExit"},
+			Why:          "The parser exited and the server's state machine stops the server when it does.",
+			Mismatches:   []Mismatch{},
+		})
+	}
+	return "{}"
 }
 
 // runExperiment runs the program with the given arguments and returns its
@@ -217,6 +350,13 @@ func runExperiment(t *testing.T, args ...string) (int, string, string) {
 	var stdout, stderr bytes.Buffer
 	code := run(args, &stdout, &stderr)
 	return code, stdout.String(), stderr.String()
+}
+
+// runFixture runs the program against the stand-in on a fixture tree.
+func runFixture(t *testing.T, f *fakeServer, root, out string, extra ...string) (int, string, string) {
+	t.Helper()
+	args := append([]string{"-url", f.URL, "-repo", root, "-out", out, "-key", fixtureKey}, extra...)
+	return runExperiment(t, args...)
 }
 
 // resultsFile finds the one results file a run wrote under dir.
@@ -229,11 +369,25 @@ func resultsFile(t *testing.T, dir string) string {
 	return files[0]
 }
 
-// callsWithProbe returns the call lines of one probe.
-func callsWithProbe(c Contents, probe string) []CallLine {
+// readRun runs a full fixture run and reads its results file back.
+func readRun(t *testing.T, f *fakeServer, extra ...string) Contents {
+	t.Helper()
+	dir := t.TempDir()
+	if code, _, stderr := runFixture(t, f, fixtureRoot(t), dir, extra...); code != 0 {
+		t.Fatalf("exit %d: %s", code, stderr)
+	}
+	c, err := ReadResults(resultsFile(t, dir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return c
+}
+
+// finals returns the final lines of one probe, one per browse or note.
+func finals(c Contents, probe string) []CallLine {
 	var out []CallLine
 	for _, cl := range c.Calls {
-		if cl.Probe == probe {
+		if cl.Probe == probe && cl.Final {
 			out = append(out, cl)
 		}
 	}

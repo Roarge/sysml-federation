@@ -15,38 +15,28 @@ import (
 	"testing"
 )
 
-// The fixture has eight tests, and the stand-in links seven of them, so a
-// full run asks 8 base questions, 7 for each of the four probes that follow
-// a link and ask whatever the evidence, 6 for the rare-shared control (the
-// Health test shares no uncited word with its requirement), and 2 repeats:
-// 44 in all.
-const fixtureQuestions = 44
+// The fixture has eight tests, and the stand-in browses every task in two
+// tool calls and a final question, three questions a browse. A full run
+// browses the eight tests, the incident five ways, the four probes on the
+// two tests of the probe sample, and two repeats: 8 + 5 + 8 + 2 = 23
+// browses, 69 questions.
+const fixtureQuestions = 69
 
 func TestEXPSR05_NothingToDeleteIsRecordedAndNotAsked(t *testing.T) {
 	f := newFakeServer(t)
-	f.reply = func(system, user string) string {
-		a := Answer{Requirement: "none", Evidence: []string{}, Reason: "Nothing fits."}
-		if m := nameLineRE.FindStringSubmatch(user); m != nil {
-			if known, ok := fixtureAnswers[strings.TrimSpace(m[1])]; ok {
-				a = known
-				a.Evidence = []string{"zzzz"}
+	f.reply = func(q capturedRequest) string {
+		if q.asks("links") {
+			if known, ok := fixtureLinks[taskName(q.user())]; ok {
+				return testAnswerJSON(TestAnswer{Links: []LinkAnswer{{ID: known.id, Relation: "verifies"}}, Evidence: []string{"zzzz"}, Mismatches: []Mismatch{}})
 			}
 		}
-		data, _ := json.Marshal(a)
-		return string(data)
+		return fixturePolicy(q)
 	}
-	dir := t.TempDir()
-	if code, _, stderr := runExperiment(t, "-url", f.URL, "-repo", fixtureRoot(t), "-out", dir); code != 0 {
-		t.Fatalf("exit %d: %s", code, stderr)
-	}
-	c, err := ReadResults(resultsFile(t, dir))
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, probe := range []string{"deletion", "control", "rare-shared"} {
-		lines := callsWithProbe(c, probe)
-		if len(lines) != 7 {
-			t.Fatalf("%d %s lines, want 7", len(lines), probe)
+	c := readRun(t, f)
+	for _, probe := range []string{ProbeDeletion, ProbeControl, ProbeRareShared} {
+		lines := finals(c, probe)
+		if len(lines) != 2 {
+			t.Fatalf("%d %s lines, want one for each of the two sampled tests", len(lines), probe)
 		}
 		for _, cl := range lines {
 			if cl.Note == "" || cl.Reply != nil || cl.User != "" {
@@ -54,8 +44,45 @@ func TestEXPSR05_NothingToDeleteIsRecordedAndNotAsked(t *testing.T) {
 			}
 		}
 	}
-	if got, want := len(f.chats()), fixtureQuestions-20; got != want {
+	for _, cl := range c.Calls {
+		if (cl.Probe == ProbeDeletion || cl.Probe == ProbeControl || cl.Probe == ProbeRareShared) && !cl.Final {
+			t.Errorf("a %s question was asked: %s", cl.Probe, cl.Key)
+		}
+	}
+	if got, want := len(f.chats()), fixtureQuestions-18; got != want {
 		t.Errorf("%d questions asked, want %d", got, want)
+	}
+}
+
+func TestEXPSR05_TheProbeSampleIsEveryFourthLinkedTest(t *testing.T) {
+	var tests []Test
+	picks := map[string]string{}
+	for i := 0; i < 12; i++ {
+		tt := Test{ID: fmt.Sprint(i)}
+		tests = append(tests, tt)
+		if i%3 != 2 { // every third test is linked to nothing
+			picks[tt.ID] = "SR-01"
+		} else {
+			picks[tt.ID] = "none"
+		}
+	}
+	var ids []string
+	for _, tt := range probeSample(tests, picks) {
+		ids = append(ids, tt.ID)
+	}
+	// Linked, in order: 0 1 3 4 6 7 9 10. The first and every fourth after it.
+	if strings.Join(ids, ",") != "0,6" {
+		t.Fatalf("probe sample = %v, want 0,6", ids)
+	}
+
+	c := readRun(t, newFakeServer(t))
+	var probed []string
+	for _, cl := range finals(c, ProbeReconstruction) {
+		probed = append(probed, cl.Test)
+	}
+	want := []string{"adapter/parse/parse_test.go#TestSR01_ParsesTokens", "adapter/serve/serve_test.go#TestSR02_ReturnsARankedPage"}
+	if !reflect.DeepEqual(probed, want) {
+		t.Errorf("the fixture run probed %v, want %v", probed, want)
 	}
 }
 
@@ -72,28 +99,13 @@ func TestEXPSR08_EveryFourthTestIsAskedTwice(t *testing.T) {
 		t.Fatalf("repeat sample = %v, want 0,4,8", ids)
 	}
 
-	f := newFakeServer(t)
-	root := fixtureRoot(t)
-	dir := t.TempDir()
-	if code, _, stderr := runExperiment(t, "-url", f.URL, "-repo", root, "-out", dir); code != 0 {
-		t.Fatalf("exit %d: %s", code, stderr)
-	}
-	c, err := ReadResults(resultsFile(t, dir))
-	if err != nil {
-		t.Fatal(err)
-	}
-	corpus, err := LoadCorpus(root)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var got, want []string
-	for _, cl := range callsWithProbe(c, "repeat") {
+	c := readRun(t, newFakeServer(t))
+	var got []string
+	for _, cl := range finals(c, ProbeRepeat) {
 		got = append(got, cl.Test)
 	}
-	for _, tt := range repeatSample(corpus.Tests) {
-		want = append(want, tt.ID)
-	}
-	if len(want) != 2 || !reflect.DeepEqual(got, want) {
+	want := []string{"adapter/parse/parse_test.go#TestHelperBuildsAQuery", "adapter/serve/serve_test.go#TestHealth"}
+	if !reflect.DeepEqual(got, want) {
 		t.Errorf("repeated %v, want %v", got, want)
 	}
 }
@@ -133,7 +145,7 @@ func TestEXPSR09_EachReplyIsWrittenAsItArrives(t *testing.T) {
 			t.Errorf("before question %d the file holds %d replies, want %d", n+1, got, n)
 		}
 	}
-	if code, _, stderr := runExperiment(t, "-url", f.URL, "-repo", fixtureRoot(t), "-out", dir); code != 0 {
+	if code, _, stderr := runFixture(t, f, fixtureRoot(t), dir); code != 0 {
 		t.Fatalf("exit %d: %s", code, stderr)
 	}
 	if got := replyLines(t, resultsFile(t, dir)); got != fixtureQuestions {
@@ -161,7 +173,7 @@ func TestEXPSR09_TheHeaderRecordsWhatARepeatNeeds(t *testing.T) {
 	}
 	f := newFakeServer(t)
 	dir := t.TempDir()
-	if code, _, stderr := runExperiment(t, "-url", f.URL, "-repo", root, "-out", dir, "-quick"); code != 0 {
+	if code, _, stderr := runFixture(t, f, root, dir, "-quick"); code != 0 {
 		t.Fatalf("exit %d: %s", code, stderr)
 	}
 	c, err := ReadResults(resultsFile(t, dir))
@@ -169,6 +181,10 @@ func TestEXPSR09_TheHeaderRecordsWhatARepeatNeeds(t *testing.T) {
 		t.Fatal(err)
 	}
 	corpus, err := LoadCorpus(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := LoadWiki(root)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,6 +197,15 @@ func TestEXPSR09_TheHeaderRecordsWhatARepeatNeeds(t *testing.T) {
 	}
 	if h.CorpusHash == "" || h.CorpusHash != corpus.Hash() {
 		t.Errorf("corpus hash %q, want %q", h.CorpusHash, corpus.Hash())
+	}
+	if h.ModelHash == "" || h.ModelHash != w.Hash() {
+		t.Errorf("systems model hash %q, want %q", h.ModelHash, w.Hash())
+	}
+	if h.TestInstructions != SystemMessage(TaskTest) || h.IncidentInstructions != SystemMessage(TaskIncident) || h.Key.Report == "" {
+		t.Errorf("header instructions or key missing: %+v", h.Key)
+	}
+	if h.BudgetTest != BudgetTest || h.BudgetIncident != BudgetIncident {
+		t.Errorf("budgets %d and %d", h.BudgetTest, h.BudgetIncident)
 	}
 }
 
@@ -235,16 +260,16 @@ func TestEXPSR10_ResumingAsksOnlyWhatIsMissing(t *testing.T) {
 	root := fixtureRoot(t)
 	f := newFakeServer(t)
 	first := t.TempDir()
-	if code, _, stderr := runExperiment(t, "-url", f.URL, "-repo", root, "-out", first); code != 0 {
+	if code, _, stderr := runFixture(t, f, root, first); code != 0 {
 		t.Fatalf("exit %d: %s", code, stderr)
 	}
 	full := resultsFile(t, first)
 	stopped := filepath.Join(t.TempDir(), "stopped.jsonl")
-	answered := truncate(t, full, stopped, 12, func(s string) string { return s })
+	answered := truncate(t, full, stopped, 13, func(s string) string { return s })
 
 	g := newFakeServer(t)
 	second := t.TempDir()
-	if code, _, stderr := runExperiment(t, "-url", g.URL, "-repo", root, "-out", second, "-resume", stopped); code != 0 {
+	if code, _, stderr := runFixture(t, g, root, second, "-resume", stopped); code != 0 {
 		t.Fatalf("resumed run: exit %d: %s", code, stderr)
 	}
 	if got, want := len(g.chats()), fixtureQuestions-answered; got != want {
@@ -259,24 +284,29 @@ func TestEXPSR10_ResumingRefusesADifferentCorpusOrSettings(t *testing.T) {
 	root := fixtureRoot(t)
 	f := newFakeServer(t)
 	first := t.TempDir()
-	if code, _, stderr := runExperiment(t, "-url", f.URL, "-repo", root, "-out", first, "-quick"); code != 0 {
+	if code, _, stderr := runFixture(t, f, root, first, "-quick"); code != 0 {
 		t.Fatalf("exit %d: %s", code, stderr)
 	}
-	stopped := filepath.Join(t.TempDir(), "other-corpus.jsonl")
-	truncate(t, resultsFile(t, first), stopped, 3, func(s string) string {
-		var h RunHeader
-		_ = json.Unmarshal([]byte(s), &h)
-		return strings.Replace(s, `"corpus_hash":"`+h.CorpusHash+`"`, `"corpus_hash":"0000000000000000"`, 1)
-	})
 	g := newFakeServer(t)
-	code, _, stderr := runExperiment(t, "-url", g.URL, "-repo", root, "-out", t.TempDir(), "-quick", "-resume", stopped)
-	if code != 2 || !strings.Contains(stderr, "different") {
-		t.Errorf("another corpus: exit %d, stderr %q", code, stderr)
+	for name, field := range map[string]string{"corpus": "corpus_hash", "systems model": "model_hash"} {
+		stopped := filepath.Join(t.TempDir(), "other.jsonl")
+		truncate(t, resultsFile(t, first), stopped, 3, func(s string) string {
+			i := strings.Index(s, `"`+field+`":"`)
+			if i < 0 {
+				t.Fatalf("no %s in the header", field)
+			}
+			j := i + len(field) + 4
+			return s[:j] + "0000" + s[j+4:]
+		})
+		code, _, stderr := runFixture(t, g, root, t.TempDir(), "-quick", "-resume", stopped)
+		if code != 2 || !strings.Contains(stderr, "different") {
+			t.Errorf("another %s: exit %d, stderr %q", name, code, stderr)
+		}
 	}
 
 	same := filepath.Join(t.TempDir(), "same.jsonl")
 	truncate(t, resultsFile(t, first), same, 3, func(s string) string { return s })
-	code, _, stderr = runExperiment(t, "-url", g.URL, "-repo", root, "-out", t.TempDir(), "-quick", "-seed", "7", "-resume", same)
+	code, _, stderr := runFixture(t, g, root, t.TempDir(), "-quick", "-seed", "7", "-resume", same)
 	if code != 2 || !strings.Contains(stderr, "different") {
 		t.Errorf("other settings: exit %d, stderr %q", code, stderr)
 	}
@@ -305,7 +335,7 @@ func TestEXPSR12_OnlyTheGivenServerIsContacted(t *testing.T) {
 	t.Cleanup(func() { transport = saved })
 
 	f := newFakeServer(t)
-	if code, _, stderr := runExperiment(t, "-url", f.URL, "-repo", fixtureRoot(t), "-out", t.TempDir()); code != 0 {
+	if code, _, stderr := runFixture(t, f, fixtureRoot(t), t.TempDir()); code != 0 {
 		t.Fatalf("exit %d: %s", code, stderr)
 	}
 	given, _ := url.Parse(f.URL)
@@ -319,7 +349,7 @@ func TestEXPSR12_OnlyTheGivenServerIsContacted(t *testing.T) {
 	}
 }
 
-func TestEXPSR14_AQuickRunTakesTwelveTests(t *testing.T) {
+func TestEXPSR14_AQuickRunTakesTwelveTestsAndOneIncident(t *testing.T) {
 	c, err := LoadCorpus(repoRoot(t))
 	if err != nil {
 		t.Fatal(err)
@@ -339,17 +369,68 @@ func TestEXPSR14_AQuickRunTakesTwelveTests(t *testing.T) {
 	}
 
 	f := newFakeServer(t)
-	dir := t.TempDir()
-	if code, _, stderr := runExperiment(t, "-url", f.URL, "-repo", fixtureRoot(t), "-out", dir, "-quick"); code != 0 {
-		t.Fatalf("exit %d: %s", code, stderr)
+	results := readRun(t, f, "-quick")
+	// The fixture has six keyed tests and two without, fewer than a quick run
+	// takes, so it takes them all.
+	if got := len(finals(results, ProbeBase)); got != 8 {
+		t.Errorf("%d tests browsed in a quick run of the fixture, want 8", got)
 	}
-	results, err := ReadResults(resultsFile(t, dir))
+	incidents := finals(results, ProbeIncident)
+	if len(incidents) != 1 || incidents[0].Variant != VariantReported {
+		t.Errorf("incident browses in a quick run: %+v", incidents)
+	}
+	if got := len(f.chats()); got != 57 {
+		t.Errorf("a quick run of the fixture asked %d questions, want 57", got)
+	}
+}
+
+func TestEXPSR22_TheIncidentIsBrowsedInFiveWays(t *testing.T) {
+	f := newFakeServer(t)
+	c := readRun(t, f)
+	lines := finals(c, ProbeIncident)
+	var variants []string
+	for _, cl := range lines {
+		variants = append(variants, cl.Variant)
+		if cl.Account == nil || len(cl.Items) == 0 || len(cl.Citations) == 0 || cl.SysML == "" {
+			t.Errorf("%s: account %v, %d key items, %d citations, view %q", cl.Variant, cl.Account, len(cl.Items), len(cl.Citations), cl.SysML)
+		}
+	}
+	want := []string{VariantReported, VariantAgain, VariantAlertOnly, VariantRemoved, VariantControl}
+	if !reflect.DeepEqual(variants, want) {
+		t.Fatalf("incident variants %v, want %v", variants, want)
+	}
+	key, err := LoadKey(fixtureKey)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// The fixture has six keyed tests and two without, fewer than a quick run
-	// takes, so it takes them all.
-	if got := len(callsWithProbe(results, "base")); got != 8 {
-		t.Errorf("%d base questions in a quick run of the fixture, want 8", got)
+	for _, cl := range c.Calls {
+		if cl.Probe != ProbeIncident || cl.Step != 1 {
+			continue
+		}
+		task := cl.User
+		switch cl.Variant {
+		case VariantAlertOnly:
+			if !strings.Contains(task, key.AlertOnly) || strings.Contains(task, "parser exited") {
+				t.Errorf("the alert-only task:\n%s", task)
+			}
+		default:
+			if !strings.Contains(task, key.Report) {
+				t.Errorf("%s task:\n%s", cl.Variant, task)
+			}
+		}
+	}
+	for _, cl := range c.Calls {
+		if cl.Probe == ProbeIncident && cl.Tool == "links" {
+			removed := !strings.Contains(cl.ToolAnswer, "onParserExit")
+			if removed != (cl.Variant == VariantRemoved) {
+				t.Errorf("%s: links of ServerStates:\n%s", cl.Variant, cl.ToolAnswer)
+			}
+		}
+	}
+	for _, cl := range lines {
+		cited, _ := citation(cl.Citations, "mechanism", "ServerStates::onParserExit")
+		if cited.Found == (cl.Variant == VariantRemoved) {
+			t.Errorf("%s: the citation of the transition is %+v", cl.Variant, cited)
+		}
 	}
 }

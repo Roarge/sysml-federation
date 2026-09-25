@@ -1,0 +1,14 @@
+{
+  "report": "The alert \"query page answers\" has failed since 02:10, checked every ten minutes. The server has stopped, and its last line reads: server: parser exited",
+  "alert_only": "The alert \"query page answers\" has failed since 02:10, checked every ten minutes.",
+  "items": [
+    {"item": "the parser is the cause", "field": "cause", "any": ["Fixture_LogicalArchitecture::system::parser", "Fixture_LogicalArchitecture::Parser"]},
+    {"item": "the server's state machine is the mechanism", "field": "mechanism", "any": ["Fixture_Behaviour::ServerStates"]},
+    {"item": "the transition on the parser's exit", "field": "mechanism", "any": ["Fixture_Behaviour::ServerStates::onParserExit", "Fixture_Behaviour::ParserExited"]},
+    {"item": "serve.go is the code to read", "field": "code", "any": ["adapter/serve/serve.go"]},
+    {"item": "SR-02 is unmet", "field": "consequences", "any": ["SR-02"]},
+    {"item": "the stakeholder story behind SR-02", "field": "consequences", "any": ["US-01"]}
+  ],
+  "remove_element": "Fixture_Behaviour::ServerStates::onParserExit",
+  "control_link": {"from": "Fixture_Behaviour::AnswerAQuery::serve", "rel": "allocated to", "to": "Fixture_LogicalArchitecture::system::server"}
+}
