@@ -94,8 +94,8 @@ Services in a Docker Compose file and services in OpenTelemetry both have to res
 
 A Compose service and a traced service are different kinds of evidence, even when they name the same part. A wrong link from telemetry sends the engineer on call to the wrong place, and a wrong link from the Compose file breaks a deployment view. I'd keep them apart, with their own cards and their own scores. Reading OpenTofu's configuration and its state is a different matter, since both describe the same resources and the links mean the same thing either way, so I'd call that one task.
 
-Part 3, coming up next, asks why no task gets every link right however carefully it's stated, and why that's less of a problem than it sounds.
+[Part 3](15-why-no-resolver-gets-every-link-right.md) asks why no task gets every link right however carefully it's stated, and why that's less of a problem than it sounds.
 
 ---
 
-Previous: [Why does a systems model need entity resolution?](13-why-a-model-needs-entity-resolution.md) · Index: [Automating traceability](../README.md)
+Previous: [Why does a systems model need entity resolution?](13-why-a-model-needs-entity-resolution.md) · Index: [Automating traceability](../README.md) · Next: [Why no resolver gets every link right](15-why-no-resolver-gets-every-link-right.md)

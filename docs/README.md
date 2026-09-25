@@ -82,6 +82,13 @@ What is entity resolution between a systems model and a built system, and what i
 2. [The parts of a resolution task](articles/14-the-parts-of-a-resolution-task.md)  
    What goes into a single resolution task, from what counts as a candidate to where the finished link lands? And why do two tools disagree about whether a renamed thing is still the same thing?
 
+### Errors and measurement
+
+Why does no resolver get every link right, and what does that mean for how one is put to work?
+
+3. [Why no resolver gets every link right](articles/15-why-no-resolver-gets-every-link-right.md)  
+   One change to a made-up pipeline breaks three links nobody touched. Why are some wrong links and missing ones certain, and when can a resolver still be left to add links on its own?
+
 ## The repository
 
 The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence.
