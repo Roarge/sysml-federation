@@ -50,9 +50,11 @@ func wordSpans(s string) [][2]int {
 		case unicode.IsLower(prev) && unicode.IsUpper(r):
 			flush(i)
 			start = i
-		case unicode.IsUpper(prev) && unicode.IsUpper(r) && i+1 < len(rs) && unicode.IsLower(rs[i+1]):
+		case unicode.IsUpper(prev) && unicode.IsUpper(r) && i+1 < len(rs) && unicode.IsLower(rs[i+1]) && !pluralS(rs, i+1):
 			flush(i)
 			start = i
+		case unicode.IsUpper(prev) && unicode.IsLower(r) && pluralS(rs, i):
+			// the s of an acronym's plural, URLs or IDs, stays with it
 		case unicode.IsLetter(prev) != unicode.IsLetter(r):
 			flush(i)
 			start = i
@@ -60,6 +62,13 @@ func wordSpans(s string) [][2]int {
 	}
 	flush(len(rs))
 	return spans
+}
+
+// pluralS reports whether rs[i] is a lone lower-case s closing an acronym,
+// as in URLs, with nothing lower-case after it.
+func pluralS(rs []rune, i int) bool {
+	return rs[i] == 's' && i >= 2 && unicode.IsUpper(rs[i-1]) && unicode.IsUpper(rs[i-2]) &&
+		(i+1 == len(rs) || !unicode.IsLower(rs[i+1]))
 }
 
 var stopWords = map[string]bool{}
