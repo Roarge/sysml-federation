@@ -5,8 +5,8 @@
 #   OLLAMA_URL=http://192.168.1.20:11434 bash experiments/llm-resolution/run.sh -quick
 #   OLLAMA_URL=http://192.168.1.20:11434 bash experiments/llm-resolution/run.sh
 #
-# The first is a quick run of twelve tests, a few minutes long, to show the
-# chain works. The second is the full run, about an hour. Each writes one
+# The first is a quick run of twelve tests and the incident, to show the
+# chain works. The second is the full run, about two hours. Each writes one
 # results file under experiments/llm-resolution/results/ and prints its path.
 # That file is the one to hand back. Any other flag is passed on: -resume FILE
 # picks up a stopped run, -model NAME asks another model, -out DIR writes

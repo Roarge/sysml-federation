@@ -296,7 +296,9 @@ func TestEXPSR11_OtherKindsAreMeasuredAgainstABaseRate(t *testing.T) {
 	if !reflect.DeepEqual(got, map[string][2]int{"part": {2, 2}, "action": {1, 0}}) {
 		t.Errorf("other kinds = %+v", s.OtherKinds)
 	}
-	if s.OtherNear.K != 2 || s.OtherNear.N != 3 || !near(s.BaseRate, 0.30) {
+	// Two links near SR-01, where a random element is near a quarter of the
+	// time, and one near SR-02, where it is 0.35: an expected share of 0.28.
+	if s.OtherNear.K != 2 || s.OtherNear.N != 3 || !near(s.BaseRate, (0.25*2+0.35)/3) {
 		t.Errorf("near %+v, base rate %v", s.OtherNear, s.BaseRate)
 	}
 	md := s.Markdown()

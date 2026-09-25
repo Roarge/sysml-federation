@@ -141,26 +141,6 @@ func removeTerms(s string, drop map[string]bool) (string, int) {
 	return collapseSpaces(b.String()), removed
 }
 
-// removeOccurrences deletes the words at the given positions (indexes into
-// the content words of s, as terms would list them).
-func removeOccurrences(s string, positions map[int]bool) string {
-	var b strings.Builder
-	last, idx := 0, 0
-	for _, sp := range wordSpans(s) {
-		n := normalise(s[sp[0]:sp[1]])
-		if len(n) < 2 || stopWords[n] || isNumber(n) {
-			continue
-		}
-		if positions[idx] {
-			b.WriteString(s[last:sp[0]])
-			last = sp[1]
-		}
-		idx++
-	}
-	b.WriteString(s[last:])
-	return collapseSpaces(b.String())
-}
-
 func collapseSpaces(s string) string {
 	return strings.Join(strings.Fields(s), " ")
 }

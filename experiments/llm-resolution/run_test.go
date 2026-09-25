@@ -104,7 +104,8 @@ func TestEXPSR08_EveryFourthTestIsAskedTwice(t *testing.T) {
 	for _, cl := range finals(c, ProbeRepeat) {
 		got = append(got, cl.Test)
 	}
-	want := []string{"adapter/parse/parse_test.go#TestHelperBuildsAQuery", "adapter/serve/serve_test.go#TestHealth"}
+	// In the order read: the helper, two parse tests, Health, and SC-01's.
+	want := []string{"adapter/parse/parse_test.go#TestHelperBuildsAQuery", "adapter/serve/serve_test.go#TestSC01_ImportsOnlyTheStandardLibrary"}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("repeated %v, want %v", got, want)
 	}

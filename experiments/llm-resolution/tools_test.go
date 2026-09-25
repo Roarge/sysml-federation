@@ -214,8 +214,8 @@ func TestEXPSR17_EveryAnswerStaysWithinItsLimit(t *testing.T) {
 	}{
 		{"find", "server", "", true},
 		{"find", "the router", "part", false},
-		{"links", "Federation_SystemStories", "", true},
-		{"links", "Federation_CheckCases", "owns", true},
+		{"links", "Demo", "", true},
+		{"links", "Demo", "subject of", true},
 		{"doc", "demo", "", false},
 		{"code", "demo", "", true},
 		{"grep", "func ", "", true},
@@ -307,7 +307,7 @@ func TestEXPSR18_GrepSearchesTheBuiltSystemOnly(t *testing.T) {
 func TestEXPSR18_ReadShowsTheLinesAroundTheOneAsked(t *testing.T) {
 	kit, _, _ := fixtureKit(t, TaskIncident, Scope{})
 	answer := kit.Call("read", "adapter/serve/serve.go", "4")
-	for _, want := range []string{"adapter/serve/serve.go", "1| package serve", "4| const Addr = \"127.0.0.1:4011\"", "11| }"} {
+	for _, want := range []string{"adapter/serve/serve.go", "1| package serve", "4| const Addr = \"127.0.0.1:4011\"", "12| }"} {
 		if !strings.Contains(answer, want) {
 			t.Errorf("read lacks %q:\n%s", want, answer)
 		}

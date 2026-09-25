@@ -39,11 +39,23 @@ type BaselineResult struct {
 
 // NewBaseline builds the weights from the requirements alone.
 func NewBaseline(reqs []Requirement) *Baseline {
+	keys := make([]string, len(reqs))
+	texts := make([]string, len(reqs))
+	for i, r := range reqs {
+		keys[i], texts[i] = r.Key, r.Name+" "+r.Statement
+	}
+	return newIndex(keys, texts)
+}
+
+// newIndex weighs any set of texts the way the baseline weighs the
+// requirements, so the search tool ranks elements as the baseline ranks
+// requirements.
+func newIndex(keys, texts []string) *Baseline {
 	b := &Baseline{idf: map[string]float64{}}
 	df := map[string]int{}
-	docs := make([][]string, len(reqs))
-	for i, r := range reqs {
-		docs[i] = terms(r.Name + " " + r.Statement)
+	docs := make([][]string, len(texts))
+	for i, text := range texts {
+		docs[i] = terms(text)
 		seen := map[string]bool{}
 		for _, t := range docs[i] {
 			if !seen[t] {
@@ -52,12 +64,12 @@ func NewBaseline(reqs []Requirement) *Baseline {
 			}
 		}
 	}
-	n := float64(len(reqs))
+	n := float64(len(texts))
 	for t, d := range df {
 		b.idf[t] = math.Log((n+1)/(float64(d)+1)) + 1
 	}
-	for i, r := range reqs {
-		b.keys = append(b.keys, r.Key)
+	for i := range texts {
+		b.keys = append(b.keys, keys[i])
 		b.vectors = append(b.vectors, b.weigh(docs[i]))
 	}
 	return b
@@ -79,8 +91,11 @@ func testText(t Test) string {
 }
 
 // Rank scores every requirement for the test, best first.
-func (b *Baseline) Rank(t Test) []Ranked {
-	q := b.weigh(terms(testText(t)))
+func (b *Baseline) Rank(t Test) []Ranked { return b.rankTerms(terms(testText(t))) }
+
+// rankTerms scores every text for the words given, best first.
+func (b *Baseline) rankTerms(words []string) []Ranked {
+	q := b.weigh(words)
 	out := make([]Ranked, len(b.keys))
 	for i, v := range b.vectors {
 		out[i] = Ranked{Key: b.keys[i], Score: cosine(q, v), Shared: shared(q, v)}
