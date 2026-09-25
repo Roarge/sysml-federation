@@ -1,0 +1,13 @@
+{%- comment -%}
+  The author under every article: the name from _config.yml and the profiles
+  from _data/profiles.yml, one to a line, each with its mark, and the Bluesky
+  handle and the ORCID iD written out. There is no biography to keep up.
+{%- endcomment -%}
+<div class="author-card">
+  <h2 class="foot-label">Written by <span class="author-name">{{ site.author }}</span></h2>
+  <ul class="link-row">
+    {%- for profile in site.data.profiles %}
+    <li>{% include profile-link.html profile=profile detail=true %}</li>
+    {%- endfor %}
+  </ul>
+</div>
