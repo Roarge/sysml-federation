@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"hash/fnv"
 	"math"
 	"sort"
 	"strings"
@@ -79,8 +80,28 @@ type BlindItem struct {
 	Pick   string `json:"pick"`
 }
 
-// mcnemarExact is not built yet.
-func mcnemarExact(b, c int) float64 { return 0 }
+// mcnemarExact is the two-sided exact McNemar test on the discordant pairs:
+// b tests only one resolver got right, c only the other. It is the binomial
+// test of b against b+c at one half.
+func mcnemarExact(b, c int) float64 {
+	n := b + c
+	if n == 0 {
+		return 1
+	}
+	k := min(b, c)
+	var tail float64
+	for i := 0; i <= k; i++ {
+		tail += math.Exp(lchoose(n, i) - float64(n)*math.Ln2)
+	}
+	return math.Min(1, 2*tail)
+}
+
+func lchoose(n, k int) float64 {
+	a, _ := math.Lgamma(float64(n + 1))
+	b, _ := math.Lgamma(float64(k + 1))
+	c, _ := math.Lgamma(float64(n - k + 1))
+	return a - b - c
+}
 
 // Proposal is a link proposed for a test that carries no key. Nobody recorded
 // an answer for these, so they are listed for a person to judge.
@@ -163,6 +184,22 @@ func Summarise(c Contents) Summary {
 	wo.Precision, wo.Recall = rate(wo.Correct, wo.Proposed), rate(wo.Correct, s.Keyed)
 	s.Resolvers = append(s.Resolvers, wo)
 
+	// The same resolver's best-ranked answer, whatever its score, so the two
+	// hidden-key resolvers can be compared without the threshold.
+	best := ResolverScore{Resolver: "word overlap, best-ranked"}
+	woRight := map[string]bool{}
+	for _, b := range c.Baseline {
+		if g := gold[b.Test]; g != "" && len(b.Top) > 0 {
+			best.Proposed++
+			if b.Top[0].Key == g {
+				best.Correct++
+				woRight[b.Test] = true
+			}
+		}
+	}
+	best.Precision, best.Recall = rate(best.Correct, best.Proposed), rate(best.Correct, s.Keyed)
+	s.Resolvers = append(s.Resolvers, best)
+
 	lm := ResolverScore{Resolver: "language model"}
 	var groundedItems, items int
 	for _, t := range sortedKeys(base) {
@@ -175,7 +212,7 @@ func Summarise(c Contents) Summary {
 		if a.Requirement == "none" {
 			continue
 		}
-		for _, ok := range groundedInLine(a, cl.User, c.Header.RequirementList) {
+		for _, ok := range foundAsWritten(a, cl.User, c.Header.RequirementList) {
 			items++
 			if ok {
 				groundedItems++
@@ -195,6 +232,24 @@ func Summarise(c Contents) Summary {
 	s.Resolvers = append(s.Resolvers, lm)
 	s.Grounded = rate(groundedItems, items)
 
+	for t, g := range gold {
+		lmRight := false
+		if cl, ok := base[t]; ok && cl.Reply != nil && cl.Error == "" {
+			lmRight = cl.Reply.Answer.Requirement == g
+		}
+		switch {
+		case lmRight && woRight[t]:
+			s.Paired.BothRight++
+		case lmRight:
+			s.Paired.OnlyLanguageModel++
+		case woRight[t]:
+			s.Paired.OnlyWordOverlap++
+		default:
+			s.Paired.NeitherRight++
+		}
+	}
+	s.Paired.McNemarP = mcnemarExact(s.Paired.OnlyLanguageModel, s.Paired.OnlyWordOverlap)
+
 	s.Probes, s.OrderOverlap = probeRates(c.Calls, base, gold)
 	s.Timing = timings(c.Calls)
 	sort.SliceStable(s.Proposals, func(i, j int) bool {
@@ -203,7 +258,31 @@ func Summarise(c Contents) Summary {
 		}
 		return s.Proposals[i].Resolver > s.Proposals[j].Resolver
 	})
+	s.Blind = blindList(s.Proposals)
 	return s
+}
+
+// blindList gives each distinct proposal once, in an order that depends on
+// nothing a judge could read anything into, with no resolver and no reason.
+func blindList(ps []Proposal) []BlindItem {
+	seen := map[string]bool{}
+	var out []BlindItem
+	for _, p := range ps {
+		if key := p.Test + "\x00" + p.Pick; !seen[key] {
+			seen[key] = true
+			out = append(out, BlindItem{Test: p.Test, Pick: p.Pick})
+		}
+	}
+	h := func(b BlindItem) uint64 {
+		f := fnv.New64a()
+		_, _ = f.Write([]byte(b.Test + "\x00" + b.Pick))
+		return f.Sum64()
+	}
+	sort.Slice(out, func(i, j int) bool { return h(out[i]) < h(out[j]) })
+	for i := range out {
+		out[i].Number = i + 1
+	}
+	return out
 }
 
 func sortedKeys(m map[string]CallLine) []string {
@@ -215,21 +294,36 @@ func sortedKeys(m map[string]CallLine) []string {
 	return keys
 }
 
-// groundedInLine checks the evidence against the question's test part and
-// the picked requirement's line in the list the run recorded.
-func groundedInLine(a Answer, user, list string) []bool {
-	req := ""
-	for _, line := range strings.Split(list, "\n") {
-		if strings.HasPrefix(line, a.Requirement+" ") {
-			req = line
+// foundAsWritten checks each piece of evidence against the test's fields as
+// the question showed them and the picked requirement's line in the list the
+// run recorded. Only the text as written counts, apart from case. Words found
+// one by one, or in the question's own fixed wording, do not.
+func foundAsWritten(a Answer, user, list string) []bool {
+	var shown []string
+	for _, line := range strings.Split(user, "\n") {
+		for _, field := range []string{"name: ", "package: ", "file: ", "doc: "} {
+			if v, ok := strings.CutPrefix(line, field); ok && v != "(none)" && v != "(not shown)" {
+				shown = append(shown, v)
+			}
 		}
 	}
-	return grounded(a.Evidence, TestView{Doc: user}, &Requirement{Statement: req})
+	for _, line := range strings.Split(list, "\n") {
+		if strings.HasPrefix(line, a.Requirement+" ") {
+			shown = append(shown, line)
+		}
+	}
+	text := strings.ToLower(strings.Join(shown, "\n"))
+	out := make([]bool, len(a.Evidence))
+	for i, e := range a.Evidence {
+		e = strings.ToLower(strings.TrimSpace(e))
+		out[i] = e != "" && strings.Contains(text, e)
+	}
+	return out
 }
 
 func probeRates(calls []CallLine, base map[string]CallLine, gold map[string]string) ([]ProbeRate, float64) {
-	type tally struct{ changed, asked, skipped, errors int }
-	order := []string{ProbeDeletion, ProbeControl, ProbeReconstruction, ProbeOrder, ProbeRepeat}
+	type tally struct{ changed, toNone, toOther, asked, skipped, errors int }
+	order := []string{ProbeDeletion, ProbeControl, ProbeRareShared, ProbeReconstruction, ProbeOrder, ProbeRepeat}
 	all := map[string]*tally{}
 	correct := map[string]*tally{}
 	for _, p := range order {
@@ -267,25 +361,34 @@ func probeRates(calls []CallLine, base map[string]CallLine, gold map[string]stri
 			overlap += jaccard(b.Reply.Answer.Evidence, cl.Reply.Answer.Evidence)
 			overlapN++
 		}
-		t.asked++
-		if changed {
-			t.changed++
-		}
-		if onCorrect {
-			correct[cl.Probe].asked++
-			if changed {
-				correct[cl.Probe].changed++
+		count := func(t *tally) {
+			t.asked++
+			if !changed {
+				return
 			}
+			t.changed++
+			if cl.Probe == ProbeRepeat {
+				return
+			}
+			if cl.Reply.Answer.Requirement == "none" {
+				t.toNone++
+			} else {
+				t.toOther++
+			}
+		}
+		count(t)
+		if onCorrect {
+			count(correct[cl.Probe])
 		}
 	}
 	var out []ProbeRate
 	for _, p := range order {
 		t := all[p]
-		out = append(out, ProbeRate{Probe: p, Changed: rate(t.changed, t.asked), Skipped: t.skipped, Errors: t.errors})
+		out = append(out, ProbeRate{Probe: p, Changed: rate(t.changed, t.asked), ToNone: t.toNone, ToOther: t.toOther, Skipped: t.skipped, Errors: t.errors})
 	}
-	for _, p := range []string{ProbeDeletion, ProbeControl} {
+	for _, p := range order[:5] {
 		t := correct[p]
-		out = append(out, ProbeRate{Probe: p + ", correct links only", Changed: rate(t.changed, t.asked), Skipped: t.skipped})
+		out = append(out, ProbeRate{Probe: p + ", correct links only", Changed: rate(t.changed, t.asked), ToNone: t.toNone, ToOther: t.toOther, Skipped: t.skipped})
 	}
 	if overlapN > 0 {
 		overlap /= float64(overlapN)
@@ -326,6 +429,7 @@ func timings(calls []CallLine) []ProbeTiming {
 var probeMeaning = map[string]string{
 	ProbeDeletion:       "the cited words deleted from the test and the picked requirement",
 	ProbeControl:        "as many other words deleted at random",
+	ProbeRareShared:     "uncited words the test and the requirement share deleted, rarest first",
 	ProbeReconstruction: "the test replaced by the cited words alone",
 	ProbeOrder:          "the requirements listed in a shuffled order",
 	ProbeRepeat:         "the same question asked again (changed means the reply's text differs)",
@@ -345,6 +449,7 @@ func (s Summary) Markdown() string {
 	if h.Quick {
 		b.WriteString(" A quick run.")
 	}
+	b.WriteString("\n\nTo judge the links proposed for tests with no key without being swayed by the reasons given, start with the last list, which has none, before reading the rest.")
 	b.WriteString("\n\n## Resolvers on the tests that carry a key\n\n")
 	b.WriteString("The keys were hidden from the word overlap baseline and the language model. The key rule reads the names as written.\n\n")
 	b.WriteString("| Resolver | Proposed | Correct | Precision (95% interval) | Recall (95% interval) |\n|---|---|---|---|---|\n")
@@ -354,14 +459,19 @@ func (s Summary) Markdown() string {
 	if s.BaseErrors > 0 {
 		fmt.Fprintf(&b, "\n%d base questions ended in an error and count as no proposal.\n", s.BaseErrors)
 	}
+	p := s.Paired
+	b.WriteString("\nTest by test, the language model against the word overlap's best-ranked answer:\n\n")
+	b.WriteString("| Both right | Only the language model | Only the word overlap | Neither |\n|---|---|---|---|\n")
+	fmt.Fprintf(&b, "| %d | %d | %d | %d |\n\nMcNemar's exact test on the %d tests only one got right: p = %.3f.\n",
+		p.BothRight, p.OnlyLanguageModel, p.OnlyWordOverlap, p.NeitherRight, p.OnlyLanguageModel+p.OnlyWordOverlap, p.McNemarP)
 	b.WriteString("\n## The explanation tests\n\n")
 	b.WriteString("Each probe asks again about a test the language model linked, with one thing changed, and counts how often the answer changed.\n\n")
-	b.WriteString("| Probe | What changed in the question | Asked | Answer changed (95% interval) | Skipped | Errors |\n|---|---|---|---|---|---|\n")
+	b.WriteString("| Probe | What changed in the question | Asked | Answer changed (95% interval) | to none | to another | Skipped | Errors |\n|---|---|---|---|---|---|---|---|\n")
 	for _, p := range s.Probes {
 		meaning := probeMeaning[strings.TrimSuffix(p.Probe, ", correct links only")]
-		fmt.Fprintf(&b, "| %s | %s | %d | %s | %d | %d |\n", p.Probe, meaning, p.Changed.N, p.Changed, p.Skipped, p.Errors)
+		fmt.Fprintf(&b, "| %s | %s | %d | %s | %d | %d | %d | %d |\n", p.Probe, meaning, p.Changed.N, p.Changed, p.ToNone, p.ToOther, p.Skipped, p.Errors)
 	}
-	fmt.Fprintf(&b, "\nEvidence found in what the language model was shown: %d of %d pieces, %s.\n", s.Grounded.K, s.Grounded.N, s.Grounded)
+	fmt.Fprintf(&b, "\nEvidence found as written, apart from case, in the test's fields or the picked requirement: %d of %d pieces, %s.\n", s.Grounded.K, s.Grounded.N, s.Grounded)
 	fmt.Fprintf(&b, "Mean overlap of the cited words before and after the shuffle (Jaccard): %.2f.\n", s.OrderOverlap)
 	b.WriteString("\n## Links proposed for tests with no key\n\n")
 	b.WriteString("Nobody recorded an answer for these tests, so these are for a person to judge and count in no score.\n\n")
@@ -371,6 +481,16 @@ func (s Summary) Markdown() string {
 		b.WriteString("| Test | Resolver | Proposed | Reason given |\n|---|---|---|---|\n")
 		for _, p := range s.Proposals {
 			fmt.Fprintf(&b, "| `%s` | %s | %s | %s |\n", p.Test, p.Resolver, p.Pick, strings.ReplaceAll(p.Reason, "|", "/"))
+		}
+	}
+	b.WriteString("\n## For blind judgement\n\n")
+	b.WriteString("The same proposals again, each once, in a scrambled order and with nothing to say where they came from. Judge these first, then compare with the reasons further up.\n\n")
+	if len(s.Blind) == 0 {
+		b.WriteString("None.\n")
+	} else {
+		b.WriteString("| Number | Test | Proposed requirement | Right? |\n|---|---|---|---|\n")
+		for _, x := range s.Blind {
+			fmt.Fprintf(&b, "| %d | `%s` | %s | |\n", x.Number, x.Test, x.Pick)
 		}
 	}
 	b.WriteString("\n## Time\n\n| Probe | Questions | Mean seconds | Mean prompt tokens | Largest prompt |\n|---|---|---|---|---|\n")

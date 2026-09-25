@@ -122,11 +122,13 @@ func (r *Runner) Run(ctx context.Context) error {
 		make  func(Test, Answer) Variant
 	}
 	repeat := repeatSample(r.Tests)
+	weights := NewBaseline(reqs)
 	steps := []probeStep{
 		{ProbeReconstruction, linked, func(_ Test, a Answer) Variant { return reconstructionVariant(reqs, a) }},
 		{ProbeRepeat, repeat, func(t Test, _ Answer) Variant { return Variant{Requirements: reqs, View: viewOf(t)} }},
 		{ProbeDeletion, linked, func(t Test, a Answer) Variant { return deletionVariant(reqs, t, a) }},
 		{ProbeControl, linked, func(t Test, a Answer) Variant { return controlVariant(reqs, t, a, r.Seed) }},
+		{ProbeRareShared, linked, func(t Test, a Answer) Variant { return rareSharedVariant(reqs, t, a, weights) }},
 		{ProbeOrder, linked, func(t Test, _ Answer) Variant {
 			v := orderVariant(reqs, r.Seed)
 			v.View = viewOf(t)

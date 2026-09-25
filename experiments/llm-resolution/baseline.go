@@ -147,5 +147,6 @@ func shared(a, b map[string]float64) []string {
 	return ts
 }
 
-// Weight is not built yet.
-func (b *Baseline) Weight(term string) float64 { return 0 }
+// Weight is how much a normalised word counts: more the fewer requirements
+// use it, and 0 for a word no requirement uses.
+func (b *Baseline) Weight(term string) float64 { return b.idf[term] }

@@ -179,42 +179,6 @@ func hashString(s string) uint64 {
 	return h.Sum64()
 }
 
-// grounded reports, for each evidence item, whether it occurs in what the
-// model was shown: as written, or word for word after normalising.
-func grounded(ev []string, view TestView, req *Requirement) []bool {
-	text := strings.ToLower(view.Name + " " + view.Package + " " + view.File + " " + view.Doc)
-	all := map[string]bool{}
-	for _, w := range terms(view.Name + " " + view.Package + " " + view.File + " " + view.Doc) {
-		all[w] = true
-	}
-	if req != nil {
-		text += " " + strings.ToLower(req.Key+" "+req.Name+" "+req.Statement)
-		for _, w := range terms(req.Name + " " + req.Statement) {
-			all[w] = true
-		}
-	}
-	out := make([]bool, len(ev))
-	for i, e := range ev {
-		e = strings.ToLower(strings.TrimSpace(e))
-		if e == "" {
-			continue
-		}
-		if strings.Contains(text, e) {
-			out[i] = true
-			continue
-		}
-		ts := terms(e)
-		ok := len(ts) > 0
-		for _, t := range ts {
-			if !all[t] {
-				ok = false
-			}
-		}
-		out[i] = ok
-	}
-	return out
-}
-
 // jaccard compares two answers' evidence as sets of normalised words.
 func jaccard(a, b []string) float64 {
 	x, y := evidenceTerms(a), evidenceTerms(b)
@@ -230,7 +194,62 @@ func jaccard(a, b []string) float64 {
 	return float64(inter) / float64(len(x)+len(y)-inter)
 }
 
-// rareSharedVariant is not built yet.
+// rareSharedVariant is the second control. The words the model cites are
+// often the most telling words the test and its requirement share, so beating
+// a control of random words could mean only that. This control deletes the
+// uncited words the two share instead, the rarest first, until at least as
+// many words are gone as the deletion took. If explanations name what the
+// answer depended on, deleting the cited words should still change it more.
 func rareSharedVariant(reqs []Requirement, t Test, base Answer, b *Baseline) Variant {
-	return Variant{}
+	drop := evidenceTerms(base.Evidence)
+	n := deletionCount(reqs, t, base)
+	v := Variant{Requirements: append([]Requirement{}, reqs...), View: viewOf(t)}
+	ri := findRequirement(v.Requirements, base.Requirement)
+	if n == 0 || ri < 0 {
+		v.Note = "nothing was deleted in the deletion probe, so there is nothing to match"
+		return v
+	}
+	inTest, inReq := map[string]int{}, map[string]int{}
+	for _, f := range []string{t.Name, t.Doc, t.File} {
+		for _, w := range terms(f) {
+			inTest[w]++
+		}
+	}
+	for _, f := range []string{reqs[ri].Name, reqs[ri].Statement} {
+		for _, w := range terms(f) {
+			inReq[w]++
+		}
+	}
+	var shared []string
+	for w := range inTest {
+		if inReq[w] > 0 && !drop[w] {
+			shared = append(shared, w)
+		}
+	}
+	sort.Slice(shared, func(i, j int) bool {
+		wi, wj := b.Weight(shared[i]), b.Weight(shared[j])
+		if wi != wj {
+			return wi > wj
+		}
+		return shared[i] < shared[j]
+	})
+	chosen := map[string]bool{}
+	for removed := 0; removed < n && len(v.Removed) < len(shared); {
+		w := shared[len(v.Removed)]
+		chosen[w] = true
+		v.Removed = append(v.Removed, w)
+		removed += inTest[w] + inReq[w]
+	}
+	if len(chosen) == 0 {
+		v.Note = "the test and the picked requirement share no word the model didn't cite"
+		return v
+	}
+	for _, f := range []*string{&v.View.Name, &v.View.Doc, &v.View.File} {
+		*f, _ = removeTerms(*f, chosen)
+	}
+	r := v.Requirements[ri]
+	r.Name, _ = removeTerms(r.Name, chosen)
+	r.Statement, _ = removeTerms(r.Statement, chosen)
+	v.Requirements[ri] = r
+	return v
 }

@@ -21,14 +21,17 @@ Then it tests the language model's explanations. For each test the language mode
 | Probe | What changes | What an explanation that names the real reasons predicts |
 |---|---|---|
 | Deletion | Every word of the cited evidence is deleted from the test and from the picked requirement. | The answer changes often. |
-| Control | As many other words are deleted, at random. | The answer changes much less often than with deletion. |
+| Random control | As many other words are deleted, at random. | The answer changes much less often than with deletion. |
+| Rare-shared control | The uncited words the test and the requirement share are deleted, the rarest first, until at least as many are gone. | The answer changes less often than with deletion, even though these words are as telling. |
 | Reconstruction | The test is replaced by the cited evidence alone. | The same answer comes back. |
 | Order | The requirements are listed in a shuffled order. | The same answer comes back. |
 | Repeat | Nothing. Every fourth test is simply asked again. | The same reply, word for word. |
 
-Deletion and reconstruction follow the two tests Atanasova and colleagues proposed for the faithfulness of written explanations ([ACL 2023](https://aclanthology.org/2023.acl-short.25/)). Teofili and colleagues found language models' own explanations of entity resolution decisions "often unstable, weakly faithful, and poorly aligned with counterfactual evidence" ([PVLDB 19, 2026](https://arxiv.org/abs/2606.01210)). This experiment asks the same thing about trace links, on a much smaller scale.
+Deletion is close to the erasure measure Teofili and colleagues used for language models' explanations of entity resolution decisions, which they found "often unstable, weakly faithful, and poorly aligned with counterfactual evidence" ([PVLDB 19, 2026](https://arxiv.org/abs/2606.01210)). Reconstruction is one of the two tests Atanasova and colleagues proposed for written explanations ([ACL 2023](https://aclanthology.org/2023.acl-short.25/)). The random control only matches the number of words deleted, and the cited words are usually the most telling ones, so the rare-shared control matches their kind as well. This experiment asks all of it about trace links, on a much smaller scale.
 
-The report gives precision and recall for each resolver on the 69 tests that carry a key, and the share of changed answers for each probe, each with its 95% Wilson interval. The other 77 tests have no recorded link, so a link proposed for one of them is listed for a person to judge and counts in no score.
+Two things about what is tested. The reply gives the requirement first and the evidence after it, so the evidence is written once the answer is already chosen. And the probes test the evidence list, not the sentence of reason, which is recorded but not probed.
+
+The report gives precision and recall for each resolver on the 69 tests that carry a key. For each probe it gives the share of changed answers, on all links and on the correct ones alone, split into changes to none and to another requirement. Each rate has its 95% Wilson interval. The two hidden-key resolvers are also compared test by test, with McNemar's exact test. The other 77 tests have no recorded link, so a link proposed for one of them counts in no score. It is listed for a person to judge, once with its reasons and once without them, for judging blind.
 
 ## Running it
 
@@ -44,7 +47,7 @@ That is a quick run: twelve tests, eight with a key and four without, through ev
 OLLAMA_URL=http://192.168.1.20:11434 bash experiments/llm-resolution/run.sh
 ```
 
-It asks one base question for each of the 146 tests, and several hundred more for the probes, depending on how many tests the language model links. On a 12 GB graphics card generating about 22 tokens a second it should take about an hour, which is an estimate until the first run measures it. Progress is printed as it goes. If the server can't be reached, or doesn't hold the language model, it stops with status 2 before asking anything.
+It asks one base question for each of the 146 tests, and several hundred more for the five probes, depending on how many tests the language model links. On a 12 GB graphics card generating about 22 tokens a second it should take about an hour, which is an estimate until the first run measures it. Progress is printed as it goes. If the server can't be reached, or doesn't hold the language model, it stops with status 2 before asking anything.
 
 Each run writes two files under `experiments/llm-resolution/results/`, which git ignores:
 
@@ -55,7 +58,7 @@ If a run stops, every reply so far is in the file. `run.sh -resume <that file>` 
 
 ## What the results can and can't show
 
-One repository, one language model at one quantisation, one prompt, no tuning. The links it is scored against were written by the same person who wrote the tests, and they're the links that were easy to write down, since every one of them sat in a name. Of the tests without a key, all 77 are unjudged, and some of them surely verify something. The probes test the explanation the language model writes, which is one kind of explanation among several. A language model that fails them may still be useful for suggesting links to a person, and one that passes them has shown only that its written reasons track its answers on this data.
+One repository, one language model at one quantisation, one prompt, no tuning, and one shuffled order for the order probe. The person who wrote the tests also wrote the links they're scored against, one requirement per test, and they're the links that were easy to write down, since every one sat in a name. Several of the 69 tests share a requirement, 32 requirements in all, so they aren't independent, and the intervals are narrower than they should be. The repository was started in August 2026, long after the language model was trained, so it can't have seen these links. Of the tests without a key, all 77 are unjudged, and some of them surely verify something. The probes test the explanation the language model writes, which is one kind of explanation among several. A language model that fails them may still be useful for suggesting links to a person, and one that passes them has shown only that its written reasons track its answers on this data.
 
 ## Where it's specified
 
