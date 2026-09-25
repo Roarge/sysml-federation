@@ -18,20 +18,37 @@ package Experiment_Context {
                registers. */
     }
 
+    item def SystemsModelText {
+        doc /* The demo's systems model as the experiment reads it: every
+               element with its kind, description and attributes, and every
+               relationship between them. */
+    }
+
+    item def CodeText {
+        doc /* The built system's files in the checkout, as the code tools
+               search and read them. */
+    }
+
+    item def IncidentReport {
+        doc /* What the engineer on call says is down: the alert, and the
+               container's last line when it is known. */
+    }
+
     item def TestText {
         doc /* A Go test's name, package, file and doc comment, with any
                requirement key removed. */
     }
 
     item def Question {
-        doc /* One chat request: the instructions and the requirements as the
-               system message, the test as the user message, the settings and
-               the reply schema. */
+        doc /* One chat request: the instructions for the task as the system
+               message, and the task, the viewpoint, the view, the calls left
+               and the last tool's answer as the user message, with the
+               settings and the reply schema. */
     }
 
     item def Answer {
-        doc /* One reply: a requirement key or none, up to five pieces of
-               evidence and one sentence of reason, with the server's timings. */
+        doc /* One reply: a tool call with edits to the view, or a final answer
+               citing elements, links and files, with the server's timings. */
     }
 
     item def ResultsFile {
@@ -83,6 +100,8 @@ package Experiment_Context {
                commit the run records. */
         out item requirements : RequirementText[1..*];
         out item tests : TestText[1..*];
+        out item systemsModel : SystemsModelText;
+        out item code : CodeText;
     }
 
     part def ExperimentContext {
@@ -91,6 +110,7 @@ package Experiment_Context {
         part server : ModelServer;
         part checkout : RepositoryCheckout;
         part operator : Operator;
+        part onCall : OnCallEngineer;
         interface chat : ChatOverHttp connect experiment.chat to server.chat;
     }
 }

@@ -1,5 +1,5 @@
 package Experiment_Stakeholders {
-    doc /* Who the experiment is for. The operator runs it, and the other three read
+    doc /* Who the experiment is for. The operator runs it, and the other four read
            what it produces, each with a different question. */
 
     part def Operator {
@@ -17,6 +17,11 @@ package Experiment_Stakeholders {
     part def SystemsEngineer {
         doc /* Human actor. A reader who would have to live with the links in a
                systems model, and answer to an assessor for each of them. */
+    }
+
+    part def OnCallEngineer {
+        doc /* Human actor. The engineer woken by an alert, who has to decide
+               what to do before there is time to read the code. */
     }
 
     part def ModelOwner {

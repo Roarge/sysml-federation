@@ -1,8 +1,10 @@
 package Experiment_Core {
     doc /* The language model experiment: whether a language model running on
-           the operator's own server can recover the trace links between the
-           demo's systems model and its Go tests once the keys are hidden, and
-           whether the model's explanations name what its answers depended on.
+           the operator's own server, reading the demo's systems model a page
+           at a time through tools, can recover the trace links between the
+           systems model and the demo's Go tests once the keys are hidden, and
+           can explain an outage from the systems model and the code, and
+           whether its explanations rest on what they cite.
            It is modelled apart from the demo because it is no part of the
            demo, and it reads the demo's registers as data (AD-0032). The
            definitions of the demo's library are reused, so a story, a

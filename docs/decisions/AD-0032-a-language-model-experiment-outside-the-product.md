@@ -33,8 +33,8 @@ written under `results/` and never committed.
 
 The experiment has a SysML v2 systems model of its own, in
 `experiments/llm-resolution/model`, built on the demo's library. It holds
-stakeholders and their concerns, five stakeholder stories, three use cases,
-sixteen system stories derived from the stakeholder stories and four design
+stakeholders and their concerns, six stakeholder stories, four use cases,
+twenty-two system stories derived from the stakeholder stories and four design
 constraints. A logical architecture records every allocation as a satisfy, and
 a verification register names each Go test. The tests were written from that register
 before the code that passes them. A new target, `make experiment-model-check`,

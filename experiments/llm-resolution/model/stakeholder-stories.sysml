@@ -1,8 +1,8 @@
 package Experiment_StakeholderStories {
-    doc /* Five stakeholder stories, EXP-US-01 to EXP-US-05. The first three are
-           realised by use cases, and the last two are qualities every run must
-           have. None is done until the operator's own run has been judged
-           against it. */
+    doc /* Six stakeholder stories, EXP-US-01 to EXP-US-06. The first three and
+           the sixth are realised by use cases, and the fourth and fifth are
+           qualities every run must have. None is done until the operator's own
+           run has been judged against it. */
     private import VSE_Library::*;
     private import Experiment_Stakeholders::*;
     private import Experiment_Concerns::*;
@@ -25,9 +25,9 @@ package Experiment_StakeholderStories {
                 doc /* When the run ends or is stopped, then one results file
                        holds everything it produced. */
             }
-            requirement withinAnHour {
+            requirement withinTwoHours {
                 doc /* On the operator's server the full run finishes in about
-                       an hour. */
+                       two hours. */
             }
         }
     }
@@ -54,6 +54,11 @@ package Experiment_StakeholderStories {
                 doc /* Links proposed for tests that carry no key are listed for
                        a person to judge, never scored. */
             }
+            requirement everyKindListed {
+                doc /* A test may be linked to elements of any kind. Links to
+                       elements that are not requirements are counted and
+                       listed, and never scored against the recorded links. */
+            }
         }
     }
 
@@ -70,8 +75,9 @@ package Experiment_StakeholderStories {
                        asked again, beside a control that removes other words. */
             }
             requirement stabilityTested {
-                doc /* The same question in a different order, and unchanged, is
-                       asked again. */
+                doc /* The same question is asked again unchanged, and the
+                       incident again with a link its account relied on
+                       removed. */
             }
         }
     }
@@ -86,6 +92,31 @@ package Experiment_StakeholderStories {
         requirement :>> acceptance {
             requirement oneServer {
                 doc /* The experiment contacts no address but the server's. */
+            }
+        }
+    }
+
+    requirement <'EXP-US-06'> EXP_US_06_ExplainTheOutage : UserStory {
+        @StoryMeta { status = StoryStatus::inProgress; }
+        subject :>> system : Experiment;
+        stakeholder :>> role : OnCallEngineer;
+        attribute :>> capability = "be told why the demo is down, where the fault lies and what else it affects, by a language model that has read the systems model and the code";
+        attribute :>> benefit    = "I can act before I have read the code, and check every step of the account I was given";
+        frame concern : ExplainTheOutage;
+        requirement :>> acceptance {
+            requirement whyWhereWhatElse {
+                doc /* Given an alert and the container's last line, when the
+                       language model has browsed, then the account names the
+                       cause, the mechanism, the code to look at and the
+                       consequences. */
+            }
+            requirement everyStepCited {
+                doc /* Every step of the account cites an element, a link or a
+                       file, and every citation is checked. */
+            }
+            requirement suspicionsReported {
+                doc /* Where the language model suspects the system was not
+                       built as modelled, it says so and why. */
             }
         }
     }

@@ -32,6 +32,13 @@ package Experiment_Concerns {
         stakeholder s : ModelOwner;
     }
 
+    concern def ExplainTheOutage {
+        doc /* Why is it down, where is the fault, what else is affected, and
+               can I check each step of the answer? */
+        subject system : ExperimentElement;
+        stakeholder s : OnCallEngineer;
+    }
+
     concern def SameAnswerTwice {
         doc /* Would the same inputs give the same links, and could someone else
                check them? */

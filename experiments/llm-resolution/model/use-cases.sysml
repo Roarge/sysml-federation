@@ -1,7 +1,8 @@
 package Experiment_UseCases {
-    doc /* Three use cases, one per stakeholder story with an actor who acts:
-           running the experiment, reading its scores, and testing its
-           explanations. The successions carry the order and nothing else. */
+    doc /* Four use cases, one per stakeholder story with an actor who acts:
+           running the experiment, reading its scores, testing its
+           explanations, and explaining an outage. The successions carry the
+           order and nothing else. */
     private import Experiment_StakeholderStories::*;
     private import Experiment_Stakeholders::*;
     private import Experiment_Context::Experiment;
@@ -38,14 +39,35 @@ package Experiment_UseCases {
 
     use case def UC_EXP_03_TestTheExplanations {
         doc /* The evaluator reads what happened when the model's cited words
-               were deleted, kept alone, reordered and asked again. */
+               were deleted or kept alone, when a question was asked again, and
+               when a link the incident's account relied on was removed. */
         subject experiment : Experiment;
         actor evaluator : Evaluator;
         objective realises :> EXP_US_03_ExplanationsPutToTheTest { subject :>> system = experiment; }
         action compareDeletionWithControl { doc /* the share of answers that changed when the cited words went, beside the share when other words went */ }
         action readTheReconstruction { doc /* the share of answers the cited words alone reproduced */ }
-        action readTheStability { doc /* the share that survived a shuffled list, and the share of identical repeats */ }
+        action readTheStability { doc /* the share of identical repeats */ }
+        action readTheRemoval { doc /* whether the incident's account changed, or kept citing what was removed */ }
         first compareDeletionWithControl then readTheReconstruction;
         first readTheReconstruction then readTheStability;
+        first readTheStability then readTheRemoval;
+    }
+
+    use case def UC_EXP_04_ExplainAnIncident {
+        doc /* The engineer on call says what is down, and reads the language
+               model's account of why, where and what else, with every step
+               cited. */
+        subject experiment : Experiment;
+        actor onCall : OnCallEngineer;
+        objective realises :> EXP_US_06_ExplainTheOutage { subject :>> system = experiment; }
+        action sayWhatIsDown { doc /* the alert, and the container's last line when it is known */ }
+        action frameTheViewpoint { doc /* the language model frames the concern the view has to answer */ }
+        action buildTheView { doc /* it searches, follows links and reads code, exposing and pruning elements */ }
+        action readTheAccount { doc /* why, the cause, the mechanism, the code, the consequences and any suspected mismatch */ }
+        action checkTheCitations { doc /* every element, link and file the account cites is looked up */ }
+        first sayWhatIsDown then frameTheViewpoint;
+        first frameTheViewpoint then buildTheView;
+        first buildTheView then readTheAccount;
+        first readTheAccount then checkTheCitations;
     }
 }

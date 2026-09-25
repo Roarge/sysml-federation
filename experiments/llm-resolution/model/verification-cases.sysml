@@ -26,6 +26,18 @@ package Experiment_VerificationCases {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/corpus_test.go"; }
             doc /* Every key in a test name of the checkout is a declared requirement. */
         }
+        action <'TestEXPSR01_EveryReferenceInTheSystemsModelResolves'> everyReferenceResolved {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/wiki_test.go"; }
+            doc /* Every relationship of the checkout's systems model points at an element the wiki read. */
+        }
+        action <'TestEXPSR01_EveryLinkShowsFromBothEnds'> linksBothWays {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/wiki_test.go"; }
+            doc /* A satisfy in a fixture model shows as satisfies on the part and satisfied by on the requirement. */
+        }
+        action <'TestEXPSR01_ElementsGetShortUniqueIDs'> shortUniqueIDs {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/wiki_test.go"; }
+            doc /* A short name is the identifier, and otherwise the shortest suffix of the qualified name no other element shares. */
+        }
     }
 
     verification def VC_EXP_SR_02 {
@@ -38,7 +50,15 @@ package Experiment_VerificationCases {
         }
         action <'TestEXPSR02_NoKeyReachesAQuestion'> noKeyInAQuestion {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/prompt_test.go"; }
-            doc /* No test part of a question made from the checkout contains a key. */
+            doc /* No task of a question made from the checkout contains a key. */
+        }
+        action <'TestEXPSR02_TheRegisterIsHiddenInTheTestTask'> registerHidden {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* No tool answer in the test task names a Go test the verification register names. */
+        }
+        action <'TestEXPSR02_KeysAreMaskedInCodeAnswers'> codeMasked {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* A key in code a tool shows in the test task comes back masked. */
         }
     }
 
@@ -62,31 +82,43 @@ package Experiment_VerificationCases {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/baseline_test.go"; }
             doc /* URLs, IDs and APIs are one word each when identifiers are split, not UR and Ls. */
         }
+        action <'TestEXPSR03_SearchForRequirementsRanksAsTheBaseline'> searchMatchesTheBaseline {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* A search among the requirements for a test's text gives the baseline's order. */
+        }
     }
 
     verification def VC_EXP_SR_04 {
-        doc /* One question per test, against a stand-in server that records what it is sent. */
+        doc /* Browsing, against a stand-in server that records what it is sent. */
         subject experiment : Experiment;
-        objective { verify EXP_SR_04_OneQuestionPerTest.acceptance; }
+        objective { verify EXP_SR_04_BrowseTheSystemsModel.acceptance; }
         action <'TestEXPSR04_EveryQuestionCarriesTheFixedSettings'> fixedSettings {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/ollama_test.go"; }
             doc /* Temperature 0, the seed and a context of 8192 arrive with every question. */
         }
-        action <'TestEXPSR04_TheReplySchemaAdmitsOnlyKeysOrNone'> schemaAdmitsOnlyKeys {
+        action <'TestEXPSR04_TheStepSchemaAdmitsOneToolAndViewEdits'> stepSchema {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/ollama_test.go"; }
-            doc /* The schema's requirement field lists the keys and none, and nothing else. */
+            doc /* The step schema admits the seven tools or done, their arguments, and up to three exposures and three prunings. */
         }
-        action <'TestEXPSR04_BaseQuestionsShareOneSystemMessage'> sharedPrefix {
+        action <'TestEXPSR04_QuestionsOfOneTaskShareOneSystemMessage'> sharedPrefix {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/prompt_test.go"; }
-            doc /* Every unaltered question has the same system message. */
+            doc /* Every question of a test browse has the same system message, and every question of an incident browse has another. */
+        }
+        action <'TestEXPSR04_EachQuestionCarriesTheViewAndOnlyTheLastAnswer'> stateNotHistory {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/browse_test.go"; }
+            doc /* The third question of a browse holds the view and the second tool's answer, and nothing of the first answer. */
+        }
+        action <'TestEXPSR04_ABrowseStopsAtItsBudget'> budgetHolds {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/browse_test.go"; }
+            doc /* A language model that never says done gets eight tool calls for a test and twenty for an incident, then the final question. */
         }
         action <'TestEXPSR04_AReplyThatIsNotTheAskedJSONIsAnError'> malformedReply {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/ollama_test.go"; }
             doc /* A reply that is not the JSON asked for comes back as an error with its text kept. */
         }
-        action <'TestEXPSR04_TheSchemaAsksForTheAnswerBeforeItsEvidence'> answerFirst {
+        action <'TestEXPSR04_TheFinalSchemaAsksForTheLinksBeforeTheEvidence'> answerFirst {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/ollama_test.go"; }
-            doc /* The schema sent lists requirement, evidence and reason in that order. */
+            doc /* The final schema for a test lists links, evidence and reason in that order. */
         }
     }
 
@@ -94,9 +126,9 @@ package Experiment_VerificationCases {
         doc /* Deleting the cited words, and the two controls beside it. */
         subject experiment : Experiment;
         objective { verify EXP_SR_05_DeleteTheCitedWords.acceptance; }
-        action <'TestEXPSR05_DeletionRemovesTheCitedWordsFromBothSides'> citedWordsDeleted {
+        action <'TestEXPSR05_DeletionRedactsTheCitedWordsFromEveryToolAnswer'> citedWordsDeleted {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/probes_test.go"; }
-            doc /* The cited words go from the test and the picked requirement, and nothing else changes. */
+            doc /* The cited words go from the task and from every tool answer of the browse, and nothing else changes. */
         }
         action <'TestEXPSR05_ControlRemovesAsManyOtherWords'> controlMatchesTheCount {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/probes_test.go"; }
@@ -110,6 +142,10 @@ package Experiment_VerificationCases {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/run_test.go"; }
             doc /* Evidence found nowhere gives a recorded note and no question. */
         }
+        action <'TestEXPSR05_TheProbeSampleIsEveryFourthLinkedTest'> sampleFixed {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/run_test.go"; }
+            doc /* The first test and every fourth after it among those linked to a requirement, in the order read. */
+        }
     }
 
     verification def VC_EXP_SR_06 {
@@ -118,27 +154,21 @@ package Experiment_VerificationCases {
         objective { verify EXP_SR_06_RebuildFromTheCitedWords.acceptance; }
         action <'TestEXPSR06_ReconstructionShowsOnlyTheCitedWords'> onlyTheEvidence {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/probes_test.go"; }
-            doc /* The test part holds the evidence and nothing of the test. */
+            doc /* The task holds the evidence and nothing else of the test. */
         }
-    }
-
-    verification def VC_EXP_SR_07 {
-        doc /* Shuffling the requirement list. */
-        subject experiment : Experiment;
-        objective { verify EXP_SR_07_ShuffleTheRequirements.acceptance; }
-        action <'TestEXPSR07_OneShuffleForEveryTest'> oneShuffle {
+        action <'TestEXPSR06_TheRebuiltBrowseHidesTheTestsOwnCode'> ownCodeHidden {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/probes_test.go"; }
-            doc /* Every test gets the same permutation of the list, and it differs from the original. */
+            doc /* No grep or read in the rebuilt browse shows the test's own function. */
         }
     }
 
     verification def VC_EXP_SR_08 {
-        doc /* Asking again, unchanged. */
+        doc /* Browsing again, unchanged. */
         subject experiment : Experiment;
         objective { verify EXP_SR_08_AskTwice.acceptance; }
         action <'TestEXPSR08_EveryFourthTestIsAskedTwice'> everyFourth {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/run_test.go"; }
-            doc /* The first test and every fourth after it are asked twice. */
+            doc /* The first test and every fourth after it are browsed twice. */
         }
     }
 
@@ -152,7 +182,7 @@ package Experiment_VerificationCases {
         }
         action <'TestEXPSR09_TheHeaderRecordsWhatARepeatNeeds'> provenance {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/run_test.go"; }
-            doc /* The header holds the commit, the settings, the version, the digest and the corpus hash. */
+            doc /* The header holds the commit, the settings, the version, the digest and a hash of the systems model and the tests. */
         }
     }
 
@@ -204,7 +234,11 @@ package Experiment_VerificationCases {
         }
         action <'TestEXPSR11_EvidenceCountsAsFoundOnlyAsWritten'> groundedAsWritten {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
-            doc /* Evidence found only word by word, or only in the question's fixed wording, does not count. */
+            doc /* Evidence found only word by word, or found only outside the test, does not count. */
+        }
+        action <'TestEXPSR11_OtherKindsAreMeasuredAgainstABaseRate'> otherKindsAgainstABaseRate {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* Links to parts and actions are counted by kind, with the share near the recorded requirement beside the share of every element. */
         }
     }
 
@@ -236,9 +270,9 @@ package Experiment_VerificationCases {
         doc /* The quick run. */
         subject experiment : Experiment;
         objective { verify EXP_SR_14_AQuickRun.acceptance; }
-        action <'TestEXPSR14_AQuickRunTakesTwelveTests'> twelveTests {
+        action <'TestEXPSR14_AQuickRunTakesTwelveTestsAndOneIncident'> twelveTests {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/run_test.go"; }
-            doc /* Eight keyed and four unkeyed tests, the same twelve each time. */
+            doc /* Eight keyed and four unkeyed tests, the same twelve each time, and one incident browse. */
         }
     }
 
@@ -259,6 +293,124 @@ package Experiment_VerificationCases {
         action <'TestEXPSR16_TheModelAndTheTestsAgree'> bothWays {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/trace_test.go"; }
             doc /* Every test named here exists in its file, and every TestEXP function is named in its requirement's case. */
+        }
+    }
+
+    verification def VC_EXP_SR_17 {
+        doc /* The tools over the systems model, on a fixture model. */
+        subject experiment : Experiment;
+        objective { verify EXP_SR_17_ToolsOverTheSystemsModel.acceptance; }
+        action <'TestEXPSR17_LinksAreGroupedByRelationship'> linksGrouped {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* A part's links come back grouped, satisfies beside typed by, as identifiers. */
+        }
+        action <'TestEXPSR17_PathsHaveAtMostThreeHops'> pathsAtMostThreeHops {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* Paths are shortest first, at most three, of at most three links each, and none beyond. */
+        }
+        action <'TestEXPSR17_EveryAnswerStaysWithinItsLimit'> capsHeld {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* Long answers are cut at their limit and say how many more there were. */
+        }
+        action <'TestEXPSR17_AnUnknownIdentifierIsAnsweredAsUnknown'> unknownAnswered {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* An identifier the systems model lacks gets an answer saying so. */
+        }
+        action <'TestEXPSR17_CodeGivesTheSystemsModelsOwnLocations'> codeFromTheModel {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* Evidence locations, paths in the description and where distinctive values occur. */
+        }
+    }
+
+    verification def VC_EXP_SR_18 {
+        doc /* The tools over the code, on the fixture tree. */
+        subject experiment : Experiment;
+        objective { verify EXP_SR_18_ToolsOverTheCode.acceptance; }
+        action <'TestEXPSR18_GrepSearchesTheBuiltSystemOnly'> builtSystemOnly {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* A word in a fixture model file, a doc and test data is found only in the built system's file. */
+        }
+        action <'TestEXPSR18_ReadShowsTheLinesAroundTheOneAsked'> linesAround {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* Numbered lines around the one asked, within the limit. */
+        }
+    }
+
+    verification def VC_EXP_SR_19 {
+        doc /* The view as working state. The rendered view is also put to both reference tools by hand, on the view of the quick run. */
+        subject experiment : Experiment;
+        objective { verify EXP_SR_19_TheViewAsWorkingState.acceptance; }
+        action <'TestEXPSR19_ExposeAndPruneChangeTheView'> exposeAndPrune {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/view_test.go"; }
+            doc /* An exposed element stays with its note until pruned, and an unknown one is refused. */
+        }
+        action <'TestEXPSR19_TheViewIsWrittenOutAsSysML'> writtenAsSysML {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/view_test.go"; }
+            doc /* A viewpoint definition framing the task, and a view exposing each element by its qualified name. */
+        }
+    }
+
+    verification def VC_EXP_SR_20 {
+        doc /* The incident and its key. */
+        subject experiment : Experiment;
+        objective { verify EXP_SR_20_ExplainAnIncident.acceptance; }
+        action <'TestEXPSR20_TheKeyNamesOnlyElementsThatExist'> keyCommitted {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/incident_test.go"; }
+            doc /* Every element the committed key names is an element of the checkout's systems model. */
+        }
+        action <'TestEXPSR20_TheIncidentSeesTheWholeSystemsModel'> wholeModel {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/incident_test.go"; }
+            doc /* The incident's tools show the register and mask no key. */
+        }
+        action <'TestEXPSR20_TheIncidentIsScoredItemByItem'> scoredItemByItem {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/incident_test.go"; }
+            doc /* Each item of the key is found or missed in an answer written for the test. */
+        }
+    }
+
+    verification def VC_EXP_SR_21 {
+        doc /* Suspected mismatches. */
+        subject experiment : Experiment;
+        objective { verify EXP_SR_21_SuspectedMismatches.acceptance; }
+        action <'TestEXPSR21_EveryFinalSchemaAsksForSuspectedMismatches'> askedEveryTime {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/ollama_test.go"; }
+            doc /* Both final schemas carry the mismatches field. */
+        }
+        action <'TestEXPSR21_SuspectedMismatchesAreListed'> listed {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* Each suspicion appears with its element, both accounts and the reason. */
+        }
+    }
+
+    verification def VC_EXP_SR_22 {
+        doc /* The incident's probes. */
+        subject experiment : Experiment;
+        objective { verify EXP_SR_22_IncidentProbes.acceptance; }
+        action <'TestEXPSR22_TheIncidentIsBrowsedInFiveWays'> fourVariants {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/run_test.go"; }
+            doc /* As reported, again unchanged, with the alert alone, and with each of the two removals. */
+        }
+        action <'TestEXPSR22_ARemovalTakesAwayOnlyItsTarget'> onlyTheTargetRemoved {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/probes_test.go"; }
+            doc /* Removing a transition changes its own pages and links and nothing else. */
+        }
+    }
+
+    verification def VC_EXP_SR_23 {
+        doc /* The citation check. */
+        subject experiment : Experiment;
+        objective { verify EXP_SR_23_CitationsChecked.acceptance; }
+        action <'TestEXPSR23_AMissingElementIsFlagged'> missingElementFlagged {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/incident_test.go"; }
+            doc /* An identifier no tool could show is marked missing. */
+        }
+        action <'TestEXPSR23_ConsecutiveStepsMustBeLinked'> unlinkedStepFlagged {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/incident_test.go"; }
+            doc /* Two steps no link joins, and no code the first names, are marked missing. */
+        }
+        action <'TestEXPSR23_ACitationOfARemovedElementIsFlagged'> removedElementFlagged {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/incident_test.go"; }
+            doc /* In a browse with a transition removed, citing that transition is marked missing. */
         }
     }
 
@@ -283,9 +435,9 @@ package Experiment_VerificationCases {
     }
 
     verification def VC_EXP_SC_03 {
-        doc /* About an hour on the operator's server. The evidence is the operator's run, which has not happened yet. */
+        doc /* About two hours on the operator's server. The evidence is the operator's run, which has not happened yet. */
         subject experiment : Experiment;
-        objective { verify EXP_SC_03_AboutAnHour.acceptance; }
+        objective { verify EXP_SC_03_AboutTwoHours.acceptance; }
     }
 
     verification def VC_EXP_SC_04 {

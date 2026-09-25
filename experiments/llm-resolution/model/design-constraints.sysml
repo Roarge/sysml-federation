@@ -21,9 +21,9 @@ package Experiment_DesignConstraints {
         }
     }
 
-    requirement <'EXP-SC-03'> EXP_SC_03_AboutAnHour : DesignConstraint {
+    requirement <'EXP-SC-03'> EXP_SC_03_AboutTwoHours : DesignConstraint {
         subject :>> system : ExperimentElement;
-        attribute :>> statement = "A full run finishes in about an hour on the operator's server, a 14B model at 4-bit quantisation on a 12 GB graphics card that generates about 22 tokens a second. It is an estimate, not a gate.";
+        attribute :>> statement = "A full run finishes in about two hours on the operator's server, a 14B model at 4-bit quantisation on a 12 GB graphics card that generates about 22 tokens a second. It is an estimate, not a gate.";
         requirement :>> acceptance {
             requirement measured { doc /* The operator's run records its own duration. */ }
         }

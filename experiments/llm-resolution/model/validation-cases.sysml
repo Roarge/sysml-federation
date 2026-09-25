@@ -35,4 +35,10 @@ package Experiment_ValidationCases {
         subject experiment : Experiment;
         objective { verify EXP_US_05_RepeatableRuns.acceptance; }
     }
+
+    verification def VAL_EXP_US_06 {
+        doc /* Explain the outage: the incident's account from the operator's run, read against its key. */
+        subject experiment : Experiment;
+        objective { verify EXP_US_06_ExplainTheOutage.acceptance; }
+    }
 }
