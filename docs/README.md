@@ -75,10 +75,12 @@ In progress. The second series takes on automating the federation itself. Before
 
 ### The task
 
-What is entity resolution between a systems model and a built system, and why does a systems model need it?
+What is entity resolution between a systems model and a built system, and what is a single task of it made of?
 
 1. [Why does a systems model need entity resolution?](articles/13-why-a-model-needs-entity-resolution.md)  
    Hardly anything a team builds carries the keys from its systems model. What does it take to find the counterparts of each element of the systems model anyway, and why is that job never quite finished?
+2. [The parts of a resolution task](articles/14-the-parts-of-a-resolution-task.md)  
+   What goes into a single resolution task, from what counts as a candidate to where the finished link lands? And why do two tools disagree about whether a renamed thing is still the same thing?
 
 ## The repository
 

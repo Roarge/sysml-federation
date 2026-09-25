@@ -94,8 +94,8 @@ Record linkage has a name for the ground in between. In Fellegi and Sunter's met
 
 People reviewing links aren't a perfect safety net either. When [Cuddeback, Dekhtyar and Hayes](https://digitalcommons.calpoly.edu/csse_fac/108/) had analysts vet candidate trace matrices, the analysts moved them towards a balance of about as many wrong links as missing ones, and poor matrices improved sharply. Follow-up studies found the other half of the story, which the review above sums up: "the higher the quality of the starting trace matrix, the worse the decisions the analyst makes". And decay cuts across both ways of working. The link from `PIPE-S2` to its OpenTofu resource goes stale just as fast whether a person confirmed it or a machine added it.
 
-Part 2, coming up next, takes a single resolution task apart, from what goes in to what comes out, and asks how exactly a task has to be stated before anyone tries to solve it.
+[Part 2](14-the-parts-of-a-resolution-task.md) takes a single resolution task apart, from what goes in to what comes out, and asks how exactly a task has to be stated before anyone tries to solve it.
 
 ---
 
-Previous: [A model of the demo itself](12-a-model-of-the-demo-itself.md), the last part of Federating a systems model · Index: [Automating traceability](../README.md)
+Previous: [A model of the demo itself](12-a-model-of-the-demo-itself.md), the last part of Federating a systems model · Index: [Automating traceability](../README.md) · Next: [The parts of a resolution task](14-the-parts-of-a-resolution-task.md)
