@@ -13,7 +13,7 @@ package Experiment_SystemStories {
     private import RequirementDerivation::*;
 
     requirement <'EXP-SR-01'> EXP_SR_01_ReadTheRegistersAndTheTests : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
         attribute statement : String = "The experiment shall read every system story and design constraint of the demo's systems model with its statement, and every top-level Go test function of the repository's main module, from the checkout it runs in.";
@@ -30,7 +30,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-02'> EXP_SR_02_HideTheKeys : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
         attribute statement : String = "The experiment shall remove every requirement key from a test's name and doc comment before any resolver reads the test.";
@@ -46,7 +46,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-03'> EXP_SR_03_AWordOverlapBaseline : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
         attribute statement : String = "The experiment shall rank the requirements for each test by the words they share, weighted by how few requirements use each word, propose the best only when its score reaches a threshold fixed in the code, and give the shared words as its reason.";
@@ -63,7 +63,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-04'> EXP_SR_04_OneQuestionPerTest : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
         attribute statement : String = "When the experiment asks the language model about a test, it shall send the instructions and every requirement as the system message and the test as the user message, with a temperature of 0, a fixed seed, a context of 8192 tokens and a reply schema that admits only a requirement key or none, up to five pieces of evidence and one reason.";
@@ -82,7 +82,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-05'> EXP_SR_05_DeleteTheCitedWords : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
         attribute statement : String = "When the language model has linked a test to a requirement, the experiment shall ask again with every word of the cited evidence deleted from the test and from that requirement, and again with as many other words deleted at random from the same places.";
@@ -99,7 +99,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-06'> EXP_SR_06_RebuildFromTheCitedWords : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
         attribute statement : String = "When the language model has linked a test to a requirement, the experiment shall ask again with the test replaced by the cited evidence alone.";
@@ -114,7 +114,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-07'> EXP_SR_07_ShuffleTheRequirements : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
         attribute statement : String = "When the language model has linked a test to a requirement, the experiment shall ask again with the requirements listed in an order shuffled with a fixed seed, the same order for every test.";
@@ -129,7 +129,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-08'> EXP_SR_08_AskTwice : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : SystemsEngineer;
         attribute statement : String = "The experiment shall ask the question about every fourth test a second time, unchanged, and record whether the two replies are identical.";
@@ -144,7 +144,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-09'> EXP_SR_09_OneResultsFile : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Operator;
         attribute statement : String = "The experiment shall write one results file in JSON Lines, opening with the commit, the settings, the server's version and the model's digest, and shall add each question and reply to it as the reply arrives.";
@@ -161,7 +161,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-10'> EXP_SR_10_ResumeAStoppedRun : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Operator;
         attribute statement : String = "When the operator gives the results file of a stopped run, the experiment shall reuse its completed replies and ask only the questions it lacks, and if that file was made from different inputs or settings, it shall refuse to resume.";
@@ -177,7 +177,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-11'> EXP_SR_11_ReportWithIntervals : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
         attribute statement : String = "The experiment shall report, for each resolver, precision and recall over the tests that carry a key, and for each probe, the share of changed answers, each with its 95% Wilson interval, and shall list every link proposed for a test that carries no key, unscored.";
@@ -194,7 +194,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-12'> EXP_SR_12_OnlyTheGivenServer : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : ModelOwner;
         attribute statement : String = "The experiment shall send requests only to the server at the address the operator gives.";
@@ -209,7 +209,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-13'> EXP_SR_13_StopBeforeAsking : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Operator;
         attribute statement : String = "If the server cannot be reached or does not hold the model, then the experiment shall stop before asking any question, with exit status 2 and a message naming what is missing.";
@@ -225,7 +225,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-14'> EXP_SR_14_AQuickRun : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Operator;
         attribute statement : String = "When the operator asks for a quick run, the experiment shall run every step on a fixed sample of twelve tests, eight that carry a key and four that do not.";
@@ -240,7 +240,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-15'> EXP_SR_15_ReportFromAFile : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
         attribute statement : String = "When given a results file to report on, the experiment shall rebuild the report from that file alone, without contacting a server.";
@@ -255,7 +255,7 @@ package Experiment_SystemStories {
     }
 
     requirement <'EXP-SR-16'> EXP_SR_16_TheModelAndTheTestsAgree : UserStory {
-        @StoryMeta { status = StoryStatus::inProgress; }
+        @StoryMeta { status = StoryStatus::done; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : SystemsEngineer;
         attribute statement : String = "A unit test of the experiment shall fail when its verification register names a Go test that does not exist, or when a Go test named for one of its requirements is missing from that requirement's case.";
