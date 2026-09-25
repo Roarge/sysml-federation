@@ -1,6 +1,6 @@
 # The missing integration layer for open MBSE?
 
-*Roar Georgsen, 27 August 2026*
+*Roar Elias Georgsen, 27 August 2026*
 
 I want SysML v2 models to be easier to connect to everything else an engineering organisation runs, down to the spreadsheets that quietly hold the place together. My proposal is federation. The model's owners publish a small projection of it, chosen with SysML's own views and viewpoints, and other services attach their own data to the model's elements by agreeing on an identifier. Nobody else has to learn SysML to join in.
 
