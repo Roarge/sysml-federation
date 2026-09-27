@@ -484,8 +484,9 @@ package Federation_LogicalArchitecture {
                    host from their published images and points the tunnel's
                    route at the demo there, and the same switch turned off
                    removes both and points the route back at the compose
-                   session. The tunnel and its DNS record are adopted into it
-                   and cannot be destroyed through it. */
+                   session. The tunnel and its DNS record are adopted into it,
+                   or created by it on a fresh account, and cannot be destroyed
+                   through it. */
             @DecisionRecord { id = "AD-0033"; title = "The demo on the owner's Proxmox host, declared in OpenTofu"; }
         }
 

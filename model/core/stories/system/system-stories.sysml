@@ -1475,7 +1475,7 @@ package Federation_SystemStories {
         attribute pattern : EarsPattern = EarsPattern::Complex;
         attribute verificationMethods : VerificationMethod[1..*] = (VerificationMethod::Test, VerificationMethod::Demonstration);
         attribute :>> capability = "start the demo on the owner's own host from the published image, public through the named tunnel, and stop it again, one command each";
-        attribute :>> benefit    = "a session's running instance can live on the owner's host for as long as the session lasts, with no hosted demo and no bill";
+        attribute :>> benefit    = "the demo can answer on its public hostname from the owner's own host for as long as the owner wants, with no hosted demo and no bill";
         frame concern : PublishedClaimsStayTrue;
         requirement :>> acceptance {
             requirement runsFromThePublishedImage {
@@ -1501,9 +1501,9 @@ package Federation_SystemStories {
             }
         }
         doc /* Rationale: the tunnel and its DNS record were set up by hand and
-               recorded nowhere, and a session needs a running instance that
-               the monitoring service can reach (AD-0033). Allocated to: HOSTS.
-               Upstream: US-19. */
+               recorded nowhere, and a running instance the public can reach
+               should not depend on a laptop staying awake (AD-0033).
+               Allocated to: HOSTS. Upstream: US-19. */
     }
 
     // ------------------------------------------------ the derivations, US-01 to US-19 --

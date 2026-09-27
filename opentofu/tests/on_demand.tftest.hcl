@@ -5,6 +5,14 @@
 # owner's host.
 
 mock_provider "proxmox" {
+  # The provider gives a pulled image the ID of its volume, which is what a
+  # container's template_file_id expects.
+  mock_resource "proxmox_oci_image" {
+    defaults = {
+      id = "local:vztmpl/stand-in.tar"
+    }
+  }
+
   mock_resource "proxmox_virtual_environment_container" {
     defaults = {
       ipv4 = { eth0 = "192.168.1.77" }
@@ -13,20 +21,21 @@ mock_provider "proxmox" {
 }
 
 mock_provider "cloudflare" {
-  mock_data "cloudflare_zero_trust_tunnel_cloudflared_token" {
+  mock_resource "cloudflare_zero_trust_tunnel_cloudflared" {
     defaults = {
-      token = "stand-in-token"
+      id = "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
     }
   }
 }
 
+# No tunnel_id and no dns_record_id, so nothing is imported: OpenTofu's test
+# framework cannot import into a mocked provider. The owner's first plan shows
+# the imports.
 variables {
   proxmox_node          = "pve"
   datastore             = "local-zfs"
   cloudflare_account_id = "0123456789abcdef0123456789abcdef"
   cloudflare_zone_id    = "fedcba9876543210fedcba9876543210"
-  tunnel_id             = "4f1c2d3e-5a6b-4c7d-8e9f-0a1b2c3d4e5f"
-  dns_record_id         = "abcdef0123456789abcdef0123456789"
 }
 
 run "switched_off_is_the_compose_session" {
@@ -93,9 +102,11 @@ run "switched_on_runs_both_on_the_host" {
     error_message = "The connector must run the named tunnel, as the compose file's named profile does."
   }
 
+  # The token itself is read only once the tunnel exists, which a plan that
+  # creates the tunnel cannot show. The variable being there is what a plan can.
   assert {
-    condition     = nonsensitive(proxmox_virtual_environment_container.tunnel[0].environment_variables["TUNNEL_TOKEN"] == "stand-in-token")
-    error_message = "The connector must be given the named tunnel's token."
+    condition     = nonsensitive(keys(proxmox_virtual_environment_container.tunnel[0].environment_variables)) == tolist(["TUNNEL_TOKEN"])
+    error_message = "The connector must be given the named tunnel's token, and nothing else."
   }
 
   assert {
@@ -105,7 +116,7 @@ run "switched_on_runs_both_on_the_host" {
 }
 
 run "switched_on_with_dhcp_routes_to_the_address_the_host_reports" {
-  command = apply
+  command = plan
 
   variables {
     run_on_proxmox = true

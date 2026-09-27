@@ -16,8 +16,9 @@ have noticed the route changing.
 The owner runs a Proxmox VE host on their own network. From version 9.1 the
 host can pull an image from an OCI registry and run it as an application
 container, a technology preview in that release. The published image suits
-that kind of container, with one process on one port and no shell. A session's
-demo could run there instead of on a laptop that has to stay awake for it.
+that kind of container, with one process on one port and no shell. The demo
+could run there, public through the same named tunnel, on a machine that stays
+up when a laptop does not.
 
 The articles on automating traceability use OpenTofu as their example of
 infrastructure as code. Until this record, every OpenTofu resource they showed
@@ -37,10 +38,12 @@ containers and both images are removed and the route points at
 starts with one `tofu apply` and ends with another, and nothing runs on the
 host between sessions.
 
-The named tunnel, its configuration and the DNS record are adopted by import
-blocks, so the first apply takes over what exists and creates nothing new at
-the tunnel provider. All three carry `prevent_destroy`, so `tofu destroy` is
-refused before it can take the public hostname with it.
+When their IDs are given, import blocks adopt the named tunnel, its
+configuration and the DNS record, so the first apply takes over what exists
+and creates nothing new at the tunnel provider. Without the IDs, the first
+apply creates all three, which is how anyone else sets the demo up on their
+own account. All three carry `prevent_destroy`, so `tofu destroy` is refused
+before it can take the public hostname with it.
 
 The configuration's names follow the two providers' conventions, and none
 carries a key from the demo's systems model. No test holds the configuration
@@ -96,6 +99,12 @@ mocked plan shows only what the configuration asks for.
 The DNS record gets no element of its own in the demo's systems model. The
 context's tunnel edge stands for whatever terminates the public hostname, and
 the record is part of that.
+
+The check session's script still starts a demo and a tunnel of its own, and its
+trace steps expect the router's spans in the collector beside it, so a check
+session runs against the compose stack and not against the demo on the host.
+Pointing a session at the host is a change to the session, left for when it is
+wanted.
 
 `make opentofu-check` downloads the two providers the first time it runs, so it
 needs a network the unit tests do not.

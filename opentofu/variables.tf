@@ -14,8 +14,14 @@ variable "proxmox_node" {
   default     = null
 }
 
+variable "template_datastore" {
+  description = "The storage the two images are pulled into. It must allow container templates, as the default local storage does."
+  type        = string
+  default     = "local"
+}
+
 variable "datastore" {
-  description = "The datastore that holds the two images and the containers' root filesystems. It must be ext4 or ZFS backed, which a root filesystem from an OCI image needs."
+  description = "The storage for the two containers' root filesystems. It must allow containers, as local-lvm or local-zfs do on a default installation."
   type        = string
   default     = null
 }
@@ -86,19 +92,21 @@ variable "cloudflare_zone_id" {
 }
 
 variable "tunnel_id" {
-  description = "The named tunnel's UUID, as the tunnel provider's dashboard shows it. The import blocks adopt the tunnel and its configuration by it."
+  description = "The UUID of a named tunnel that already exists, as the tunnel provider's dashboard shows it, to adopt it and its routes. Leave it unset to create a new tunnel."
   type        = string
+  default     = null
 }
 
 variable "tunnel_name" {
-  description = "The named tunnel's name, as it was created."
+  description = "The named tunnel's name. When adopting a tunnel, give the name it was created with."
   type        = string
   default     = "sysml-federation"
 }
 
 variable "dns_record_id" {
-  description = "The ID of the public hostname's DNS record, which the import block adopts it by."
+  description = "The ID of the public hostname's DNS record, if one already exists, to adopt it. Leave it unset to create the record."
   type        = string
+  default     = null
 }
 
 variable "hostname" {

@@ -201,9 +201,9 @@ container for it behind the `checkly-private` profile, with its own key in
 
 The named tunnel is the route for a session that runs all twelve stories. It
 needs a token, created on the owner's own zone, and the public hostname routed
-to that tunnel, and the route from the hostname to `http://demo:8080` is
-configured where the tunnel was created, so nothing of it is in the
-repository. The
+to that tunnel. The tunnel, its route from the hostname to `http://demo:8080`
+and the DNS record can be created, or adopted if they were made by hand, with
+the host configuration under [`opentofu/`](../opentofu/README.md). The
 hostname is a CNAME to the tunnel, flattened at the edge, which is why the DNS
 monitor asks for an A record. The quick tunnel needs nothing. It is given a
 hostname under the tunnel provider's own domain for the life of the session,

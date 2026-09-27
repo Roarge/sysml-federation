@@ -983,6 +983,14 @@ package Federation_VerificationCases {
                host once it has been run and recorded. */
         subject hostConfiguration : HostConfiguration;
         objective { verify SR_49_TheDemoOnTheOwnersHostWhenAsked.acceptance; }
+        action <'make opentofu-check'> plannedAgainstStandIns {
+            @Evidence { kind = "make-target"; location = "Makefile"; }
+            doc /* Formats and validates the configuration, then plans it against mocked providers in opentofu/tests/on_demand.tftest.hcl. Switched off: nothing on the host, and the route to the compose session's demo. Switched on: two images at the releases the compose file uses, two unprivileged containers that do not start with the host, the connector given the tunnel's token, and the route to the demo on the host by its static address or the one DHCP gave it. */
+        }
+        action <'cloudflare.tf'> destroyRefused {
+            @Evidence { kind = "inspection"; location = "opentofu/cloudflare.tf"; }
+            doc /* The tunnel, its configuration and the DNS record each carry prevent_destroy, so a destroy of the configuration stops before it reaches them. */
+        }
     }
 
     // -------------------------------------------------------- design constraints --
