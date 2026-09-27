@@ -103,4 +103,4 @@ A gold set decays along with the links it describes, so it has to be maintained 
 
 ---
 
-Previous: [Why no resolver gets every link right](15-why-no-resolver-gets-every-link-right.md) · Index: [Automating traceability](../README.md) · Next: [What makes a resolver worth running](17-what-makes-a-resolver-worth-running.md)
+Previous: [Why no resolver gets every link right](15-why-no-resolver-gets-every-link-right.md) · Index: [Automating traceability](../README.md) · Next: [What makes a resolver worth running?](17-what-makes-a-resolver-worth-running.md)
