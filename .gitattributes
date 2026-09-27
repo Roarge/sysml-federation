@@ -5,6 +5,7 @@
 *.kerml     text
 *.graphql   text
 *.graphqls  text
+*.feature   text
 go.sum      text -diff
 *.png       binary
 *.pdf       binary
