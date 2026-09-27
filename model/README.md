@@ -58,8 +58,9 @@ never silently wrong (US-15), the contract checked before deployment (US-16),
 the example accepted by the reference tools (US-17), the demo's own model as the
 record (US-18), and the stories exercised against a running instance (US-19).
 Three requirements came with them. SR-46 states that a unit test fails when the
-model and the repository disagree on an identifier, a test name, a check file or
-a published image. SR-47 states that both reference tools accept the model and
+model and the repository disagree on an identifier, a test name, a scenario, a
+check file or a published image, or when a criterion of a story that is done
+has no scenario of its own. SR-47 states that both reference tools accept the model and
 that continuous integration runs them on every change to it. SR-48 states that
 the demo, given credentials, runs the check suite against itself through a
 tunnel and is unchanged when given none. SR-49 came later, with the host
@@ -73,7 +74,10 @@ statement as an attribute, `attribute statement : String = "...";`, so that
 the text a case verifies is the text the story carries. Three statements were
 amended with the model: SR-03 for the configuration-file opt-in, SC-01 for the
 check project and SC-07 for the model validation. SC-01 was amended again for
-the host configuration (AD-0033).
+the host configuration (AD-0033), and a third time for the Gherkin scenarios
+(AD-0034). The same record rewrote SR-22's two criteria and SR-46's eight in
+given, when, then form, which every other criterion of a system story was
+already written in.
 
 A story's status is carried as `@StoryMeta` and is `done` or `inProgress`.
 `done` is asserted as of the merge of the pull request that carries the story's
@@ -130,9 +134,10 @@ session's registers.
 Before the registers were written, every form the model intended to use was put
 to both reference tools in a probe file, once with every form together and once
 with each form on its own, with every other form commented out and the ones it
-depends on kept. Nineteen forms were probed. Eighteen are accepted by both
-validators as written, and none of those fell back to a simpler spelling. One is
-refused by both, and the model uses the alternative its row names.
+depends on kept. Twenty forms were probed, the last on 2026-09-27, before the
+scenarios were registered. Nineteen are accepted by both validators as written,
+and none of those fell back to a simpler spelling. One is refused by both, and
+the model uses the alternative its row names.
 
 | Form | Pilot | OpenSysML | Form used |
 |---|---|---|---|
@@ -155,6 +160,7 @@ refused by both, and the model uses the alternative its row names.
 | `ref part demo :> demoInstance;` in a composite, `part t : TunnelConnector[0..1] { :>> mode = "named"; }`, a `verification def` with `actor checkly : ChecklyCloud;` and `verify US_P02_Nested.acceptance.criterionOne;`, and `attribute locations : String[1..3] = ("eu-central-1");` | accepted | accepted, exit 0 | the probed form, with the qualified cross-package spelling of the `ref part` settled by the last row |
 | `view def ReadabilityRendering { satisfy viewpoint ReadabilityViewpoint; }`, a view definition expressing conformance with a satisfy statement rather than with an owned viewpoint usage | refused: `ERROR:no viable alternative at input 'viewpoint'` | refused, exit 2: `error: expected '{' or ';'`, caret under `ReadabilityViewpoint` | the owned viewpoint usage of the sixth row, `view def V { viewpoint conformsTo : VP; }` |
 | `ref part demoFromElsewhere :> ModelProbeOther::demoInstanceElsewhere;` in a composite, the target being a part usage in a second top-level package, named through that package's qualified name | accepted | accepted, exit 0 | the probed form |
+| `action <'@fourPathsAnswer'> fourPathsAnswerScenario { @Evidence { kind = "scenario"; location = "..."; } doc /* */ }`, the tag of a criterion as the short name | accepted | accepted, exit 0 | the probed form |
 
 A validator accepting a form is not the same as a validator checking what the
 author meant by it, and four of the acceptances carry a caveat. `require
@@ -297,11 +303,23 @@ router's outbound paths or the module file, is an action of kind `analysis` or
 `inspection`. An inspection's location names the practice, `review checklist`,
 rather than a file in the repository.
 
-A case names only evidence that exists. Three stories ask for more than the
-repository holds. SR-01's criterion `recordedOnThreePlatforms` has one platform
-recorded of three. SR-40 and SR-43 name `Test` among their methods
-and have no test function of their own, so their cases carry the inspection and
-the recorded run alone. Each case claims what is there and nothing more.
+A Gherkin scenario that go test runs is named by the tag of the criterion it
+gives steps to, `<'@fourPathsAnswer'>`, with the kind `scenario` and its feature
+file as the location,
+`cmd/sysml-federation/features/sr04-four-paths-on-one-port.feature`. Fifty-nine
+actions name a scenario, under thirty-three cases, and none of their docs names
+a Go test. A scenario that go test does not run adds no action. It carries the
+kind of evidence that verifies its criterion as a tag, `@record` for a run
+recorded in a browser, and its case already names that evidence.
+
+A case names only evidence that exists. One story asks for more than the
+repository holds: SR-01's criterion `recordedOnThreePlatforms` has one platform
+recorded of three. SR-40 and SR-43 name `Test` among their methods and have no
+test function of their own. Each now has a scenario that runs for one
+criterion: for SR-40, that the apps fail without the router, and for SR-43, that
+the served schema carries all three subgraphs. The other criterion of each keeps
+the inspection or the recorded run alone. Each case claims what is there and
+nothing more.
 
 The check session brings its own cases with it. Every live check is a
 verification case of its own, carrying the check's steps: thirty-one cases in
@@ -352,6 +370,13 @@ them, one subtest per agreement.
   the session's own record, which has no kind and is in the register alone.
 - `sessionParts`: the services the compose file of the check session starts are
   the parts the session composite carries, and nothing else.
+- `scenarios`: every feature file sits in a `features` directory, tags one system
+  story and is named after it. Every scenario names one acceptance criterion of
+  that story, and any other tag it carries is a kind of evidence the story's
+  case offers. Every criterion of a story that is done has exactly one
+  scenario, and the scenarios go test runs are the ones the register names,
+  each with a `TestScenarios` runner in its package. The feature files are read
+  with godog's own parser, the one the scenarios run with.
 
 Three of these read the check project: `checkFiles` the files under
 `checkly/__checks__/`, `checkInventory` the manifest, and `sessionParts` the
