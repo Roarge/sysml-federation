@@ -24,6 +24,7 @@
 **/bin
 **/docs
 **/testdata
+**/features
 **/*_test.go
 **/*.out
 **/*.test

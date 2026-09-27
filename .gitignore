@@ -164,6 +164,14 @@
 !**/testdata/
 !**/testdata/**
 
+# ------------------------------------------------------------ scenarios ---
+# The Gherkin scenarios (AD-0034): one feature file per system story, in a
+# features directory beside the package whose tests run it. The directories
+# are already open through the source tree section, so one rule admits the
+# files. It names the directory as well as the extension, so a feature file
+# anywhere else stays untracked, and the re-exclusions below still apply.
+!**/features/*.feature
+
 # ---------------------------------------------------- hard re-exclusions ---
 # These come after every rule above, so they win. The directory-only forms
 # stop Git descending, which confines every unanchored rule above to real

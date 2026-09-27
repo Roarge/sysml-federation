@@ -152,6 +152,16 @@ func (s service) owns(imported string) bool {
 // which neither can call the other except over the wire, and the test below
 // covers that.
 func TestSR41_NoServiceImportsAnother(t *testing.T) {
+	for _, found := range crossImports(t) {
+		t.Error(found)
+	}
+}
+
+// crossImports returns one line for every import by which one service
+// reaches the package of another.
+func crossImports(t *testing.T) []string {
+	t.Helper()
+	var found []string
 	for _, from := range pipelineServices {
 		walkSources(t, from, parser.ImportsOnly, func(path string, file *ast.File) {
 			for _, imported := range importPaths(t, path, file) {
@@ -159,12 +169,13 @@ func TestSR41_NoServiceImportsAnother(t *testing.T) {
 					if to.pkg == from.pkg || !to.owns(imported) {
 						continue
 					}
-					t.Errorf("%s: %s imports %q, which belongs to %s",
-						path, from.name, imported, to.name)
+					found = append(found, fmt.Sprintf("%s: %s imports %q, which belongs to %s",
+						path, from.name, imported, to.name))
 				}
 			}
 		})
 	}
+	return found
 }
 
 // addressLike matches a string that could name something to connect to: a
@@ -199,6 +210,16 @@ var reachesOut = map[string][]string{
 // schemas and the generator rather than from anyone writing here, and one of
 // them quotes the federation specification's own URL.
 func TestSR41_NoServiceIsConfiguredWithAnAddress(t *testing.T) {
+	for _, found := range waysOut(t) {
+		t.Error(found)
+	}
+}
+
+// waysOut returns one line for every address, flag, environment lookup or
+// means of dialling that the hand-written sources of the three services hold.
+func waysOut(t *testing.T) []string {
+	t.Helper()
+	var found []string
 	for _, s := range pipelineServices {
 		walkSources(t, s, parser.ParseComments, func(path string, file *ast.File) {
 			if ast.IsGenerated(file) {
@@ -206,8 +227,8 @@ func TestSR41_NoServiceIsConfiguredWithAnAddress(t *testing.T) {
 			}
 			for _, imported := range importPaths(t, path, file) {
 				if imported == "flag" {
-					t.Errorf("%s: %s imports %q, a way of being handed an address",
-						path, s.name, imported)
+					found = append(found, fmt.Sprintf("%s: %s imports %q, a way of being handed an address",
+						path, s.name, imported))
 				}
 			}
 			ast.Inspect(file, func(n ast.Node) bool {
@@ -222,8 +243,8 @@ func TestSR41_NoServiceIsConfiguredWithAnAddress(t *testing.T) {
 						return true
 					}
 					if addressLike.MatchString(text) {
-						t.Errorf("%s: %s holds %q, which reads as an address",
-							path, s.name, text)
+						found = append(found, fmt.Sprintf("%s: %s holds %q, which reads as an address",
+							path, s.name, text))
 					}
 				case *ast.SelectorExpr:
 					qualifier, ok := node.X.(*ast.Ident)
@@ -232,8 +253,8 @@ func TestSR41_NoServiceIsConfiguredWithAnAddress(t *testing.T) {
 					}
 					for _, name := range reachesOut[qualifier.Name] {
 						if node.Sel.Name == name {
-							t.Errorf("%s: %s names %s.%s, which reaches outside the process",
-								path, s.name, qualifier.Name, name)
+							found = append(found, fmt.Sprintf("%s: %s names %s.%s, which reaches outside the process",
+								path, s.name, qualifier.Name, name))
 						}
 					}
 				}
@@ -241,6 +262,7 @@ func TestSR41_NoServiceIsConfiguredWithAnAddress(t *testing.T) {
 			})
 		})
 	}
+	return found
 }
 
 // TestSR36_TheDocumentServiceReachesNoAdapterPackage parses the imports of

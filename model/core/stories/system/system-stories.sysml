@@ -643,12 +643,15 @@ package Federation_SystemStories {
         frame concern : ShapeWithoutTouching;
         requirement :>> acceptance {
             requirement literalAndProjectionAgree {
-                doc /* After each mutation the literal in the served text equals
-                       the projected value and the version has grown by one. */
+                doc /* Given the served model, when a mutation sets a value
+                       that is a literal in the source, then the literal in the
+                       served text equals the projected value and the version
+                       has grown by one. */
             }
             requirement agreeUnderConcurrentReads {
-                doc /* Concurrent reads during a patch observe the text and the
-                       projection agreeing. */
+                doc /* Given reads that run while mutations patch the model,
+                       when each read takes the served text and the projected
+                       value together, then the two agree. */
             }
         }
         doc /* Rationale: the viewer shows the text and the document shows the
@@ -1342,55 +1345,81 @@ package Federation_SystemStories {
         @StoryMeta { status = StoryStatus::done; }
         subject :>> system : DemoElement;
         stakeholder :>> role : Maintainer;
-        attribute statement : String = "The repository shall carry a unit test that fails when an identifier of a story, a requirement, a constraint or a decision record, a Go test name, a check file or a published image is named in the model without existing in the repository, or exists in the repository without being named in the model.";
+        attribute statement : String = "The repository shall carry a unit test that fails when an identifier of a story, a requirement, a constraint or a decision record, a Go test name, a scenario that go test runs, a check file or a published image is named in the model without existing in the repository, or exists in the repository without being named in the model, and when an acceptance criterion of a system story that is done has no scenario or more than one.";
         attribute pattern : EarsPattern = EarsPattern::Ubiquitous;
         attribute verificationMethods : VerificationMethod[1..*] = (VerificationMethod::Test);
-        attribute :>> capability = "keep the model and the repository in agreement by a test that fails on the first identifier, test name, check file or image that one names and the other lacks";
+        attribute :>> capability = "keep the model and the repository in agreement by a test that fails on the first identifier, test name, scenario, check file or image that one names and the other lacks, and on a criterion without its one scenario";
         attribute :>> benefit    = "the record cannot drift from what ships without a check failing";
         frame concern : PublishedClaimsStayTrue;
         requirement :>> acceptance {
             requirement identifiers {
-                doc /* Every identifier the model writes is declared exactly once
-                       in it, every decision record the model names exists under
-                       the decisions folder, and every record there is named in
+                doc /* Given the model and the decisions folder, when the
+                       agreement test reads them, then every identifier the
+                       model writes is declared exactly once in it, every
+                       decision record the model names exists under the
+                       decisions folder, and every record there is named in
                        the model. */
             }
             requirement requirementsAffected {
-                doc /* Every requirement a decision record names as affected is a
-                       short name the model declares. */
+                doc /* Given the decision records, when the agreement test
+                       reads the requirements each names as affected, then
+                       every one is a short name the model declares. */
             }
             requirement goTests {
-                doc /* Every Go test the model names exists in the file it names,
-                       and every Go test of the requirement scheme is named by
-                       the model. */
+                doc /* Given the Go tests of the requirement scheme and the
+                       verification register, when the agreement test compares
+                       them, then every Go test the model names exists in the
+                       file it names, and every Go test of the scheme is named
+                       by the model. */
             }
             requirement checkFiles {
-                doc /* Every check file a case names exists in the check project,
-                       and every check file of that project is named by a
-                       case. */
+                doc /* Given the check project and the case registers, when
+                       the agreement test compares them, then every check file
+                       a case names exists in the check project, and every
+                       check file of that project is named by a case. */
             }
             requirement images {
-                doc /* Every published image is named by exactly one view, and
-                       every image a view names is published. */
+                doc /* Given the published images and the views, when the
+                       agreement test compares them, then every published
+                       image is named by exactly one view, and every image a
+                       view names is published. */
             }
             requirement coverage {
-                doc /* Every story that is done is verified by a case, satisfied
-                       by something in the logical architecture, and a derived
-                       end of a derivation connection. */
+                doc /* Given the stories, the cases and the logical
+                       architecture, when the agreement test reads them, then
+                       every story that is done is verified by a case,
+                       satisfied by something in the logical architecture, and
+                       a derived end of a derivation connection. */
             }
             requirement checkInventory {
-                doc /* The check register and the manifest the check project
-                       reads carry the same checks with the same fields. */
+                doc /* Given the check register and the manifest the check
+                       project reads, when the agreement test compares them,
+                       then both carry the same checks with the same
+                       fields. */
             }
             requirement sessionParts {
-                doc /* The services the compose file of the check session starts
-                       are the parts the session composite carries, and nothing
-                       else. */
+                doc /* Given the compose file of the check session and the
+                       session composite, when the agreement test compares
+                       them, then the services the compose file starts are the
+                       parts the composite carries, and nothing else. */
+            }
+            requirement scenarios {
+                doc /* Given the feature files, the system stories and the
+                       verification register, when the agreement test reads
+                       them, then every feature file is named after the one
+                       system story its tag names, every scenario names one
+                       acceptance criterion of that story, every criterion of
+                       a story that is done has exactly one scenario, every
+                       kind of evidence a scenario names in place of running
+                       is offered by its story's case, and every scenario go
+                       test runs is named by that case and has a runner in its
+                       package. */
             }
         }
         doc /* Rationale: a general claim about the model is only as good as the
-               test that reads it (AD-0029). Allocated to: DEMOMODEL, REPO.
-               Upstream: US-18. */
+               test that reads it (AD-0029), and an acceptance criterion is
+               only executable where a scenario gives it steps (AD-0034).
+               Allocated to: DEMOMODEL, REPO. Upstream: US-18. */
     }
 
     #derive

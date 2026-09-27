@@ -153,6 +153,10 @@ $(GOTESTSUM):
 test-watch: $(GOTESTSUM) ## Red-green-refactor loop
 	$(GOTESTSUM) --watch --format testname -- $(TEST_FLAGS) ./...
 
+.PHONY: scenarios
+scenarios: ## Run the Gherkin scenarios alone, one line per acceptance criterion (AD-0034)
+	$(GO) test $(TEST_FLAGS) -run '^TestScenarios$$' -v ./...
+
 .PHONY: experiment-test
 experiment-test: ## Run the language model experiment's own tests (AD-0032)
 	cd experiments/llm-resolution && $(GO) test $(TEST_FLAGS) ./...
@@ -234,7 +238,7 @@ check-allowlist: ## Warn about source files on disk that .gitignore would not tr
 	   $(addsuffix /,$(ALLOWLIST_ROOTS)) 2>/dev/null \
 	   | tr '\0' '\n' \
 	   | grep -vE '/(node_modules|test-results|playwright-report|\.checkly)/' \
-	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json|py|tf|hcl)$$' || true)"; \
+	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json|py|tf|hcl|feature)$$' || true)"; \
 	 if [ -n "$$missing" ]; then \
 	   printf 'source files on disk that .gitignore does not track:\n'; \
 	   printf '%s\n' "$$missing" | sed 's/^/    /'; \

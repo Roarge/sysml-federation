@@ -92,22 +92,28 @@ func TestSR19_ARequirementThatBindsNoSubjectIsRefused(t *testing.T) {
 	assert.Equal(t, se.Message, `requirement "r" binds no subject`)
 }
 
+// shapeHead declares the part a constraint below is rooted at.
+const shapeHead = "package P { part def D { attribute q : Real; }\n  part <'p'> p : D;\n"
+
+// otherShapes are the constraint shapes the adapter does not read, one fixture
+// each, with the place and message each is refused with (SR-19).
+var otherShapes = []tabletest.Case[string, refusal]{
+	{Name: "two subject chains", In: shapeHead + "  requirement def R { subject s : D; require constraint { s.q >= s.q } }\n  requirement <'r'> r : R { subject :>> s = p; } }",
+		Want: refusal{3, 38, "the constraint compares two operands rooted at the subject"}},
+	{Name: "no subject chain", In: shapeHead + "  requirement def R { subject s : D; attribute l : Real; require constraint { l >= 1 } }\n  requirement <'r'> r : R { subject :>> s = p; attribute :>> l = 1; } }",
+		Want: refusal{3, 58, `no operand is a feature chain rooted at the subject "s"`}},
+	{Name: "other operand is a chain into a part", In: shapeHead + "  requirement def R { subject s : D; require constraint { s.q >= p.q } }\n  requirement <'r'> r : R { subject :>> s = p; } }",
+		Want: refusal{3, 66, `"p.q" is neither an attribute of the requirement nor a literal`}},
+	{Name: "no constraint", In: shapeHead + "  requirement def R { subject s : D; }\n  requirement <'r'> r : R { subject :>> s = p; } }",
+		Want: refusal{4, 3, `requirement "r" has no require constraint`}},
+	{Name: "no subject", In: shapeHead + "  requirement def R { require constraint { s.q >= 1 } }\n  requirement <'r'> r : R { } }",
+		Want: refusal{4, 3, `requirement "r" has no subject`}},
+	{Name: "limit attribute unbound", In: shapeHead + "  requirement def R { subject s : D; attribute l : Real; require constraint { s.q >= l } }\n  requirement <'r'> r : R { subject :>> s = p; } }",
+		Want: refusal{4, 3, `limit attribute "l" of requirement "r" has no value`}},
+	{Name: "subject does not declare the quantity", In: shapeHead + "  requirement def R { subject s : D; require constraint { s.zz >= 1 } }\n  requirement <'r'> r : R { subject :>> s = p; } }",
+		Want: refusal{3, 59, `subject "p" declares no attribute "zz"`}},
+}
+
 func TestSR19_OtherShapesAreRefused(t *testing.T) {
-	const head = "package P { part def D { attribute q : Real; }\n  part <'p'> p : D;\n"
-	tabletest.Run(t, []tabletest.Case[string, refusal]{
-		{Name: "two subject chains", In: head + "  requirement def R { subject s : D; require constraint { s.q >= s.q } }\n  requirement <'r'> r : R { subject :>> s = p; } }",
-			Want: refusal{3, 38, "the constraint compares two operands rooted at the subject"}},
-		{Name: "no subject chain", In: head + "  requirement def R { subject s : D; attribute l : Real; require constraint { l >= 1 } }\n  requirement <'r'> r : R { subject :>> s = p; attribute :>> l = 1; } }",
-			Want: refusal{3, 58, `no operand is a feature chain rooted at the subject "s"`}},
-		{Name: "other operand is a chain into a part", In: head + "  requirement def R { subject s : D; require constraint { s.q >= p.q } }\n  requirement <'r'> r : R { subject :>> s = p; } }",
-			Want: refusal{3, 66, `"p.q" is neither an attribute of the requirement nor a literal`}},
-		{Name: "no constraint", In: head + "  requirement def R { subject s : D; }\n  requirement <'r'> r : R { subject :>> s = p; } }",
-			Want: refusal{4, 3, `requirement "r" has no require constraint`}},
-		{Name: "no subject", In: head + "  requirement def R { require constraint { s.q >= 1 } }\n  requirement <'r'> r : R { } }",
-			Want: refusal{4, 3, `requirement "r" has no subject`}},
-		{Name: "limit attribute unbound", In: head + "  requirement def R { subject s : D; attribute l : Real; require constraint { s.q >= l } }\n  requirement <'r'> r : R { subject :>> s = p; } }",
-			Want: refusal{4, 3, `limit attribute "l" of requirement "r" has no value`}},
-		{Name: "subject does not declare the quantity", In: head + "  requirement def R { subject s : D; require constraint { s.zz >= 1 } }\n  requirement <'r'> r : R { subject :>> s = p; } }",
-			Want: refusal{3, 59, `subject "p" declares no attribute "zz"`}},
-	}, refuse)
+	tabletest.Run(t, otherShapes, refuse)
 }

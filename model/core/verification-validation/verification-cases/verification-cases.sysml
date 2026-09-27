@@ -6,9 +6,10 @@ package Federation_VerificationCases {
            it. The action's metadata says what kind of evidence it is and where
            it lives: a Go test by its function name and file, a recorded run by
            its row in the example's verification record, a reference tool, a
-           make target, a workflow step, an analysis or an inspection. A case
-           whose evidence has not been produced yet carries its objective and no
-           action. */
+           make target, a workflow step, an analysis or an inspection, and a
+           scenario by the tag of the criterion it runs and its feature file.
+           A case whose evidence has not been produced yet carries its
+           objective and no action. */
     private import Federation_SystemStories::*;
     private import Federation_DesignConstraints::*;
     private import Federation_Context::*;
@@ -48,6 +49,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A container polled every 200 ms answered the viewer after 0.75 s and a query through the router after 0.77 s. */
         }
+        action <'@readyWithinTenSeconds'> readyWithinTenSecondsScenario {
+            @Evidence { kind = "scenario"; location = "cmd/sysml-federation/features/sr02-ready-within-ten-seconds.feature"; }
+            doc /* The whole process tree starts in the test process with a stand-in router, and the subgraphs, the router and the UI server all answer within ten seconds. */
+        }
     }
 
     verification def VC_SR_03 {
@@ -80,6 +85,14 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The router child's environment read from the running container carries the four variables, and the router logged that usage tracking is disabled. */
         }
+        action <'@environmentCarriesTheFourVariables'> environmentCarriesTheFourVariablesScenario {
+            @Evidence { kind = "scenario"; location = "cmd/sysml-federation/features/sr03-no-outbound-network.feature"; }
+            doc /* The router the supervisor starts carries the four variables that keep it off the network, and every address the composed configuration names is on loopback. */
+        }
+        action <'@configurationFileIsAnOptIn'> configurationFileIsAnOptInScenario {
+            @Evidence { kind = "scenario"; location = "cmd/sysml-federation/features/sr03-no-outbound-network.feature"; }
+            doc /* With the variable unset the router's environment is the nine variables and no CONFIG_PATH, and with it set CONFIG_PATH carries the path beside the same nine. */
+        }
     }
 
     verification def VC_SR_04 {
@@ -106,6 +119,14 @@ package Federation_VerificationCases {
         action <'router.check.ts'> pathsAgainstARunningInstance {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
             doc /* router-playground reads the playground as HTML, router-root-redirect reads the 302 to the viewer without following it, and router-health-not-proxied expects a 404 on the health path, each hourly against a running instance. */
+        }
+        action <'@fourPathsAnswer'> fourPathsAnswerScenario {
+            @Evidence { kind = "scenario"; location = "cmd/sysml-federation/features/sr04-four-paths-on-one-port.feature"; }
+            doc /* With the demo running on a stand-in router, the four paths are requested on the published port and each is served by the app or the endpoint it names. */
+        }
+        action <'@rootRedirectsToTheViewer'> rootRedirectsToTheViewerScenario {
+            @Evidence { kind = "scenario"; location = "cmd/sysml-federation/features/sr04-four-paths-on-one-port.feature"; }
+            doc /* With the demo running, the root path is requested and redirects to the viewer. */
         }
     }
 
@@ -170,6 +191,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "inspection"; location = "review checklist"; }
             doc /* The root is read for a notice naming both third-party works, with the MIT text beside the vendored file. */
         }
+        action <'@noticeAndMitTextInPlace'> noticeAndMitTextInPlaceScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/ui/features/sr08-licences-carried-in-the-repository.feature"; }
+            doc /* The repository's NOTICE names the router and SortableJS, and the MIT text sits beside the vendored file. */
+        }
     }
 
     verification def VC_SR_09 {
@@ -190,6 +215,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A stop and restart of the whole stack after the recorded edits came back on model version 1, document version 1 and the shipped verdict. */
         }
+        action <'@restartReturnsTheShippedState'> restartReturnsTheShippedStateScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/features/sr09-state-lives-in-memory.feature"; }
+            doc /* Values and the document structure are edited, the services are started again in the test process, and both show the shipped state. */
+        }
     }
 
     verification def VC_SR_10 {
@@ -209,6 +238,10 @@ package Federation_VerificationCases {
         action <'record: 2026-09-14 SR-10'> renderWithTheHostOffline {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* With the host taken off the network, both apps reloaded and drew in full. */
+        }
+        action <'@noAbsoluteUrlInTheAssets'> noAbsoluteUrlInTheAssetsScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/ui/features/sr10-no-resource-from-another-origin.feature"; }
+            doc /* The embedded assets are scanned, and none carries an absolute URL to another origin. */
         }
     }
 
@@ -305,6 +338,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "go-test"; location = "adapter/model/fixture_test.go"; }
             doc /* Mutations on the second fixture patch its text and its projection as they do on the example. */
         }
+        action <'@everyFieldProjected'> everyFieldProjectedScenario {
+            @Evidence { kind = "scenario"; location = "adapter/model/features/sr16-generic-projection.feature"; }
+            doc /* The second fixture, with other names and other wiring, is projected, and every field the statement lists is present. */
+        }
     }
 
     verification def VC_SR_17 {
@@ -324,6 +361,14 @@ package Federation_VerificationCases {
             @Evidence { kind = "inspection"; location = "review checklist"; }
             doc /* The adapter source is read for the example's own words as well as its identifiers. */
         }
+        action <'@noExampleNameInTheSource'> noExampleNameInTheSourceScenario {
+            @Evidence { kind = "scenario"; location = "adapter/features/sr17-no-example-identifiers-in-the-adapter.feature"; }
+            doc /* The adapter's source is searched for every name of the example, and none is found. */
+        }
+        action <'@secondFixtureProjectsWithoutThem'> secondFixtureProjectsWithoutThemScenario {
+            @Evidence { kind = "scenario"; location = "adapter/features/sr17-no-example-identifiers-in-the-adapter.feature"; }
+            doc /* The second fixture projects every field, and no name of the example takes part. */
+        }
     }
 
     verification def VC_SR_18 {
@@ -342,6 +387,14 @@ package Federation_VerificationCases {
         action <'TestSR18_RequirementRejections'> requirementRejections {
             @Evidence { kind = "go-test"; location = "adapter/syntax/parser_test.go"; }
             doc /* Each unsupported requirement form is refused at the place it appears. */
+        }
+        action <'@refusalNamesThePlace'> refusalNamesThePlaceScenario {
+            @Evidence { kind = "scenario"; location = "adapter/syntax/features/sr18-refusal-of-unsupported-syntax.feature"; }
+            doc /* A model file with a construct outside the subset is loaded as the adapter loads it at start, and the refusal names its file, line and column. */
+        }
+        action <'@oneFixturePerRejection'> oneFixturePerRejectionScenario {
+            @Evidence { kind = "scenario"; location = "adapter/syntax/features/sr18-refusal-of-unsupported-syntax.feature"; }
+            doc /* One fixture per rejection the parser distinguishes is read, and each is refused at its own place. */
         }
     }
 
@@ -370,6 +423,14 @@ package Federation_VerificationCases {
             @Evidence { kind = "go-test"; location = "adapter/model/constraint_test.go"; }
             doc /* A constraint of any other shape is refused rather than guessed at. */
         }
+        action <'@quantityComparisonAndLimitRead'> quantityComparisonAndLimitReadScenario {
+            @Evidence { kind = "scenario"; location = "adapter/model/features/sr19-quantity-comparison-and-limit-from-the-constraint.feature"; }
+            doc /* Each of the example's seven requirements is projected with the chain's last segment as its quantity, the operator as its comparison and the other operand's value as its limit. */
+        }
+        action <'@anyOtherShapeIsRefused'> anyOtherShapeIsRefusedScenario {
+            @Evidence { kind = "scenario"; location = "adapter/model/features/sr19-quantity-comparison-and-limit-from-the-constraint.feature"; }
+            doc /* Constraints of every other shape are refused, as unsupported syntax is. */
+        }
     }
 
     verification def VC_SR_20 {
@@ -380,6 +441,14 @@ package Federation_VerificationCases {
         action <'TestSR20_ConnectionsFollowEndOrderAndPortDirections'> endOrderAndPortDirections {
             @Evidence { kind = "go-test"; location = "adapter/model/model_test.go"; }
             doc /* Each connection projects from its first end to its second, and a reversed pair of ports is refused. */
+        }
+        action <'@directionFollowsTheEnds'> directionFollowsTheEndsScenario {
+            @Evidence { kind = "scenario"; location = "adapter/model/features/sr20-connection-direction.feature"; }
+            doc /* Each connection of the example's wiring runs from its first end to its second. */
+        }
+        action <'@reversedPortsAreRefused'> reversedPortsAreRefusedScenario {
+            @Evidence { kind = "scenario"; location = "adapter/model/features/sr20-connection-direction.feature"; }
+            doc /* A connection whose first end is not an out port, or whose second end is not an in port, is refused. */
         }
     }
 
@@ -395,6 +464,14 @@ package Federation_VerificationCases {
         action <'TestSR21_RequirementAndVerificationIdentifiers'> requirementIdentifiers {
             @Evidence { kind = "go-test"; location = "adapter/model/model_test.go"; }
             doc /* Requirements and verification cases are identified the same way. */
+        }
+        action <'@shortNameIsTheIdentifier'> shortNameIsTheIdentifierScenario {
+            @Evidence { kind = "scenario"; location = "adapter/model/features/sr21-short-names-as-identifiers.feature"; }
+            doc /* Every element of the example that declares a short name is identified by it. */
+        }
+        action <'@qualifiedNameWhereNoneIsDeclared'> qualifiedNameWhereNoneIsDeclaredScenario {
+            @Evidence { kind = "scenario"; location = "adapter/model/features/sr21-short-names-as-identifiers.feature"; }
+            doc /* An element with no short name is identified by its qualified name. */
         }
     }
 
@@ -430,6 +507,14 @@ package Federation_VerificationCases {
         action <'record: 2026-08-28 SR-12, SR-14, SR-22'> editedNumbersInTheServedText {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* Every value edited in the viewer appeared in the served text exactly where the original literal was. */
+        }
+        action <'@literalAndProjectionAgree'> literalAndProjectionAgreeScenario {
+            @Evidence { kind = "scenario"; location = "adapter/projection/features/sr22-edits-patch-the-source.feature"; }
+            doc /* A mutation sets a literal, and the served text and the projection then agree on it with the version one higher. */
+        }
+        action <'@agreeUnderConcurrentReads'> agreeUnderConcurrentReadsScenario {
+            @Evidence { kind = "scenario"; location = "adapter/projection/features/sr22-edits-patch-the-source.feature"; }
+            doc /* Reads run while mutations patch the model, and each sees the served text and the projection agreeing. */
         }
     }
 
@@ -467,6 +552,14 @@ package Federation_VerificationCases {
             @Evidence { kind = "go-test"; location = "adapter/projection/projection_test.go"; }
             doc /* The same movement is visible through the store a query reads. */
         }
+        action <'@derivedLimitsFollowTheGlobalLimit'> derivedLimitsFollowTheGlobalLimitScenario {
+            @Evidence { kind = "scenario"; location = "adapter/model/features/sr23-expression-bound-values-are-evaluated.feature"; }
+            doc /* The global limit of the shipped model changes, and every limit bound by an expression over it changes with it. */
+        }
+        action <'@everyOperatorEvaluates'> everyOperatorEvaluatesScenario {
+            @Evidence { kind = "scenario"; location = "adapter/model/features/sr23-expression-bound-values-are-evaluated.feature"; }
+            doc /* Each operator, and a parenthesised expression, evaluates to the value the expression gives. */
+        }
     }
 
     verification def VC_SR_24 {
@@ -489,6 +582,10 @@ package Federation_VerificationCases {
         action <'refusals.multistep.spec.ts'> derivedLimitRefusedAgainstARunningInstance {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
             doc /* The refusals check sets PIPE-R1.3's limit through the router and expects the sentence that the value is not a literal in the source, with no data and the model version unchanged. */
+        }
+        action <'@boundValueIsNotEdited'> boundValueIsNotEditedScenario {
+            @Evidence { kind = "scenario"; location = "adapter/projection/features/sr24-expression-bound-values-are-read-only.feature"; }
+            doc /* A limit bound by an expression is set through the adapter's graph, and the mutation is refused with the value unchanged. */
         }
     }
 
@@ -521,6 +618,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/refusals.multistep.spec.ts"; }
             doc /* The refusals check sets PIPE-S1's throughput to -5 through the router and expects the sentence that the value must be a finite, non-negative number, with no data and the model version unchanged. */
         }
+        action <'@invalidValuesAreRejected'> invalidValuesAreRejectedScenario {
+            @Evidence { kind = "scenario"; location = "adapter/projection/features/sr25-rejection-of-invalid-values.feature"; }
+            doc /* An empty, textual, negative, infinite and not-a-number input are each submitted, and each is rejected with the previous value and the version standing. */
+        }
     }
 
     verification def VC_SR_26 {
@@ -540,6 +641,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* A subscription held through the router carried the new version within a second of each mutation. */
         }
+        action <'@subscriberReceivesTheVersion'> subscriberReceivesTheVersionScenario {
+            @Evidence { kind = "scenario"; location = "adapter/serve/features/sr26-model-version-events.feature"; }
+            doc /* A subscriber on the adapter's subscription receives the new model version when a mutation is accepted. */
+        }
     }
 
     verification def VC_SR_27 {
@@ -550,6 +655,10 @@ package Federation_VerificationCases {
         action <'TestSR27_DocumentChangedReachesEverySubscriber'> everySubscriber {
             @Evidence { kind = "go-test"; location = "examples/pipeline/document/document_test.go"; }
             doc /* Every subscriber receives the new document version after each accepted change. */
+        }
+        action <'@subscriberReceivesTheDocumentVersion'> subscriberReceivesTheDocumentVersionScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/document/features/sr27-document-version-events.feature"; }
+            doc /* A subscriber on the document service's subscription receives the new document version when a change is accepted. */
         }
     }
 
@@ -568,6 +677,18 @@ package Federation_VerificationCases {
             @Evidence { kind = "go-test"; location = "examples/pipeline/capacity/flow/flow_test.go"; }
             doc /* On series-parallel wirings the maximum flow agrees with the recursive minimum and sum. */
         }
+        action <'@tableCasesForEachWiring'> tableCasesForEachWiringScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/flow/features/sr28-rollup-by-maximum-flow.feature"; }
+            doc /* Table cases for each kind of wiring give the maximum flow through it. */
+        }
+        action <'@aLeafReadsItsOwnAttribute'> aLeafReadsItsOwnAttributeScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/flow/features/sr28-rollup-by-maximum-flow.feature"; }
+            doc /* A part with no children reports its own configured attribute as its capacity. */
+        }
+        action <'@differentialAgainstMinimumAndSum'> differentialAgainstMinimumAndSumScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/flow/features/sr28-rollup-by-maximum-flow.feature"; }
+            doc /* Generated series-parallel wirings roll up to the same capacity as the recursive minimum and sum. */
+        }
     }
 
     verification def VC_SR_29 {
@@ -583,6 +704,14 @@ package Federation_VerificationCases {
             @Evidence { kind = "go-test"; location = "examples/pipeline/capacity/capacity_test.go"; }
             doc /* The capacity and bottleneck a query reads follow the three states of the worked example. */
         }
+        action <'@cutIsTheBottleneck'> cutIsTheBottleneckScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/flow/features/sr29-bottleneck-as-the-minimum-cut.feature"; }
+            doc /* The three states of the worked example report the child parts of the source-side minimum cut as the bottleneck. */
+        }
+        action <'@aTieHasOneAnswer'> aTieHasOneAnswerScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/flow/features/sr29-bottleneck-as-the-minimum-cut.feature"; }
+            doc /* A wiring with several minimum cuts reports the source-side cut, the same whichever order its parts arrive in. */
+        }
     }
 
     verification def VC_SR_30 {
@@ -597,6 +726,18 @@ package Federation_VerificationCases {
         action <'TestSR30_LatencyIsInconclusiveThroughTheEntity'> latencyIsInconclusive {
             @Evidence { kind = "go-test"; location = "examples/pipeline/capacity/capacity_test.go"; }
             doc /* A requirement constraining a quantity the service does not compute reads inconclusive through the graph, naming its verification case. */
+        }
+        action <'@oneCasePerVerdictKind'> oneCasePerVerdictKindScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/flow/features/sr30-verdicts-and-reasons.feature"; }
+            doc /* One case for each verdict kind returns that kind. */
+        }
+        action <'@precedenceHolds'> precedenceHoldsScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/flow/features/sr30-verdicts-and-reasons.feature"; }
+            doc /* Two conditions holding at once give the verdict the ordering names. */
+        }
+        action <'@reasonsFollowTheTemplates'> reasonsFollowTheTemplatesScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/flow/features/sr30-verdicts-and-reasons.feature"; }
+            doc /* Each reason is built from its template, and the INCONCLUSIVE reason names the verification case where the projection carries one. */
         }
     }
 
@@ -623,6 +764,14 @@ package Federation_VerificationCases {
         action <'TestSR32_NoStore'> noStore {
             @Evidence { kind = "go-test"; location = "examples/pipeline/capacity/capacity_test.go"; }
             doc /* A restart between two identical requests changes nothing, and the service has no store to change. */
+        }
+        action <'@restartChangesNothing'> restartChangesNothingScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/features/sr32-no-copy-of-the-model.feature"; }
+            doc /* The same request is made to the capacity service before and after it is started again, and the two answers are the same. */
+        }
+        action <'@theServiceHasNoStore'> theServiceHasNoStoreScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/capacity/features/sr32-no-copy-of-the-model.feature"; }
+            doc /* The capacity service's source is read, and it declares no store of model data. */
         }
     }
 
@@ -652,6 +801,18 @@ package Federation_VerificationCases {
         action <'record: 2026-08-28 Depth limit'> depthLimit {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* At the sixth level the app says so and withholds the two operations that would nest deeper, offering them at every level above. */
+        }
+        action <'@shippedTreeNumbersCorrectly'> shippedTreeNumbersCorrectlyScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/document/features/sr33-numbering-from-the-tree-alone.feature"; }
+            doc /* The shipped tree is numbered in dotted decimals with siblings counted from one in tree order. */
+        }
+        action <'@proseIsSkippedAndUnnumbered'> proseIsSkippedAndUnnumberedScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/document/features/sr33-numbering-from-the-tree-alone.feature"; }
+            doc /* Prose nodes are skipped by the numbering and carry no number. */
+        }
+        action <'@numberingFollowsEachEdit'> numberingFollowsEachEditScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/document/features/sr33-numbering-from-the-tree-alone.feature"; }
+            doc /* After each kind of edit the numbers follow the tree alone. */
         }
     }
 
@@ -687,6 +848,14 @@ package Federation_VerificationCases {
             @Evidence { kind = "go-test"; location = "examples/pipeline/document/document_test.go"; }
             doc /* Excluding and restoring a requirement and editing the text of a prose node behave as the operation list says. */
         }
+        action <'@eachOperationIsApplied'> eachOperationIsAppliedScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/document/features/sr35-editorial-operations-in-the-service.feature"; }
+            doc /* Each editorial operation is accepted, applied to the tree, and the tree renumbered. */
+        }
+        action <'@restoreReturnsToTheFormerParent'> restoreReturnsToTheFormerParentScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/document/features/sr35-editorial-operations-in-the-service.feature"; }
+            doc /* An excluded requirement is restored and returns as the last child of its former parent. */
+        }
     }
 
     verification def VC_SR_36 {
@@ -706,6 +875,10 @@ package Federation_VerificationCases {
         action <'record: 2026-08-28 SR-36'> countersInTheHeader {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* The document counter rose through every operation driven by hand and the model counter did not move. */
+        }
+        action <'@documentReachesNoAdapterPackage'> documentReachesNoAdapterPackageScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/features/sr36-document-operations-leave-the-model-unchanged.feature"; }
+            doc /* The document service's imports are followed through the module, and none reaches an adapter package. */
         }
     }
 
@@ -762,12 +935,17 @@ package Federation_VerificationCases {
 
     verification def VC_SR_40 {
         doc /* Every request through the router: the calls the apps make read
-               against the one endpoint. */
+               against the one endpoint, and the apps failing when no router
+               answers it. */
         subject demo : Demo;
         objective { verify SR_40_EveryRequestThroughTheRouter.acceptance; }
         action <'network calls of the apps'> networkCallsInspected {
             @Evidence { kind = "inspection"; location = "review checklist"; }
             doc /* The apps' queries, mutations and subscriptions are read, and every one of them goes to the router. */
+        }
+        action <'@appsFailWithoutTheRouter'> appsFailWithoutTheRouterScenario {
+            @Evidence { kind = "scenario"; location = "cmd/sysml-federation/features/sr40-every-request-through-the-router.feature"; }
+            doc /* With no router behind the UI server, both apps' pages are served and every request to the one GraphQL endpoint fails rather than reaching a service another way. */
         }
     }
 
@@ -792,16 +970,29 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* An import sweep over the three services found each reaching only its own subpackages. */
         }
+        action <'@noServiceReachesAnother'> noServiceReachesAnotherScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/features/sr41-services-isolated.feature"; }
+            doc /* Each service's imports, calls and addresses are read, and none imports, calls or reads the data of another. */
+        }
     }
 
     verification def VC_SR_42 {
         doc /* Composition that cannot drift: the committed configuration
-               compared with the schema files it was composed from. */
+               compared with the schema files it was composed from, and the
+               compose step run again to reproduce it. */
         subject repository : Repository;
         objective { verify SR_42_CompositionThatCannotDrift.acceptance; }
         action <'TestSR42_ComposedSchemasMatchTheSchemaFiles'> composedSchemasMatch {
             @Evidence { kind = "go-test"; location = "examples/pipeline/compose_test.go"; }
             doc /* The schemas embedded in the committed configuration are identical to the schema files in the repository. */
+        }
+        action <'@driftFailsTheTest'> driftFailsTheTestScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/features/sr42-composition-that-cannot-drift.feature"; }
+            doc /* The committed configuration is compared with the schema files, and a changed schema is reported as drift. */
+        }
+        action <'record: 2026-09-27 SR-42'> compositionReproduced {
+            @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
+            doc /* The maintainer's compose step, run with wgc 0.130.1, wrote a configuration identical to the committed one. */
         }
     }
 
@@ -817,6 +1008,10 @@ package Federation_VerificationCases {
         action <'router.check.ts'> joinAgainstARunningInstance {
             @Evidence { kind = "checkly"; location = "checkly/__checks__/router.check.ts"; }
             doc /* router-join asks PIPE-R1 for its text, verdict, verdictReason and documentNumber through the router every hour and expects the shipped text, a verdict and document number 1 in one answer, with router-version reading the version through the same path. */
+        }
+        action <'@schemaCarriesAllThreeSubgraphs'> schemaCarriesAllThreeSubgraphsScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/features/sr43-one-query-three-services.feature"; }
+            doc /* The schema the router is configured to serve is read from the composed configuration, and it carries types from all three subgraphs. */
         }
     }
 
@@ -841,6 +1036,10 @@ package Federation_VerificationCases {
             @Evidence { kind = "record"; location = "examples/pipeline/README.md#verification-record"; }
             doc /* Reset pressed in each app in turn showed the shipped values and the shipped structure in both. */
         }
+        action <'@resetMutationsReturnTheShippedState'> resetMutationsReturnTheShippedStateScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/features/sr44-reset-from-either-app.feature"; }
+            doc /* Values and the document structure are edited, the two reset mutations are called, and each service returns to its shipped state. */
+        }
     }
 
     // ---------------------------------------------- the models and the repository --
@@ -858,16 +1057,58 @@ package Federation_VerificationCases {
             @Evidence { kind = "validator"; location = "make example-model-check"; }
             doc /* The command line validates each example file strictly and exits zero. */
         }
+        action <'@recordedInTheExampleReadme'> recordedInTheExampleReadmeScenario {
+            @Evidence { kind = "scenario"; location = "examples/pipeline/features/sr45-a-model-the-reference-tools-accept.feature"; }
+            doc /* The example's verification record is read, and its rows for the two reference tools name the releases used. */
+        }
     }
 
     verification def VC_SR_46 {
         doc /* The model and the repository agree: one test that fails on the
-               first name one side carries and the other lacks. */
+               first name one side carries and the other lacks, and the
+               scenarios that give each acceptance criterion its executable
+               form. */
         subject demoModel : DemoModel;
         objective { verify SR_46_TheModelAndTheRepositoryAgree.acceptance; }
         action <'TestSR46_ModelAndRepositoryAgree'> modelAndRepositoryAgree {
             @Evidence { kind = "go-test"; location = "internal/trace/trace_test.go"; }
-            doc /* Identifiers, decision records, Go test names, check files, published images, story coverage, the check inventory and the session services are each read from both sides and compared. */
+            doc /* Identifiers, decision records, Go test names, scenarios, check files, published images, story coverage, the check inventory and the session services are each read from both sides and compared. */
+        }
+        action <'@identifiers'> identifiersScenario {
+            @Evidence { kind = "scenario"; location = "internal/trace/features/sr46-the-model-and-the-repository-agree.feature"; }
+            doc /* The agreement test's identifier check reads the model and the decisions folder, and every identifier and record agrees. */
+        }
+        action <'@requirementsAffected'> requirementsAffectedScenario {
+            @Evidence { kind = "scenario"; location = "internal/trace/features/sr46-the-model-and-the-repository-agree.feature"; }
+            doc /* The agreement test's check of the records' requirements affected finds each a short name the model declares. */
+        }
+        action <'@goTests'> goTestsScenario {
+            @Evidence { kind = "scenario"; location = "internal/trace/features/sr46-the-model-and-the-repository-agree.feature"; }
+            doc /* The agreement test's check of the Go tests finds the register and the repository naming the same tests in the same files. */
+        }
+        action <'@checkFiles'> checkFilesScenario {
+            @Evidence { kind = "scenario"; location = "internal/trace/features/sr46-the-model-and-the-repository-agree.feature"; }
+            doc /* The agreement test's check of the check files finds the case registers and the check project naming the same files. */
+        }
+        action <'@images'> imagesScenario {
+            @Evidence { kind = "scenario"; location = "internal/trace/features/sr46-the-model-and-the-repository-agree.feature"; }
+            doc /* The agreement test's check of the images finds every published image named by exactly one view. */
+        }
+        action <'@coverage'> coverageScenario {
+            @Evidence { kind = "scenario"; location = "internal/trace/features/sr46-the-model-and-the-repository-agree.feature"; }
+            doc /* The agreement test's coverage check finds every story that is done verified, satisfied and derived. */
+        }
+        action <'@checkInventory'> checkInventoryScenario {
+            @Evidence { kind = "scenario"; location = "internal/trace/features/sr46-the-model-and-the-repository-agree.feature"; }
+            doc /* The agreement test's check of the inventory finds the check register and the manifest carrying the same checks. */
+        }
+        action <'@sessionParts'> sessionPartsScenario {
+            @Evidence { kind = "scenario"; location = "internal/trace/features/sr46-the-model-and-the-repository-agree.feature"; }
+            doc /* The agreement test's check of the session finds the compose services and the session composite the same. */
+        }
+        action <'@scenarios'> scenariosScenario {
+            @Evidence { kind = "scenario"; location = "internal/trace/features/sr46-the-model-and-the-repository-agree.feature"; }
+            doc /* The agreement test's check of the scenarios finds every feature file, scenario and register action in agreement, with every criterion given one scenario. */
         }
     }
 
@@ -973,6 +1214,10 @@ package Federation_VerificationCases {
         action <'collector-checkly.yaml'> ingestCollector {
             @Evidence { kind = "record"; location = "checkly/otel/collector-checkly.yaml"; }
             doc /* The collector with an ingest key: every span to the viewer, only the spans marked checkly=true to the monitoring service on a second pipeline, and a receiver under a bearer token for spans that arrive from outside. */
+        }
+        action <'@unchangedWithoutCredentials'> unchangedWithoutCredentialsScenario {
+            @Evidence { kind = "scenario"; location = "checkly/features/sr48-an-optional-check-session.feature"; }
+            doc /* The compose file's default services are read with no profile chosen, and they run the demo as docker run does, with no credential needed. */
         }
     }
 

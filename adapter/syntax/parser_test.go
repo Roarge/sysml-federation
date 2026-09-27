@@ -126,31 +126,36 @@ type rejection struct {
 	Message      string
 }
 
+// structuralRejections are the fixtures of the structural rejections, one
+// for each rejection the parser distinguishes (SR-18), with the place and the
+// message each is refused with.
+var structuralRejections = []tabletest.Case[string, rejection]{
+	{Name: "no package", In: "part def A;",
+		Want: rejection{1, 1, "expected keyword 'package', found keyword 'part'"}},
+	{Name: "trailing text", In: "package P {} part def A;",
+		Want: rejection{1, 14, "expected end of file, found keyword 'part'"}},
+	{Name: "keyword as a name", In: "package P { part def in; }",
+		Want: rejection{1, 22, "expected a name, found keyword 'in'"}},
+	{Name: "missing semicolon", In: "package P {\n  private import A::B\n}",
+		Want: rejection{3, 1, "expected ';', found '}'"}},
+	{Name: "unsupported member in a package", In: "package P { action a; }",
+		Want: rejection{1, 13, "keyword 'action' is not supported in a package body"}},
+	{Name: "unsupported member in a part definition", In: "package P { part def A { ref b; } }",
+		Want: rejection{1, 26, "keyword 'ref' is not supported in a part definition body"}},
+	{Name: "unsupported member in a part", In: "package P { part a { requirement r; } }",
+		Want: rejection{1, 22, "keyword 'requirement' is not supported in a part body"}},
+	{Name: "multiplicity", In: "package P { part def A { part b : B[4..6]; } }",
+		Want: rejection{1, 36, "expected ';', found '['"}},
+	{Name: "second doc", In: "package P { doc /* a */ doc /* b */ }",
+		Want: rejection{1, 25, "only one doc is allowed in a package body"}},
+	{Name: "unexpected end of file", In: "package P {",
+		Want: rejection{1, 12, "expected '}', found end of file"}},
+	{Name: "lexical error surfaces from Parse", In: "package P { part a : ~B; }",
+		Want: rejection{1, 22, "unexpected character '~'"}},
+}
+
 func TestSR18_StructuralRejections(t *testing.T) {
-	tabletest.Run(t, []tabletest.Case[string, rejection]{
-		{Name: "no package", In: "part def A;",
-			Want: rejection{1, 1, "expected keyword 'package', found keyword 'part'"}},
-		{Name: "trailing text", In: "package P {} part def A;",
-			Want: rejection{1, 14, "expected end of file, found keyword 'part'"}},
-		{Name: "keyword as a name", In: "package P { part def in; }",
-			Want: rejection{1, 22, "expected a name, found keyword 'in'"}},
-		{Name: "missing semicolon", In: "package P {\n  private import A::B\n}",
-			Want: rejection{3, 1, "expected ';', found '}'"}},
-		{Name: "unsupported member in a package", In: "package P { action a; }",
-			Want: rejection{1, 13, "keyword 'action' is not supported in a package body"}},
-		{Name: "unsupported member in a part definition", In: "package P { part def A { ref b; } }",
-			Want: rejection{1, 26, "keyword 'ref' is not supported in a part definition body"}},
-		{Name: "unsupported member in a part", In: "package P { part a { requirement r; } }",
-			Want: rejection{1, 22, "keyword 'requirement' is not supported in a part body"}},
-		{Name: "multiplicity", In: "package P { part def A { part b : B[4..6]; } }",
-			Want: rejection{1, 36, "expected ';', found '['"}},
-		{Name: "second doc", In: "package P { doc /* a */ doc /* b */ }",
-			Want: rejection{1, 25, "only one doc is allowed in a package body"}},
-		{Name: "unexpected end of file", In: "package P {",
-			Want: rejection{1, 12, "expected '}', found end of file"}},
-		{Name: "lexical error surfaces from Parse", In: "package P { part a : ~B; }",
-			Want: rejection{1, 22, "unexpected character '~'"}},
-	}, func(t *testing.T, in string) rejection {
+	tabletest.Run(t, structuralRejections, func(t *testing.T, in string) rejection {
 		_, err := syntax.Parse("m.sysml", in)
 		e := assert.ErrorAs[*syntax.Error](t, err)
 		assert.Equal(t, e.File, "m.sysml")
@@ -214,35 +219,39 @@ func TestParsePortsConnectAndSatisfy(t *testing.T) {
 		Span:        at(src, "satisfy req1 by a;")}})
 }
 
+// expressionAndPortRejections are the fixtures of the expression and port
+// rejections, one for each rejection the parser distinguishes (SR-18).
+var expressionAndPortRejections = []tabletest.Case[string, rejection]{
+	{Name: "minus before a chain", In: "package P { part a { attribute :>> x = -y; } }",
+		Want: rejection{1, 41, "expected a number after '-', found identifier 'y'"}},
+	{Name: "function call", In: "package P { part a { attribute :>> x = sum(y); } }",
+		Want: rejection{1, 43, "expected ';', found '('"}},
+	{Name: "reduce idiom", In: "package P { part a { attribute :>> x = y->reduce min; } }",
+		Want: rejection{1, 41, "expected ';', found '-'"}},
+	{Name: "unit expression", In: "package P { part a { attribute :>> x = 10[km / L]; } }",
+		Want: rejection{1, 46, "expected ']', found '/'"}},
+	{Name: "unbalanced parenthesis", In: "package P { part a { attribute :>> x = (1 + 2; } }",
+		Want: rejection{1, 46, "expected ')', found ';'"}},
+	{Name: "port with a body", In: "package P { part def S { port p : In { attribute t : Real; } } }",
+		Want: rejection{1, 38, "expected ';', found '{'"}},
+	{Name: "untyped port", In: "package P { part def S { port p; } }",
+		Want: rejection{1, 32, "expected ':', found ';'"}},
+	{Name: "conjugated port", In: "package P { part def S { port p : ~In; } }",
+		Want: rejection{1, 35, "unexpected character '~'"}},
+	{Name: "attribute in a port definition", In: "package P { port def In { attribute t : Real; } }",
+		Want: rejection{1, 27, "keyword 'attribute' is not supported in a port definition body"}},
+	{Name: "unsupported member in an attribute body", In: "package P { part a { attribute x : Real { part b; } } }",
+		Want: rejection{1, 43, "keyword 'part' is not supported in an attribute body"}},
+	{Name: "non-member in an attribute body", In: "package P { part a { attribute x : Real { 5 } } }",
+		Want: rejection{1, 43, "expected a member of an attribute body, found number '5'"}},
+	{Name: "connect with a bare part", In: "package P { part box { connect a to b; } }",
+		Want: rejection{1, 32, "connect ends must be written as part.port"}},
+	{Name: "satisfy without by", In: "package P { part box { satisfy r; } }",
+		Want: rejection{1, 33, "expected keyword 'by', found ';'"}},
+}
+
 func TestSR18_ExpressionAndPortRejections(t *testing.T) {
-	tabletest.Run(t, []tabletest.Case[string, rejection]{
-		{Name: "minus before a chain", In: "package P { part a { attribute :>> x = -y; } }",
-			Want: rejection{1, 41, "expected a number after '-', found identifier 'y'"}},
-		{Name: "function call", In: "package P { part a { attribute :>> x = sum(y); } }",
-			Want: rejection{1, 43, "expected ';', found '('"}},
-		{Name: "reduce idiom", In: "package P { part a { attribute :>> x = y->reduce min; } }",
-			Want: rejection{1, 41, "expected ';', found '-'"}},
-		{Name: "unit expression", In: "package P { part a { attribute :>> x = 10[km / L]; } }",
-			Want: rejection{1, 46, "expected ']', found '/'"}},
-		{Name: "unbalanced parenthesis", In: "package P { part a { attribute :>> x = (1 + 2; } }",
-			Want: rejection{1, 46, "expected ')', found ';'"}},
-		{Name: "port with a body", In: "package P { part def S { port p : In { attribute t : Real; } } }",
-			Want: rejection{1, 38, "expected ';', found '{'"}},
-		{Name: "untyped port", In: "package P { part def S { port p; } }",
-			Want: rejection{1, 32, "expected ':', found ';'"}},
-		{Name: "conjugated port", In: "package P { part def S { port p : ~In; } }",
-			Want: rejection{1, 35, "unexpected character '~'"}},
-		{Name: "attribute in a port definition", In: "package P { port def In { attribute t : Real; } }",
-			Want: rejection{1, 27, "keyword 'attribute' is not supported in a port definition body"}},
-		{Name: "unsupported member in an attribute body", In: "package P { part a { attribute x : Real { part b; } } }",
-			Want: rejection{1, 43, "keyword 'part' is not supported in an attribute body"}},
-		{Name: "non-member in an attribute body", In: "package P { part a { attribute x : Real { 5 } } }",
-			Want: rejection{1, 43, "expected a member of an attribute body, found number '5'"}},
-		{Name: "connect with a bare part", In: "package P { part box { connect a to b; } }",
-			Want: rejection{1, 32, "connect ends must be written as part.port"}},
-		{Name: "satisfy without by", In: "package P { part box { satisfy r; } }",
-			Want: rejection{1, 33, "expected keyword 'by', found ';'"}},
-	}, func(t *testing.T, in string) rejection {
+	tabletest.Run(t, expressionAndPortRejections, func(t *testing.T, in string) rejection {
 		_, err := syntax.Parse("m.sysml", in)
 		e := assert.ErrorAs[*syntax.Error](t, err)
 		return rejection{e.Line, e.Column, e.Message}

@@ -32,8 +32,8 @@ package Federation_Library {
 
     metadata def Evidence {
         doc /* Applied to a verification action: what kind of evidence it is and
-               where it lives. Kinds: go-test, record, validator, make-target,
-               workflow, analysis, inspection, checkly. */
+               where it lives. Kinds: go-test, scenario, record, validator,
+               make-target, workflow, analysis, inspection, checkly. */
         attribute kind : String;
         attribute location : String;
     }

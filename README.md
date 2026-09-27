@@ -179,9 +179,17 @@ The plan is to grow the adapter's coverage of the language with a more complete 
 
 ## The model of the demo
 
-The repository also carries a SysML v2 model of the demo itself, under `model/`. It is a different thing from the pipeline model the demo serves. That one describes five servers and their requirements, and the adapter reads it at startup. This one describes the adapter, the two services beside it, the router, the two web apps and the image they ship in. It holds the stakeholders and their concerns, the storyboard stories, the requirements as system stories with their statements kept, the constraints, the architecture and its interfaces, and a verification register in which every Go test that carries a requirement identifier, every recorded demonstration, the validators, the make targets and the workflows are named.
+The repository also carries a SysML v2 model of the demo itself, under `model/`. It is a different thing from the pipeline model the demo serves. That one describes five servers and their requirements, and the adapter reads it at startup. This one describes the adapter, the two services beside it, the router, the two web apps and the image they ship in. It holds the stakeholders and their concerns, the storyboard stories, the requirements as system stories with their statements kept, the constraints, the architecture and its interfaces, and a verification register in which every Go test that carries a requirement identifier, every scenario that go test runs, every recorded demonstration, the validators, the make targets and the workflows are named.
 
-The two reference tools, the OMG pilot implementation and OpenSysML, accept it on every change, through `make model-check` locally and the `model` workflow on every pull request that touches it. A unit test fails when the model and the repository disagree on an identifier, a test name or a published image. [The model's own README](model/README.md) says how the registers are laid out, what the identifiers mean and which board corresponds to which view.
+The two reference tools, the OMG pilot implementation and OpenSysML, accept it on every change, through `make model-check` locally and the `model` workflow on every pull request that touches it. A unit test fails when the model and the repository disagree on an identifier, a test name, a scenario or a published image. [The model's own README](model/README.md) says how the registers are laid out, what the identifiers mean and which board corresponds to which view.
+
+Every acceptance criterion of a system story also has a Gherkin scenario (AD-0034), in a `features` directory beside the package whose tests run it, such as [`cmd/sysml-federation/features/`](cmd/sysml-federation/features/). `go test ./...` runs them with the rest of the suite, and `make scenarios` runs them alone, one line per criterion. One criterion runs on its own like this:
+
+```sh
+go test -run 'TestScenarios/SR-04/fourPathsAnswer' -v ./cmd/sysml-federation
+```
+
+A criterion that a browser, the publishing workflow or the reference tools verify is read and not run, and the run reports it as skipped, naming the evidence that verifies it instead.
 
 ## An optional check session
 
