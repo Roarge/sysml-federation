@@ -205,7 +205,7 @@ func (r *Runner) browse(ctx context.Context, j job) (BrowseResult, error) {
 		if a := whole.Final.Test; a != nil {
 			cl.Answer = a
 			cl.Pick = r.requirementAnswer(a)
-			cl.Facts, cl.BaseRate = r.linkFacts(a, j.gold)
+			r.linkFacts(&cl, a, j.gold, j.kit.Seen())
 			cl.Citations = CheckTestCitations(*a, j.kit)
 		}
 		if a := whole.Final.Incident; a != nil {
@@ -232,28 +232,73 @@ func (r *Runner) requirementAnswer(a *TestAnswer) string {
 	return "none"
 }
 
-// linkFacts places every link of an answer in the whole systems model: its
-// kind, whether it is a system requirement, and whether it lies within three
-// links of the recorded requirement. The base rate is the share of every
-// element that lies that near.
-func (r *Runner) linkFacts(a *TestAnswer, gold string) ([]LinkFact, float64) {
-	var near map[*Element]bool
-	rate := 0.0
-	if g, ok := r.Wiki.Get(gold); ok && gold != "" {
-		near = r.Wiki.near(g)
-		rate = float64(len(near)) / float64(len(r.Wiki.Elements)-1)
+// linkFacts places every link of an answer in the whole systems model, and
+// sets the base rates beside them.
+func (r *Runner) linkFacts(cl *CallLine, a *TestAnswer, gold string, seen []string) {
+	p := placeLinks(r.Wiki, r.keys, a, gold, seen)
+	cl.Facts, cl.BaseRate, cl.BaseRates = p.facts, p.rate, p.rates
+	cl.VisitedRates, cl.Visited = p.visitedRates, p.visited
+}
+
+// placement is where an answer's links lie from the recorded requirement.
+type placement struct {
+	facts        []LinkFact
+	rate         float64   // the share of every element within three links
+	rates        []float64 // the same within one, two and three links
+	visitedRates []float64 // the share of the visited elements as near
+	visited      int       // the elements the browse's tool answers named, less the requirement
+}
+
+// placeLinks gives each link its kind, whether it is a system requirement,
+// and how many links it lies from the recorded requirement. The base rates
+// are the shares of every element, and of the elements the browse's tool
+// answers named, that lie as near.
+func placeLinks(w *Wiki, keys map[string]bool, a *TestAnswer, gold string, seen []string) placement {
+	var p placement
+	var dist map[*Element]int
+	g, ok := w.Get(gold)
+	if ok && gold != "" {
+		dist = w.distances(g)
+		others := float64(len(w.Elements) - 1)
+		var visited []*Element
+		for _, id := range seen {
+			if e, ok := w.Get(id); ok && e != g {
+				visited = append(visited, e)
+			}
+		}
+		p.visited = len(visited)
+		p.rates, p.visitedRates = make([]float64, LimitHops), make([]float64, LimitHops)
+		for d := 1; d <= LimitHops; d++ {
+			within := 0
+			for _, x := range dist {
+				if x <= d {
+					within++
+				}
+			}
+			p.rates[d-1] = float64(within) / others
+			if len(visited) > 0 {
+				within = 0
+				for _, e := range visited {
+					if x, ok := dist[e]; ok && x <= d {
+						within++
+					}
+				}
+				p.visitedRates[d-1] = float64(within) / float64(len(visited))
+			}
+		}
+		p.rate = p.rates[LimitHops-1]
 	}
-	var out []LinkFact
 	for _, l := range a.Links {
 		f := LinkFact{ID: l.ID, Kind: "unknown"}
-		if e, ok := r.Wiki.Get(l.ID); ok {
+		if e, ok := w.Get(l.ID); ok {
 			f.ID, f.Kind = e.ID, e.Kind
-			f.Requirement = r.keys[e.Short]
-			f.Near = near[e]
+			f.Requirement = keys[e.Short]
+			f.Distance = dist[e]
+			f.Near = f.Distance > 0
 		}
-		out = append(out, f)
+		p.facts = append(p.facts, f)
 	}
-	return out, rate
+	return p
 }
 
 func (r *Runner) record(cl CallLine) error {

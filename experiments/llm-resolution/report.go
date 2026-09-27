@@ -271,11 +271,48 @@ func Summarise(c Contents) Summary {
 	best.Precision, best.Recall = rate(best.Correct, best.Proposed), rate(best.Correct, s.Keyed)
 	s.Resolvers = append(s.Resolvers, best)
 
+	// The systems model baseline, in a file from a run that had it.
+	smRight := map[string]bool{}
+	ran := false
+	for _, b := range c.Baseline {
+		ran = ran || b.ModelPick != ""
+	}
+	if ran {
+		sm := ResolverScore{Resolver: "systems model baseline"}
+		reach := 0
+		for _, b := range c.Baseline {
+			g := gold[b.Test]
+			proposed := b.ModelPick != "none" && b.ModelPick != ""
+			switch {
+			case g == "" && proposed:
+				reason := ""
+				if b.ModelVia != "" {
+					reason = "through " + b.ModelVia
+				}
+				s.Proposals = append(s.Proposals, Proposal{Test: b.Test, Resolver: sm.Resolver, Pick: b.ModelPick, Reason: reason})
+			case g != "" && proposed:
+				sm.Proposed++
+				if b.ModelPick == g {
+					sm.Correct++
+					smRight[b.Test] = true
+				}
+			}
+			if g != "" && b.Reach {
+				reach++
+			}
+		}
+		sm.Precision, sm.Recall = rate(sm.Correct, sm.Proposed), rate(sm.Correct, s.Keyed)
+		s.Resolvers = append(s.Resolvers, sm)
+		s.Reach = rate(reach, s.Keyed)
+	}
+
 	lm := ResolverScore{Resolver: "language model"}
 	var grounded, pieces int
 	kinds := map[string]*KindCount{}
 	var near, links int
 	var expected float64
+	byDistance := make([]NearAt, LimitHops)
+	measured := false
 	for _, t := range sortedKeys(base) {
 		cl := base[t]
 		if cl.Reply == nil || cl.Answer == nil {
@@ -320,6 +357,20 @@ func Summarise(c Contents) Summary {
 				k.Near++
 				near++
 			}
+			if len(cl.BaseRates) == LimitHops {
+				measured = true
+			}
+			for d := range byDistance {
+				if f.Distance > 0 && f.Distance <= d+1 {
+					byDistance[d].Near.K++
+				}
+				if len(cl.BaseRates) == LimitHops {
+					byDistance[d].EveryElement += cl.BaseRates[d]
+				}
+				if len(cl.VisitedRates) == LimitHops {
+					byDistance[d].Visited += cl.VisitedRates[d]
+				}
+			}
 		}
 	}
 	lm.Precision, lm.Recall = rate(lm.Correct, lm.Proposed), rate(lm.Correct, s.Keyed)
@@ -337,6 +388,15 @@ func Summarise(c Contents) Summary {
 	s.OtherNear = rate(near, links)
 	if links > 0 {
 		s.BaseRate = expected / float64(links)
+	}
+	if measured {
+		for d := range byDistance {
+			n := byDistance[d]
+			n.Distance, n.Near = d+1, rate(n.Near.K, links)
+			n.EveryElement /= float64(links)
+			n.Visited /= float64(links)
+			s.NearByDistance = append(s.NearByDistance, n)
+		}
 	}
 
 	for t, g := range gold {
@@ -357,7 +417,30 @@ func Summarise(c Contents) Summary {
 	}
 	s.Paired.McNemarP = mcnemarExact(s.Paired.OnlyLanguageModel, s.Paired.OnlyWordOverlap)
 
+	if ran {
+		p := &s.PairedModel
+		p.Baseline = "systems model baseline"
+		for t, g := range gold {
+			lmRight := false
+			if cl, ok := base[t]; ok {
+				lmRight = cl.Pick == g
+			}
+			switch {
+			case lmRight && smRight[t]:
+				p.BothRight++
+			case lmRight:
+				p.OnlyLanguageModel++
+			case smRight[t]:
+				p.OnlyBaseline++
+			default:
+				p.NeitherRight++
+			}
+		}
+		p.McNemarP = mcnemarExact(p.OnlyLanguageModel, p.OnlyBaseline)
+	}
+
 	s.Probes = probeRates(c.Calls, base, gold)
+	s.ProbePairs = probePairs(c.Calls, base)
 	s.Incident = incidentResults(c.Calls)
 	for _, t := range sortedKeys(base) {
 		if a := base[t].Answer; a != nil {
@@ -496,6 +579,54 @@ func probeRates(calls []CallLine, base map[string]CallLine, gold map[string]stri
 	return out
 }
 
+// probePairs compares deletion with each control on the tests where both
+// were asked and answered, by which of the two changed the answer.
+func probePairs(calls []CallLine, base map[string]CallLine) []ProbePair {
+	changed := map[string]map[string]bool{}
+	for _, cl := range calls {
+		if !cl.Final || cl.Note != "" || cl.Reply == nil || cl.Answer == nil {
+			continue
+		}
+		switch cl.Probe {
+		case ProbeDeletion, ProbeControl, ProbeRareShared:
+		default:
+			continue
+		}
+		basePick := cl.BasePick
+		if basePick == "" {
+			basePick = base[cl.Test].Pick
+		}
+		if changed[cl.Probe] == nil {
+			changed[cl.Probe] = map[string]bool{}
+		}
+		changed[cl.Probe][cl.Test] = cl.Pick != basePick
+	}
+	var out []ProbePair
+	for _, control := range []string{ProbeControl, ProbeRareShared} {
+		p := ProbePair{Control: control}
+		for t, del := range changed[ProbeDeletion] {
+			ctl, ok := changed[control][t]
+			if !ok {
+				continue
+			}
+			p.Asked++
+			switch {
+			case del && ctl:
+				p.BothChanged++
+			case del:
+				p.OnlyDeletion++
+			case ctl:
+				p.OnlyControl++
+			default:
+				p.Neither++
+			}
+		}
+		p.McNemarP = mcnemarExact(p.OnlyDeletion, p.OnlyControl)
+		out = append(out, p)
+	}
+	return out
+}
+
 func incidentResults(calls []CallLine) []IncidentResult {
 	seconds := map[string]float64{}
 	for _, cl := range calls {
@@ -567,6 +698,8 @@ var probeMeaning = map[string]string{
 	ProbeRepeat:         "the same browse again (changed means the final reply's text differs)",
 }
 
+var distanceWords = map[int]string{1: "one link", 2: "two links", 3: "three links"}
+
 func cell(s string) string { return strings.ReplaceAll(strings.ReplaceAll(s, "|", "/"), "\n", " ") }
 
 // Markdown is the report as a page a person can read. It depends on the
@@ -621,7 +754,7 @@ func (s Summary) Markdown() string {
 	}
 
 	b.WriteString("\n## Resolvers on the tests that carry a key\n\n")
-	b.WriteString("The keys were hidden from the word overlap baseline and the language model. The key rule reads the names as written.\n\n")
+	b.WriteString("The keys were hidden from every resolver but the key rule, which reads the names as written.\n\n")
 	b.WriteString("| Resolver | Proposed | Correct | Precision (95% interval) | Recall (95% interval) |\n|---|---|---|---|---|\n")
 	for _, r := range s.Resolvers {
 		fmt.Fprintf(&b, "| %s | %d | %d | %s | %s |\n", r.Resolver, r.Proposed, r.Correct, r.Precision, r.Recall)
@@ -629,11 +762,21 @@ func (s Summary) Markdown() string {
 	if s.BaseErrors > 0 {
 		fmt.Fprintf(&b, "\n%d browses ended without a final answer and count as no proposal.\n", s.BaseErrors)
 	}
+	if s.Reach.N > 0 {
+		fmt.Fprintf(&b, "\nFor %d of the %d tests that carry a key, %s, the recorded requirement is among the first eight elements the search ranks for the test's text, or one trace link from one of them.\n",
+			s.Reach.K, s.Reach.N, s.Reach)
+	}
 	p := s.Paired
 	b.WriteString("\nTest by test, the language model against the word overlap's best-ranked answer:\n\n")
-	b.WriteString("| Both right | Only the language model | Only the word overlap | Neither |\n|---|---|---|---|\n")
-	fmt.Fprintf(&b, "| %d | %d | %d | %d |\n\nMcNemar's exact test on the %d tests only one got right: p = %.3f.\n",
+	b.WriteString("| Both correct | Only the language model | Only the word overlap | Neither |\n|---|---|---|---|\n")
+	fmt.Fprintf(&b, "| %d | %d | %d | %d |\n\nMcNemar's exact test on the %d tests only one answered correctly: p = %.3f.\n",
 		p.BothRight, p.OnlyLanguageModel, p.OnlyWordOverlap, p.NeitherRight, p.OnlyLanguageModel+p.OnlyWordOverlap, p.McNemarP)
+	if m := s.PairedModel; m.Baseline != "" {
+		fmt.Fprintf(&b, "\nTest by test, the language model against the %s:\n\n", m.Baseline)
+		b.WriteString("| Both correct | Only the language model | Only the baseline | Neither |\n|---|---|---|---|\n")
+		fmt.Fprintf(&b, "| %d | %d | %d | %d |\n\nMcNemar's exact test on the %d tests only one answered correctly: p = %.3f.\n",
+			m.BothRight, m.OnlyLanguageModel, m.OnlyBaseline, m.NeitherRight, m.OnlyLanguageModel+m.OnlyBaseline, m.McNemarP)
+	}
 
 	b.WriteString("\n## Links to elements of other kinds\n\n")
 	if s.OtherNear.N == 0 {
@@ -645,6 +788,13 @@ func (s Summary) Markdown() string {
 		}
 		fmt.Fprintf(&b, "\n%d of %d such links lie within three links of the recorded requirement, %s. Of every element, the share that lies as near, taken over the same links, is %.2f.\n",
 			s.OtherNear.K, s.OtherNear.N, s.OtherNear, s.BaseRate)
+		if len(s.NearByDistance) > 0 {
+			b.WriteString("\nBy distance, beside the share of every element and of the visited elements, the ones the browse's tool answers named, that lie as near. Each share is taken over the same links.\n\n")
+			b.WriteString("| Within | Links (95% interval) | Every element | Visited elements |\n|---|---|---|---|\n")
+			for _, d := range s.NearByDistance {
+				fmt.Fprintf(&b, "| %s | %d of %d, %s | %.2f | %.2f |\n", distanceWords[d.Distance], d.Near.K, d.Near.N, d.Near, d.EveryElement, d.Visited)
+			}
+		}
 	}
 
 	b.WriteString("\n## The explanation tests\n\n")
@@ -653,6 +803,13 @@ func (s Summary) Markdown() string {
 	for _, p := range s.Probes {
 		meaning := probeMeaning[strings.TrimSuffix(p.Probe, ", correct links only")]
 		fmt.Fprintf(&b, "| %s | %s | %d | %s | %d | %d | %d | %d |\n", p.Probe, meaning, p.Changed.N, p.Changed, p.ToNone, p.ToOther, p.Skipped, p.Errors)
+	}
+	if len(s.ProbePairs) > 0 {
+		b.WriteString("\nDeletion against each control, test by test, on the tests where both were asked and answered:\n\n")
+		b.WriteString("| Deletion against | Asked | Both changed | Only deletion | Only the control | Neither | McNemar's exact p |\n|---|---|---|---|---|---|---|\n")
+		for _, p := range s.ProbePairs {
+			fmt.Fprintf(&b, "| %s | %d | %d | %d | %d | %d | %.3f |\n", p.Control, p.Asked, p.BothChanged, p.OnlyDeletion, p.OnlyControl, p.Neither, p.McNemarP)
+		}
 	}
 	fmt.Fprintf(&b, "\nEvidence found as written, apart from case, in the test's fields: %d of %d pieces, %s.\n", s.Grounded.K, s.Grounded.N, s.Grounded)
 
@@ -687,7 +844,7 @@ func (s Summary) Markdown() string {
 	if len(s.Blind) == 0 {
 		b.WriteString("None.\n")
 	} else {
-		b.WriteString("| Number | Test | Proposed | Right? |\n|---|---|---|---|\n")
+		b.WriteString("| Number | Test | Proposed | Correct? |\n|---|---|---|---|\n")
 		for _, x := range s.Blind {
 			fmt.Fprintf(&b, "| %d | `%s` | %s | |\n", x.Number, x.Test, x.Pick)
 		}

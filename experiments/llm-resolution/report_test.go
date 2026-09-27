@@ -353,6 +353,18 @@ func TestEXPSR11_NearMissesAreCountedAtEachDistance(t *testing.T) {
 			t.Errorf("the report lacks %q", want)
 		}
 	}
+
+	// On the fixture, the parser satisfies SR-01 and its definition types it.
+	w, _ := fixtureWiki(t)
+	keys := map[string]bool{"SR-01": true, "SR-02": true, "SR-03": true}
+	parser, def := idOf(t, w, "Fixture_LogicalArchitecture::system::parser"), idOf(t, w, "Fixture_LogicalArchitecture::Parser")
+	p := placeLinks(w, keys, &TestAnswer{Links: []LinkAnswer{{ID: "SR-01"}, {ID: parser}, {ID: def}}}, "SR-01", nil)
+	if len(p.facts) != 3 || p.facts[1].Distance != 1 || p.facts[2].Distance != 2 || p.facts[0].Distance != 0 {
+		t.Errorf("facts = %+v, want the parser one link away and its definition two", p.facts)
+	}
+	if len(p.rates) != LimitHops || p.rates[0] > p.rates[1] || p.rates[1] > p.rates[2] || p.rates[2] != p.rate {
+		t.Errorf("base rates %v, three-link rate %v: want three shares, growing, the last the three-link rate", p.rates, p.rate)
+	}
 }
 
 func TestEXPSR11_NearMissesAreMeasuredAgainstTheVisitedElements(t *testing.T) {
@@ -374,6 +386,16 @@ func TestEXPSR11_NearMissesAreMeasuredAgainstTheVisitedElements(t *testing.T) {
 	}
 	if !strings.Contains(s.Markdown(), "visited") {
 		t.Error("the report doesn't compare with the visited elements")
+	}
+
+	// The parser is one link from SR-01 and its definition two. SR-01 itself
+	// is left out of what the browse visited.
+	w, _ := fixtureWiki(t)
+	keys := map[string]bool{"SR-01": true}
+	parser, def := idOf(t, w, "Fixture_LogicalArchitecture::system::parser"), idOf(t, w, "Fixture_LogicalArchitecture::Parser")
+	p := placeLinks(w, keys, &TestAnswer{}, "SR-01", []string{"SR-01", parser, def, "NoSuchElement"})
+	if p.visited != 2 || len(p.visitedRates) != LimitHops || !near(p.visitedRates[0], 0.5) || !near(p.visitedRates[1], 1) {
+		t.Errorf("visited %d with shares %v, want 2 with half one link away and all within two", p.visited, p.visitedRates)
 	}
 }
 
@@ -465,5 +487,16 @@ func TestEXPSR24_TheBaselineIsScoredAndPaired(t *testing.T) {
 	old := Summarise(Contents{Baseline: []BaselineResult{{Test: "A", Gold: "SR-01", Pick: "SR-01"}}, Calls: []CallLine{final("base", "A", "SR-01", "", "SR-01")}})
 	if _, ok := findResolver(old, "systems model baseline"); ok {
 		t.Error("an older results file shows a systems model baseline it never ran")
+	}
+
+	// A run resolves every test with it before asking the server anything.
+	run := readRun(t, newFakeServer(t))
+	for _, b := range run.Baseline {
+		if b.ModelPick == "" {
+			t.Errorf("%s: no pick from the systems model baseline", b.Test)
+		}
+	}
+	if _, ok := findResolver(Summarise(run), "systems model baseline"); !ok || len(run.Baseline) == 0 {
+		t.Error("a run's report has no systems model baseline")
 	}
 }
