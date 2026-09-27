@@ -2,7 +2,7 @@
 
 *Roar Elias Georgsen, 24 September 2026*
 
-Part 1 of 6 in [Automating traceability](../README.md).
+Part 1 of 7 in [Automating traceability](../README.md).
 
 Say a team of systems engineers has built a <span class="term" data-term="systems-model">systems model</span> of a search pipeline before the pipeline itself exists. Queries come in at one end and results go out at the other, through five stages. The second stage, parse, has the key `PIPE-S2`, and the systems model gives it a capacity of 1,200 queries per second. A requirement with the key `PIPE-R1.2` asks parse to handle 1,500, so on paper parse falls short.
 
