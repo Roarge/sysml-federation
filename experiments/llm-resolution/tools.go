@@ -160,6 +160,7 @@ type ToolKit struct {
 	byKind map[string]*Baseline
 	hidden map[string][2]int // file: first and last line hidden, 1-based
 	looked map[string]bool   // files read, or found by a search, in this browse
+	seen   map[string]bool   // elements the tool answers named, in this browse
 }
 
 // NewToolKit gives the tools for one browse. In the test task the
@@ -170,7 +171,7 @@ func NewToolKit(w *Wiki, code *CodeBase, reqs []Requirement, sc Scope) *ToolKit 
 		w = w.withoutGoTests()
 	}
 	k := &ToolKit{w: w, code: code, scope: sc, keys: map[string]bool{}, reqs: NewBaseline(reqs),
-		byKind: map[string]*Baseline{}, hidden: map[string][2]int{}, looked: map[string]bool{}}
+		byKind: map[string]*Baseline{}, hidden: map[string][2]int{}, looked: map[string]bool{}, seen: map[string]bool{}}
 	for _, r := range reqs {
 		k.keys[r.Key] = true
 	}
@@ -184,6 +185,26 @@ func NewToolKit(w *Wiki, code *CodeBase, reqs []Requirement, sc Scope) *ToolKit 
 		k.hideTest(sc.HideTest)
 	}
 	return k
+}
+
+// Seen lists the elements this browse's tool answers have named, in order of
+// identifier.
+func (k *ToolKit) Seen() []string {
+	out := make([]string, 0, len(k.seen))
+	for id := range k.seen {
+		out = append(out, id)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// saw records elements an answer names.
+func (k *ToolKit) saw(es ...*Element) {
+	for _, e := range es {
+		if e != nil {
+			k.seen[e.ID] = true
+		}
+	}
 }
 
 // Wiki is the systems model as this browse sees it.
@@ -323,6 +344,7 @@ func (k *ToolKit) find(text, kind string) string {
 			continue
 		}
 		lines = append(lines, fmt.Sprintf("%s (%s): %s", e.ID, e.Kind, gist(e)))
+		k.saw(e)
 	}
 	if len(lines) == 0 {
 		return fmt.Sprintf("nothing found for %q", text)
@@ -422,6 +444,7 @@ func (k *ToolKit) links(id, rel string) string {
 	type group struct {
 		rel   string
 		items []string
+		named [][]*Element // the elements each item names
 	}
 	var groups []*group
 	byRel := map[string]*group{}
@@ -436,11 +459,15 @@ func (k *ToolKit) links(id, rel string) string {
 			groups = append(groups, g)
 		}
 		item := l.Other
+		named := []*Element{k.w.byID[l.Other]}
 		if l.Via != "" {
 			item += " (via " + l.Via + ")"
+			named = append(named, k.w.byID[l.Via])
 		}
 		g.items = append(g.items, item)
+		g.named = append(g.named, named)
 	}
+	k.saw(e)
 	lines := []string{fmt.Sprintf("%s (%s)", e.ID, e.Kind)}
 	if len(groups) == 0 {
 		if rel != "" {
@@ -470,6 +497,7 @@ func (k *ToolKit) links(id, rel string) string {
 				break
 			}
 			line += sep + item
+			k.saw(g.named[i]...)
 			shown++
 		}
 		if shown < len(g.items) {
@@ -489,14 +517,17 @@ func (k *ToolKit) doc(id string) string {
 		return k.unknown(id)
 	}
 	head := fmt.Sprintf("%s (%s)", e.ID, e.Kind)
+	k.saw(e)
 	if o, ok := k.w.byQName[e.Owner]; ok {
 		head += ", owned by " + o.ID
+		k.saw(o)
 	}
 	lines := []string{head}
 	var types []string
 	for _, l := range k.w.LinksOf(e.ID) {
 		if l.Rel == "typed by" || l.Rel == "specialises" {
 			types = append(types, l.Other)
+			k.saw(k.w.byID[l.Other])
 		}
 	}
 	if len(types) > 0 {
@@ -624,6 +655,7 @@ func (k *ToolKit) path(from, to string) string {
 	if !ok {
 		return k.unknown(to)
 	}
+	k.saw(a, b)
 	if a == b {
 		return "the two are the same element, " + a.ID
 	}
@@ -634,31 +666,35 @@ func (k *ToolKit) path(from, to string) string {
 	var lines []string
 	for _, p := range ps {
 		lines = append(lines, pathText(a, p))
+		for _, h := range p {
+			k.saw(h.to)
+		}
 	}
 	return strings.Join(lines, "\n")
 }
 
-// near gives every element within three links of e, not through a package.
-func (w *Wiki) near(e *Element) map[*Element]bool {
-	seen := map[*Element]bool{e: true}
+// distances gives every element within three links of e, not through a
+// package, with the fewest links it lies from e.
+func (w *Wiki) distances(e *Element) map[*Element]int {
+	dist := map[*Element]int{e: 0}
 	frontier := []*Element{e}
-	for d := 0; d < LimitHops; d++ {
+	for d := 1; d <= LimitHops; d++ {
 		var next []*Element
 		for _, x := range frontier {
 			if x != e && x.isPackage() {
 				continue
 			}
 			for _, l := range w.links[x] {
-				if !seen[l.other] {
-					seen[l.other] = true
+				if _, ok := dist[l.other]; !ok {
+					dist[l.other] = d
 					next = append(next, l.other)
 				}
 			}
 		}
 		frontier = next
 	}
-	delete(seen, e)
-	return seen
+	delete(dist, e)
+	return dist
 }
 
 // ---- code ---------------------------------------------------------------------
@@ -762,6 +798,7 @@ func (k *ToolKit) codeOf(id string) string {
 	if !ok {
 		return k.unknown(id)
 	}
+	k.saw(e)
 	refs := k.codeLines(e)
 	if len(refs) == 0 {
 		return fmt.Sprintf("the systems model gives no code for %s", e.ID)

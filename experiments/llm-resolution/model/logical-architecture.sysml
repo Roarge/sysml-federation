@@ -72,6 +72,8 @@ package Experiment_LogicalArchitecture {
     satisfy EXP_SR_22_IncidentProbes by experiment.runner;
     satisfy EXP_SR_23_CitationsChecked by experiment.incident;
     satisfy EXP_SR_23_CitationsChecked by experiment.reporter;
+    satisfy EXP_SR_24_ASystemsModelBaseline by experiment.baseline;
+    satisfy EXP_SR_24_ASystemsModelBaseline by experiment.reporter;
     satisfy EXP_SC_01_StandardLibraryInItsOwnModule by experiment;
     satisfy EXP_SC_02_NoEmptyInterface by experiment;
     satisfy EXP_SC_03_AboutTwoHours by experiment.runner;

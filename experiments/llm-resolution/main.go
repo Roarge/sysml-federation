@@ -147,9 +147,12 @@ func run(args []string, stdout, stderr io.Writer) int {
 	}
 	err = w.write(header)
 	baseline := NewBaseline(corpus.Requirements)
+	fromModel := NewModelBaseline(wiki.withoutGoTests(), corpus.Requirements)
 	for _, t := range tests {
 		if err == nil {
-			err = w.write(BaselineLine{BaselineResult: baseline.Resolve(t)})
+			b := baseline.Resolve(t)
+			b.ModelPick, b.ModelVia, b.Reach = fromModel.Resolve(t)
+			err = w.write(BaselineLine{BaselineResult: b})
 		}
 	}
 	if err == nil {

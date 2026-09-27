@@ -50,6 +50,7 @@ type LinkFact struct {
 	Kind        string `json:"kind"`
 	Requirement bool   `json:"requirement,omitempty"` // a system requirement, scored as the answer
 	Near        bool   `json:"near,omitempty"`        // within three links of the recorded requirement
+	Distance    int    `json:"distance,omitempty"`    // links from the recorded requirement, 1 to 3, or 0 for farther
 }
 
 // CallLine is one question and its reply, or a browse's final line. A final
@@ -81,16 +82,22 @@ type CallLine struct {
 	ToolAnswer string `json:"tool_answer,omitempty"`
 
 	// a final line
-	Pick      string          `json:"pick,omitempty"`
-	Answer    *TestAnswer     `json:"test_answer,omitempty"`
-	Account   *IncidentAnswer `json:"incident_answer,omitempty"`
-	Facts     []LinkFact      `json:"link_facts,omitempty"`
-	BaseRate  float64         `json:"base_rate,omitempty"`
-	Citations []Citation      `json:"citations,omitempty"`
-	Items     []KeyResult     `json:"key_items,omitempty"`
-	View      *View           `json:"view,omitempty"`
-	SysML     string          `json:"view_sysml,omitempty"`
-	Steps     int             `json:"steps,omitempty"`
+	Pick     string          `json:"pick,omitempty"`
+	Answer   *TestAnswer     `json:"test_answer,omitempty"`
+	Account  *IncidentAnswer `json:"incident_answer,omitempty"`
+	Facts    []LinkFact      `json:"link_facts,omitempty"`
+	BaseRate float64         `json:"base_rate,omitempty"`
+	// The share of every element, and of the elements the browse's tool
+	// answers named, within one, two and three links of the recorded
+	// requirement.
+	BaseRates    []float64   `json:"base_rates,omitempty"`
+	VisitedRates []float64   `json:"visited_rates,omitempty"`
+	Visited      int         `json:"visited,omitempty"`
+	Citations    []Citation  `json:"citations,omitempty"`
+	Items        []KeyResult `json:"key_items,omitempty"`
+	View         *View       `json:"view,omitempty"`
+	SysML        string      `json:"view_sysml,omitempty"`
+	Steps        int         `json:"steps,omitempty"`
 }
 
 // SummaryLine closes the file.

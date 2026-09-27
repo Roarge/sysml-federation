@@ -35,6 +35,11 @@ type BaselineResult struct {
 	Top    []Ranked `json:"top"`  // the best three, whatever their scores
 	Rank   int      `json:"gold_rank,omitempty"`
 	Reason []string `json:"reason"`
+
+	// The systems model baseline's answer, empty in a file from before it.
+	ModelPick string `json:"model_pick,omitempty"`
+	ModelVia  string `json:"model_via,omitempty"` // the element it came through
+	Reach     bool   `json:"reach,omitempty"`     // the recorded requirement within the search's reach
 }
 
 // NewBaseline builds the weights from the requirements alone.
@@ -165,3 +170,100 @@ func shared(a, b map[string]float64) []string {
 // Weight is how much a normalised word counts: more the fewer requirements
 // use it, and 0 for a word no requirement uses.
 func (b *Baseline) Weight(term string) float64 { return b.idf[term] }
+
+// traceRelations are the links the systems model baseline follows from an
+// element to a requirement: the ones a systems engineer writes to say what
+// meets, checks or gives rise to a requirement.
+var traceRelations = map[string]bool{
+	"satisfies": true, "satisfied by": true,
+	"verifies": true, "verified by": true,
+	"derives": true, "derived from": true,
+}
+
+// ModelBaseline resolves a test from the systems model without a language
+// model: the search's ranking of every element, then at most one trace link
+// to a requirement (EXP-SR-24).
+type ModelBaseline struct {
+	w    *Wiki
+	all  *Baseline       // every element, weighted as the search weighs them
+	reqs *Baseline       // the requirements alone, to choose among several
+	keys map[string]bool // the requirements a pick may name
+}
+
+// NewModelBaseline builds the baseline over the systems model a test task
+// shows.
+func NewModelBaseline(w *Wiki, reqs []Requirement) *ModelBaseline {
+	m := &ModelBaseline{w: w, reqs: NewBaseline(reqs), keys: map[string]bool{}}
+	for _, r := range reqs {
+		m.keys[r.Key] = true
+	}
+	var ids, texts []string
+	for _, e := range w.Elements {
+		ids = append(ids, e.ID)
+		texts = append(texts, pageText(e))
+	}
+	m.all = newIndex(ids, texts)
+	return m
+}
+
+// Resolve gives the baseline's answer for one test, and whether its recorded
+// requirement lies within the search's reach.
+func (m *ModelBaseline) Resolve(t Test) (pick, via string, reach bool) {
+	ranked := m.all.rankTerms(terms(testText(t)))
+	pick, via = m.pickFrom(ranked, t)
+	return pick, via, t.Gold != "" && m.reach(ranked, t.Gold)
+}
+
+// pickFrom takes the first ranked element that is a requirement, or that one
+// trace link joins to one.
+func (m *ModelBaseline) pickFrom(ranked []Ranked, t Test) (pick, via string) {
+	for _, r := range ranked {
+		if r.Score <= 0 {
+			break
+		}
+		e, ok := m.w.Get(r.Key)
+		if !ok {
+			continue
+		}
+		if m.keys[e.Short] {
+			return e.Short, ""
+		}
+		if linked := m.traced(e); len(linked) > 0 {
+			for _, x := range m.reqs.Rank(t) {
+				if linked[x.Key] {
+					return x.Key, e.ID
+				}
+			}
+		}
+	}
+	return "none", ""
+}
+
+// reach says whether gold is among the first eight ranked elements, or one
+// trace link from one of them.
+func (m *ModelBaseline) reach(ranked []Ranked, gold string) bool {
+	for i, r := range ranked {
+		if i == LimitFind || r.Score <= 0 {
+			break
+		}
+		e, ok := m.w.Get(r.Key)
+		if !ok {
+			continue
+		}
+		if e.Short == gold || m.traced(e)[gold] {
+			return true
+		}
+	}
+	return false
+}
+
+// traced gives the requirements one trace link joins to e.
+func (m *ModelBaseline) traced(e *Element) map[string]bool {
+	out := map[string]bool{}
+	for _, l := range m.w.links[e] {
+		if traceRelations[l.rel] && m.keys[l.other.Short] {
+			out[l.other.Short] = true
+		}
+	}
+	return out
+}
