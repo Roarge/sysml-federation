@@ -327,3 +327,33 @@ func TestEXPSR18_ReadShowsTheLinesAroundTheOneAsked(t *testing.T) {
 		t.Errorf("read of line 120 doesn't show line 120:\n%s", long)
 	}
 }
+
+func TestEXPSR11_TheToolsRecordTheElementsTheyName(t *testing.T) {
+	kit, _, _ := fixtureKit(t, TaskTest, Scope{})
+	if len(kit.Seen()) != 0 {
+		t.Fatalf("a new browse has seen %v", kit.Seen())
+	}
+	found := answerIDs(kit.Call("find", "ranked page of results", ""))
+	kit.Call("links", "SR-01", "")
+	kit.Call("doc", "SR-03", "")
+	kit.Call("doc", "NoSuchElement", "")
+	seen := map[string]bool{}
+	for _, id := range kit.Seen() {
+		seen[id] = true
+	}
+	want := append([]string{"SR-01", "SR-03"}, found...)
+	for _, l := range kit.Wiki().LinksOf("SR-01") {
+		want = append(want, l.Other)
+	}
+	for _, id := range want {
+		if !seen[id] {
+			t.Errorf("%s was named in an answer and isn't recorded as seen", id)
+		}
+	}
+	if seen["NoSuchElement"] {
+		t.Error("an unknown identifier is recorded as seen")
+	}
+	if len(found) == 0 {
+		t.Error("the search found nothing, so the test proves little")
+	}
+}

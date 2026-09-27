@@ -71,3 +71,127 @@ func TestEXPSR03_AnAcronymsPluralStaysOneWord(t *testing.T) {
 		}
 	}
 }
+
+// modelFixture is the systems model baseline over the fixture's test task,
+// with the register's Go tests hidden as the tools hide them.
+func modelFixture(t *testing.T) (*ModelBaseline, *Wiki) {
+	t.Helper()
+	w, root := fixtureWiki(t)
+	c, err := LoadCorpus(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tw := w.withoutGoTests()
+	return NewModelBaseline(tw, c.Requirements), tw
+}
+
+// ranking lists elements best first, as the search would rank them.
+func ranking(t *testing.T, w *Wiki, refs ...string) []Ranked {
+	t.Helper()
+	var out []Ranked
+	for i, ref := range refs {
+		e, ok := w.Get(ref)
+		if !ok {
+			t.Fatalf("the fixture has no element %s", ref)
+		}
+		out = append(out, Ranked{Key: e.ID, Score: 1 - float64(i)/100})
+	}
+	return out
+}
+
+func idOf(t *testing.T, w *Wiki, ref string) string {
+	t.Helper()
+	e, ok := w.Get(ref)
+	if !ok {
+		t.Fatalf("the fixture has no element %s", ref)
+	}
+	return e.ID
+}
+
+func TestEXPSR24_ARequirementRankedFirstIsTheAnswer(t *testing.T) {
+	m, w := modelFixture(t)
+	pick, via := m.pickFrom(ranking(t, w, "SR-01", "Fixture_VerificationCases::VC_SR_02"), Test{Name: "ParsesTokens"})
+	if pick != "SR-01" || via != "" {
+		t.Errorf("pick %q via %q, want SR-01 directly", pick, via)
+	}
+}
+
+func TestEXPSR24_OneTraceLinkLeadsToARequirement(t *testing.T) {
+	m, w := modelFixture(t)
+	vc := idOf(t, w, "Fixture_VerificationCases::VC_SR_02")
+	if pick, via := m.pickFrom(ranking(t, w, vc), Test{}); pick != "SR-02" || via != vc {
+		t.Errorf("from the verification case: pick %q via %q, want SR-02 via %s", pick, via, vc)
+	}
+	parser := idOf(t, w, "Fixture_LogicalArchitecture::system::parser")
+	if pick, via := m.pickFrom(ranking(t, w, parser), Test{}); pick != "SR-01" || via != parser {
+		t.Errorf("from the parser: pick %q via %q, want SR-01 via %s", pick, via, parser)
+	}
+}
+
+func TestEXPSR24_WordOverlapBreaksTies(t *testing.T) {
+	m, w := modelFixture(t)
+	// The server satisfies SR-02 and SR-03.
+	server := ranking(t, w, "Fixture_LogicalArchitecture::system::server")
+	if pick, _ := m.pickFrom(server, Test{Name: "ReportsLatency", Doc: "the latency of every page it returns"}); pick != "SR-03" {
+		t.Errorf("a test about latency: pick %q, want SR-03", pick)
+	}
+	if pick, _ := m.pickFrom(server, Test{Name: "ReturnsARankedPage", Doc: "the top results as a ranked page"}); pick != "SR-02" {
+		t.Errorf("a test about ranked pages: pick %q, want SR-02", pick)
+	}
+}
+
+func TestEXPSR24_OwnershipIsNoTraceLink(t *testing.T) {
+	m, w := modelFixture(t)
+	// The package owns every system story, and the part definition only
+	// types the server.
+	if pick, via := m.pickFrom(ranking(t, w, "Fixture_SystemStories", "Fixture_LogicalArchitecture::Server"), Test{}); pick != "none" || via != "" {
+		t.Errorf("pick %q via %q, want none", pick, via)
+	}
+	vc := idOf(t, w, "Fixture_VerificationCases::VC_SR_02")
+	if pick, via := m.pickFrom(ranking(t, w, "Fixture_SystemStories", "Fixture_LogicalArchitecture::Server", vc), Test{}); pick != "SR-02" || via != vc {
+		t.Errorf("passed over, they leave the answer to the next element: pick %q via %q", pick, via)
+	}
+	if pick, _ := m.pickFrom(nil, Test{}); pick != "none" {
+		t.Errorf("an empty ranking: pick %q, want none", pick)
+	}
+}
+
+func TestEXPSR24_TheFirstSearchsReachIsCounted(t *testing.T) {
+	m, w := modelFixture(t)
+	vc := ranking(t, w, "Fixture_VerificationCases::VC_SR_02")
+	if !m.reach(vc, "SR-02") {
+		t.Error("SR-02 is one verify link from its verification case")
+	}
+	if m.reach(vc, "SR-01") {
+		t.Error("SR-01 is more than one trace link from VC_SR_02")
+	}
+	if !m.reach(ranking(t, w, "SR-03"), "SR-03") {
+		t.Error("a requirement in the ranking is within reach")
+	}
+	// Only the first eight count: eight elements with no trace link to SR-01,
+	// then SR-01 itself.
+	var refs []string
+	for _, e := range w.Elements {
+		if len(refs) == LimitFind {
+			break
+		}
+		if e.Short == "SR-01" {
+			continue
+		}
+		linked := false
+		for _, l := range w.LinksOf(e.ID) {
+			if o, ok := w.Get(l.Other); ok && o.Short == "SR-01" && traceRelations[l.Rel] {
+				linked = true
+			}
+		}
+		if !linked {
+			refs = append(refs, e.ID)
+		}
+	}
+	if len(refs) < LimitFind {
+		t.Fatalf("the fixture has only %d elements away from SR-01", len(refs))
+	}
+	if m.reach(ranking(t, w, append(refs, "SR-01")...), "SR-01") {
+		t.Error("a requirement ninth in the ranking is out of reach")
+	}
+}

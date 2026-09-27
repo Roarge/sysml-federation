@@ -35,6 +35,11 @@ type BaselineResult struct {
 	Top    []Ranked `json:"top"`  // the best three, whatever their scores
 	Rank   int      `json:"gold_rank,omitempty"`
 	Reason []string `json:"reason"`
+
+	// The systems model baseline's answer, empty in a file from before it.
+	ModelPick string `json:"model_pick,omitempty"`
+	ModelVia  string `json:"model_via,omitempty"` // the element it came through
+	Reach     bool   `json:"reach,omitempty"`     // the recorded requirement within the search's reach
 }
 
 // NewBaseline builds the weights from the requirements alone.
@@ -165,3 +170,33 @@ func shared(a, b map[string]float64) []string {
 // Weight is how much a normalised word counts: more the fewer requirements
 // use it, and 0 for a word no requirement uses.
 func (b *Baseline) Weight(term string) float64 { return b.idf[term] }
+
+// traceRelations are the links the systems model baseline follows from an
+// element to a requirement: the ones a systems engineer writes to say what
+// meets, checks or gives rise to a requirement.
+var traceRelations = map[string]bool{
+	"satisfies": true, "satisfied by": true,
+	"verifies": true, "verified by": true,
+	"derives": true, "derived from": true,
+}
+
+// ModelBaseline resolves a test from the systems model without a language
+// model: the search's ranking of every element, then at most one trace link
+// to a requirement (EXP-SR-24).
+type ModelBaseline struct{}
+
+// NewModelBaseline builds the baseline over the systems model a test task
+// shows.
+func NewModelBaseline(w *Wiki, reqs []Requirement) *ModelBaseline { return &ModelBaseline{} }
+
+// Resolve gives the baseline's answer for one test, and whether its recorded
+// requirement lies within the search's reach.
+func (m *ModelBaseline) Resolve(t Test) (pick, via string, reach bool) { return "", "", false }
+
+// pickFrom takes the first ranked element that is a requirement, or that one
+// trace link joins to one.
+func (m *ModelBaseline) pickFrom(ranked []Ranked, t Test) (pick, via string) { return "", "" }
+
+// reach says whether gold is among the first eight ranked elements, or one
+// trace link from one of them.
+func (m *ModelBaseline) reach(ranked []Ranked, gold string) bool { return false }

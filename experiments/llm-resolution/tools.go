@@ -186,6 +186,10 @@ func NewToolKit(w *Wiki, code *CodeBase, reqs []Requirement, sc Scope) *ToolKit 
 	return k
 }
 
+// Seen lists the elements this browse's tool answers have named, in order of
+// identifier.
+func (k *ToolKit) Seen() []string { return nil }
+
 // Wiki is the systems model as this browse sees it.
 func (k *ToolKit) Wiki() *Wiki { return k.w }
 

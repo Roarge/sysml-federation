@@ -98,6 +98,39 @@ type PairedComparison struct {
 	McNemarP          float64 `json:"mcnemar_exact_p"`
 }
 
+// PairedWith counts the keyed tests by which of the language model and a
+// baseline got each right.
+type PairedWith struct {
+	Baseline          string  `json:"baseline"`
+	BothRight         int     `json:"both_right"`
+	OnlyLanguageModel int     `json:"only_language_model"`
+	OnlyBaseline      int     `json:"only_baseline"`
+	NeitherRight      int     `json:"neither_right"`
+	McNemarP          float64 `json:"mcnemar_exact_p"`
+}
+
+// ProbePair counts the tests where deletion and one control were both asked
+// by which of the two changed the answer.
+type ProbePair struct {
+	Control      string  `json:"control"`
+	Asked        int     `json:"asked"`
+	BothChanged  int     `json:"both_changed"`
+	OnlyDeletion int     `json:"only_deletion"`
+	OnlyControl  int     `json:"only_control"`
+	Neither      int     `json:"neither"`
+	McNemarP     float64 `json:"mcnemar_exact_p"`
+}
+
+// NearAt is how many links to other kinds lie within one distance of the
+// recorded requirement, beside the share of every element and of the
+// visited elements that lie as near, each weighted by the links.
+type NearAt struct {
+	Distance     int     `json:"distance"`
+	Near         Rate    `json:"near"`
+	EveryElement float64 `json:"every_element"`
+	Visited      float64 `json:"visited"`
+}
+
 // Proposal is a link proposed for a test that carries no key. Nobody recorded
 // an answer for these, so they are listed for a person to judge.
 type Proposal struct {
@@ -155,22 +188,26 @@ type ProbeTiming struct {
 
 // Summary is the report on one results file.
 type Summary struct {
-	Header     RunHeader        `json:"-"`
-	Tests      int              `json:"tests"`
-	Keyed      int              `json:"keyed_tests"`
-	Resolvers  []ResolverScore  `json:"resolvers"`
-	Paired     PairedComparison `json:"paired"`
-	Probes     []ProbeRate      `json:"probes"`
-	Grounded   Rate             `json:"evidence_grounded"`
-	OtherKinds []KindCount      `json:"other_kinds"`
-	OtherNear  Rate             `json:"other_near"`
-	BaseRate   float64          `json:"base_rate"`
-	Incident   []IncidentResult `json:"incident"`
-	Mismatches []MismatchItem   `json:"mismatches"`
-	Proposals  []Proposal       `json:"proposals"`
-	Blind      []BlindItem      `json:"blind"`
-	Timing     []ProbeTiming    `json:"timing"`
-	BaseErrors int              `json:"base_errors"`
+	Header         RunHeader        `json:"-"`
+	Tests          int              `json:"tests"`
+	Keyed          int              `json:"keyed_tests"`
+	Resolvers      []ResolverScore  `json:"resolvers"`
+	Paired         PairedComparison `json:"paired"`
+	PairedModel    PairedWith       `json:"paired_systems_model"`
+	Reach          Rate             `json:"reach"`
+	ProbePairs     []ProbePair      `json:"probe_pairs"`
+	NearByDistance []NearAt         `json:"near_by_distance"`
+	Probes         []ProbeRate      `json:"probes"`
+	Grounded       Rate             `json:"evidence_grounded"`
+	OtherKinds     []KindCount      `json:"other_kinds"`
+	OtherNear      Rate             `json:"other_near"`
+	BaseRate       float64          `json:"base_rate"`
+	Incident       []IncidentResult `json:"incident"`
+	Mismatches     []MismatchItem   `json:"mismatches"`
+	Proposals      []Proposal       `json:"proposals"`
+	Blind          []BlindItem      `json:"blind"`
+	Timing         []ProbeTiming    `json:"timing"`
+	BaseErrors     int              `json:"base_errors"`
 }
 
 // Summarise computes the report from a results file's contents alone.
