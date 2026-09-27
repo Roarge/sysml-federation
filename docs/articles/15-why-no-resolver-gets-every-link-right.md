@@ -2,7 +2,7 @@
 
 *Roar Elias Georgsen, 27 September 2026*
 
-Part 3 of 6 in [Automating traceability](../README.md).
+Part 3 of 7 in [Automating traceability](../README.md).
 
 > [!IMPORTANT]
 > **The story so far**
