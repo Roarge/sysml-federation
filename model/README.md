@@ -387,13 +387,15 @@ published boards needed a place to be named. The particulars of the tailoring:
 - The GraphQL schema the services share, drawn on the composition boards, is
   not modelled as elements. The interface definitions carry its payloads and
   the projection's doc names its types.
-- Allocation is expressed by `satisfy`, ninety-five of them in the components
-  register, because the allocation keyword has no recorded validation run
-  against either reference tool, and a form neither has been seen to accept does
-  not go into the model. The elements allocated to are thirteen. The nine of the
-  requirement scheme are `Adapter`, `CapacityService`, `DocumentService`,
-  `Router`, `ModelViewer`, `RequirementsDocument`, `Demo` (the image),
-  `ExampleModel` and `Repository`. `DemoModel` and `CheckSuite` came with the
-  model. `SessionRunner` is the twelfth, because SR-48 is satisfied by it beside
-  the check suite and the repository. `HostConfiguration` is the thirteenth, the
-  allocation element HOSTS, and SR-49 is satisfied by it alone.
+- The allocation of a requirement is expressed by `satisfy`, ninety-five of
+  them in the components register. The steps of an edit and of a traced
+  request are allocated with `allocate`, in the one form both reference tools
+  accept, a `perform action` usage and then `allocate` on its step, as the
+  table of forms added on 25 September records. The elements requirements are
+  allocated to are thirteen. The nine of the requirement scheme are `Adapter`,
+  `CapacityService`, `DocumentService`, `Router`, `ModelViewer`,
+  `RequirementsDocument`, `Demo` (the image), `ExampleModel` and `Repository`.
+  `DemoModel` and `CheckSuite` came with the model. `SessionRunner` is the
+  twelfth, because SR-48 is satisfied by it beside the check suite and the
+  repository. `HostConfiguration` is the thirteenth, the allocation element
+  HOSTS, and SR-49 is satisfied by it alone.
