@@ -42,6 +42,8 @@
 !/illustrations/**/
 !/experiments/
 !/experiments/**/
+!/opentofu/
+!/opentofu/**/
 
 
 # ------------------------------------------------------------ source files --
@@ -88,6 +90,12 @@
 !/checkly/__checks__/lib/*.ts
 !/checkly/scripts/*.sh
 !/checkly/otel/*.yaml
+# The host configuration (AD-0033): its OpenTofu files, its tests and its
+# README. The state it writes holds the tunnel's token, and the variables file
+# an owner keeps beside it holds their addresses, so neither is named here.
+!/opentofu/*.tf
+!/opentofu/tests/*.tftest.hcl
+!/opentofu/README.md
 
 # The two web apps: HTML, CSS and JavaScript at any depth under examples/,
 # the MIT text beside the one vendored file (AD-0017), and the document
@@ -191,6 +199,10 @@ playwright-report/
 # swept in with them.
 !/.gitignore
 !/.gitattributes
+# The provider lock file of the host configuration, so that every checkout
+# resolves the same provider builds. The .terraform directory beside it stays
+# out, as every other hidden entry does.
+!/opentofu/.terraform.lock.hcl
 !/.dockerignore
 !/.nointerface-baseline
 # The lint and editor settings the gate reads. Without these two rules a fresh
