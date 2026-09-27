@@ -1,6 +1,7 @@
 package adapter_test
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -32,8 +33,22 @@ var exampleNames = []string{
 var sourceExtensions = map[string]bool{".go": true, ".graphql": true, ".graphqls": true}
 
 func TestSR17_NoExampleIdentifiersInTheAdapter(t *testing.T) {
-	checked := 0
-	err := filepath.WalkDir(".", func(path string, d fs.DirEntry, err error) error {
+	checked, hits, err := exampleNameHits()
+	assert.NoError(t, err)
+	for _, hit := range hits {
+		t.Error(hit)
+	}
+	// The adapter's twenty-two source files are the floor. A walk that finds
+	// fewer is looking in the wrong place, or has skipped a whole package,
+	// and would pass for the wrong reason.
+	assert.True(t, checked >= 22, "at least twenty-two adapter source files were checked")
+}
+
+// exampleNameHits searches the adapter's source, tests and fixtures left out,
+// for the example's names. It returns how many files it read and one line per
+// name found, naming the file and the line.
+func exampleNameHits() (checked int, hits []string, err error) {
+	err = filepath.WalkDir(".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -54,17 +69,13 @@ func TestSR17_NoExampleIdentifiersInTheAdapter(t *testing.T) {
 		for i, line := range strings.Split(string(src), "\n") {
 			for _, name := range exampleNames {
 				if strings.Contains(line, name) {
-					t.Errorf("%s:%d: contains the example identifier %q", path, i+1, name)
+					hits = append(hits, fmt.Sprintf("%s:%d: contains the example identifier %q", path, i+1, name))
 				}
 			}
 		}
 		return nil
 	})
-	assert.NoError(t, err)
-	// The adapter's twenty-two source files are the floor. A walk that finds
-	// fewer is looking in the wrong place, or has skipped a whole package,
-	// and would pass for the wrong reason.
-	assert.True(t, checked >= 22, "at least twenty-two adapter source files were checked")
+	return checked, hits, err
 }
 
 // The second fixture is SR-17's other verification: a model that shares no
