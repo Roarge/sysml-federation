@@ -66,7 +66,7 @@ git ignores:
 - `llm-resolution-<time>.jsonl` holds the whole run. It records the commit,
   the settings, the server's version, the language model's digest, the
   instructions, the key and hashes of the tests and the systems model. Then
-  come the baseline's answers and every question and reply as it arrived, with
+  come the two baselines' answers and every question and reply as it arrived, with
   the tool's answer. A final line for each browse holds its view and its
   checks, and the summary comes last. **This is the file to hand back.**
 - `llm-resolution-<time>.md` is the report, for reading.
@@ -105,15 +105,18 @@ A browse is one question per tool call. Each question carries the task, the view
 
 ## What it measures
 
-**Linking the tests.** The demo's verification register names 69 Go tests as evidence for 32 of its verification cases. Every one of those names starts with its requirement's key, as in `TestSR22_SetAttributePatchesTextAndProjectionTogether`, so a rule that reads the key finds all 69. The experiment hides the keys. In this task the tools also leave out the register's test names and mask every key in the code they show. For each test, the language model browses and then links the test to up to five elements, the requirement it verifies first. Three resolvers are scored on the 69:
+**Linking the tests.** The demo's verification register names 69 Go tests as evidence for 32 of its verification cases. Every one of those names starts with its requirement's key, as in `TestSR22_SetAttributePatchesTextAndProjectionTogether`, so a rule that reads the key finds all 69. The experiment hides the keys. In this task the tools also leave out the register's test names and mask every key in the code they show. For each test, the language model browses and then links the test to up to five elements, the requirement it verifies first. Four resolvers are scored on the 69:
 
 | Resolver | What it does |
 |---|---|
 | Key rule | Reads the key in the name as written. Its links are correct by construction, and it's there to show what hiding the keys takes away. |
 | Word overlap | Ranks the 56 system stories and design constraints by the words they share with the test, each word weighted by how few requirements use it (TF-IDF with cosine similarity), and proposes the best above a fixed threshold. Its best-ranked answer is also what `find` gives for the test's text, so it is the first step any browse can take. |
+| Systems model baseline | Ranks every element the task shows, with the weighting `find` uses. It takes the first ranked element that is a requirement, or that one satisfy, verify or derive link joins to one, and of several such requirements the one word overlap ranks highest. It needs no language model, so it shows what the search and one trace link give without one. |
 | Language model | `qwen2.5-coder:14b` by default, at temperature 0 with a fixed seed, answering under a JSON schema. Its answer is the first link to a system requirement, or none. |
 
-The links to parts, actions, state machines and other elements have nothing recorded to score them against. The report counts them by kind and gives the share that lies within three links of the recorded requirement, beside the share of every element that lies as near.
+The report also counts the tests whose recorded requirement is among the first eight elements that search ranks for the test's text, or one trace link from one of them. That count is the first search's reach.
+
+The links to parts, actions, state machines and other elements have nothing recorded to score them against. The report counts them by kind, and gives the shares that lie within one, two and three links of the recorded requirement. Beside each share sits the share of every element that lies as near, and the share of the elements the browse's tool answers named, since whatever a browse proposes comes from what it saw.
 
 **Explaining the incident.** The engineer on call reports that the alert "monitor: the viewer answers" has failed since 02:10, and that the service's container stopped with the last line `sysml-federation serve: router exited: signal: killed`. The language model browses the whole systems model and the code, and gives the cause, the mechanism, the code to read first, the consequences, the path it followed, and two or three sentences of why. [`incident-key.json`](incident-key.json), written and committed before any run, lists twelve things a good account names, and each is scored as found or missed. Every element, link and file the account cites is checked against what the browse's tools could show. The steps of its path must be joined one to the next by a link, or by code the element names, or by a file the browse read.
 
@@ -133,7 +136,7 @@ Deletion is close to the erasure measure Teofili and colleagues used for languag
 
 Every final question also asks where the language model suspects the system wasn't built as the systems model says. The report lists each suspicion with the element, what the systems model says, what the system shows and why. One mismatch is known before the run and listed in the key: the systems model puts the store and its version counter in `adapter/serve`, and the code has them in `adapter/projection/store.go`.
 
-The report gives precision and recall for each resolver on the tests that carry a key. For each probe it gives the share of changed answers, on all links and on the correct ones alone, split into changes to none and to another requirement. Each rate has its 95% Wilson interval. The language model and the word overlap's best-ranked answer are compared test by test, with McNemar's exact test. The other 77 tests have no recorded link, so a link proposed for one of them counts in no score. It is listed for a person to judge, once with its reasons and once without them.
+The report gives precision and recall for each resolver on the tests that carry a key. For each probe it gives the share of changed answers, on all links and on the correct ones alone, split into changes to none and to another requirement. Each rate has its 95% Wilson interval. The language model is compared test by test with the word overlap's best-ranked answer and with the systems model baseline, and deletion with each control on the tests where both were asked. Each comparison uses McNemar's exact test, two-sided, and a difference is taken as significant at p below 0.05, a threshold set before the language model was asked anything. The other 77 tests have no recorded link, so a link proposed for one of them counts in no score. It is listed for a person to judge, once with its reasons and once without them.
 
 ## What the results can and can't show
 
@@ -141,14 +144,14 @@ One repository, one language model at one quantisation, one set of instructions,
 
 ## Where it's specified
 
-The experiment has a SysML v2 systems model of its own in [`model/`](model/), built on the demo's library. It holds stakeholders and their concerns, six stakeholder stories, four use cases, 22 system stories with their statements and four design constraints. A logical architecture records the allocations, and a verification register names each Go test. The tests were written from that register before the code. `make experiment-model-check` puts that systems model to both SysML v2 reference tools, and `make experiment-test` runs the tests, one of which fails if the register and the tests disagree.
+The experiment has a SysML v2 systems model of its own in [`model/`](model/), built on the demo's library. It holds stakeholders and their concerns, six stakeholder stories, four use cases, 23 system stories with their statements and four design constraints. A logical architecture records the allocations, and a verification register names each Go test. The tests were written from that register before the code. `make experiment-model-check` puts that systems model to both SysML v2 reference tools, and `make experiment-test` runs the tests, one of which fails if the register and the tests disagree.
 
 | File | Part |
 |---|---|
 | `corpus.go`, `words.go` | reads the requirements and the tests, and hides the keys |
 | `wiki.go` | reads the systems model into pages and links |
-| `tools.go` | the seven tools, and what each task hides from them |
-| `baseline.go` | the word overlap baseline, and the weighting `find` uses |
+| `tools.go` | the seven tools, what each task hides from them, and what each browse was shown |
+| `baseline.go` | the word overlap and systems model baselines, and the weighting `find` uses |
 | `view.go` | the view, and its SysML v2 rendering |
 | `browse.go` | one question per tool call, then the final question |
 | `prompt.go` | the instructions and the questions |
@@ -157,5 +160,5 @@ The experiment has a SysML v2 systems model of its own in [`model/`](model/), bu
 | `probes.go` | the altered browses |
 | `run.go` | the order of the browses, the samples and resuming |
 | `results.go` | the results file |
-| `report.go` | the scores, the rates and their intervals |
+| `report.go` | the scores, the rates, their intervals and the paired comparisons |
 | `main.go`, `run.sh` | the command, its checks and its flags |
