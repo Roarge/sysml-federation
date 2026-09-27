@@ -19,7 +19,9 @@
 // and nothing outside that block reads either side with a pattern of its own. A
 // form the model could take and these patterns do not match is a hole in the
 // check rather than a pass, which is why the registers are written in the
-// shapes named here.
+// shapes named here. The Gherkin feature files are the one exception: the test
+// reads them with the parser the scenarios run with, through internal/scenario,
+// so that the check and the run cannot read a file differently.
 package trace
 
 import (
@@ -91,6 +93,10 @@ const (
 	EvidenceCheckly = "checkly"
 	EvidenceRecord  = "record"
 )
+
+// EvidenceScenario is the kind of evidence a Gherkin scenario offers in the
+// verification register, as @Evidence { kind = "scenario"; ... } writes it.
+const EvidenceScenario = "scenario"
 
 // ErrNoModuleRoot reports that the walk upwards from the working directory
 // found no go.mod, so there is no repository to read.
@@ -212,6 +218,25 @@ var (
 	// A key indented under the top-level services: of a compose file, which is
 	// as much of that file as this package reads.
 	composeKeyRE = regexp.MustCompile(`^([\t ]+)([A-Za-z0-9._-]+):[\t ]*(?:#.*)?$`)
+
+	// A case of the verification register for a system story, with its brace:
+	// verification def VC_SR_04 {.
+	storyCaseRE = regexp.MustCompile(`(?m)^[\t ]*verification\s+def\s+VC_SR_(\d\d)\s*\{`)
+
+	// A story's acceptance, which nests its criteria:
+	// requirement :>> acceptance {.
+	acceptanceRE = regexp.MustCompile(`(?m)^[\t ]*requirement\s+:>>\s+acceptance\s*\{`)
+
+	// One criterion inside that acceptance: requirement fourPathsAnswer {.
+	criterionRE = regexp.MustCompile(`(?m)^[\t ]*requirement\s+(\w+)\s*\{`)
+
+	// The runner of a package's scenarios, as a test file declares it:
+	// func TestScenarios(t *testing.T).
+	scenarioRunnerRE = regexp.MustCompile(`(?m)^func TestScenarios\(\w+ \*testing\.T\)`)
+
+	// One word of a story's name, for the name of its feature file:
+	// Four, Paths, On, One, Port in FourPathsOnOnePort.
+	nameWordRE = regexp.MustCompile(`[A-Z][a-z0-9]*`)
 )
 
 // File is one file read from the repository: its path from the root in slash
@@ -287,6 +312,15 @@ type ManifestEntry struct {
 	FrequencyMinutes json.RawMessage `json:"frequencyMinutes"`
 	Deployed         json.RawMessage `json:"deployed"`
 	Locations        []string        `json:"locations"`
+}
+
+// ScenarioRef is one scenario as the register names it: the system story, the
+// acceptance criterion the scenario gives steps to, and its feature file as a
+// path from the module root.
+type ScenarioRef struct {
+	Story     string
+	Criterion string
+	File      string
 }
 
 // ModuleRoot returns the directory holding the module's go.mod, by walking up
@@ -463,6 +497,129 @@ func GoTestEvidence(text string) []TestFunc {
 		found = append(found, TestFunc{Name: name, File: evidence["location"]})
 	}
 	return found
+}
+
+// AcceptanceCriteria returns, for each story of a register, the names of its
+// acceptance criteria in the order they are written.
+func AcceptanceCriteria(text string) map[string][]string {
+	criteria := make(map[string][]string)
+	for _, story := range blocks(text, storyRE) {
+		for _, acceptance := range blocks(story.Body, acceptanceRE) {
+			criteria[story.Header[1]] = append(criteria[story.Header[1]], captures(acceptance.Body, criterionRE)...)
+		}
+	}
+	return criteria
+}
+
+// ScenarioEvidence returns the scenarios the verification register names: one
+// per action offering evidence of kind scenario, under the case of its story.
+// The criterion is the action's short name without its @. An action whose short
+// name is not a tag reads as an empty criterion, which the test reports rather
+// than passing over.
+func ScenarioEvidence(text string) []ScenarioRef {
+	var found []ScenarioRef
+	for _, story := range blocks(text, storyCaseRE) {
+		for _, action := range blocks(story.Body, actionRE) {
+			evidence := evidenceFields(action.Body)
+			if evidence["kind"] != EvidenceScenario {
+				continue
+			}
+			criterion, tagged := strings.CutPrefix(action.Header[1], "@")
+			if !tagged {
+				criterion = ""
+			}
+			found = append(found, ScenarioRef{Story: "SR-" + story.Header[1], Criterion: criterion, File: evidence["location"]})
+		}
+	}
+	return found
+}
+
+// EvidenceKinds returns, for each system story, the kinds of evidence its case
+// in the verification register offers, in order and without repeats.
+func EvidenceKinds(text string) map[string][]string {
+	kinds := make(map[string][]string)
+	for _, story := range blocks(text, storyCaseRE) {
+		var offered []string
+		for _, action := range blocks(story.Body, actionRE) {
+			offered = append(offered, evidenceFields(action.Body)["kind"])
+		}
+		kinds["SR-"+story.Header[1]] = slices.Compact(slices.Sorted(slices.Values(offered)))
+	}
+	return kinds
+}
+
+// FeatureFiles returns every Gherkin feature file of the module, as paths from
+// the root in slash form and in order. The walk skips what GoTestFunctions
+// skips, so a fixture under testdata is not taken for a scenario of the demo.
+func FeatureFiles(root string) ([]string, error) {
+	var found []string
+	err := filepath.WalkDir(root, func(name string, entry fs.DirEntry, err error) error {
+		switch {
+		case err != nil:
+			return err
+		case entry.IsDir():
+			return skipDirectory(root, name, entry)
+		case !strings.HasSuffix(entry.Name(), ".feature"):
+			return nil
+		}
+		rel, err := filepath.Rel(root, name)
+		if err != nil {
+			return err
+		}
+		found = append(found, filepath.ToSlash(rel))
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	slices.Sort(found)
+	return found, nil
+}
+
+// ScenarioRunners returns the package directories whose tests declare the
+// runner of their scenarios, func TestScenarios(t *testing.T), as paths from
+// the root in slash form and in order.
+func ScenarioRunners(root string) ([]string, error) {
+	var found []string
+	err := filepath.WalkDir(root, func(name string, entry fs.DirEntry, err error) error {
+		switch {
+		case err != nil:
+			return err
+		case entry.IsDir():
+			return skipDirectory(root, name, entry)
+		case !strings.HasSuffix(entry.Name(), "_test.go"):
+			return nil
+		}
+		raw, err := os.ReadFile(name)
+		if err != nil {
+			return err
+		}
+		if !scenarioRunnerRE.Match(raw) {
+			return nil
+		}
+		rel, err := filepath.Rel(root, filepath.Dir(name))
+		if err != nil {
+			return err
+		}
+		found = append(found, filepath.ToSlash(rel))
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return slices.Compact(slices.Sorted(slices.Values(found))), nil
+}
+
+// FeatureFileName is the name of a system story's feature file: its key
+// without the hyphen and the words of its name in lower case, joined by
+// hyphens. SR-04, SR_04_FourPathsOnOnePort gives
+// sr04-four-paths-on-one-port.feature.
+func FeatureFileName(short, name string) string {
+	words := nameWordRE.FindAllString(name[strings.LastIndex(name, "_")+1:], -1)
+	for i, word := range words {
+		words[i] = strings.ToLower(word)
+	}
+	return strings.ToLower(strings.ReplaceAll(short, "-", "")) + "-" + strings.Join(words, "-") + ".feature"
 }
 
 // Stories returns the story usages of a register, in the order they are

@@ -4,18 +4,22 @@ import (
 	"cmp"
 	"fmt"
 	"maps"
+	"path"
+	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
 
 	"github.com/Roarge/sysml-federation/internal/assert"
+	"github.com/Roarge/sysml-federation/internal/scenario"
 )
 
 // TestSR46_ModelAndRepositoryAgree is the evidence for SR-46. The model under
 // model/ names things that live in the repository around it: the identifiers of
-// the light scheme, the decision records, the Go test functions, the check
-// files, the published images, the inventory of live checks and the services of
-// the check session. Nothing in the modelling language makes those names true.
+// the light scheme, the decision records, the Go test functions, the Gherkin
+// scenarios, the check files, the published images, the inventory of live
+// checks and the services of the check session. Nothing in the modelling
+// language makes those names true.
 // Each subtest below reads one register of the model and the part of the
 // repository it describes, and fails on the first name one side carries and the
 // other lacks.
@@ -36,6 +40,7 @@ func TestSR46_ModelAndRepositoryAgree(t *testing.T) {
 	t.Run("coverage", func(t *testing.T) { coverageAgrees(t, root) })
 	t.Run("checkInventory", func(t *testing.T) { checkInventoryAgrees(t, root) })
 	t.Run("sessionParts", func(t *testing.T) { sessionPartsAgree(t, root) })
+	t.Run("scenarios", func(t *testing.T) { scenariosAgree(t, root) })
 }
 
 // identifiersAgree holds three agreements at once: every short name the model
@@ -298,6 +303,142 @@ func sessionPartsAgree(t *testing.T, root string) {
 		})
 }
 
+// scenariosAgree holds the Gherkin scenarios, the system stories and the
+// verification register to each other. Every feature file sits in a features
+// directory, carries one tag naming a system story, and is named after that
+// story. Every scenario names one acceptance criterion of its story, and any
+// other tag it carries is a kind of evidence its story's case offers. Every
+// criterion of a story that is done has exactly one scenario. The scenarios go
+// test runs are the ones the register names, story, criterion and file alike,
+// and each has a runner in its package.
+//
+// The feature files are read with the parser the scenarios run with, so a file
+// this check passes is a file the runner reads the same way.
+func scenariosAgree(t *testing.T, root string) {
+	t.Helper()
+
+	stories := text(t, root, SystemStoriesFile)
+	register := text(t, root, VerificationCasesFile)
+	byShortName := make(map[string]Story)
+	for _, story := range Stories(stories) {
+		byShortName[story.ShortName] = story
+	}
+	criteria := AcceptanceCriteria(stories)
+	offered := EvidenceKinds(register)
+	found, err := FeatureFiles(root)
+	files := assert.Must(t, found, err)
+	listed, err := ScenarioRunners(root)
+	runners := nameSet(assert.Must(t, listed, err))
+
+	fileOf := make(map[string]string)
+	given := make(map[string]map[string]int)
+	var run []ScenarioRef
+	for _, file := range files {
+		dir := path.Dir(file)
+		if path.Base(dir) != scenario.Dir {
+			t.Errorf("%s is a feature file outside a %s directory, where no runner reads it", file, scenario.Dir)
+			continue
+		}
+		feature, err := scenario.ReadFile(filepath.Join(root, filepath.FromSlash(file)))
+		if err != nil {
+			t.Errorf("%s: %v", file, err)
+			continue
+		}
+		for _, problem := range feature.Problems {
+			t.Errorf("%s: %s", file, problem)
+		}
+		if len(feature.Tags) != 1 {
+			t.Errorf("%s carries %d tags on its feature, and the story's key is the one tag it carries",
+				file, len(feature.Tags))
+			continue
+		}
+		short := feature.Tags[0]
+		story, ok := byShortName[short]
+		if !ok {
+			t.Errorf("%s is tagged @%s, which is no system story of the model", file, short)
+			continue
+		}
+		if other, twice := fileOf[short]; twice {
+			t.Errorf("%s has two feature files, %s and %s, and one holds all its scenarios", short, other, file)
+		}
+		fileOf[short] = file
+		if want := FeatureFileName(short, story.Name); path.Base(file) != want {
+			t.Errorf("%s holds the scenarios of %s (%s), whose file is named %s", file, short, story.Name, want)
+		}
+		if given[short] == nil {
+			given[short] = make(map[string]int)
+		}
+		ofStory := nameSet(criteria[short])
+		for _, s := range feature.Scenarios {
+			switch {
+			case s.Criterion == "":
+				continue
+			case !ofStory[s.Criterion]:
+				t.Errorf("%s:%d is tagged @%s, which is no acceptance criterion of %s", file, s.Line, s.Criterion, short)
+				continue
+			}
+			given[short][s.Criterion]++
+			for _, kind := range s.Elsewhere {
+				if !slices.Contains(offered[short], kind) {
+					t.Errorf("%s:%d says @%s is verified by %s evidence, and VC_%s offers none",
+						file, s.Line, s.Criterion, kind, strings.ReplaceAll(short, "-", "_"))
+				}
+			}
+			if !s.Runs() {
+				continue
+			}
+			run = append(run, ScenarioRef{Story: short, Criterion: s.Criterion, File: file})
+			if !runners[path.Dir(dir)] {
+				t.Errorf("%s:%d runs in go test, and %s declares no TestScenarios to run it", file, s.Line, path.Dir(dir))
+			}
+		}
+	}
+
+	for _, story := range Stories(stories) {
+		for _, criterion := range criteria[story.ShortName] {
+			switch times := given[story.ShortName][criterion]; {
+			case times == 1:
+			case times > 1:
+				t.Errorf("%s's criterion %s has %d scenarios, and one scenario gives it its steps",
+					story.ShortName, criterion, times)
+			case evidenceIsDue(t, story, "a scenario for "+criterion):
+				t.Errorf("%s (%s) is done, and its criterion %s has no scenario", story.ShortName, story.Name, criterion)
+			}
+		}
+	}
+
+	ran, named := counted(run), counted(ScenarioEvidence(register))
+	for _, ref := range unionScenarios(ran, named) {
+		if ref.Criterion == "" {
+			t.Errorf("an action of VC_%s offers scenario evidence in %s, and its short name is no tag",
+				strings.ReplaceAll(ref.Story, "-", "_"), ref.File)
+			continue
+		}
+		switch runs, names := ran[ref], named[ref]; {
+		case runs == names:
+		case names == 0:
+			t.Errorf("@%s of %s in %s runs in go test, and the verification register does not name it",
+				ref.Criterion, ref.Story, ref.File)
+		case runs == 0:
+			t.Errorf("the verification register names @%s of %s in %s, and no scenario there runs it",
+				ref.Criterion, ref.Story, ref.File)
+		default:
+			t.Errorf("@%s of %s in %s: %d scenarios run it and the register names it %d times",
+				ref.Criterion, ref.Story, ref.File, runs, names)
+		}
+	}
+
+	withFeatures := make(map[string]bool)
+	for _, file := range files {
+		withFeatures[path.Dir(path.Dir(file))] = true
+	}
+	for runner := range runners {
+		if !withFeatures[runner] {
+			t.Errorf("%s declares TestScenarios, and holds no %s directory for it to run", runner, scenario.Dir)
+		}
+	}
+}
+
 // evidenceIsDue reports whether a story is far enough along that the evidence
 // named by what is expected of it. A story in progress is exempt and logged,
 // which is the exemption the requirement grants. Every other answer is a
@@ -417,6 +558,16 @@ func unionTests(first, second map[TestFunc]int) []TestFunc {
 		return cmp.Or(cmp.Compare(a.File, b.File), cmp.Compare(a.Name, b.Name))
 	})
 	return slices.Compact(tests)
+}
+
+// unionScenarios is unionTests for scenarios, ordered by file, then story, then
+// criterion.
+func unionScenarios(first, second map[ScenarioRef]int) []ScenarioRef {
+	refs := append(slices.Collect(maps.Keys(first)), slices.Collect(maps.Keys(second))...)
+	slices.SortFunc(refs, func(a, b ScenarioRef) int {
+		return cmp.Or(cmp.Compare(a.File, b.File), cmp.Compare(a.Story, b.Story), cmp.Compare(a.Criterion, b.Criterion))
+	})
+	return slices.Compact(refs)
 }
 
 // byLogicalID keys one side's rows by the identifier each carries, and reports
