@@ -12,7 +12,7 @@ package Federation_DesignConstraints {
 
     requirement <'SC-01'> SC_01_LanguageAndLicence : DesignConstraint {
         subject :>> system : DemoElement;
-        attribute :>> statement = "Product code is Go 1.27 under the Apache-2.0 licence. The only permitted third-party Go dependencies beyond the standard library are gqlgen with its own dependencies, go-cmp for tests, and what those require. No dependency that drives a browser is added to the product code, and go-yaml is permitted for the test that reads the compose file. The optional check project under checkly/ is outside the product and is not built, run or read to run the demo.";
+        attribute :>> statement = "Product code is Go 1.27 under the Apache-2.0 licence. The only permitted third-party Go dependencies beyond the standard library are gqlgen with its own dependencies, go-cmp for tests, and what those require. No dependency that drives a browser is added to the product code, and go-yaml is permitted for the test that reads the compose file. The optional check project under checkly/ and the host configuration under opentofu/ are outside the product and are not built, run or read to run the demo.";
         frame concern : ReadBuildChange;
         requirement :>> acceptance {
             requirement permittedDependenciesOnly {
@@ -20,8 +20,8 @@ package Federation_DesignConstraints {
                        tests, and what those require. */
             }
         }
-        doc /* Decisions: AD-0031. Allocated to: ADAPTER, CAPACITY, DOCUMENT,
-               IMAGE, REPO. */
+        doc /* Decisions: AD-0031, AD-0033. Allocated to: ADAPTER, CAPACITY,
+               DOCUMENT, IMAGE, REPO. */
     }
 
     requirement <'SC-02'> SC_02_NoEmptyInterfaceInHandWrittenCode : DesignConstraint {

@@ -1,6 +1,6 @@
 # What shipped, and what did not
 
-*Roar Georgsen, 29 August 2026*
+*Roar Elias Georgsen, 29 August 2026*
 
 Part 12 of 13 in [Federating a systems model](../README.md), written for release v0.3.0.
 

@@ -1,6 +1,6 @@
 # A model of the demo itself
 
-*Roar Georgsen, 13 September 2026*
+*Roar Elias Georgsen, 13 September 2026*
 
 Part 13 of 13 in [Federating a systems model](../README.md), written for release v0.3.0.
 
@@ -163,7 +163,7 @@ Every run of the session is dated in the [check session's record](https://github
 
 The model has no risk register and no priorities. A story carries a status and nothing else from a lifecycle.
 
-Allocation, the link that says which part carries which requirement, is written with `satisfy`. SysML v2 has an allocation keyword of its own, but there's no recorded run of either reference tool accepting it, and a form neither tool has been seen to accept doesn't go into the model. No view declares a rendering either, so nothing generates a diagram from the model.
+Allocation, the link that says which part carries which requirement, is written with `satisfy`. The steps of an edit and of a traced request are allocated to the parts that carry them out with SysML v2's own `allocate`. It's written in the one form both reference tools accept, which [the model's README](https://github.com/Roarge/sysml-federation/blob/main/model/README.md) records. No view declares a rendering, so nothing generates a diagram from the model.
 
 Two parts of the check session have never run, because both need a paid Checkly plan. One is a private location, which would put Checkly's runners beside the demo with no tunnel needed. The other is incident automation on the status page, with its weekly maintenance window. Both are written and switched off behind flags, so the project deploys on the free tier as it stands.
 

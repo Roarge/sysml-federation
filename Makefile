@@ -51,7 +51,7 @@ NOINTERFACE := $(BIN)/nointerface
 # Only the directories .gitignore actually allowlists. Support trees are
 # deliberately untracked, so finding source in them is the intended state, not a
 # forgotten allowlist entry.
-override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly illustrations
+override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly illustrations experiments opentofu
 override TEST_FLAGS := -race -shuffle=on -count=1 -timeout=120s
 
 # A floor, not a decoration. 'override' for the same reason as the rest: an
@@ -153,6 +153,21 @@ $(GOTESTSUM):
 test-watch: $(GOTESTSUM) ## Red-green-refactor loop
 	$(GOTESTSUM) --watch --format testname -- $(TEST_FLAGS) ./...
 
+.PHONY: experiment-test
+experiment-test: ## Run the language model experiment's own tests (AD-0032)
+	cd experiments/llm-resolution && $(GO) test $(TEST_FLAGS) ./...
+
+# The host configuration (AD-0033), planned against stand-ins for its two
+# providers, so it needs no credentials. init downloads the providers the lock
+# file names, which is the one step that needs the network.
+TOFU ?= tofu
+.PHONY: opentofu-check
+opentofu-check: ## Format, validate and test the host configuration against mocked providers (SR-49)
+	$(TOFU) -chdir=opentofu fmt -check -recursive
+	$(TOFU) -chdir=opentofu init -backend=false -input=false -lockfile=readonly
+	$(TOFU) -chdir=opentofu validate
+	$(TOFU) -chdir=opentofu test
+
 .PHONY: cover
 cover: ## Run the suite with coverage and enforce the floor
 	$(GO) test $(TEST_FLAGS) -covermode=atomic -coverprofile=$(COVER) -coverpkg=./... ./...
@@ -219,7 +234,7 @@ check-allowlist: ## Warn about source files on disk that .gitignore would not tr
 	   $(addsuffix /,$(ALLOWLIST_ROOTS)) 2>/dev/null \
 	   | tr '\0' '\n' \
 	   | grep -vE '/(node_modules|test-results|playwright-report|\.checkly)/' \
-	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json|py)$$' || true)"; \
+	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json|py|tf|hcl)$$' || true)"; \
 	 if [ -n "$$missing" ]; then \
 	   printf 'source files on disk that .gitignore does not track:\n'; \
 	   printf '%s\n' "$$missing" | sed 's/^/    /'; \
@@ -302,6 +317,43 @@ model-check: ## Put model/ to both SysML v2 reference tools
 	 pilot_check $$files; \
 	 opensysml_check $$files
 
+.PHONY: experiment-model-check
+experiment-model-check: ## Put the experiment's model, with the library it uses, to both tools
+	@$(SYSML_TOOLS); \
+	 files="$$(git ls-files --cached --others --exclude-standard -- \
+	   ':(glob)model/library/*.sysml' ':(glob)experiments/*/model/*.sysml' | sort)"; \
+	 case "$$files" in *experiments/*) ;; *) \
+	   printf 'experiment-model-check: no .sysml file under experiments/*/model/ -- nothing to validate\n' >&2; exit 1;; \
+	 esac; \
+	 pilot_check $$files; \
+	 opensysml_check $$files
+
+.PHONY: model-state-check
+model-state-check: ## Run the supervisor's state machine through a router exit in OpenSysML
+	@if ! command -v sysml >/dev/null 2>&1; then \
+	   printf 'sysml is not on the PATH -- install OpenSysML v0.6.0 (see examples/pipeline/README.md)\n' >&2; exit 1; \
+	 fi; \
+	 files="$$(git ls-files --cached --others --exclude-standard -- \
+	   'model/*.sysml' 'model/**/*.sysml' | sort)"; \
+	 n=Federation_FunctionalArchitecture::Supervision; \
+	 out="$$(printf '%s\n' \
+	   '%instantiate Federation_LogicalArchitecture::Supervisor' \
+	   "%state $$n::SupervisorStates #1" \
+	   "%send $$n::SubgraphsHealthy" '%step' \
+	   "%send $$n::RouterReady" '%step' \
+	   "%send $$n::PortOpen" '%step' \
+	   "%send $$n::RouterExited" '%step' '%step' '%step' \
+	   '%current' '%exit' \
+	   | timeout 120 sysml $$files 2>&1)"; \
+	 if grep -q 'transition onRouterExit fires' <<< "$$out" \
+	   && grep -q '^Current state: stopped' <<< "$$out" \
+	   && ! grep -q '^error:' <<< "$$out"; then \
+	   printf 'model-state-check: SupervisorStates goes from serving to stopped on a router exit\n'; \
+	 else \
+	   grep -vE '^(✓ package|  model/|loaded )' <<< "$$out" >&2; \
+	   printf 'model-state-check: SupervisorStates did not reach stopped on a router exit\n' >&2; exit 1; \
+	 fi
+
 .PHONY: example-model-check
 example-model-check: ## Put the two example models to both tools, one at a time
 	@$(SYSML_TOOLS); \
@@ -348,14 +400,14 @@ run: ## Run the locally built image on port 8080
 	docker run --rm -p 8080:8080 $(IMAGE)
 
 # ---------------------------------------------------------- illustrations --
-# The PDFs under docs/ and the article images cut from the same boards are
-# built from the HTML sources under illustrations/, whose README lists each
-# output. The build needs Chrome, pdfunite and pdfinfo from poppler,
-# Pillow, and a network connection for the fonts, so it runs on request and
-# never as part of a gate.
+# The PDFs under docs/, the article images cut from the same boards and the
+# site's share card are built from the HTML sources under illustrations/, whose
+# README lists each output. The build needs Chrome, pdfunite and pdfinfo from
+# poppler, Pillow, and a network connection for the fonts, so it runs on
+# request and never as part of a gate.
 # illustrations/README.md has the options and the requirements.
 .PHONY: illustrations
-illustrations: ## Rebuild the PDFs and the drawn article images from illustrations/
+illustrations: ## Rebuild the PDFs, the drawn article images and the share card from illustrations/
 	python3 illustrations/build.py
 
 # ------------------------------------------------------------------ gates ---

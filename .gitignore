@@ -40,6 +40,10 @@
 !/checkly/**/
 !/illustrations/
 !/illustrations/**/
+!/experiments/
+!/experiments/**/
+!/opentofu/
+!/opentofu/**/
 
 
 # ------------------------------------------------------------ source files --
@@ -86,6 +90,12 @@
 !/checkly/__checks__/lib/*.ts
 !/checkly/scripts/*.sh
 !/checkly/otel/*.yaml
+# The host configuration (AD-0033): its OpenTofu files, its tests and its
+# README. The state it writes holds the tunnel's token, and the variables file
+# an owner keeps beside it holds their addresses, so neither is named here.
+!/opentofu/*.tf
+!/opentofu/tests/*.tftest.hcl
+!/opentofu/README.md
 
 # The two web apps: HTML, CSS and JavaScript at any depth under examples/,
 # the MIT text beside the one vendored file (AD-0017), and the document
@@ -103,13 +113,24 @@
 # boards.
 !/docs/*/*.pdf
 
-# The sources of those PDFs and of the article images cut from the same boards:
-# one HTML page per board, one directory level down, and the build script and
-# its README beside them.
+# The sources of those PDFs, of the article images cut from the same boards and
+# of the site's share card: one HTML page per board, one directory level down,
+# and the build script and its README beside them.
 # Anchored and depth-bounded, so each rule admits exactly the files it names.
 !/illustrations/README.md
 !/illustrations/build.py
 !/illustrations/*/*.html
+
+# The language model experiment, a Go module of its own outside the product
+# (AD-0032): its module file, its README, the script that runs it, the
+# incident's key and the fixture tree its tests read. Its model's .sysml files
+# and its .go files are admitted by the unanchored rules above. What a run
+# writes under results/ matches none of these rules and stays untracked
+# (EXP-SC-04).
+!/experiments/*/go.mod
+!/experiments/*/README.md
+!/experiments/*/*.sh
+!/experiments/*/incident-key.json
 
 # The documentation site. GitHub Pages builds docs/ with Jekyll, which needs
 # its configuration, its layouts, its includes and one stylesheet, each named
@@ -121,9 +142,10 @@
 !/docs/_includes/*.html
 !/docs/assets/*.css
 
-# The one script the site loads, which opens a term's definition in place, and
-# the data file it reads those definitions from. Jekyll reads _data at build
-# time and never publishes it as a page of its own.
+# The one script the site loads, which opens a term's definition in place and
+# copies an article's address, and the data files Jekyll reads at build time,
+# the glossary and the author's profiles. Jekyll never publishes _data as a
+# page of its own.
 !/docs/assets/*.js
 !/docs/_data/*.yml
 
@@ -177,6 +199,10 @@ playwright-report/
 # swept in with them.
 !/.gitignore
 !/.gitattributes
+# The provider lock file of the host configuration, so that every checkout
+# resolves the same provider builds. The .terraform directory beside it stays
+# out, as every other hidden entry does.
+!/opentofu/.terraform.lock.hcl
 !/.dockerignore
 !/.nointerface-baseline
 # The lint and editor settings the gate reads. Without these two rules a fresh

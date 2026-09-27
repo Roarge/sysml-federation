@@ -1,10 +1,11 @@
 # Illustrations
 
-The architecture views, the two A3 sheets, the use-case storyboard and 28 of the
-images in the articles are all built from the HTML files in this directory. Each
-file is one board, a standalone page at its printed size, and
-[`build.py`](build.py) prints it with headless Chrome as it stands. A correction
-to any of those drawings is an edit to one of these files followed by a rebuild.
+The architecture views, the two A3 sheets, the use-case storyboard, 28 of the
+images in the articles and the site's share card are all built from the HTML
+files in this directory. Each file is one board, a standalone page at its
+printed size, and [`build.py`](build.py) prints it with headless Chrome as it
+stands. A correction to any of those drawings is an edit to one of these files
+followed by a rebuild.
 
 ## Which file makes which output
 
@@ -72,9 +73,23 @@ sketch and its caption.
 | `us11-query.png` | `stories/us11-query-the-graph.html` | the element `div.sketch` |
 | `us12-reset.png` | `stories/us12-reset.html` | the element `div.sketch` |
 
-Images are rendered at twice their size in CSS pixels, and one that would exceed
-1.5 MB is rendered again at 1.5 times. The images in `docs/img` whose names
-begin with `app-` are screenshots of the running apps and are not built here.
+The share card is the picture that LinkedIn, Bluesky and X show beside a link to
+any page of the site. It is not an article image, so it has a table of its own.
+
+| Image under `docs/assets/` | Source | Taken as |
+|---|---|---|
+| `og-card.png` | `site/og-card.html` | whole board, at 1200 by 630 px |
+
+The card is taken at its own size rather than at twice that, because the
+`og:image` tags in `docs/_includes/head.html` state 1200 by 630 px. It sits
+outside `docs/img`, since every image there is named by a view of the model of
+the demo. The card repeats `title`, `author` and the host name in `url` from
+`docs/_config.yml`, so a change to any of them is made on the card too.
+
+The article images are rendered at twice their size in CSS pixels, and one that
+would exceed 1.5 MB is rendered again at 1.5 times. The images in `docs/img`
+whose names begin with `app-` are screenshots of the running apps and are not
+built here.
 
 ## Previewing a board
 
@@ -96,10 +111,14 @@ onto a second page, and a build of the PDFs then stops with a message naming the
 file. A build with `--only png` makes no such check and gives no warning. An
 image of the whole board is cut off at the page edge. The image of an element
 that reaches past the page keeps the element's full size, and everything beyond
-the page edge comes out solid black. The sizes in use are 1440 by 560 px for
-the architecture overview, 1440 by 900 px for the five views, 1440 by 800 px for
-the use-case overview, 960 by 640 px for each use case and 1587 by 1123 px for
-the A3 sheets, which is A3 at 96 px to the inch.
+the page edge comes out solid black. The share card is in no PDF, so the build
+measures its board before rendering it, and stops with a message naming the
+file when the board is not the size of its `@page` rule or anything on it runs
+into the board's padding or past its edge. The sizes in use are 1440 by 560 px
+for the architecture overview, 1440 by 900 px for the five views, 1440 by 800 px
+for the use-case overview, 960 by 640 px for each use case, 1587 by 1123 px for
+the A3 sheets, which is A3 at 96 px to the inch, and 1200 by 630 px for the
+share card.
 
 Inside the SVG drawings every colour is written as a literal `oklch()` value,
 and an edit uses the same values exactly. Every file but the L0 sheet also
@@ -129,15 +148,16 @@ architecture views is set out in [Five views and twenty-six decisions](../docs/a
 and the layout, type and colour code of the A3 sheets in
 [An A3 sheet for a fifteen-minute reader](../docs/articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md).
 
-Two faces are loaded from Google Fonts. Source Sans 3, at weights 400 and 600,
-carries the running text, the legends, most labels in the architecture drawings
-and everything on the A3 sheets. Patrick Hand, a handwriting face, carries the
-titles and headings of the architecture and use-case boards, a few labels and
-notes in the architecture drawings, and the sketches on the use-case boards.
-Inside the sketches of the twelve use cases, Source Sans 3 sets most of what a
-sketched screen or terminal shows, such as model text, commands and document
-rows. A face other than these two is not loaded, so the browser would draw it in
-whatever font the machine has.
+Three faces are loaded from Google Fonts. Source Sans 3, at weights 400 and
+600, carries the running text, the legends, most labels in the architecture
+drawings and everything on the A3 sheets. Patrick Hand, a handwriting face,
+carries the titles and headings of the architecture and use-case boards, a few
+labels and notes in the architecture drawings, and the sketches on the use-case
+boards. Inside the sketches of the twelve use cases, Source Sans 3 sets most of
+what a sketched screen or terminal shows, such as model text, commands and
+document rows. Source Serif 4, at weight 400, is the serif of the site and sets
+the title on the share card and nothing else. A face other than these three is
+not loaded, so the browser would draw it in whatever font the machine has.
 
 No text on an A3 sheet is smaller than 19 px, the equivalent of 14 points when
 the sheet prints at A3. Text that no longer fits is shortened rather than set
@@ -194,17 +214,18 @@ python3 illustrations/build.py
 
 Before rendering, it reads the page size of every board it needs and checks that
 the tools are installed. It then opens one of those boards in Chrome, to make
-sure Chrome can read the files where they are, and loads the three font faces
-(Source Sans 3 at 400 and 600, Patrick Hand at 400) on a small test page it
-writes to the work directory. If Chrome cannot open either page, the build stops
-and shows what Chrome reported. If the test page opens and a face fails to load,
-it stops with a message that the fonts could not be fetched. Both checks come
-before any output is written. Chrome that cannot read a file renders its own
-error page in place of the board and still reports success, and Chrome that
-cannot load a face falls back to another without a warning and reflows the
-page. After that Chrome prints the boards and renders the images, pdfinfo
-confirms that each board printed as one page, and pdfunite joins the pages of
-the two multi-page PDFs. The build writes one line with the path of each file
+sure Chrome can read the files where they are, and loads the four font faces
+(Source Sans 3 at 400 and 600, Patrick Hand at 400, Source Serif 4 at 400) on a
+small test page it writes to the work directory. If Chrome cannot open either
+page, the build stops and shows what Chrome reported. If the test page opens and
+a face fails to load, it stops with a message that the fonts could not be
+fetched. Both checks come before any output is written. Chrome that cannot read
+a file renders its own error page in place of the board and still reports
+success, and Chrome that cannot load a face falls back to another without a
+warning and reflows the page. After that Chrome prints the boards and renders
+the images, pdfinfo confirms that each board printed as one page, and pdfunite
+joins the pages of the two multi-page PDFs. Before the share card is rendered,
+Chrome measures its board. The build writes one line with the path of each file
 as it goes, and any failure stops it with a message and a non-zero exit status.
 
 The options:
@@ -267,7 +288,8 @@ b = Image.open(".cache/after/use-cases-06.png").convert("RGB")
 print(ImageChops.difference(a, b).getbbox())  # None when the pages are identical
 ```
 
-The images under `img/` of the two output directories compare the same way.
+The images under `img/` and the share card under `assets/` of the two output
+directories compare the same way.
 Only the pages and images the edit was meant to change should differ. Chrome of
 another version, or on another system, can draw text a fraction of a pixel away
 from where it sits in the committed files, which is why both builds come from
