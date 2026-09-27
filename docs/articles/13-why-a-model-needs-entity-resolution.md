@@ -52,7 +52,7 @@ Other links I added by hand. The <span class="term" data-term="adapter">adapter<
 
 The longer name also shows how a name keeps the context it was chosen in. The router joins every service in the demo and has nothing to do with SysML as such. It was introduced at the same time as a SysML model server, though, and the prefix stuck. If the router ever serves queries for something with no SysML in it, the name will mislead whoever reads it.
 
-Of the 146 top-level Go test functions in the demo's repository, 69 carry a requirement's key in their names. The other 77 are invisible to anything that joins on keys.
+Of the 146 top-level Go test functions in the demo's own code, 69 carry a requirement's key in their names. The other 77 are invisible to anything that joins on keys.
 
 Each tool also has its own idea of identity, and none of them has any reason to use mine. OpenTofu knows a resource by its [address](https://opentofu.org/docs/cli/state/resource-addressing/), which the author chooses and which only means something inside that configuration. Rename it and, by default, OpenTofu reads the change as an [intent to destroy the old object and create a new one](https://opentofu.org/docs/language/modules/develop/refactoring/), unless a `moved` block says otherwise.
 
