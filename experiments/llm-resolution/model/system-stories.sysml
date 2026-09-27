@@ -179,7 +179,7 @@ package Experiment_SystemStories {
         @StoryMeta { status = StoryStatus::inProgress; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : Evaluator;
-        attribute statement : String = "The experiment shall report, for each resolver, precision and recall of the requirement links over the tests that carry a key, and for each probe, the share of changed answers on all links and on correct links alone, split into changes to none and to another requirement, each with its 95% Wilson interval. It shall compare the two hidden-key resolvers test by test with McNemar's exact test, count as found only evidence that occurs as written in the test, count the links to elements of other kinds by kind with the share that lies within three links of the recorded requirement beside the same share for every element, and list every link proposed for a test that carries no key, unscored, once with its reasons and once without them for blind judgement.";
+        attribute statement : String = "The experiment shall report, for each resolver, precision and recall of the requirement links over the tests that carry a key, and for each probe, the share of changed answers on all links and on correct links alone, split into changes to none and to another requirement, each with its 95% Wilson interval. It shall compare the two hidden-key resolvers test by test with McNemar's exact test, count as found only evidence that occurs as written in the test, count the links to elements of other kinds by kind with the shares that lie within one, two and three links of the recorded requirement, beside the same shares for every element and for the elements the browse's tool answers named, compare deletion with each control test by test with McNemar's exact test on the tests where both were asked, and list every link proposed for a test that carries no key, unscored, once with its reasons and once without them for blind judgement.";
         attribute pattern : EarsPattern = EarsPattern::Ubiquitous;
         attribute verificationMethods : VerificationMethod[1..*] = (VerificationMethod::Test);
         attribute :>> capability = "read the scores with their uncertainty, and the unjudged links apart";
@@ -195,6 +195,9 @@ package Experiment_SystemStories {
             requirement blindList { doc /* The proposals for unkeyed tests are listed a second time, shuffled, without the resolver or its reason. */ }
             requirement groundedAsWritten { doc /* A piece of evidence counts as found only if it occurs, apart from case, in the test's fields. */ }
             requirement otherKindsAgainstABaseRate { doc /* Links to elements that are not requirements are counted by kind, and the share within three links of the recorded requirement is given beside the share of every element that is. */ }
+            requirement nearByDistance { doc /* The links to other kinds are counted within one, two and three links of the recorded requirement, each distance apart. */ }
+            requirement againstTheVisitedElements { doc /* Beside the share of every element, the report gives the share of the elements the browse's tool answers named that lie as near. */ }
+            requirement deletionAgainstEachControl { doc /* On the tests where deletion and a control were both asked, the report counts which of the two changed the answer and gives McNemar's exact p. */ }
         }
     }
 
@@ -392,6 +395,26 @@ package Experiment_SystemStories {
         }
     }
 
+    requirement <'EXP-SR-24'> EXP_SR_24_ASystemsModelBaseline : UserStory {
+        @StoryMeta { status = StoryStatus::inProgress; }
+        subject :>> system : ExperimentElement;
+        stakeholder :>> role : Evaluator;
+        attribute statement : String = "The experiment shall resolve each test with a baseline that reads the systems model and needs no language model: it shall rank every element the test task shows by the search's weighting, take the first ranked element that is a system requirement or that one satisfy, verify or derive link joins to one, choose among several the requirement the word overlap ranks highest, and report for each test that carries a key whether its requirement is among the search's first eight elements or one such link from them.";
+        attribute pattern : EarsPattern = EarsPattern::Ubiquitous;
+        attribute verificationMethods : VerificationMethod[1..*] = (VerificationMethod::Test);
+        attribute :>> capability = "tell what browsing with a language model adds from what the systems model's links give on their own";
+        attribute :>> benefit    = "a gain is credited to the language model only when a program following the same links falls short of it";
+        frame concern : MeasuredAgainstTheRecord;
+        requirement :>> acceptance {
+            requirement requirementTakenDirectly { doc /* A requirement ranked first is the answer. */ }
+            requirement oneTraceLinkFollowed { doc /* An element that satisfies, verifies or derives a requirement leads to that requirement. */ }
+            requirement wordOverlapBreaksTies { doc /* Of several requirements one link away, the one the word overlap ranks highest is taken. */ }
+            requirement ownershipIsNoTraceLink { doc /* A package that owns requirements, or a definition that types a part, leads to none. */ }
+            requirement reachCounted { doc /* For each test that carries a key, the report says whether its requirement is among the search's first eight elements or one trace link from them. */ }
+            requirement scoredAndPaired { doc /* The baseline is scored like the other resolvers and compared with the language model test by test with McNemar's exact test. */ }
+        }
+    }
+
     // ------------------------------------------------------------ derivation --
 
     #derivation connection us01Derives {
@@ -411,6 +434,7 @@ package Experiment_SystemStories {
         end #derive   ::> EXP_SR_03_AWordOverlapBaseline;
         end #derive   ::> EXP_SR_11_ReportWithIntervals;
         end #derive   ::> EXP_SR_17_ToolsOverTheSystemsModel;
+        end #derive   ::> EXP_SR_24_ASystemsModelBaseline;
         end #derive   ::> EXP_SR_18_ToolsOverTheCode;
     }
 

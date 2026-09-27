@@ -240,6 +240,22 @@ package Experiment_VerificationCases {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
             doc /* Links to parts and actions are counted by kind, with the share near the recorded requirement beside the share of every element. */
         }
+        action <'TestEXPSR11_NearMissesAreCountedAtEachDistance'> nearByDistance {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* Links one, two and three steps from the recorded requirement are counted at each distance. */
+        }
+        action <'TestEXPSR11_NearMissesAreMeasuredAgainstTheVisitedElements'> againstTheVisitedElements {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* The share of the visited elements that lie as near stands beside the share of every element. */
+        }
+        action <'TestEXPSR11_TheToolsRecordTheElementsTheyName'> visitedRecorded {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* Every element a search, a list of links, a description or a path names is recorded as visited. */
+        }
+        action <'TestEXPSR11_DeletionIsComparedWithEachControlTestByTest'> deletionAgainstEachControl {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* Deletion and each control are counted by which changed the answer, with McNemar's exact p. */
+        }
     }
 
     verification def VC_EXP_SR_12 {
@@ -411,6 +427,36 @@ package Experiment_VerificationCases {
         action <'TestEXPSR23_ACitationOfARemovedElementIsFlagged'> removedElementFlagged {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/incident_test.go"; }
             doc /* In a browse with a transition removed, citing that transition is marked missing. */
+        }
+    }
+
+    verification def VC_EXP_SR_24 {
+        doc /* The systems model baseline on the fixture's systems model, and its place in the report. */
+        subject experiment : Experiment;
+        objective { verify EXP_SR_24_ASystemsModelBaseline.acceptance; }
+        action <'TestEXPSR24_ARequirementRankedFirstIsTheAnswer'> requirementTakenDirectly {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/baseline_test.go"; }
+            doc /* A ranking that opens with a requirement answers with it. */
+        }
+        action <'TestEXPSR24_OneTraceLinkLeadsToARequirement'> oneTraceLinkFollowed {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/baseline_test.go"; }
+            doc /* A verification case leads to the requirement it verifies, and a part to the one it satisfies. */
+        }
+        action <'TestEXPSR24_WordOverlapBreaksTies'> wordOverlapBreaksTies {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/baseline_test.go"; }
+            doc /* A part that satisfies two requirements leads to the one the word overlap ranks higher. */
+        }
+        action <'TestEXPSR24_OwnershipIsNoTraceLink'> ownershipIsNoTraceLink {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/baseline_test.go"; }
+            doc /* A package or a part definition ranked first is passed over. */
+        }
+        action <'TestEXPSR24_TheFirstSearchsReachIsCounted'> reachCounted {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/baseline_test.go"; }
+            doc /* A requirement one trace link from the first eight is within reach, and one two links away is not. */
+        }
+        action <'TestEXPSR24_TheBaselineIsScoredAndPaired'> scoredAndPaired {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/report_test.go"; }
+            doc /* The baseline has a row among the resolvers, a paired comparison with the language model and a reach count. */
         }
     }
 
