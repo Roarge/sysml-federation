@@ -199,8 +199,8 @@ package Federation_LogicalArchitecture {
     // --------------------------------------------- the project around it --
 
     part def Project {
-        doc /* The repository, the model of the demo and the check suite as one
-               thing. */
+        doc /* The repository, the model of the demo, the check suite and the
+               host configuration as one thing. */
     }
 
     // ------------------------------------------- the check suite's insides --
@@ -441,7 +441,8 @@ package Federation_LogicalArchitecture {
     // ---------------------------------------------- the project composite --
 
     part project : Project {
-        doc /* The repository, the model and the check suite. */
+        doc /* The repository, the model, the check suite and the host
+               configuration. */
         part repository : Repository {
             doc /* The repository as a thing that is built, tested and
                    published. The publish chain runs from end to end without a
@@ -477,6 +478,16 @@ package Federation_LogicalArchitecture {
             doc /* The optional check project, which drives the demo through a
                    tunnel and is no part of running it. */
         }
+        part hostConfiguration : HostConfiguration {
+            doc /* The OpenTofu configuration under opentofu/. One switch starts
+                   the demo and the tunnel's connector on the owner's Proxmox
+                   host from their published images and points the tunnel's
+                   route at the demo there, and the same switch turned off
+                   removes both and points the route back at the compose
+                   session. The tunnel and its DNS record are adopted into it
+                   and cannot be destroyed through it. */
+            @DecisionRecord { id = "AD-0033"; title = "The demo on the owner's Proxmox host, declared in OpenTofu"; }
+        }
 
         // REPO.
         satisfy SR_08_LicencesCarriedInTheRepository by repository;
@@ -491,6 +502,9 @@ package Federation_LogicalArchitecture {
 
         // CHECKS.
         satisfy SR_48_AnOptionalCheckSession by checkSuite;
+
+        // HOSTS.
+        satisfy SR_49_TheDemoOnTheOwnersHostWhenAsked by hostConfiguration;
 
         // The design constraints the repository carries.
         satisfy SC_01_LanguageAndLicence by repository;

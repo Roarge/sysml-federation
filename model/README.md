@@ -21,7 +21,7 @@ One register per file, and the root imports every one of them.
 | [`core/context/`](core/context/architecture-context.sysml) | the demo among what it touches, the external systems, and the elements the requirements are allocated to |
 | [`core/domain/`](core/domain/domain.sysml) | the items that move, pages, queries, version events, the image, the router configuration, spans and alerts |
 | [`core/stories/stakeholder/`](core/stories/stakeholder/stakeholder-stories.sysml) | nineteen stakeholder stories, US-01 to US-19 |
-| [`core/stories/system/`](core/stories/system/system-stories.sysml) | forty-eight system stories, SR-01 to SR-48, each restating one requirement, and their derivation from the stakeholder stories |
+| [`core/stories/system/`](core/stories/system/system-stories.sysml) | forty-nine system stories, SR-01 to SR-49, each restating one requirement, and their derivation from the stakeholder stories |
 | [`core/constraints/`](core/constraints/design-constraints.sysml) | seven design constraints, SC-01 to SC-07, each with a plain statement |
 | [`core/use-cases/`](core/use-cases/use-cases.sysml) | thirteen use cases, one per storyboard story and one for the check session |
 | [`core/functional-architecture/`](core/functional-architecture/functional-architecture.sysml) | what the demo does, an edit's seven steps, the verdict arithmetic with its two calculations and its verdict rule, the argument in eight steps, how the supervisor starts and stops everything, and the check session's behaviour |
@@ -62,21 +62,28 @@ model and the repository disagree on an identifier, a test name, a check file or
 a published image. SR-47 states that both reference tools accept the model and
 that continuous integration runs them on every change to it. SR-48 states that
 the demo, given credentials, runs the check suite against itself through a
-tunnel and is unchanged when given none.
+tunnel and is unchanged when given none. SR-49 came later, with the host
+configuration under `opentofu/` (AD-0033), and derives from US-19 as SR-48
+does. It states that the owner's Proxmox host runs the demo from the published
+image when asked, public through the named tunnel, and keeps nothing once the
+demo is switched off.
 
 The requirements are restated as system stories, and each story keeps its
 statement as an attribute, `attribute statement : String = "...";`, so that
 the text a case verifies is the text the story carries. Three statements were
 amended with the model: SR-03 for the configuration-file opt-in, SC-01 for the
-check project and SC-07 for the model validation.
+check project and SC-07 for the model validation. SC-01 was amended again for
+the host configuration (AD-0033).
 
 A story's status is carried as `@StoryMeta` and is `done` or `inProgress`.
 `done` is asserted as of the merge of the pull request that carries the story's
-evidence, and not before. No story is in progress. US-19, SR-03 and SR-48
-were the last three to close, and `done` was asserted for them when their
-evidence landed with the check session: the configuration-file opt-in and its
-test for SR-03, and the compose file with its test, the check project and the
-session script for SR-48 and US-19.
+evidence, and not before. SR-49 is the one story in progress. Its case holds
+the mocked plan of the host configuration, and it waits for a run on the
+owner's host to be recorded. US-19, SR-03 and SR-48 were the last three to
+close, and `done` was asserted for them when their evidence landed with the
+check session: the configuration-file opt-in and its test for SR-03, and the
+compose file with its test, the check project and the session script for SR-48
+and US-19.
 
 ## Validation
 
@@ -380,12 +387,13 @@ published boards needed a place to be named. The particulars of the tailoring:
 - The GraphQL schema the services share, drawn on the composition boards, is
   not modelled as elements. The interface definitions carry its payloads and
   the projection's doc names its types.
-- Allocation is expressed by `satisfy`, ninety-four of them in the components
+- Allocation is expressed by `satisfy`, ninety-five of them in the components
   register, because the allocation keyword has no recorded validation run
   against either reference tool, and a form neither has been seen to accept does
-  not go into the model. The elements allocated to are twelve. The nine of the
+  not go into the model. The elements allocated to are thirteen. The nine of the
   requirement scheme are `Adapter`, `CapacityService`, `DocumentService`,
   `Router`, `ModelViewer`, `RequirementsDocument`, `Demo` (the image),
   `ExampleModel` and `Repository`. `DemoModel` and `CheckSuite` came with the
   model. `SessionRunner` is the twelfth, because SR-48 is satisfied by it beside
-  the check suite and the repository.
+  the check suite and the repository. `HostConfiguration` is the thirteenth, the
+  allocation element HOSTS, and SR-49 is satisfied by it alone.

@@ -1467,6 +1467,45 @@ package Federation_SystemStories {
                Upstream: US-19. */
     }
 
+    requirement <'SR-49'> SR_49_TheDemoOnTheOwnersHostWhenAsked : UserStory {
+        @StoryMeta { status = StoryStatus::inProgress; }
+        subject :>> system : DemoElement;
+        stakeholder :>> role : Maintainer;
+        attribute statement : String = "Where the owner has a Proxmox VE host of version 9.1 or later, when the host configuration is applied with the demo switched on, the host shall run the demo from the published image and the named tunnel shall route the public hostname to it. When the configuration is applied with the demo switched off, nothing shall remain on the host and the route shall return to the compose session's demo. The tunnel and its DNS record shall survive both, and a destroy of the configuration shall be refused.";
+        attribute pattern : EarsPattern = EarsPattern::Complex;
+        attribute verificationMethods : VerificationMethod[1..*] = (VerificationMethod::Test, VerificationMethod::Demonstration);
+        attribute :>> capability = "start the demo on the owner's own host from the published image, public through the named tunnel, and stop it again, one command each";
+        attribute :>> benefit    = "a session's running instance can live on the owner's host for as long as the session lasts, with no hosted demo and no bill";
+        frame concern : PublishedClaimsStayTrue;
+        requirement :>> acceptance {
+            requirement runsFromThePublishedImage {
+                doc /* Given a Proxmox VE host of version 9.1 or later, when the
+                       configuration is applied with the demo switched on, then
+                       the host runs the demo from the published image. */
+            }
+            requirement publicThroughTheTunnel {
+                doc /* Given the demo running on the host, when the public
+                       hostname is requested, then the tunnel hands the request
+                       to the demo on the host. */
+            }
+            requirement nothingLeftWhenSwitchedOff {
+                doc /* Given the demo running on the host, when the
+                       configuration is applied with the demo switched off, then
+                       nothing it created remains on the host and the route
+                       points at the compose session's demo again. */
+            }
+            requirement theTunnelSurvives {
+                doc /* Given the tunnel and its DNS record under the
+                       configuration, when the configuration is destroyed, then
+                       the destroy is refused and both remain. */
+            }
+        }
+        doc /* Rationale: the tunnel and its DNS record were set up by hand and
+               recorded nowhere, and a session needs a running instance that
+               the monitoring service can reach (AD-0033). Allocated to: HOSTS.
+               Upstream: US-19. */
+    }
+
     // ------------------------------------------------ the derivations, US-01 to US-19 --
 
     #derivation connection us01Derives {
@@ -1659,5 +1698,6 @@ package Federation_SystemStories {
         doc /* The requirements US-19 gives rise to. */
         end #original ::> US_19_TheStoriesExercisedAgainstARunningInstance;
         end #derive   ::> SR_48_AnOptionalCheckSession;
+        end #derive   ::> SR_49_TheDemoOnTheOwnersHostWhenAsked;
     }
 }

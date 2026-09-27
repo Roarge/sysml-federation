@@ -976,6 +976,15 @@ package Federation_VerificationCases {
         }
     }
 
+    verification def VC_SR_49 {
+        doc /* The demo on the owner's host when asked: the host configuration
+               planned against stand-ins for the two providers, with the demo
+               switched off and switched on, and the demonstration on the owner's
+               host once it has been run and recorded. */
+        subject hostConfiguration : HostConfiguration;
+        objective { verify SR_49_TheDemoOnTheOwnersHostWhenAsked.acceptance; }
+    }
+
     // -------------------------------------------------------- design constraints --
 
     verification def VC_SC_01 {

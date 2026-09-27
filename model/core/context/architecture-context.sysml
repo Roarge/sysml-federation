@@ -46,6 +46,15 @@ package Federation_Context {
         port pull : ImageClientPort;
     }
 
+    part def ProxmoxHost {
+        doc /* External system. The owner's Proxmox VE host, 9.1 or later, on
+               the owner's own network. When the host configuration switches the
+               demo on, it pulls the published image into a datastore and runs
+               it as an application container, and runs the tunnel's connector
+               beside it the same way. */
+        port pull : ImageClientPort;
+    }
+
     part def ContainerRegistry {
         doc /* External system. The GitHub container registry,
                ghcr.io/roarge/sysml-federation, a public package, two
@@ -83,6 +92,14 @@ package Federation_Context {
         doc /* Project element. The optional check project under checkly/,
                which drives the demo through a tunnel and is no part of running
                it. The allocation element CHECKS of the requirements scheme. */
+    }
+
+    part def HostConfiguration :> DemoElement {
+        doc /* Project element. The OpenTofu configuration under opentofu/,
+               which starts the demo on the owner's Proxmox host when asked and
+               stops it again, and which holds the named tunnel and its DNS
+               record. It is no part of running the demo. The allocation
+               element HOSTS of the requirements scheme. */
     }
 
     // --------------------------------------------- environmental effect --
@@ -133,8 +150,9 @@ package Federation_Context {
     part def DemoContext {
         doc /* V1: the demo among the things it touches. Two crossings of the
                boundary are not port connections and are recorded here instead.
-               The Docker host runs the container once, with docker run, and it
-               is the maintainer's machine rather than the container that
+               The Docker host runs the container once, with docker run, or the
+               owner's Proxmox host runs it when the host configuration asks.
+               And it is the maintainer's machine rather than the container that
                composes config.json with wgc and commits it. */
         part demo : Demo;
         part visitor : Visitor;
@@ -142,15 +160,18 @@ package Federation_Context {
         part documentOwner : DocumentOwner;
         part browser : Browser;
         part dockerHost : DockerHost;
+        part proxmoxHost : ProxmoxHost;
         part registry : ContainerRegistry;
         part maintainerMachine : MaintainerMachine;
         part actions : GitHubActions;
         part repository : Repository;
         part demoModel : DemoModel;
         part checkSuite : CheckSuite;
+        part hostConfiguration : HostConfiguration;
         part network : Network;
         interface pages : HttpOnOnePort connect browser.http to demo.web;
         interface pull : ImagePull connect registry.image to dockerHost.pull;
+        interface proxmoxPull : ImagePull connect registry.image to proxmoxHost.pull;
         interface publish : TagPublish connect maintainerMachine.tags to actions.trigger;
     }
 }
