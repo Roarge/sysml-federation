@@ -102,6 +102,20 @@ img {
   color: var(--ink);
 }
 
+/* Text for a screen reader alone, such as "Share on" before the visible name
+   of a share link. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* ------------------------------------------------------------------ header */
 
 .site-header {
@@ -150,6 +164,46 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+/* The mark before the name of a profile or share link: a brand's own mark,
+   or a line drawing in the manner of the arrow above. It stays in ink when
+   the link turns blue, since the brands ask that their marks keep their
+   colour. It sits inline, so the link's baseline stays on its text and the
+   masthead still lines up by baseline. 16px is the smallest ORCID allows. */
+.icon {
+  flex: none;
+  margin-right: 6px;
+  vertical-align: -0.2em;
+  color: var(--ink);
+}
+
+/* A profile or share link, set as the header's and the pager's links are:
+   ink and semibold, blue and underlined on hover, with the underline of the
+   site's other links, so the Copy link button, which is no link, matches its
+   neighbours. The name is always written out, so the mark is never the only
+   label. */
+.icon-link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.icon-link:hover {
+  color: var(--blue);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+button.icon-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 /* -------------------------------------------------------------------- main */
@@ -1010,7 +1064,8 @@ button.term[aria-expanded="true"] {
   text-decoration: underline;
 }
 
-.pager-label {
+.pager-label,
+.prose .foot-label {
   font-size: 14px;
   line-height: 1.4;
   font-weight: 600;
@@ -1022,6 +1077,105 @@ button.term[aria-expanded="true"] {
 .pager-next a {
   align-items: flex-end;
   text-align: right;
+}
+
+/* ------------------------------------------------------ sharing and author */
+
+/* Under the pager, behind a rule like the pager's own: where to share the
+   article, then who wrote it. The links are set in the pager's type. */
+.prose > .article-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin: 40px 0 0;
+  padding-top: 20px;
+  border-top: var(--rule);
+}
+
+/* Each part of the foot is named by a label set as the pager's, in the darker
+   grey of the sidebar's part titles, since it names a section and is read on
+   its own. */
+.prose .foot-label {
+  margin: 0 0 8px;
+  color: var(--label-grey);
+}
+
+.prose .link-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.prose .link-row > li {
+  margin: 0;
+}
+
+.prose .link-row > [hidden] {
+  display: none;
+}
+
+/* Whether the copy worked, beside the button, in the grey that small text
+   needs on paper. */
+.share-status {
+  font-size: 16px;
+  color: var(--label-grey);
+}
+
+.share-status:not(:empty) {
+  margin-left: 12px;
+}
+
+/* The author, set as a key-term box is: shade, a small label, the name in the
+   serif, and the profiles one to a line. On shade a hovered link takes the
+   deeper blue the boxes use, which keeps its contrast. */
+.author-card {
+  padding: 20px 24px 22px;
+  border-radius: 4px;
+  background: var(--shade);
+}
+
+.author-card .foot-label {
+  margin-bottom: 12px;
+}
+
+.author-card .icon-link:hover {
+  color: var(--blue-deep);
+}
+
+.author-name {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+.author-card .link-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.profile-detail {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--label-grey);
+}
+
+/* A profile link under the home page's byline and the dot after it, which
+   _layouts/home.html keeps on one line. */
+.keep-together {
+  white-space: nowrap;
 }
 
 /* ------------------------------------------------------------------ footer */
@@ -1075,11 +1229,14 @@ button.term[aria-expanded="true"] {
     line-height: 1.53;
   }
 
-  /* The masthead and the one repository link share the row, and the title
-     gives up width first so the link is never pushed off the edge. */
+  /* The masthead and the site's links share the row where they fit. Where
+     they do not, the links wrap to a row of their own under the title, so
+     the title stays on one line and each link keeps a full-height target. */
   .menu {
+    flex-wrap: wrap;
     align-items: center;
     gap: 16px;
+    row-gap: 6px;
     min-height: 44px;
     padding: 8px 20px;
   }
@@ -1096,6 +1253,7 @@ button.term[aria-expanded="true"] {
 
   .site-nav a {
     display: flex;
+    align-items: center;
     padding: 10px 0;
     line-height: 1.2;
   }
@@ -1274,6 +1432,40 @@ button.term[aria-expanded="true"] {
   .pager-next a {
     align-items: flex-start;
     text-align: left;
+  }
+
+  .prose > .article-foot {
+    gap: 24px;
+    margin-top: 32px;
+    padding-top: 12px;
+  }
+
+  .prose .link-row {
+    gap: 0 20px;
+  }
+
+  .author-card {
+    padding: 16px 18px 18px;
+  }
+
+  .author-card .link-row {
+    gap: 0;
+  }
+
+  .author-name {
+    font-size: 20px;
+  }
+
+  /* A share or profile link on a phone, under an article or under the home
+     page's byline, is a target at least 44px tall, as the pager's links are.
+     As an inline block it makes its line tall enough to hold it, so no target
+     reaches over the line above or a link on the line below, and it keeps the
+     baseline of its text. */
+  .article-foot .icon-link,
+  .layout-home .prose > h1 + p .icon-link {
+    display: inline-block;
+    min-height: 44px;
+    padding-block: 10px;
   }
 
   .site-footer p {

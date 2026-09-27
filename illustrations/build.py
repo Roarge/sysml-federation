@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Build the published PDFs and article images from the sources beside this file.
+"""Build the published PDFs, article images and share card from the sources here.
 
 Each source is a standalone HTML page that states its own page size in an
 @page rule. Headless Chrome prints it as it is, pdfunite joins the pages of a
-set into one PDF, and Pillow cuts the article images out of screenshots.
+set into one PDF, and Pillow cuts the article images and the share card out of
+screenshots.
 
 Usage:
     python3 illustrations/build.py [SOURCE ...] [--only pdf|png|all]
@@ -42,13 +43,22 @@ SRC = REPO / "illustrations"
 
 PAPER = "oklch(98% 0.005 90)"
 
-# The Google Fonts stylesheet the boards link (the L0 sheet links its Source Sans 3
-# part alone), and the faces it has to deliver.
+# The Google Fonts stylesheet that covers every face the sources link, and the
+# faces it has to deliver. The boards link its first two families (the L0 sheet
+# links its Source Sans 3 part alone), and the share card links Source Sans 3 and
+# the site's serif, Source Serif 4.
 FONTS_CSS = (
     "https://fonts.googleapis.com/css2?family=Patrick+Hand"
-    "&family=Source+Sans+3:wght@400;600&display=swap"
+    "&family=Source+Sans+3:wght@400;600"
+    "&family=Source+Serif+4:opsz,wght@8..60,400"
+    "&display=swap"
 )
-FACES = [("Source Sans 3", 400), ("Source Sans 3", 600), ("Patrick Hand", 400)]
+FACES = [
+    ("Source Sans 3", 400),
+    ("Source Sans 3", 600),
+    ("Patrick Hand", 400),
+    ("Source Serif 4", 400),
+]
 
 CHROME_NAMES = ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser")
 MAC_CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
@@ -171,9 +181,18 @@ HTML_CROPS = [
     ("stories/us12-reset.html", SKETCH, "us12-reset.png"),
 ]
 
+# (source, file under the output directory): a whole board for the site rather
+# than an article, taken at one pixel per CSS px. The og:image tags in
+# docs/_includes/head.html give the share card's size, which is the page size in
+# its @page rule. It is written outside img/, since every image there is named by
+# a view of the model of the demo, and a test in internal/trace checks that.
+SITE_IMAGES = [
+    ("site/og-card.html", "assets/og-card.png"),
+]
+
 
 def image_sources() -> set[str]:
-    return {row[0] for row in WHOLE_BOARDS + SVG_PANELS + HTML_CROPS}
+    return {row[0] for row in WHOLE_BOARDS + SVG_PANELS + HTML_CROPS + SITE_IMAGES}
 
 
 def all_sources() -> set[str]:
@@ -329,6 +348,7 @@ FONT_PROBE = """<!doctype html>
 <p style="font-family: 'Source Sans 3'; font-weight: 400">Source Sans 3 regular</p>
 <p style="font-family: 'Source Sans 3'; font-weight: 600">Source Sans 3 semibold</p>
 <p style="font-family: 'Patrick Hand'; font-weight: 400">Patrick Hand</p>
+<p style="font-family: 'Source Serif 4'; font-weight: 400">Source Serif 4 regular</p>
 <script>
 window.addEventListener('load', function () {
   document.body.getBoundingClientRect();
@@ -465,6 +485,87 @@ def html_rect(rel: str, selectors: list[str]) -> dict:
     return box
 
 
+# Added to a copy of a site image's source, once the fonts have loaded: the size
+# of its .board in CSS px, and how far what the board holds stays inside its
+# padding on the left, top, right and bottom. A negative figure is a reach into
+# the padding or past the board's edge. What the board holds is the boxes of the
+# block-level elements inside it, each widened by any text that runs out of its
+# side. An element that is not rendered, such as a hidden one, a <template> or a
+# <style>, has no box and is left out. Heights come from the boxes alone: an
+# inline box and the scroll height both count a font's whole ascent and descent,
+# which reach past a line set tighter than that, as the card's title is.
+OVERFLOW_SCRIPT = """<script>
+window.addEventListener('load', function () {
+  document.fonts.ready.then(function () {
+    var b = document.querySelector('.board');
+    var out = null;
+    if (b) {
+      var r = b.getBoundingClientRect(), s = getComputedStyle(b);
+      var u = { l: Infinity, t: Infinity, r: -Infinity, b: -Infinity };
+      b.querySelectorAll('*').forEach(function (e) {
+        if (e.getClientRects().length === 0) { return; }
+        if (getComputedStyle(e).display.indexOf('inline') === 0) { return; }
+        var q = e.getBoundingClientRect();
+        u.l = Math.min(u.l, q.left);
+        u.t = Math.min(u.t, q.top);
+        u.r = Math.max(u.r, q.right + Math.max(0, e.scrollWidth - e.clientWidth));
+        u.b = Math.max(u.b, q.bottom);
+      });
+      out = [
+        r.width,
+        r.height,
+        u.l - r.left - parseFloat(s.paddingLeft),
+        u.t - r.top - parseFloat(s.paddingTop),
+        r.right - parseFloat(s.paddingRight) - u.r,
+        r.bottom - parseFloat(s.paddingBottom) - u.b
+      ];
+    }
+    var pre = document.createElement('pre');
+    pre.id = 'overflow';
+    pre.textContent = JSON.stringify(out);
+    document.body.appendChild(pre);
+  });
+});
+</script>
+"""
+
+
+def check_overflow(rel: str) -> None:
+    """Stop unless the board is the size of its page and all it holds fits inside.
+
+    A site image is in no PDF, so no page count catches content that grows past
+    its page, and the screenshot would cut it off at the edge without a word.
+    Content that only runs into the board's padding is cut off by nothing, but
+    it breaks the margins, so it stops the build too. Measured on a copy of the
+    source with a script added to its head."""
+    w, h = page_size(rel)
+    text = (SRC / rel).read_text(encoding="utf-8")
+    probe = WORK / "pages" / f"{slug(rel)}.overflow.html"
+    probe.parent.mkdir(parents=True, exist_ok=True)
+    probe.write_text(
+        text.replace("</head>", OVERFLOW_SCRIPT + "</head>", 1), encoding="utf-8"
+    )
+    size = json.loads(chrome_dump_dom(probe, w, h, PRE % "overflow"))
+    if size is None:
+        raise SystemExit(f"illustrations/{rel}: no .board to measure")
+    bw, bh, *room = size
+    if (round(bw), round(bh)) != (w, h):
+        raise SystemExit(
+            f"illustrations/{rel}: its .board is {bw:g} by {bh:g} px, not the {w} "
+            f"by {h} px of its @page rule"
+        )
+    over = [
+        f"{-r:g} px at the {side}"
+        for r, side in zip(room, ("left", "top", "right", "bottom"))
+        if r < -0.5
+    ]
+    if over:
+        raise SystemExit(
+            f"illustrations/{rel}: what its .board holds runs into its padding or "
+            f"past its edge, by {', '.join(over)}"
+        )
+
+
 def svg_span(text: str) -> tuple[str, int, int]:
     """(root open tag, index after it, index of its matching </svg>)."""
     i = text.index("<svg")
@@ -595,6 +696,13 @@ def build_pngs(out_root: Path, chosen: set[str]) -> None:
             box = html_rect(rel, selectors)
             fit(lambda s: crop_from_board(rel, box, out, s), out)
 
+    for rel, name in SITE_IMAGES:
+        if rel in chosen:
+            check_overflow(rel)
+            out = out_root / name
+            render_whole_board(rel, out, 1)
+            print(shown(out))
+
 
 # ---------------------------------------------------------------------- main
 
@@ -648,7 +756,8 @@ def chosen_sources(names: list[str]) -> set[str]:
 def main() -> None:
     global CHROME, WORK
     ap = argparse.ArgumentParser(
-        description="Build the PDFs and article images from illustrations/."
+        description="Build the PDFs, the article images and the share card from "
+        "illustrations/."
     )
     ap.add_argument(
         "sources",

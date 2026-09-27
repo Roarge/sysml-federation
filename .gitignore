@@ -103,9 +103,9 @@
 # boards.
 !/docs/*/*.pdf
 
-# The sources of those PDFs and of the article images cut from the same boards:
-# one HTML page per board, one directory level down, and the build script and
-# its README beside them.
+# The sources of those PDFs, of the article images cut from the same boards and
+# of the site's share card: one HTML page per board, one directory level down,
+# and the build script and its README beside them.
 # Anchored and depth-bounded, so each rule admits exactly the files it names.
 !/illustrations/README.md
 !/illustrations/build.py
@@ -121,9 +121,10 @@
 !/docs/_includes/*.html
 !/docs/assets/*.css
 
-# The one script the site loads, which opens a term's definition in place, and
-# the data file it reads those definitions from. Jekyll reads _data at build
-# time and never publishes it as a page of its own.
+# The one script the site loads, which opens a term's definition in place and
+# copies an article's address, and the data files Jekyll reads at build time,
+# the glossary and the author's profiles. Jekyll never publishes _data as a
+# page of its own.
 !/docs/assets/*.js
 !/docs/_data/*.yml
 

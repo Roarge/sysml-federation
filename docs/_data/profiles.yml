@@ -1,0 +1,26 @@
+# The author's profiles, in the order the author card under each article lists
+# them. The site header shows the entries marked `header`. docs/README.md
+# repeats the four links by hand under its byline, for github.com, and
+# _layouts/home.html gives each one its mark by finding the same address and
+# name there, so a change here is made there too, word for word, or that link
+# loses its mark on the home page.
+#
+# `icon` names a mark in _includes/icon.html. `detail` follows the name inside
+# the link in the author card. Each address was checked by a live request on
+# 24 and 25 September 2026. LinkedIn's has no trailing slash, since the form
+# with one only redirects here.
+- label: LinkedIn
+  url: "https://www.linkedin.com/in/roareliasgeorgsen"
+  icon: linkedin
+  header: true
+- label: Bluesky
+  url: "https://bsky.app/profile/roarge.bsky.social"
+  icon: bluesky
+  detail: "@roarge.bsky.social"
+- label: Google Scholar
+  url: "https://scholar.google.com/citations?user=_IxcvnQAAAAJ&hl=en"
+  icon: googlescholar
+- label: ORCID
+  url: "https://orcid.org/0000-0003-2868-497X"
+  icon: orcid
+  detail: "0000-0003-2868-497X"
