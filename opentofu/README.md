@@ -74,9 +74,9 @@ tunnel_name   = "<the name it was created with>"
 dns_record_id = "<record id>"
 ```
 
-You'll find the tunnel's ID and name on its page in Cloudflare's Zero Trust
-dashboard. A DNS record's ID isn't shown there, but the API gives it, as the
-`id` of the record in this answer:
+You'll find the tunnel's ID and name on its page under **Networking ›
+Tunnels** in the Cloudflare dashboard. A DNS record's ID isn't shown there,
+but the API gives it, as the `id` of the record in this answer:
 
 ```sh
 curl -s "https://api.cloudflare.com/client/v4/zones/<zone id>/dns_records?name.exact=demo.example.org" \

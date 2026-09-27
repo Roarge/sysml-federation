@@ -23,6 +23,16 @@ docker run --rm -p 8080:8080 sysml-federation:dev
 
 What to try, what each service holds and where the demo stops are in [the example's own README](examples/pipeline/README.md). The design underneath it is in [docs/](docs/README.md).
 
+### The other parts
+
+Three more things in the repository run with your own accounts and hardware. None of them is needed for the demo, and each guide says what to install, where your credentials go, and the commands in order.
+
+| To run | You need | Guide |
+|---|---|---|
+| The check session, which tests the running demo from Checkly's runners through a tunnel | Docker and a Checkly account, and optionally a domain on Cloudflare | [checkly/README.md](checkly/README.md) |
+| The demo on your own Proxmox host, on your own public hostname | Proxmox VE 9.1 or later, a Cloudflare account with a domain, and OpenTofu 1.8 or later | [opentofu/README.md](opentofu/README.md) |
+| The language model experiment on the demo's own systems model | Go at the version `go.mod` names, and an Ollama server holding `qwen2.5-coder:14b` | [experiments/llm-resolution/README.md](experiments/llm-resolution/README.md) |
+
 ## The integration problem
 
 Engineering organisations have always described their systems in documents. A requirements specification in one file, interface definitions in another, a power budget in a spreadsheet, a hazard analysis somewhere a third team owns. Every one of those describes the same system, and keeping them consistent with each other is manual work that nobody enjoys and everybody defers.

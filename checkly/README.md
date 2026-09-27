@@ -1,110 +1,203 @@
 # The check session
 
-The demo is one container, and this directory is a project beside it that
-checks the demo from outside: a Checkly project of thirty checks and monitors,
-a compose profile that opens a tunnel to a running instance, an OpenTelemetry
-collector the router exports to, and a trace viewer. The session is optional.
-Nothing here runs unless it is asked for. A session needs a Checkly account
-and its two credentials, and without them `docker run` runs the demo exactly
-as before: the variable that hands the router a configuration file is unset,
-the router's environment is what the supervisor sets, and nothing under
-`checkly/` is built, run or read. The decision is
+The check session tests the running demo from outside, the way a visitor would
+reach it. One command starts the demo, a tunnel that gives it a public address,
+an OpenTelemetry collector with a trace viewer, and a runner. The runner has
+[Checkly](https://www.checklyhq.com) run every check against the demo from
+Checkly's own runners and record the run as a test session. It then deploys the
+checks as monitors for as long as the session lasts, and removes them when you
+stop it.
+
+The session is optional. The demo itself needs none of it, and `docker run`
+runs the demo exactly as before. The decision is
 [AD-0031](../docs/decisions/AD-0031-an-optional-check-session.md), and every
 check here is a verification case of its own in
-[the model of the demo](../model/README.md).
+[the demo's systems model](../model/README.md).
 
-The image of release 0.2.0 is the first published one that carries the
-router's tracing opt-in. With `DEMO_IMAGE` unset, the compose file starts
-`ghcr.io/roarge/sysml-federation`. `docker compose up` pulls it only when the
-host holds no image under that name, so a host that pulled the demo before
-release 0.2.0 still starts the older image, which ignores the opt-in and
-exports no traces, until one `docker pull ghcr.io/roarge/sysml-federation`
-replaces it. A local build can run in place of the published image.
-`make image` from the repository root builds `sysml-federation:dev`, and
-`DEMO_IMAGE=sysml-federation:dev` in the environment or in `checkly/.env` makes
-the compose file start that build instead.
+## What you need
 
-## Running a session
+- **Docker with the Compose plugin** ([install](https://docs.docker.com/compose/install/)),
+  and bash to run the script.
+- **A Checkly account.** The free tier covers everything a session deploys,
+  and [the free tier's budget](#the-free-tiers-budget) below shows the
+  arithmetic. You need an API key and your account ID. In Checkly's Settings,
+  the API keys tab gives the key and the Account settings tab shows the ID
+  ([Checkly's guide](https://www.checklyhq.com/docs/cli/authentication/)).
+- **Optionally, a domain on Cloudflare**, for a named tunnel on your own
+  hostname. Without one, the session opens a quick tunnel on a hostname
+  Cloudflare picks, which needs no account, and seven of the twelve story
+  checks skip, for the reason [below](#the-tunnel-and-streamed-responses).
 
-The session reads its settings from the environment and from `checkly/.env`
-when the file exists, which `.gitignore` excludes. Two are required and the
-rest are optional.
+## Run a session
 
-| Variable | What it does |
-|---|---|
-| `CHECKLY_API_KEY`, `CHECKLY_ACCOUNT_ID` | the account the project is tested, deployed and destroyed in, both required for a session |
-| `SESSION_WITHOUT_ACCOUNT` | `1` starts the stack, the tunnel and the subscription probe with no account at all, whatever the file carries, and deploys nothing |
-| `DEMO_IMAGE` | the demo's image, `ghcr.io/roarge/sysml-federation` when unset, or `sysml-federation:dev` for the local build from `make image` |
-| `LOG_LEVEL` | the demo's log level, passed through to its container |
-| `TUNNEL_TOKEN` | the named tunnel's token. When set, the named tunnel runs in place of the quick one, and `DEMO_HOSTNAME` must be set with it |
-| `DEMO_HOSTNAME` | the named tunnel's public hostname, `demo.sysml-federation.org` for the owner's. It also constructs the three hostname monitors |
-| `CHECKLY_ALERT_EMAIL`, `CHECKLY_WEBHOOK_URL` | an alert channel each, constructed only when set |
-| `OTEL_COLLECTOR_CONFIG` | `collector-local.yaml` by default, or `collector-checkly.yaml` for traces beside the check results |
-| `CHECKLY_OTEL_API_KEY` | the account's tracing key, read by `collector-checkly.yaml` |
-| `OTEL_INGEST_TOKEN` | any secret string, needed by `collector-checkly.yaml`, which guards its inbound port with it |
-| `CHECKLY_DASHBOARD_SLUG`, `CHECKLY_STATUS_SLUG` | the dashboard's and the status page's subdomains, derived from the account id when unset |
-| `CHECKLY_INCIDENTS`, `CHECKLY_MAINTENANCE` | `1` constructs the status page's automation rules and the weekly maintenance window, each a paid feature |
-| `CHECKLY_PRIVATE_LOCATION_SLUG` | constructs a private location and moves every group onto it, a paid feature |
-| `CHECKLY_PL_API_KEY` | the private location's own key, read by the compose file's `checkly-agent` service under the `checkly-private` profile, which the session script never starts and which has not been run |
+**1. Give it your account.** From the root of a clone, create `checkly/.env`.
+Git ignores it, since it holds your credentials:
 
-One command starts everything.
-
+```sh
+CHECKLY_API_KEY=<your API key>
+CHECKLY_ACCOUNT_ID=<your account ID>
+# optional, to be told when a check fails:
+CHECKLY_ALERT_EMAIL=you@example.org
 ```
+
+**2. Start it:**
+
+```sh
 bash checkly/scripts/session.sh up
 ```
 
-On the host the script loads `checkly/.env`, refuses to start without the two
-credentials unless `SESSION_WITHOUT_ACCOUNT=1`, chooses the named tunnel when
-`TUNNEL_TOKEN` is set and the quick one otherwise, warns once when no alert
-channel is configured, and hands over to `docker compose` with the profiles
-that choice calls for. Five containers come up: the demo, one tunnel, the
-collector, the viewer and the runner. The runner is a Node image with the
-project mounted from this directory and its dependencies in a named volume, so
-the dependencies are not written into the host's tree. It installs an HTTP
-client and a certificate store on every start, about fifteen seconds and a
-network dependency, because the pinned image carries neither and the probes
-and the pings are `curl`.
+Five containers come up: the demo, one tunnel, the collector, the trace viewer
+and the runner. The runner first installs an HTTP client and a certificate
+store, which takes about fifteen seconds and needs the network, since the
+pinned Node image carries neither.
 
-Inside the runner the same script walks the session's twelve steps and logs
-each under its number, `[1/12] installDependencies` through
-`[12/12] destroyOnStop`. It prints the demo's public address once it has one,
-whether the viewer answers through the tunnel, the verdict of the subscription
-probe as `SSE_STREAMS=1` or `SSE_STREAMS=0`, the account the session runs as
-and its plan, the name of the recorded test session, the dashboard's and the
-status page's addresses after the deploy, and `heartbeat sent` every five
-minutes until stopped. No credential is printed.
+**3. Follow it in the log.** The runner logs twelve numbered steps,
+`[1/12] installDependencies` to `[12/12] destroyOnStop`. Along the way it
+prints the demo's public address and whether the viewer answers through the
+tunnel. `SSE_STREAMS=1` or `SSE_STREAMS=0` says whether the tunnel carries live
+updates. Then come the name of the recorded test session and the addresses of
+the dashboard and the status page, and after that `heartbeat sent` every five
+minutes. No credential is printed.
 
-Stopping is `Ctrl-C` on the `up` command. Compose forwards the stop, and the
-runner destroys the deployed project, removes the account variable it
-published and exits with the test session's status, inside a grace period of
-90 seconds. Then
+While it runs, the demo answers at the public address, every request's trace
+is in the viewer at `http://localhost:16686`, and the results are in your
+Checkly account.
 
-```
+**4. Stop it** with `Ctrl-C`. The runner removes everything it deployed from
+your account within 90 seconds and exits with the test session's status. Then
+remove the containers, the network and the runner's volume:
+
+```sh
 docker compose -f checkly/compose.yml --profile checkly --profile quick down -v
 ```
 
-removes the containers, the network and the runner's volume, with
-`--profile named` in place of `quick` after a named-tunnel session.
+After a session on a named tunnel, use `--profile named` in place of
+`--profile quick`.
 
-Without an account, a contributor runs the checks against a local demo. From
-`checkly/`, after `npm ci` and `npx playwright install chromium`, with the
-demo answering on port 8080:
+### On your own hostname
 
+A named tunnel carries live updates, so all twelve story checks run, and the
+session adds three monitors for the hostname: its certificate, its DNS record
+and its port.
+
+1. In the Cloudflare dashboard, go to **Networking › Tunnels** and create a
+   tunnel ([Cloudflare's guide](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/create-remote-tunnel/)).
+   The installation command it shows carries the tunnel's token after
+   `--token`. Copy the token, and don't run the command, since the session
+   runs the connector itself.
+2. Give the tunnel a public hostname on your domain, routed to the service
+   `http://demo:8080`, the demo's address inside the session.
+3. Add both to `checkly/.env`:
+
+   ```sh
+   TUNNEL_TOKEN=<the token>
+   DEMO_HOSTNAME=demo.example.org
+   ```
+
+If you also run the demo on a Proxmox host, the
+[host configuration](../opentofu/README.md) can create the tunnel, its route
+and the DNS record for you, or adopt ones you made by hand. Then
+`tofu output -raw tunnel_token` prints the token.
+
+### Traces beside the check results
+
+By default the collector sends every span to the trace viewer alone. To see
+each check's own trace beside its result in Checkly, add:
+
+```sh
+OTEL_COLLECTOR_CONFIG=collector-checkly.yaml
+CHECKLY_OTEL_API_KEY=<the tracing key from your account's OpenTelemetry integration page>
+OTEL_INGEST_TOKEN=<any secret string>
 ```
+
+The last one guards an inbound port the collector opens in that
+configuration, and the collector refuses to start without it.
+[Traces](#traces) below says what each configuration does.
+
+### Without a Checkly account
+
+`SESSION_WITHOUT_ACCOUNT=1` in `checkly/.env` or the environment starts the
+demo, the tunnel, the collector and the viewer, and runs the live-update probe,
+and deploys nothing, whatever else the file holds.
+
+### The checks against a local demo, with no account at all
+
+The browser checks are Playwright specs, and they run on your own machine
+against a demo on port 8080. From `checkly/`:
+
+```sh
+npm ci
+npx playwright install chromium
+docker run -d --rm -p 8080:8080 --name demo ghcr.io/roarge/sysml-federation
 DEMO_URL=http://localhost:8080 SSE_STREAMS=1 npx playwright test --project chromium
 ```
 
-runs the twelve browser specs one file at a time, which is how the shipped
-configuration runs them everywhere, and `SSE_STREAMS=0` shows the seven that
-skip without a stream. The three multistep specs are outside the shipped
-configuration's `testMatch`, and a file argument on the command line does not
-widen it, so they run under a copy of `playwright.config.ts` whose `testMatch`
-reads `'*.multistep.spec.ts'`, passed with `--config`. Every mutating spec
-puts the demo back as it found it, and the caption reads `capacity 1200,
-bottleneck parse` afterwards. `npx tsc --noEmit` type-checks the project.
-`npx checkly test` needs the account before it parses anything, and the
-record below carries one load of the project through the CLI's own parser
-without one.
+That runs the twelve story specs, one file at a time, as the shipped
+configuration runs them everywhere. With `SSE_STREAMS=0` the seven that need
+live updates skip. The three multistep specs sit outside the configuration's
+`testMatch`, and naming a file on the command line doesn't widen it, so they
+need a copy of the configuration that matches them:
+
+```sh
+sed "s/testMatch: 'us\*.spec.ts'/testMatch: '*.multistep.spec.ts'/" playwright.config.ts > multistep.config.ts
+DEMO_URL=http://localhost:8080 npx playwright test --config multistep.config.ts --project chromium
+```
+
+Every spec that changes the demo puts it back as it found it, so the caption
+reads `capacity 1200, bottleneck parse` afterwards. `npx tsc --noEmit`
+type-checks the project. `docker stop demo` ends the demo, and
+`rm multistep.config.ts` removes the copy, which git would otherwise offer to
+track. `npx checkly
+test` needs an account before it parses anything.
+
+### A local build of the demo
+
+`make image` from the repository root builds `sysml-federation:dev`, and
+`DEMO_IMAGE=sysml-federation:dev` in `checkly/.env` has the session start that
+build in place of the published image.
+
+### If something goes wrong
+
+- **The script stops with status 2.** Its last line names the missing
+  setting, one of the two Checkly credentials, `DEMO_HOSTNAME` beside a
+  `TUNNEL_TOKEN`, or `OTEL_INGEST_TOKEN` beside `collector-checkly.yaml`.
+- **The quick tunnel never gets a hostname.** Some networks' resolvers answer
+  the tunnel service's name with a block page, and the tunnel exits. The
+  [verification record](#verification-record) has one such run. A named tunnel
+  works on those networks.
+- **No traces arrive.** An image of the demo pulled before release 0.2.0
+  ignores the tracing setting, and `docker compose up` doesn't pull again while
+  an image of that name is on the host. `docker pull
+  ghcr.io/roarge/sysml-federation` replaces it.
+
+## Settings
+
+The script reads these from the environment, and from `checkly/.env` when the
+file exists.
+
+| Setting | What it does |
+|---|---|
+| **Required** | |
+| `CHECKLY_API_KEY`, `CHECKLY_ACCOUNT_ID` | the account the checks are tested, deployed and removed in |
+| `SESSION_WITHOUT_ACCOUNT` | `1` runs the stack and the probe with no account, and deploys nothing |
+| **The tunnel** | |
+| `TUNNEL_TOKEN` | the named tunnel's token. Set, the named tunnel runs in place of the quick one |
+| `DEMO_HOSTNAME` | the named tunnel's public hostname, needed with `TUNNEL_TOKEN`. It also adds the three hostname monitors |
+| **Alerts** | |
+| `CHECKLY_ALERT_EMAIL`, `CHECKLY_WEBHOOK_URL` | an alert channel each, created only when set |
+| **Traces** | |
+| `OTEL_COLLECTOR_CONFIG` | `collector-local.yaml` by default, or `collector-checkly.yaml` for traces beside the check results |
+| `CHECKLY_OTEL_API_KEY` | the account's tracing key, read by `collector-checkly.yaml` |
+| `OTEL_INGEST_TOKEN` | any secret string, needed by `collector-checkly.yaml` |
+| **The demo** | |
+| `DEMO_IMAGE` | the demo's image, `ghcr.io/roarge/sysml-federation` when unset |
+| `LOG_LEVEL` | the demo's log level |
+| **Public pages** | |
+| `CHECKLY_DASHBOARD_SLUG`, `CHECKLY_STATUS_SLUG` | the dashboard's and the status page's subdomains, made from the account ID when unset |
+| **Paid features, off by default** | |
+| `CHECKLY_INCIDENTS`, `CHECKLY_MAINTENANCE` | `1` creates the status page's automation rules and the weekly maintenance window |
+| `CHECKLY_PRIVATE_LOCATION_SLUG` | creates a private location and moves every group onto it |
+| `CHECKLY_PL_API_KEY` | the private location's own key, for the compose file's `checkly-agent` service under the `checkly-private` profile. The script never starts that profile, and it has not been run |
 
 ## What runs
 
