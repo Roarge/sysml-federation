@@ -1,6 +1,6 @@
 # The architecture in one sitting
 
-*Roar Georgsen, 27 August 2026*
+*Roar Elias Georgsen, 27 August 2026*
 
 Part 2 of 13 in [Federating a systems model](../README.md), written for release v0.3.0.
 

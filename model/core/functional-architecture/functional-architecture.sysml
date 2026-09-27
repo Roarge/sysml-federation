@@ -78,8 +78,10 @@ package Federation_FunctionalArchitecture {
                serve. The limits are 1500 on the pipeline and on ingest, parse
                and serve, and 750 on each index server.
 
-               No calculation is modelled here. The arithmetic is the capacity
-               service's, and the rollup is a maximum flow (AD-0007). */
+               The arithmetic is the capacity service's, and the rollup is a
+               maximum flow (AD-0007). The two calculations and the verdict
+               rule are modelled by their inputs and results, and the numbers
+               are left to the code. */
 
         action def ComputeCapacityAndVerdicts {
             doc /* How the number is made, and why raising one server changes
@@ -97,6 +99,38 @@ package Federation_FunctionalArchitecture {
             first findSourceSideCut then compareWithEachLimit;
             first compareWithEachLimit then raiseOutsideTheCut;
             first raiseOutsideTheCut then raiseInsideTheCut;
+        }
+
+        item def FlowNetwork {
+            doc /* One edge per server, sized by its throughput, running from
+                   the servers no connection enters to the servers no
+                   connection leaves. */
+        }
+
+        calc def MaximumFlow {
+            doc /* The capacity: the maximum flow through the network, from
+                   Rollup in examples/pipeline/capacity/flow/flow.go. */
+            in network : FlowNetwork;
+            return capacity : Real;
+        }
+
+        calc def SourceSideCut {
+            doc /* The bottleneck: the saturated servers nearest the entry,
+                   the source side of the minimum cut, also from Rollup in
+                   examples/pipeline/capacity/flow/flow.go. */
+            in network : FlowNetwork;
+            return bottleneck : String[*];
+        }
+
+        constraint def MeetsItsLimit {
+            doc /* The verdict rule for a throughput requirement, whose
+                   constraint compares the capacity with the limit by >=: PASS
+                   when the capacity is at least the limit, FAIL otherwise.
+                   Verdict in examples/pipeline/capacity/flow/verdict.go
+                   applies whichever comparison a constraint projects. */
+            in capacity : Real;
+            in limit : Real;
+            capacity >= limit
         }
     }
 
@@ -124,6 +158,60 @@ package Federation_FunctionalArchitecture {
             first composeIntoOneGraph then serveTwoApps;
             first serveTwoApps then changeANumber;
             first changeANumber then watchBothFollow;
+        }
+    }
+
+    // ------------------------------------------------------ the supervisor --
+
+    package Supervision {
+        doc /* How the supervisor starts the demo and how it stops it, from
+               supervisor.run in cmd/sysml-federation/serve.go. The start
+               order is the one the deployment board draws. The stop is the
+               part no board draws. When a component fails, when the router
+               exits or when the process is asked to stop, the supervisor
+               stops everything, and because it is PID 1 the container ends
+               with it. */
+
+        item def SubgraphsHealthy { doc /* every subgraph answered its /health endpoint */ }
+        item def RouterReady { doc /* the router answered /health/ready */ }
+        item def PortOpen { doc /* the user interface server is listening on the published port */ }
+        item def StopRequested { doc /* SIGINT or SIGTERM ended the process's context */ }
+        item def ComponentFailed { doc /* a subgraph or the user interface server reported an error while serving */ }
+        item def RouterExited { doc /* the router child process ended while serving */ }
+        item def StartFailed { doc /* the model or the document could not be loaded, a component could not listen or did not answer within ten seconds, or the router exited before it was ready */ }
+
+        state def SupervisorStates {
+            doc /* supervisor.run in cmd/sysml-federation/serve.go. Loading
+                   reads the model file and the document tree. Each start
+                   waits for a health endpoint, for ten seconds at most.
+                   Serving lasts until the first of a stop request, a failed
+                   component or the router's exit, and all three lead to the
+                   same stop. */
+            entry; then loading;
+            state loading;
+            state startingSubgraphs;
+            state startingRouter;
+            state openingThePort;
+            state serving;
+            state stopping {
+                doc /* Stops whichever of them are running: the user interface
+                       server first, then the router unless it has already
+                       gone, then the subgraphs last. The process then returns,
+                       and the container ends. */
+            }
+            state stopped;
+            transition loaded first loading then startingSubgraphs;
+            transition loadFailed first loading accept StartFailed then stopped;
+            transition subgraphsUp first startingSubgraphs accept SubgraphsHealthy then startingRouter;
+            transition subgraphsFailed first startingSubgraphs accept StartFailed then stopping;
+            transition routerUp first startingRouter accept RouterReady then openingThePort;
+            transition routerFailed first startingRouter accept StartFailed then stopping;
+            transition portOpen first openingThePort accept PortOpen then serving;
+            transition portFailed first openingThePort accept StartFailed then stopping;
+            transition onStopRequest first serving accept StopRequested then stopping;
+            transition onComponentFailure first serving accept ComponentFailed then stopping;
+            transition onRouterExit first serving accept RouterExited then stopping;
+            transition stoppedAll first stopping then stopped;
         }
     }
 
@@ -157,8 +245,13 @@ package Federation_FunctionalArchitecture {
             action destroyOnStop { doc /* on stop, destroy the project and remove the account variable, then exit with the test session's code */ }
             first installDependencies then resolveTheDemoUrl;
             first resolveTheDemoUrl then waitForTheDemo;
-            first waitForTheDemo then probeSubscriptions;
-            first probeSubscriptions then readTheAccountPlan;
+            first waitForTheDemo then whichTunnel;
+            decide whichTunnel;
+                if not tunnelToken then probeSubscriptions;
+                else afterTheProbe;
+            first probeSubscriptions then afterTheProbe;
+            merge afterTheProbe;
+            first afterTheProbe then readTheAccountPlan;
             first readTheAccountPlan then publishTheDemoUrl;
             first publishTheDemoUrl then recordATestSession;
             first recordATestSession then recordASuiteSession;

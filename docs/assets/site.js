@@ -165,3 +165,44 @@
     if (open) place(open.button, open.pop);
   });
 })();
+
+// Copy link.
+//
+// The share links under an article end with a button that copies the
+// article's address. The page carries it hidden, and this script shows it only
+// where the browser offers a clipboard to write to, so a reader without the
+// script never meets a button that does nothing. The status line beside the
+// button says whether the copy worked, and a screen reader reads it out.
+(function () {
+  "use strict";
+
+  if (!navigator.clipboard || !navigator.clipboard.writeText) return;
+
+  var buttons = document.querySelectorAll("button[data-copy-url]");
+  Array.prototype.forEach.call(buttons, function (button) {
+    var item = button.closest(".share-copy");
+    var status = item && item.querySelector(".share-status");
+    if (!status) return;
+
+    function say(text) {
+      // Emptied first, so that a second copy is announced as well.
+      status.textContent = "";
+      window.setTimeout(function () {
+        status.textContent = text;
+      }, 100);
+    }
+
+    button.addEventListener("click", function () {
+      var url = button.getAttribute("data-copy-url");
+      navigator.clipboard.writeText(url).then(
+        function () {
+          say("Link copied");
+        },
+        function () {
+          say("Could not copy. The link is " + url);
+        }
+      );
+    });
+    item.hidden = false;
+  });
+})();

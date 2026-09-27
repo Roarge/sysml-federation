@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <title>Share card</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400&display=swap">
+  <style>
+    /* The picture a link preview shows for every page of the site, named by
+       the og:image tags in docs/_includes/head.html, which give its size. The
+       colours are the site's, from docs/assets/site.css. The title is set as
+       the site's page titles are, in Source Serif 4 at 400, and the author as
+       the site's links are, in Source Sans 3 at 600. The title, the author and
+       the domain repeat title, author and the host name in url in
+       docs/_config.yml. */
+    :root {
+      --paper: oklch(98% 0.005 90);
+      --ink: oklch(25% 0.01 260);
+      --pencil: oklch(58% 0.01 260);
+      --sans: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      --serif: "Source Serif 4", Charter, Georgia, serif;
+    }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    .board { width: 1200px; height: 630px; box-sizing: border-box; padding: 88px 96px 80px; background: var(--paper); display: flex; flex-direction: column; justify-content: space-between; }
+    .title { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 120px; line-height: 1.1; letter-spacing: -0.01em; }
+    .foot { display: flex; justify-content: space-between; align-items: baseline; padding-top: 28px; border-top: 2px solid var(--pencil); }
+    .author { font-size: 40px; line-height: 1.2; font-weight: 600; }
+    .domain { font-size: 30px; line-height: 1.2; color: var(--pencil); }
+  </style>
+  <style>
+    @page { size: 1200px 630px; margin: 0; }
+    html, body { margin: 0; padding: 0; background: oklch(98% 0.005 90); }
+    *, *::before, *::after { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  </style>
+</head>
+<body>
+<div class="board">
+  <p class="title">Federating a<br>systems model</p>
+  <div class="foot">
+    <span class="author">Roar Elias Georgsen</span>
+    <span class="domain">sysml-federation.org</span>
+  </div>
+</div>
+</body>
+</html>
