@@ -87,7 +87,7 @@ What is entity resolution between a systems model and a built system, and what i
 Why does no resolver get every link right, and what does that mean for how one is put to work?
 
 3. [Why no resolver gets every link right](articles/15-why-no-resolver-gets-every-link-right.md)  
-   One change to a made-up pipeline breaks three links nobody touched. Why are some wrong links and missing ones certain, and when can a resolver still be left to add links on its own?
+   One change to a hypothetical pipeline breaks three links nobody touched. What makes a link correct, why are some incorrect and missing links certain, and when can a resolver be left to add links on its own?
 
 ## The repository
 

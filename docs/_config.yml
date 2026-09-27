@@ -124,5 +124,5 @@ series:
         dek: "What goes into a single resolution task, from what counts as a candidate to where the finished link lands? And why do two tools disagree about whether a renamed thing is still the same thing?"
       - path: articles/15-why-no-resolver-gets-every-link-right.md
         title: "Why no resolver gets every link right"
-        date: 2026-09-24
-        dek: "One change to a made-up pipeline breaks three links nobody touched. Why are some wrong links and missing ones certain, and when can a resolver still be left to add links on its own?"
+        date: 2026-09-27
+        dek: "One change to a hypothetical pipeline breaks three links nobody touched. What makes a link correct, why are some incorrect and missing links certain, and when can a resolver be left to add links on its own?"
