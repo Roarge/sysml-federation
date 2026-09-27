@@ -637,4 +637,39 @@ package Federation_LogicalArchitecture {
             allocate traceOneRequest.ingestBesideTheCheckResult to checkly;
         }
     }
+
+    // ------------------------------------------------ the demo on the host --
+
+    package HostDeployment {
+        doc /* The demo on the owner's Proxmox host, as the host configuration
+               under opentofu/ starts it when its switch is on: the demo and
+               the tunnel's connector, each an application container made from
+               its published image, and the edge that hands them the public
+               hostname. None of it runs while the switch is off (AD-0033). */
+
+        part def HostDeployment {
+            doc /* The demo and the tunnel's connector on the host, and the edge
+                   in front of them. */
+        }
+
+        part hostDeployment : HostDeployment {
+            doc /* Started and stopped by opentofu/proxmox.tf. The route from the
+                   public hostname to the demo is opentofu/cloudflare.tf's, and
+                   while the switch is on it points here and not at the check
+                   session's demo. */
+            ref part host : Federation_Context::ProxmoxHost;
+            part connector : Federation_LogicalArchitecture::CheckSession::TunnelConnector {
+                doc /* The named tunnel's connector, run on the host from
+                       cloudflare/cloudflared at the release the compose file
+                       pins, with the tunnel's token in its environment. It is
+                       the container proxmox_virtual_environment_container.tunnel
+                       in opentofu/proxmox.tf. */
+                :>> mode = "named";
+            }
+            ref part demo :> Federation_LogicalArchitecture::demo;
+            ref part edge : Federation_Context::CheckSession::TunnelEdge;
+            interface tunnel : TunnelLink connect edge.origin to connector.edge;
+            interface toDemo : HttpOnOnePort connect connector.origin to demo.web;
+        }
+    }
 }
