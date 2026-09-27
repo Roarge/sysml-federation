@@ -99,8 +99,8 @@ A score against last month's gold set describes last month's system. For a syste
 
 A gold set decays along with the links it describes, so it has to be maintained like them. The table above changed while I was writing it. Its connector row first read "none, and flag the systems model", because the only tunnel connector the systems model held was the check session's. I modelled the connector on the host, and the row became a link. A plan made with the demo switched off holds none of the first three rows, so the table holds only for a plan with the switch on. On the hypothetical pipeline, the telemetry task's gold set gains `query-frontend` resolving to `PIPE-S2` once the parse service is renamed. Without updates like these, the next measurement marks the resolver down for proposing a correct link.
 
-Part 5, coming up next, looks at what else decides whether a resolver is worth running, once its links are good enough.
+[Part 5](17-what-makes-a-resolver-worth-running.md) looks at what else decides whether a resolver is worth running, once its links are good enough.
 
 ---
 
-Previous: [Why no resolver gets every link right](15-why-no-resolver-gets-every-link-right.md) · Index: [Automating traceability](../README.md)
+Previous: [Why no resolver gets every link right](15-why-no-resolver-gets-every-link-right.md) · Index: [Automating traceability](../README.md) · Next: [What makes a resolver worth running](17-what-makes-a-resolver-worth-running.md)

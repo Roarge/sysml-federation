@@ -110,7 +110,7 @@ A browse is one question per tool call. Each question carries the task, the view
 | Resolver | What it does |
 |---|---|
 | Key rule | Reads the key in the name as written. Its links are correct by construction, and it's there to show what hiding the keys takes away. |
-| Word overlap | Ranks the 55 system stories and design constraints by the words they share with the test, each word weighted by how few requirements use it (TF-IDF with cosine similarity), and proposes the best above a fixed threshold. Its best-ranked answer is also what `find` gives for the test's text, so it is the first step any browse can take. |
+| Word overlap | Ranks the 56 system stories and design constraints by the words they share with the test, each word weighted by how few requirements use it (TF-IDF with cosine similarity), and proposes the best above a fixed threshold. Its best-ranked answer is also what `find` gives for the test's text, so it is the first step any browse can take. |
 | Language model | `qwen2.5-coder:14b` by default, at temperature 0 with a fixed seed, answering under a JSON schema. Its answer is the first link to a system requirement, or none. |
 
 The links to parts, actions, state machines and other elements have nothing recorded to score them against. The report counts them by kind and gives the share that lies within three links of the recorded requirement, beside the share of every element that lies as near.
