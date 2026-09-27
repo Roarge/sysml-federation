@@ -8,6 +8,11 @@ It is a check rather than a helper, so the sentence below saying the two helper
 packages are all the tree holds is no longer true. See
 [the demo's own model](AD-0029-the-demos-own-model-in-sysml-v2.md).
 
+Amendment, 2026-09-27: `internal/` holds a fourth package, `internal/scenario`,
+which reads the Gherkin scenarios and runs them from the tests of the packages
+they describe. See
+[acceptance criteria as Gherkin scenarios](AD-0034-acceptance-criteria-as-gherkin-scenarios.md).
+
 ## Context
 
 Two packages sit under `internal/`. `assert` holds assertion helpers over type
