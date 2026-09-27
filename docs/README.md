@@ -65,7 +65,7 @@ These are the boards, sheets and records the articles draw on, for anyone who wa
 - [L0, Federating a systems model](a3/L0-federating-a-systems-model.pdf), an A3 sheet for the reader asking "What does this demo claim, what is in the box, and what would I keep or replace if I adopted it?"
 - [L2b, Pipeline example: capacity and verdicts](a3/L2b-pipeline-example-capacity-and-verdicts.pdf), an A3 sheet for the reader asking "Why does raising one server change nothing and raising another change everything?"
 - [Use cases](stories/use-cases.pdf), the storyboard as one PDF, one page per use case after the overview.
-- [Decision records](decisions/README.md), the 31 decisions with their alternatives and consequences.
+- [Decision records](decisions/README.md), the 32 decisions with their alternatives and consequences.
 - [The model of the demo](https://github.com/Roarge/sysml-federation/tree/main/model), the demo itself in SysML v2, with its stories, requirements, architecture, tests and views, validated by the two reference tools on every change.
 - [The check session](https://github.com/Roarge/sysml-federation/tree/main/checkly), the Checkly project that runs every story against a live instance through a tunnel, with a collector and a trace viewer. It needs your own Checkly account, since mine cannot ship with the image.
 

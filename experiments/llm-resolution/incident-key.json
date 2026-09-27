@@ -1,0 +1,23 @@
+{
+  "report": "The alert \"monitor: the viewer answers\" has failed since 02:10. It asks for /viewer/ every ten minutes from eu-central-1 and gets nothing back. The service's container has stopped, and its last line reads: sysml-federation serve: router exited: signal: killed",
+  "alert_only": "The alert \"monitor: the viewer answers\" has failed since 02:10. It asks for /viewer/ every ten minutes from eu-central-1 and gets nothing back.",
+  "items": [
+    {"item": "the router is the cause", "field": "cause", "any": ["Federation_LogicalArchitecture::demo::router", "Federation_LogicalArchitecture::Router"]},
+    {"item": "the supervisor's state machine is the mechanism", "field": "mechanism", "any": ["Federation_FunctionalArchitecture::Supervision::SupervisorStates", "Federation_FunctionalArchitecture::Supervision::SupervisorStates::stopping", "Federation_LogicalArchitecture::Supervisor", "Federation_LogicalArchitecture::Supervisor::lifecycle", "Federation_LogicalArchitecture::demo::supervisor"]},
+    {"item": "the transition on the router's exit", "field": "mechanism", "any": ["Federation_FunctionalArchitecture::Supervision::SupervisorStates::onRouterExit", "Federation_FunctionalArchitecture::Supervision::RouterExited"]},
+    {"item": "the supervisor's code", "field": "code", "any": ["cmd/sysml-federation/serve.go"]},
+    {"item": "the compose file, which restarts nothing", "field": "code", "any": ["checkly/compose.yml"]},
+    {"item": "SR-04, four paths on one port, is unmet", "field": "consequences", "any": ["SR-04"]},
+    {"item": "SR-09, every edit lost with the memory it lived in", "field": "consequences", "any": ["SR-09"]},
+    {"item": "the document's monitor fails too", "field": "consequences", "any": ["Federation_CheckCases::CHK_MonitorDocument"]},
+    {"item": "the root's monitor fails too", "field": "consequences", "any": ["Federation_CheckCases::CHK_MonitorRoot"]},
+    {"item": "a stakeholder story behind SR-04", "field": "consequences", "any": ["US-01", "US-11"]},
+    {"item": "the stakeholder story behind SR-09", "field": "consequences", "any": ["US-12"]},
+    {"item": "the session's heartbeat, which keeps passing", "field": "consequences", "any": ["Federation_CheckCases::CHK_SessionHeartbeat"]}
+  ],
+  "remove_element": "Federation_FunctionalArchitecture::Supervision::SupervisorStates::onRouterExit",
+  "control_link": {"from": "Federation_FunctionalArchitecture::EditPropagation::PropagateAnEdit::recomputeVerdict", "rel": "allocated to", "to": "Federation_LogicalArchitecture::demo::capacity"},
+  "known_mismatches": [
+    {"id": "Federation_LogicalArchitecture::Adapter::serve", "note": "The systems model puts the store and the version counter in adapter/serve. The code has them in adapter/projection/store.go."}
+  ]
+}
