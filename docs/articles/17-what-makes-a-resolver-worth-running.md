@@ -1,4 +1,4 @@
-# What makes a resolver worth running
+# What makes a resolver worth running?
 
 *Roar Elias Georgsen, 27 September 2026*
 
