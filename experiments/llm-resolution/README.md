@@ -4,6 +4,87 @@ Can a language model running on your own hardware read a systems model the way a
 
 It is no part of the demo. It is a Go module of its own, built on the standard library alone, that a person runs against an [Ollama](https://ollama.com) server in their own network ([AD-0032](../../docs/decisions/AD-0032-a-language-model-experiment-outside-the-product.md)).
 
+## Running it
+
+### What you need
+
+- **A checkout of this repository**, and **Go** at the version `go.mod`
+  names ([install](https://go.dev/doc/install)). `go version` says which you
+  have.
+- **An [Ollama](https://ollama.com/download) server** your machine can reach,
+  holding the language model. The runs described here were planned for a
+  graphics card with 12 GB, which holds `qwen2.5-coder:14b` at its default
+  4-bit build. On the server:
+
+  ```sh
+  ollama pull qwen2.5-coder:14b
+  ```
+
+  Ollama listens only on its own machine by default. If it runs on another
+  machine, set `OLLAMA_HOST=0.0.0.0:11434` for the server and restart it. On
+  Linux, where it runs as a systemd service, `systemctl edit ollama.service`
+  takes that as an `Environment` line ([Ollama's FAQ](https://docs.ollama.com/faq)
+  has the other systems). Then check from your own machine:
+
+  ```sh
+  curl http://192.168.1.20:11434/api/version
+  ```
+
+- **`curl`** on your machine, optionally, so the script finds a mistyped
+  address in seconds instead of after the build.
+
+Nothing is sent anywhere but the server you name.
+
+### A quick run, then the full run
+
+From the root of the checkout, with your server's address:
+
+```sh
+OLLAMA_URL=http://192.168.1.20:11434 bash experiments/llm-resolution/run.sh -quick
+```
+
+That is a quick run: twelve tests, eight with a key and four without, through
+every step, and the incident once. It shows the chain works. Then the full
+run:
+
+```sh
+OLLAMA_URL=http://192.168.1.20:11434 bash experiments/llm-resolution/run.sh
+```
+
+It browses each of the 146 tests, the incident five ways, the four probes on
+the sample and the repeats. On a 12 GB graphics card generating about 22
+tokens a second it should take about two hours, which is an estimate until the
+first run measures it. Progress is printed as it goes. If the server can't be
+reached, doesn't hold the language model, or the incident's key names
+something the checkout lacks, it stops with status 2 before asking anything.
+
+### What you get back
+
+Each run writes two files under `experiments/llm-resolution/results/`, which
+git ignores:
+
+- `llm-resolution-<time>.jsonl` holds the whole run. It records the commit,
+  the settings, the server's version, the language model's digest, the
+  instructions, the key and hashes of the tests and the systems model. Then
+  come the baseline's answers and every question and reply as it arrived, with
+  the tool's answer. A final line for each browse holds its view and its
+  checks, and the summary comes last. **This is the file to hand back.**
+- `llm-resolution-<time>.md` is the report, for reading.
+
+### Stopping, resuming and other flags
+
+If a run stops, every reply so far is in the file. `run.sh -resume <that
+file>` asks only what's missing, and refuses a file made from a different
+checkout, systems model or settings. From `experiments/llm-resolution/`,
+`go run . -report <file>` rebuilds the report from a file alone, without a
+server.
+
+`run.sh` passes any other flag on to the program. `-model NAME` asks another
+language model the server holds, `-out DIR` writes the results elsewhere, and
+`-seed N` changes the seed for the language model and for the probes' random
+choices. A run with another language model or seed is a different experiment,
+and resuming refuses to mix the two.
+
 ## The systems model as a wiki
 
 The experiment reads the SysML v2 text under `model/` into pages and links. Every element is a page. Every relationship the systems engineer wrote is a link that shows on both of its ends, from satisfy and verify to allocations, bindings, derivations and a state machine's transitions. A unit test holds the reader to the systems model: every reference resolves, and the satisfy, allocate and bind statements each give one link.
@@ -28,7 +109,7 @@ A browse is one question per tool call. Each question carries the task, the view
 
 | Resolver | What it does |
 |---|---|
-| Key rule | Reads the key in the name as written. It is right by construction, and it's there to show what hiding the keys takes away. |
+| Key rule | Reads the key in the name as written. Its links are correct by construction, and it's there to show what hiding the keys takes away. |
 | Word overlap | Ranks the 55 system stories and design constraints by the words they share with the test, each word weighted by how few requirements use it (TF-IDF with cosine similarity), and proposes the best above a fixed threshold. Its best-ranked answer is also what `find` gives for the test's text, so it is the first step any browse can take. |
 | Language model | `qwen2.5-coder:14b` by default, at temperature 0 with a fixed seed, answering under a JSON schema. Its answer is the first link to a system requirement, or none. |
 
@@ -54,32 +135,9 @@ Every final question also asks where the language model suspects the system wasn
 
 The report gives precision and recall for each resolver on the tests that carry a key. For each probe it gives the share of changed answers, on all links and on the correct ones alone, split into changes to none and to another requirement. Each rate has its 95% Wilson interval. The language model and the word overlap's best-ranked answer are compared test by test, with McNemar's exact test. The other 77 tests have no recorded link, so a link proposed for one of them counts in no score. It is listed for a person to judge, once with its reasons and once without them.
 
-## Running it
-
-You need a checkout of this repository, Go at the version `go.mod` names, and an Ollama server your machine can reach with `qwen2.5-coder:14b` pulled. `curl` lets the script find a wrong address in seconds instead of after the build. From the root of the checkout:
-
-```
-OLLAMA_URL=http://192.168.1.20:11434 bash experiments/llm-resolution/run.sh -quick
-```
-
-That is a quick run: twelve tests, eight with a key and four without, through every step, and the incident once. It shows the chain works. Then the full run:
-
-```
-OLLAMA_URL=http://192.168.1.20:11434 bash experiments/llm-resolution/run.sh
-```
-
-It browses each of the 146 tests, the incident five ways, the four probes on the sample and the repeats. On a 12 GB graphics card generating about 22 tokens a second it should take about two hours, which is an estimate until the first run measures it. Progress is printed as it goes. If the server can't be reached, doesn't hold the language model, or the incident's key names something the checkout lacks, it stops with status 2 before asking anything.
-
-Each run writes two files under `experiments/llm-resolution/results/`, which git ignores:
-
-- `llm-resolution-<time>.jsonl` holds the whole run. It records the commit, the settings, the server's version, the language model's digest, the instructions, the key and hashes of the tests and the systems model. Then come the baseline's answers and every question and reply as it arrived, with the tool's answer. A final line for each browse holds its view and its checks, and the summary comes last. **This is the file to hand back.**
-- `llm-resolution-<time>.md` is the report, for reading.
-
-If a run stops, every reply so far is in the file. `run.sh -resume <that file>` asks only what's missing, and refuses a file made from a different checkout, systems model or settings. `go run . -report <file>` rebuilds the report from a file alone, without a server.
-
 ## What the results can and can't show
 
-One repository, one language model at one quantisation, one set of instructions, and no tuning. There is one incident. Whoever chose it also wrote the systems model, the key and the tools, so the page format and the tool list are one person's design and no standard. While this experiment was being built, the supervisor's state machine, which carries the incident's mechanism, was added to the systems model from the code. The links the tests are scored against were written by the same person, one requirement per test, and they are the links that were easy to write down, since every one sat in a name. Several of the 69 tests share a requirement, so they aren't independent, and the intervals are narrower than they should be. Since the repository was started in August 2026, long after the language model was trained, it can't have seen these links. Of the tests without a key, all 77 are unjudged, and some of them surely verify something. As for the citation check, it proves that what an answer cites exists, and nothing about whether it supports the answer.
+One repository, one language model at one quantisation, one set of instructions, and no tuning. There is one incident. Whoever chose it also built the systems model and wrote the key and the tools, so the page format and the tool list are one person's design and no standard. While this experiment was being built, the supervisor's state machine, which carries the incident's mechanism, was added to the systems model from the code. The links the tests are scored against were written by the same person, one requirement per test, and they are the links that were easy to write down, since every one sat in a name. Several of the 69 tests share a requirement, so they aren't independent, and the intervals are narrower than they should be. Since the repository was started in August 2026, long after the language model was trained, it can't have seen these links. Of the tests without a key, all 77 are unjudged, and some of them surely verify something. As for the citation check, it proves that what an answer cites exists, and nothing about whether it supports the answer.
 
 ## Where it's specified
 

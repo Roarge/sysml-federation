@@ -51,7 +51,7 @@ NOINTERFACE := $(BIN)/nointerface
 # Only the directories .gitignore actually allowlists. Support trees are
 # deliberately untracked, so finding source in them is the intended state, not a
 # forgotten allowlist entry.
-override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly illustrations experiments
+override ALLOWLIST_ROOTS := adapter cmd examples docs internal model checkly illustrations experiments opentofu
 override TEST_FLAGS := -race -shuffle=on -count=1 -timeout=120s
 
 # A floor, not a decoration. 'override' for the same reason as the rest: an
@@ -157,6 +157,17 @@ test-watch: $(GOTESTSUM) ## Red-green-refactor loop
 experiment-test: ## Run the language model experiment's own tests (AD-0032)
 	cd experiments/llm-resolution && $(GO) test $(TEST_FLAGS) ./...
 
+# The host configuration (AD-0033), planned against stand-ins for its two
+# providers, so it needs no credentials. init downloads the providers the lock
+# file names, which is the one step that needs the network.
+TOFU ?= tofu
+.PHONY: opentofu-check
+opentofu-check: ## Format, validate and test the host configuration against mocked providers (SR-49)
+	$(TOFU) -chdir=opentofu fmt -check -recursive
+	$(TOFU) -chdir=opentofu init -backend=false -input=false -lockfile=readonly
+	$(TOFU) -chdir=opentofu validate
+	$(TOFU) -chdir=opentofu test
+
 .PHONY: cover
 cover: ## Run the suite with coverage and enforce the floor
 	$(GO) test $(TEST_FLAGS) -covermode=atomic -coverprofile=$(COVER) -coverpkg=./... ./...
@@ -223,7 +234,7 @@ check-allowlist: ## Warn about source files on disk that .gitignore would not tr
 	   $(addsuffix /,$(ALLOWLIST_ROOTS)) 2>/dev/null \
 	   | tr '\0' '\n' \
 	   | grep -vE '/(node_modules|test-results|playwright-report|\.checkly)/' \
-	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json|py)$$' || true)"; \
+	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json|py|tf|hcl)$$' || true)"; \
 	 if [ -n "$$missing" ]; then \
 	   printf 'source files on disk that .gitignore does not track:\n'; \
 	   printf '%s\n' "$$missing" | sed 's/^/    /'; \
