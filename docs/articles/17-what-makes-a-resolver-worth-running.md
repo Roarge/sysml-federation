@@ -144,8 +144,8 @@ A systems model adds a third. Retrieval finds text that looks like the question,
 
 This is where the hypothetical pipeline leaves the series. It has carried five parts, and part 1 pictured one of its checks failing at two in the morning. It only ever existed in a systems model and in my examples, though, so nothing about it can fail, and no resolver can be tested against it. My demo can. It has a systems model built beside its code, a service that runs, and monitors that report when the service stops answering.
 
-Part 6, coming up next, puts a language model to work on the demo's own systems model, on my own hardware. It describes how every link the language model proposes, and every reason it gives, will be checked.
+[Part 6](18-a-resolver-that-reads-the-systems-model.md) puts a language model to work on the demo's own systems model, on my own hardware. It describes how every link the language model proposes, and every reason it gives, will be checked.
 
 ---
 
-Previous: [Measuring a resolver](16-measuring-a-resolver.md) · Index: [Automating traceability](../README.md)
+Previous: [Measuring a resolver](16-measuring-a-resolver.md) · Index: [Automating traceability](../README.md) · Next: [A resolver that reads the systems model](18-a-resolver-that-reads-the-systems-model.md)
