@@ -282,6 +282,27 @@ func TestEXPSR17_CodeGivesTheSystemsModelsOwnLocations(t *testing.T) {
 	}
 }
 
+func TestEXPSR17_OnlyAnAbsentFileIsMarkedMissing(t *testing.T) {
+	kit, _, _ := fixtureKit(t, TaskIncident, Scope{})
+	cases := kit.Call("code", "VC_SR_02", "")
+	for _, want := range []string{"docs/notes.md#a-record", "docs/gone.md#a-record", "review checklist"} {
+		if !strings.Contains(cases, want) {
+			t.Fatalf("code for VC_SR_02 lacks the evidence location %q:\n%s", want, cases)
+		}
+	}
+	for _, line := range strings.Split(cases, "\n") {
+		marked := strings.Contains(line, "not in the checkout")
+		switch {
+		case strings.Contains(line, "docs/notes.md#a-record") && marked:
+			t.Errorf("a location into a file in the checkout is marked missing: %s", line)
+		case strings.Contains(line, "docs/gone.md#a-record") && !marked:
+			t.Errorf("a location into an absent file is not marked missing: %s", line)
+		case strings.Contains(line, "review checklist") && marked:
+			t.Errorf("a location that names no file is marked missing: %s", line)
+		}
+	}
+}
+
 func TestEXPSR18_GrepSearchesTheBuiltSystemOnly(t *testing.T) {
 	kit, _, _ := fixtureKit(t, TaskIncident, Scope{})
 	answer := kit.Call("grep", "quokka", "")

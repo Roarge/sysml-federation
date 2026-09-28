@@ -293,6 +293,7 @@ package Experiment_SystemStories {
             requirement capsHeld { doc /* No answer is longer than its limit, and a cut list says how many more there were. */ }
             requirement unknownAnswered { doc /* An identifier the systems model lacks is answered as unknown, and the browse goes on. */ }
             requirement codeFromTheModel { doc /* The code an element names is its evidence locations, the paths its description names and where its distinctive values occur in the code. */ }
+            requirement missingOnlyWhenAbsent { doc /* A location is marked as not in the checkout only when it names a file the checkout lacks. A location that points into a file, such as README.md#verification-record, names that file, and one that gives a command or a review, such as make model-check, names none. */ }
         }
     }
 

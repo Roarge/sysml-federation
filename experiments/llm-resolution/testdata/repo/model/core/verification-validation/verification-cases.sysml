@@ -11,8 +11,16 @@ package Fixture_VerificationCases {
             doc /* TestSR02_ReturnsARankedPage checks the page is ranked. */
         }
         action <'record: 2026-09-01 SR-02'> servedByHand {
-            @Evidence { kind = "record"; location = "docs/notes.md"; }
+            @Evidence { kind = "record"; location = "docs/notes.md#a-record"; }
             doc /* A query served by hand, the page ranked. */
+        }
+        action <'record: 2026-09-02 SR-02'> servedAgain {
+            @Evidence { kind = "record"; location = "docs/gone.md#a-record"; }
+            doc /* The same query, recorded in a file the checkout no longer has. */
+        }
+        action <'inspection: SR-02'> reviewed {
+            @Evidence { kind = "inspection"; location = "review checklist"; }
+            doc /* The page read against the story in a review. */
         }
     }
 }

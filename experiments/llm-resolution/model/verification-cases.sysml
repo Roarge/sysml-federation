@@ -336,6 +336,10 @@ package Experiment_VerificationCases {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
             doc /* Evidence locations, paths in the description and where distinctive values occur. */
         }
+        action <'TestEXPSR17_OnlyAnAbsentFileIsMarkedMissing'> missingOnlyWhenAbsent {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* A location into a file in the checkout is not marked, one into an absent file is, and a review is not. */
+        }
     }
 
     verification def VC_EXP_SR_18 {

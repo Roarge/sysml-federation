@@ -774,8 +774,15 @@ type codeRef struct {
 	text string
 }
 
-func (k *ToolKit) missing(path string) string {
-	if ok, _ := k.code.exists(path); ok {
+// missing marks a location that names a file the checkout lacks. A location
+// that points into a file, README.md#verification-record, names that file,
+// and one that gives a command or a review, make model-check, names none.
+func (k *ToolKit) missing(location string) string {
+	file, _, _ := strings.Cut(location, "#")
+	if strings.ContainsAny(file, " \t") {
+		return ""
+	}
+	if ok, _ := k.code.exists(file); ok {
 		return ""
 	}
 	return " (not in the checkout)"
