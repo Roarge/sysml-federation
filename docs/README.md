@@ -98,6 +98,13 @@ What decides whether a resolver is worth running, once its links are good enough
 5. [What makes a resolver worth running?](articles/17-what-makes-a-resolver-worth-running.md)  
    A resolver that measures well can still be a poor choice to run. What else decides it, from where a link came from to who may read the systems model?
 
+### Testing a language model
+
+Can a language model on your own hardware follow the links in a systems model, and are the reasons it gives the ones it had?
+
+6. [A resolver that reads the systems model](articles/18-a-resolver-that-reads-the-systems-model.md)  
+   What does it take to put a language model on a real traceability job, on your own hardware, so that a success is one a sceptic would believe?
+
 ## The repository
 
 The code is at https://github.com/Roarge/sysml-federation, under the Apache 2.0 licence.
