@@ -38,6 +38,11 @@ You'll find the text of each view, with the field ownership table and the proces
 
 Everything the demo needs runs inside one container. Outside it are a browser, the Docker host, and the registry the image is pulled from once, and nothing else. I built the demo to make no connection beyond that boundary while it runs.
 
+> [!CAUTION]
+> **Changed in v0.4.0**
+>
+> The demo's own systems model, which part 13 introduces, now puts a second host in the context. A Proxmox VE host can pull the same image from the registry and run the demo on demand ([the demo on my own Proxmox host](../decisions/AD-0033-the-demo-on-the-owners-proxmox-host.md)). The board above and [the architecture page](../architecture/README.md) still show the Docker host alone.
+
 ### Composition: who answers for which field
 
 ![The composition view: three subgraph schemas, their entity keys and the merged Requirement](../img/v2-composition.png)
@@ -69,6 +74,11 @@ The adapter parses the model text into a tree in which every node remembers wher
 ## Twenty-six decisions
 
 The main choices behind those views each have a <span class="term" data-term="decision-record">decision record</span>, with its context, the alternatives that lost, and the consequences. Twenty-four of the records came from decisions already taken in the brief, the plan and the engineering log. Two more turned up when the traceability showed requirements with no decision behind them. The [decision index](../decisions/README.md) lists thirty-one by release v0.3.0, because five more came during the build and after it.
+
+> [!CAUTION]
+> **Changed in v0.4.0**
+>
+> The index lists thirty-four records now. Since v0.3.0 it has gained three, [a language model experiment kept outside the product](../decisions/AD-0032-a-language-model-experiment-outside-the-product.md), [the demo on my own Proxmox host, declared in OpenTofu](../decisions/AD-0033-the-demo-on-the-owners-proxmox-host.md) and [acceptance criteria as Gherkin scenarios](../decisions/AD-0034-acceptance-criteria-as-gherkin-scenarios.md).
 
 The twenty-six fall into five groups:
 

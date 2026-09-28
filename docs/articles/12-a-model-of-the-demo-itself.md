@@ -31,6 +31,11 @@ The **demo model** describes the thing doing the serving. It covers the adapter,
 
 *The pipeline model is content the demo serves. The demo model describes the demo, and only tests and validators read it.*
 
+> [!CAUTION]
+> **Changed in v0.4.0**
+>
+> Another SysML v2 model has joined these two, the systems model of a language model experiment in `experiments/llm-resolution/model/`. The experiment is a program of its own, kept outside the product, and it reads the demo model's files as well. So tests and validators are no longer the only readers of the demo model ([a language model experiment kept outside the product](../decisions/AD-0032-a-language-model-experiment-outside-the-product.md)).
+
 You can tell the two apart by the shape of a name. Anything from the example starts with `PIPE-`, is set in code font, and is always called a model requirement or a model element. The demo's own identifiers come from the light scheme, where each has a short prefix and a number.
 
 | Identifier | What it names | Example |
@@ -58,6 +63,11 @@ The demo model is built around chains of such links, and one real chain shows th
 [![A chain from left to right. Story US-03 derives system requirement SR-22. SR-22 is satisfied by the adapter and verified by case VC_SR_22. The case lists its evidence as actions: six Go tests and one recorded run.](../figures/story-to-evidence.svg)](../figures/story-to-evidence.svg)
 
 *One chain through the model. A system requirement marked done must be derived, satisfied and verified.*
+
+> [!CAUTION]
+> **Changed in v0.4.0**
+>
+> Evidence has a new kind, `scenario`, for a Gherkin scenario that `go test` runs. It's named by the tag of the criterion it checks, such as `<'@fourPathsAnswer'>`, and points to its feature file. Thirty-three verification cases now list fifty-nine scenarios between them ([acceptance criteria as Gherkin scenarios](../decisions/AD-0034-acceptance-criteria-as-gherkin-scenarios.md)). `VC_SR_22` is one of those cases, and lists two scenarios beside the six Go tests and the recorded run. The figure above shows its evidence as of v0.3.0.
 
 The twelve stories of the storyboard became the demo model's stakeholder stories, each a SysML requirement with a role, a capability, a benefit and its acceptance criteria. Seven more joined them. Each covers a system requirement that had traced to an obligation I'd set the project, and never to a person who wanted it. One such obligation is keeping every name of the example out of the adapter. A story has a role and a benefit, so now each of those requirements has someone who wants it.
 
@@ -97,6 +107,11 @@ The test runs under `make check` and takes a fraction of a second. From the day 
 >
 > Then rename any image under `docs/img` and run it again to watch the `images` agreement fail.
 
+> [!CAUTION]
+> **Changed in v0.4.0**
+>
+> The test now runs nine agreements. Its ninth, `scenarios`, holds the feature files to the stories and to the evidence the model lists. Each feature file names one declared system requirement, and each scenario one of its acceptance criteria. Every criterion of a requirement that is done has exactly one scenario, and the scenarios that run are exactly the `scenario` evidence in the verification cases. So an edit to a feature file is now an edit to the demo model too. The command's output also has a line for `SR-49`, the forty-ninth system requirement, which came with the Proxmox configuration. It's in progress, so the test doesn't ask for its verification case or its allocation yet.
+
 ## The boards and their views
 
 A SysML <span class="term" data-term="view">view</span> picks out the part of a model that one audience cares about. Every board published in this series now has one, ten in all: the five architecture views, the two A3 sheets, the storyboard, the five-views overview and the app screenshots. A view says what it covers with `expose`, and nothing is redrawn. The boards stay the hand-drawn PDFs from the design phase.
@@ -116,6 +131,11 @@ Checking the demo model against the repository only helps if the model is valid 
 Before I built the model, I tried nineteen of the forms it would use on both tools, and both refused one of them. Five more were refused while I built the model itself, among them a pair of reserved words, `public` and `connector`, that I really should have spotted. The model's README records each refusal with the form used instead.
 
 Acceptance has limits of its own. A tool that accepts a form hasn't checked what I meant by it. Both tools accept a `require constraint` that holds a documentation comment where an expression belongs, and such a constraint asserts nothing beyond its comment. The model's README says which acceptances carry that caveat.
+
+> [!CAUTION]
+> **Changed in v0.4.0**
+>
+> The demo model now describes some behaviour as well as structure. For the supervisor there's a state machine taken from its code, and `make model-state-check` has OpenSysML run it through a router exit to check that it ends in its stopped state, as the code does. The capacity service's two calculations, the maximum flow and the cut, are declared by their inputs and results only. The two tunnels of the check session are a variation, and a session runs exactly one of them. Continuous integration now also runs `make model-state-check`, and `make experiment-model-check` for the experiment's model, whenever a file of either model changes.
 
 ## Every story against the live demo
 

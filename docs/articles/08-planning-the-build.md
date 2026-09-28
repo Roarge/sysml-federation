@@ -49,6 +49,11 @@ Phase 0 runs the spikes. Each is a small experiment that answers a question the 
 
 Every phase is one pull request. Tests come first, with the test as the specification, and a test that verifies a numbered requirement is named for that requirement. `make check` runs after every task, and a coverage floor of 70 per cent is checked before every push. Requirements about browser behaviour get checklists, run by hand and recorded with the date and host.
 
+> [!CAUTION]
+> **Changed in v0.4.0**
+>
+> Each acceptance criterion now also has a Gherkin scenario, a plain-text specification in given, when and then that a reader can follow without reading Go. `go test` runs every scenario that can run there. The tests named after requirements stay, and none was renamed ([acceptance criteria as Gherkin scenarios](../decisions/AD-0034-acceptance-criteria-as-gherkin-scenarios.md)).
+
 The end-to-end proof is the worked example from [From use cases to requirements](05-from-use-cases-to-requirements.md), observed through the router and both web apps. It runs from the shipped state failing at parse, through the bottleneck moving and the pipeline passing while one server fails its share, to reset putting everything back.
 
 ## Why the line figures are estimates

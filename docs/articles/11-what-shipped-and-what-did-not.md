@@ -47,6 +47,11 @@ The second is the same-origin check on the services' subscription socket. The ea
 
 I build and test the demo on Ubuntu under WSL, and nowhere else by hand. The image is built for amd64 and for arm64, and arm64 is the one Macs with Apple silicon need. From release v0.3.0, continuous integration also pulls the published image and starts it on GitHub's Linux runners, one amd64 and one arm64, before `latest` moves. I haven't tried it on a real Mac of my own, and I make no promises beyond what those runs show.
 
+> [!CAUTION]
+> **Changed in v0.4.0**
+>
+> The repository now holds an OpenTofu configuration that runs the published image on a Proxmox VE host on demand, public through a Cloudflare tunnel ([the demo on my own Proxmox host](../decisions/AD-0033-the-demo-on-the-owners-proxmox-host.md)). Proxmox VE calls the application containers it uses for this a technology preview. So far the configuration has been checked only against mocked providers, by `make opentofu-check`, which continuous integration doesn't run, and no run on a real host is recorded. It adds nothing yet to where the image is known to run.
+
 ## What the demo is
 
 What's here is one command. It puts a SysML model file, an analysis that has never read a model file and a document that has never computed anything behind a single endpoint. Two pages sit in front, and they work nothing out for themselves.

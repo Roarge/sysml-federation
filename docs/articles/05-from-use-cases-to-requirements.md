@@ -22,6 +22,11 @@ There are forty-five requirements, each with one statement, a rationale, the use
 
 Most requirements are verified by a Go test named after them. Behaviour that lives in the browser is **demonstrated** instead, because nothing in the repository drove a browser at the time. A demonstration is a scripted checklist, run by hand and recorded in the example's verification record. That's a smaller promise than a test, and the requirements say so.
 
+> [!CAUTION]
+> **Changed in v0.4.0**
+>
+> Every acceptance criterion of every system requirement now also has a scenario in Gherkin, the plain-text format that writes a criterion as given, when and then. There are forty-nine system requirements by now, with ninety-eight criteria between them. `go test` runs the fifty-nine scenarios it can through godog, the Go implementation of Cucumber. The other thirty-nine, such as what a browser draws, carry the kind of evidence that verifies them today, and are reported as skipped for that reason. The Go tests named after requirements stay as they were. [Acceptance criteria as Gherkin scenarios](../decisions/AD-0034-acceptance-criteria-as-gherkin-scenarios.md) records the decision.
+
 Model requirements, the ones inside the example model such as `PIPE-R1`, are demo content. They place no obligation on this code, and they keep their SysML short names.
 
 ## Three holes in the design
