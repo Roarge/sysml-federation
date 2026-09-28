@@ -7,13 +7,11 @@ Part 8 of 13 in [Federating a systems model](../README.md), written for release 
 > [!IMPORTANT]
 > **The story so far**
 >
-> The demo publishes a SysML v2 model, a capacity analysis and a requirements document as three GraphQL services, served as one graph through a router, with two web apps in front, all in one container. Part 7 introduced the architecture, drawn as five views with twenty-six decisions behind it. This part is about the opposite problem: getting the important part onto a single sheet of paper.
-
-## Who the sheet is for
+> The demo publishes a SysML v2 model, a capacity analysis and a requirements document as three GraphQL services. A router serves them as one graph, with two web apps in front, all in one container. Part 7 introduced the architecture, drawn as five views with twenty-six decisions behind it. This part is about the opposite problem, getting the essentials onto a single sheet of paper.
 
 The reader I have in mind is an engineering manager, or a systems engineer new to federation, deciding in a quarter of an hour whether the approach deserves a closer look. That reader isn't going to open an [architecture description](../architecture/README.md) with five views and twenty-six decision records. What they need fits on one sheet of paper.
 
-So the design phase made the Markdown description and the records the record, and the sheets the overview ([the architecture record decision](../decisions/AD-0021-architecture-record.md)). When the design changes, the record changes first and a sheet follows at its next re-issue, so a sheet can lag behind, and its status says so.
+So the design phase made the Markdown description and the decision records the record of the architecture, and the sheets its overview ([the architecture record decision](../decisions/AD-0021-architecture-record.md)). When the design changes, the record changes first and a sheet follows at its next re-issue. So a sheet can lag behind, and its status says so.
 
 ## Why A3
 
@@ -22,17 +20,17 @@ So the design phase made the Markdown description and the records the record, an
 >
 > A way of summarising one aspect of a system's architecture on a single sheet of A3 paper, from Borches and Bonnema, developed at Philips Healthcare. The sheet carries simple models of the system, such as what it does, the numbers that matter and how it's built, with a short text summary.
 
-I adopted A3 for what it forces, not for its rituals. Four things make it worth the effort.
+I adopted A3 for what it forces more than for its rituals. Four things make it worth the effort.
 
-**It gets read.** Borches found that people came to meetings having read the A3, when they hadn't read the equivalent document ([the 2010 paper](https://web.mst.edu/~lib-circ/files/Special%20Collections/INCOSE2010/A3%20Architecture%20Overviews.pdf)). A 2025 study at a Norwegian company, by Bergtun and Engen, found readers spending ten to fifteen minutes on a sheet, and over 90 per cent said they understood the system better for it.
+**It gets read.** Borches found that people came to meetings having read the A3, when they hadn't read the equivalent document ([the 2010 paper](https://web.mst.edu/~lib-circ/files/Special%20Collections/INCOSE2010/A3%20Architecture%20Overviews.pdf)). A 2025 study at a Norwegian company, by Bergtun and Engen, found readers spending ten to fifteen minutes on a sheet. Over 90 per cent of them said they understood the system better for it.
 
-**It forces a choice.** One aspect per sheet, and nothing that doesn't fit. Borches' [cookbook for the method](https://www.gaudisite.nl/BorchesCookbookA3architectureOverview.pdf) puts it bluntly: "you can't put everything you know about this topic in this A3! So do not try to do it." Anything else goes on another sheet, or stays in the record.
+**It forces a choice.** Each sheet takes one aspect, and nothing that doesn't fit. Borches' [cookbook for the method](https://www.gaudisite.nl/BorchesCookbookA3architectureOverview.pdf) puts it bluntly: "you can't put everything you know about this topic in this A3! So do not try to do it." Anything else goes on another sheet, or stays in the record.
 
-**It keeps notation out.** No formal modelling notation on the sheet, because in Borches' own experiments with SysML "most of the meetings with experts was spent discussing the notation itself rather than the content". That's a dry thing to find in the literature behind a project about SysML, and a fair warning to me.
+**It keeps notation out.** The sheet carries no formal modelling notation, because in Borches' own experiments with SysML "most of the meetings with experts was spent discussing the notation itself rather than the content". That's a dry thing to find in the literature behind a project about SysML, and a fair warning to me.
 
 **It layers.** Practice settled on a small hierarchy: an L0 sheet for context, an L1 for the technical overview, and L2 sheets for topics. A reader starts at the top and goes only as deep as they need.
 
-The rest of what the method offers, I took as guidance, and used where it helped.
+I took the rest of what the method offers as guidance, and used it where it helped.
 
 ## Four sheets, two drawn
 
@@ -64,9 +62,9 @@ The reading path is [the argument for federating a systems model](00-why-federat
 7. Change a number in either app.
 8. Watch the verdict and the document follow.
 
-Beside it sit the numbers a manager asks about: one image, one command, one port, and how little the services have to agree on. The container view marks what an adopter would keep (the adapter, the compose step, the supervisor) and what they'd replace (the model, the example services, the apps and the document tree).
+Beside the reading path sit the numbers a manager asks about: one image, one command, one port, and how little the services have to agree on. The container view marks what an adopter would keep (the adapter, the compose step, the supervisor) and what they'd replace (the model, the example services, the apps and the document tree).
 
-I first drew L0 with the numbers the design could only estimate, and re-issued it on 29 August once the build had measured them. It now shows the image at 45 MB for amd64 and 41 MB for arm64 against an 80 MB ceiling, and the two-second bound on an edit as met.
+I first drew L0 with the numbers the design could only estimate, and re-issued it on 29 August once the build had measured them. It now shows the image at 45 MB for amd64 and 41 MB for arm64, against an 80 MB ceiling. It also shows the two-second bound on an edit as met.
 
 ## L2b, how the number is made
 
@@ -74,7 +72,7 @@ I first drew L0 with the numbers the design could only estimate, and re-issued i
 
 *The L2b sheet: seven numbered boxes, the wiring in three states beside them, the arithmetic and its table top right. The whole sheet is [L2b, Pipeline example: capacity and verdicts](../a3/L2b-pipeline-example-capacity-and-verdicts.pdf).*
 
-L2b is for anyone who has run the demo and wants to know why the bottleneck moved. Its seven boxes go from reading the five servers and their wiring, through the flow and the cut, to the verdicts. They end on the two lessons: raise a server outside the cut and nothing moves, raise one inside it and the cut migrates. Its table is the worked example from [From use cases to requirements](05-from-use-cases-to-requirements.md), row for row, and a note under the boxes spells out the limits of the idealised model it rests on.
+L2b is for anyone who has run the demo and wants to know why the bottleneck moved. Its seven boxes go from reading the five servers and their wiring, through the flow and the cut, to the verdicts. They end on the two lessons. Raise a server outside the cut and nothing moves. Raise one inside it and the cut migrates. Its table is the worked example from [From use cases to requirements](05-from-use-cases-to-requirements.md), row for row. A note under the boxes spells out the limits of the idealised capacity model the sheet rests on.
 
 The next part leaves the design behind, and plans the build.
 
