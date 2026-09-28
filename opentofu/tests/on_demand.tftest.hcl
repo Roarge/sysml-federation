@@ -78,7 +78,7 @@ run "switched_on_runs_both_on_the_host" {
   }
 
   assert {
-    condition     = proxmox_oci_image.demo[0].reference == "ghcr.io/roarge/sysml-federation:0.3.0"
+    condition     = proxmox_oci_image.demo[0].reference == "ghcr.io/roarge/sysml-federation:0.4.0"
     error_message = "The demo must run from the published image at the pinned release."
   }
 
