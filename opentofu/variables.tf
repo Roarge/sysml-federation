@@ -65,11 +65,11 @@ variable "gateway" {
 variable "demo_version" {
   description = "The release of the published image to run, a tag of ghcr.io/roarge/sysml-federation without its v."
   type        = string
-  default     = "0.3.0"
+  default     = "0.4.0"
 
   validation {
     condition     = can(regex("^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.]+)?$", var.demo_version))
-    error_message = "demo_version must be a release version such as 0.3.0."
+    error_message = "demo_version must be a release version such as 0.4.0."
   }
 }
 

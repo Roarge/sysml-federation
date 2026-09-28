@@ -384,7 +384,7 @@ compose file.
 
 ## Tailoring
 
-Profile: light. Status only on stories, no priorities, no risk register, no allocation keyword, no process documents, no copy of the practice's own specification.
+Profile: light. Status only on stories, no priorities, no risk register, no process documents, no copy of the practice's own specification.
 
 The layout follows a story-driven practice of agile model-based systems
 engineering, trimmed to what a demo of this size can carry. Seven directories

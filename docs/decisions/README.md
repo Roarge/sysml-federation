@@ -6,7 +6,7 @@ There are thirty-four, all accepted. Twenty-six were written in the design phase
 
 When building the system changed what a record decides, the record kept its number and its first date and gained a dated amendment line at its head. The list below marks those records as amended. A decision that replaces another gets a number of its own, and no number is ever reused.
 
-Inside the records, `SR-nn` is a system requirement and `SC-nn` a design constraint. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) describes the first forty-five requirements and the seven constraints, and SR-46 to SR-48 came with the demo's own model. A name beginning `PIPE-` is a short name in the example model. `C-nn` is an entry on the design phase's technical constraints card, which isn't published, so those references show what a decision rested on and aren't there to be looked up. The four gates are the design phase's own, and [How the design was run](../articles/02-how-the-design-was-run.md) says what each produced.
+Inside the records, `SR-nn` is a system requirement and `SC-nn` a design constraint. [From use cases to requirements](../articles/05-from-use-cases-to-requirements.md) describes the first forty-five requirements and the seven constraints. SR-46 to SR-48 came with the demo's own model, and SR-49 with the host configuration. A name beginning `PIPE-` is a short name in the example model. `C-nn` is an entry on the design phase's technical constraints card, which isn't published, so those references show what a decision rested on and aren't there to be looked up. The four gates are the design phase's own, and [How the design was run](../articles/02-how-the-design-was-run.md) says what each produced.
 
 ## The shape of the system
 

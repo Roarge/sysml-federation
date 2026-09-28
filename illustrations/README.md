@@ -143,10 +143,7 @@ a legend of their own, and an edit keeps to the legend of its board. The marks
 differ from board to board. A dashed outline, for instance, stands for something
 outside the demo on the architecture overview and for a document owner story on
 the use-case overview. The twelve use cases have no legend, and the role tag at
-the top of each is drawn with the marks of the overview's. The legend of the
-architecture views is set out in [Five views and twenty-six decisions](../docs/articles/06-five-views-and-twenty-six-decisions.md),
-and the layout, type and colour code of the A3 sheets in
-[An A3 sheet for a fifteen-minute reader](../docs/articles/07-an-a3-sheet-for-a-fifteen-minute-reader.md).
+the top of each is drawn with the marks of the overview's.
 
 Three faces are loaded from Google Fonts. Source Sans 3, at weights 400 and
 600, carries the running text, the legends, most labels in the architecture
