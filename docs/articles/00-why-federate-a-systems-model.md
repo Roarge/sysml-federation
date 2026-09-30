@@ -4,7 +4,7 @@
 
 Part 1 of 13 in [Federating a systems model](../README.md), written for release v0.3.0.
 
-Every engineering organisation I've worked with keeps its system in several places at once. The requirements live in one file and the interface definitions in another. The power budget sits in a spreadsheet, and the hazard analysis is somewhere a third team controls. All of them describe the same machine. Keeping them in agreement is manual work that nobody enjoys and everybody puts off until a review forces the issue.
+Every engineering organisation I've worked with keeps its system in several places at once. The requirements live in one file and the interface definitions in another. The power budget sits in a spreadsheet, and the hazard analysis is somewhere a third team controls. All of them describe the same engineered system. Keeping them in agreement is manual work that nobody enjoys and everybody puts off until a review forces the issue.
 
 [Model-based systems engineering](https://www.sebokwiki.org/wiki/Model-Based_Systems_Engineering_(MBSE)) (MBSE) was supposed to end that. The documents give way to a systems model, one structured description holding the system's parts, the properties they carry, the requirements they must meet and the relationships between all of it. Documents become views of the model. Change a component's power draw and everything downstream can be recomputed, including which requirements now fail.
 
