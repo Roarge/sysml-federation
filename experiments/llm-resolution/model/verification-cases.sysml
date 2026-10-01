@@ -356,7 +356,7 @@ package Experiment_VerificationCases {
         }
         action <'TestEXPSR18_ANestedModelPackageIsCode'> nestedModelIsCode {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
-            doc /* A word in the fixture's adapter/model file is found by grep and its lines are shown by read, while the top-level model folder stays out. */
+            doc /* A word in the fixture's adapter/model file is found by grep and its lines are shown by read, while the top-level model, docs and experiments folders, which hold the same word, stay out. */
         }
     }
 
