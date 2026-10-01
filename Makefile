@@ -233,12 +233,14 @@ check-tracked: ## No tracked path may be excluded by .gitignore (catches git add
 check-allowlist: ## Warn about source files on disk that .gitignore would not track
 	@# Ignored files are listed one by one, and a dependency or run-output tree
 	@# holds thousands of them, so those are dropped before the extension filter
-	@# rather than reported as allowlist gaps.
+	@# rather than reported as allowlist gaps. An experiment's working results
+	@# are dropped the same way, since only a published copy of a run is tracked.
 	@missing="$$(git ls-files --others --ignored --exclude-standard -z -- \
 	   $(addsuffix /,$(ALLOWLIST_ROOTS)) 2>/dev/null \
 	   | tr '\0' '\n' \
 	   | grep -vE '/(node_modules|test-results|playwright-report|\.checkly)/' \
-	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json|py|tf|hcl|feature)$$' || true)"; \
+	   | grep -vE '^experiments/[^/]+/results/' \
+	   | grep -E '\.(go|sysml|kerml|graphql|graphqls|proto|html|css|js|ts|yml|yaml|sh|json|md|jsonl|csv|py|tf|hcl|feature)$$|/SHA256SUMS$$' || true)"; \
 	 if [ -n "$$missing" ]; then \
 	   printf 'source files on disk that .gitignore does not track:\n'; \
 	   printf '%s\n' "$$missing" | sed 's/^/    /'; \

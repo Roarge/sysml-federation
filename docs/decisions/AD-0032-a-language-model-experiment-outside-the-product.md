@@ -1,6 +1,15 @@
 # AD-0032 A language model experiment kept outside the product
 
-Status: accepted. Date: 2026-09-25.
+Status: accepted, amended once runs were published. Date: 2026-09-25.
+
+Amendment, 2026-10-01: a run's results are published in the repository. The
+files a run writes stay under `results/`, which git ignores, and a run is
+published by copying them, once they have been checked for private data, into
+`published/<run-id>/`, which git tracks file by file. The sentence below saying
+results are never committed now holds for those working files alone.
+EXP-SC-04 says so, and
+[the experiment's README](https://github.com/Roarge/sysml-federation/blob/main/experiments/llm-resolution/README.md#publishing-a-run)
+says what a published run holds.
 
 ## Context
 

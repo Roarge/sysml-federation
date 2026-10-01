@@ -131,6 +131,18 @@
 !/experiments/*/README.md
 !/experiments/*/*.sh
 !/experiments/*/incident-key.json
+# A run is published by copying its files into published/<run-id>/ once they
+# have been checked for private data (EXP-SC-04). The folder's README and the
+# seven files of a run's folder are named one by one, so nothing else put
+# there is tracked.
+!/experiments/*/published/README.md
+!/experiments/*/published/*/run.jsonl
+!/experiments/*/published/*/report.md
+!/experiments/*/published/*/environment.json
+!/experiments/*/published/*/deviations.md
+!/experiments/*/published/*/outcomes.md
+!/experiments/*/published/*/judgements.csv
+!/experiments/*/published/*/SHA256SUMS
 
 # The documentation site. GitHub Pages builds docs/ with Jekyll, which needs
 # its configuration, its layouts, its includes and one stylesheet, each named

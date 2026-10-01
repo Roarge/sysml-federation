@@ -74,16 +74,69 @@ git ignores:
 ### Stopping, resuming and other flags
 
 If a run stops, every reply so far is in the file. `run.sh -resume <that
-file>` asks only what's missing, and refuses a file made from a different
-checkout, systems model or settings. From `experiments/llm-resolution/`,
-`go run . -report <file>` rebuilds the report from a file alone, without a
-server.
+file>` asks only what's missing, and refuses a file made from other tests or
+requirements, another systems model or other settings. From
+`experiments/llm-resolution/`, `go run . -report <file>` rebuilds the report
+from a file alone, without a server.
 
 `run.sh` passes any other flag on to the program. `-model NAME` asks another
 language model the server holds, `-out DIR` writes the results elsewhere, and
 `-seed N` changes the seed for the language model and for the probes' random
 choices. A run with another language model or seed is a different experiment,
 and resuming refuses to mix the two.
+
+### Publishing a run
+
+A run's working files stay under `results/`, which git ignores. A run is
+published by copying them into `published/<run-id>/`, which git tracks, once
+they have been checked for private data: the server's address, a login, a host
+name, a home folder or a credential. A value that must go is replaced by a
+placeholder such as `<ollama-url>`. The program's JSON escapes every `<` it
+writes, so a bare one always marks a replacement, and the run's
+`deviations.md` lists each. The run id is the time in the results file's name,
+then the kind, as in `2026-10-02T091504Z-full`.
+
+| File | What it holds |
+|---|---|
+| `run.jsonl` | the results file, byte for byte apart from the replacements `deviations.md` lists |
+| `report.md` | the report the run wrote, unchanged |
+| `environment.json` | what the results file's header doesn't record, such as the graphics card and the server's settings, each fact with its source |
+| `deviations.md` | everything that differed from this README and from [the article that set the experiment out](../../docs/articles/18-a-resolver-that-reads-the-systems-model.md#what-will-count-for-and-against-it), dated |
+| `outcomes.md` | for a full run only, the four results that article said would count for the approach and against it, set against the run's figures, with each figure's place in the summary line |
+| `judgements.csv` | for a full run only, one person's judgement of the links proposed for tests with no key, first blind and then with the reasons |
+| `SHA256SUMS` | the checksum of every other file, so `sha256sum -c SHA256SUMS` in the folder checks them |
+
+`published/README.md` lists the runs, each with its commit, its kind and its
+status.
+
+#### Reading the article's rules
+
+The article's rules are applied as written, and where their words give no
+number they are read as follows, fixed before the first run.
+
+- Every p is McNemar's exact two-sided p as the summary line records it, and
+  a difference is real when it is below 0.05.
+- In the first rule, a difference in the baseline's favour is an outcome the
+  rule doesn't name.
+- In the second, deletion changes answers more often than the rare-shared
+  control when p is below 0.05 and more of the discordant tests changed under
+  deletion. Reconstruction mostly gives the same answer back when the 95%
+  Wilson interval of its share of changed answers lies wholly below one half,
+  and rarely when it lies wholly above. Otherwise the rule leaves it
+  undecided.
+- In the third, a repeat whose final reply didn't parse is compared with the
+  first browse's final reply by its raw text.
+- In the fourth, the account names the cause when the key's first item is
+  found, the mechanism when the second or third is, and the first file to
+  read when the fourth or fifth is. It changes when the found-or-missed
+  pattern of the twelve items differs between the browse as reported and the
+  browse with the transition removed. It says the systems model no longer
+  explains the code when that browse raises a suspicion naming
+  `onRouterExit`, `SupervisorStates` or `serve.go`, and it still cites the
+  missing transition when that browse's citation check flags a reference
+  ending in `onRouterExit`.
+- The known mismatch counts as found when a suspicion names `Adapter::serve`
+  as its element and `adapter/projection/store.go` in its text.
 
 ## The systems model as a wiki
 
