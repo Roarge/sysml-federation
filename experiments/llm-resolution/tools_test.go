@@ -350,18 +350,19 @@ func TestEXPSR18_ReadShowsTheLinesAroundTheOneAsked(t *testing.T) {
 }
 
 func TestEXPSR18_ANestedModelPackageIsCode(t *testing.T) {
+	// The word is in adapter/model/model.go and in a Go file in each of the
+	// top-level model, docs and experiments folders.
 	kit, _, _ := fixtureKit(t, TaskIncident, Scope{})
-	if answer := kit.Call("grep", "wombat", ""); !strings.Contains(answer, "adapter/model/model.go:4:") {
+	answer := kit.Call("grep", "wombat", "")
+	if !strings.Contains(answer, "adapter/model/model.go:4:") {
 		t.Errorf("grep misses the nested model package:\n%s", answer)
+	}
+	if n := strings.Count(answer, ".go:"); n != 1 {
+		t.Errorf("grep found %d hits, want the one in adapter/model/model.go:\n%s", n, answer)
 	}
 	read := kit.Call("read", "adapter/model/model.go", "1")
 	if strings.Contains(read, "no file") || !strings.Contains(read, "1| package model") {
 		t.Errorf("read of the nested model package:\n%s", read)
-	}
-	for _, line := range strings.Split(kit.Call("grep", "quokka", ""), "\n") {
-		if strings.HasPrefix(line, "model/") {
-			t.Errorf("grep searched the top-level model folder: %s", line)
-		}
 	}
 }
 
