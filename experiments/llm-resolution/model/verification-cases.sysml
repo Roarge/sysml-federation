@@ -491,12 +491,16 @@ package Experiment_VerificationCases {
     }
 
     verification def VC_EXP_SC_04 {
-        doc /* Results stay out of the repository. */
+        doc /* Working files stay out, and a published copy is tracked. */
         subject experiment : Experiment;
-        objective { verify EXP_SC_04_ResultsStayOutOfTheRepository.acceptance; }
+        objective { verify EXP_SC_04_ResultsArePublishedByCopy.acceptance; }
         action <'TestEXPSC04_ResultsAreIgnoredByGit'> ignored {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/constraints_test.go"; }
             doc /* git check-ignore reports a file under results/ as ignored. */
+        }
+        action <'TestEXPSC04_PublishedRunsAreTracked'> publishedCopiesTracked {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/constraints_test.go"; }
+            doc /* git tracks the published folder's README and the seven files of a run's folder, and ignores any other file put there. */
         }
     }
 }
