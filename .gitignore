@@ -126,23 +126,12 @@
 # incident's key and the fixture tree its tests read. Its model's .sysml files
 # and its .go files are admitted by the unanchored rules above. What a run
 # writes under results/ matches none of these rules and stays untracked
-# (EXP-SC-04).
+# (EXP-SC-04). A published copy of a run has a section of its own further
+# down.
 !/experiments/*/go.mod
 !/experiments/*/README.md
 !/experiments/*/*.sh
 !/experiments/*/incident-key.json
-# A run is published by copying its files into published/<run-id>/ once they
-# have been checked for private data (EXP-SC-04). The folder's README and the
-# seven files of a run's folder are named one by one, so nothing else put
-# there is tracked.
-!/experiments/*/published/README.md
-!/experiments/*/published/*/run.jsonl
-!/experiments/*/published/*/report.md
-!/experiments/*/published/*/environment.json
-!/experiments/*/published/*/deviations.md
-!/experiments/*/published/*/outcomes.md
-!/experiments/*/published/*/judgements.csv
-!/experiments/*/published/*/SHA256SUMS
 
 # The documentation site. GitHub Pages builds docs/ with Jekyll, which needs
 # its configuration, its layouts, its includes and one stylesheet, each named
@@ -183,6 +172,24 @@
 # files. It names the directory as well as the extension, so a feature file
 # anywhere else stays untracked, and the re-exclusions below still apply.
 !**/features/*.feature
+
+# -------------------------------------------------------- published runs ---
+# A run of the language model experiment is published by copying its files
+# into published/<run-id>/ once they have been checked for private data
+# (EXP-SC-04). This section sits after every rule above that admits source
+# files, fixtures or scenarios at any depth, so its first line shuts
+# published/ to all of them. The lines after it open each run's folder and
+# name the folder's README and the seven files of a run's folder, one by one.
+/experiments/*/published/**
+!/experiments/*/published/*/
+!/experiments/*/published/README.md
+!/experiments/*/published/*/run.jsonl
+!/experiments/*/published/*/report.md
+!/experiments/*/published/*/environment.json
+!/experiments/*/published/*/deviations.md
+!/experiments/*/published/*/outcomes.md
+!/experiments/*/published/*/judgements.csv
+!/experiments/*/published/*/SHA256SUMS
 
 # ---------------------------------------------------- hard re-exclusions ---
 # These come after every rule above, so they win. The directory-only forms

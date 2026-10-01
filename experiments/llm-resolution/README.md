@@ -87,14 +87,15 @@ and resuming refuses to mix the two.
 
 ### Publishing a run
 
-A run's working files stay under `results/`, which git ignores. A run is
-published by copying them into `published/<run-id>/`, which git tracks, once
-they have been checked for private data: the server's address, a login, a host
-name, a home folder or a credential. A value that must go is replaced by a
-placeholder such as `<ollama-url>`. The program's JSON escapes every `<` it
-writes, so a bare one always marks a replacement, and the run's
-`deviations.md` lists each. The run id is the time in the results file's name,
-then the kind, as in `2026-10-02T091504Z-full`.
+A run writes its working files under `results/`, unless `-out` names another
+folder, and git ignores `results/`. A run is published by copying them into
+`published/<run-id>/`, which git tracks, once they have been checked for
+private data: the server's address, a login, a host name, a home folder or a
+credential. A value that must go is replaced by a placeholder such as
+`<ollama-url>`. The program's JSON escapes every `<` it writes, so a bare one
+always marks a replacement, and the run's `deviations.md` lists each. The run
+id is the time in the results file's name, then the kind, `quick` or `full`,
+as in `2026-10-02T091504Z-full`.
 
 | File | What it holds |
 |---|---|
@@ -102,17 +103,18 @@ then the kind, as in `2026-10-02T091504Z-full`.
 | `report.md` | the report the run wrote, unchanged |
 | `environment.json` | what the results file's header doesn't record, such as the graphics card and the server's settings, each fact with its source |
 | `deviations.md` | everything that differed from this README and from [the article that set the experiment out](../../docs/articles/18-a-resolver-that-reads-the-systems-model.md#what-will-count-for-and-against-it), dated |
-| `outcomes.md` | for a full run only, the four results that article said would count for the approach and against it, set against the run's figures, with each figure's place in the summary line |
+| `outcomes.md` | for a full run only, the four results that article said would count for the approach and against it, set against the run's figures, each with its place in the summary line or, where the summary line lacks it, in the call lines and how it was computed |
 | `judgements.csv` | for a full run only, one person's judgement of the links proposed for tests with no key, first blind and then with the reasons |
 | `SHA256SUMS` | the checksum of every other file, so `sha256sum -c SHA256SUMS` in the folder checks them |
 
-`published/README.md` lists the runs, each with its commit, its kind and its
-status.
+Each published run also has a row in `published/README.md`, giving its run id,
+its kind, its commit, the language model with its digest, and its status:
+complete, resumed or failed.
 
 #### Reading the article's rules
 
-The article's rules are applied as written, and where their words give no
-number they are read as follows, fixed before the first run.
+The article's rules are applied as written. Where their words leave a choice
+open, they are read as below. These readings were fixed before the first run.
 
 - Every p is McNemar's exact two-sided p as the summary line records it, and
   a difference is real when it is below 0.05.
@@ -121,11 +123,13 @@ number they are read as follows, fixed before the first run.
 - In the second, deletion changes answers more often than the rare-shared
   control when p is below 0.05 and more of the discordant tests changed under
   deletion. Reconstruction mostly gives the same answer back when the 95%
-  Wilson interval of its share of changed answers lies wholly below one half,
-  and rarely when it lies wholly above. Otherwise the rule leaves it
-  undecided.
-- In the third, a repeat whose final reply didn't parse is compared with the
-  first browse's final reply by its raw text.
+  Wilson interval of the reconstruction row's share of changed answers, over
+  all its links, lies wholly below one half, and rarely when it lies wholly
+  above. Otherwise the rule leaves it undecided.
+- In the third, the summary line counts a repeat whose final reply didn't
+  parse as an error and doesn't compare it. Such a repeat is compared with the
+  first browse's final reply by its raw text, from the call lines. The
+  incident's second browse doesn't count as a repeat.
 - In the fourth, the account names the cause when the key's first item is
   found, the mechanism when the second or third is, and the first file to
   read when the fourth or fifth is. It changes when the found-or-missed
@@ -135,8 +139,10 @@ number they are read as follows, fixed before the first run.
   `onRouterExit`, `SupervisorStates` or `serve.go`, and it still cites the
   missing transition when that browse's citation check flags a reference
   ending in `onRouterExit`.
-- The known mismatch counts as found when a suspicion names `Adapter::serve`
-  as its element and `adapter/projection/store.go` in its text.
+
+`outcomes.md` also says whether the known mismatch was among the suspicions.
+It counts when a suspicion names `Adapter::serve` as its element and
+`adapter/projection/store.go` in its text.
 
 ## The systems model as a wiki
 

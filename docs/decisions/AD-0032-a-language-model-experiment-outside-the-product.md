@@ -1,6 +1,6 @@
 # AD-0032 A language model experiment kept outside the product
 
-Status: accepted, amended once runs were published. Date: 2026-09-25.
+Status: accepted, amended so that runs are published. Date: 2026-09-25.
 
 Amendment, 2026-10-01: a run's results are published in the repository. The
 files a run writes stay under `results/`, which git ignores, and a run is
