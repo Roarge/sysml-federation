@@ -308,7 +308,7 @@ package Experiment_SystemStories {
         attribute :>> benefit    = "a place where the system was not built as modelled can be found";
         frame concern : ExplainTheOutage;
         requirement :>> acceptance {
-            requirement builtSystemOnly { doc /* A search finds nothing under model, docs, experiments or test data. */ }
+            requirement builtSystemOnly { doc /* A search finds nothing under the checkout's top-level model, docs or experiments folders, or in test data. */ }
             requirement linesAround { doc /* A read shows the lines around the one asked for, numbered, within its limit. */ }
             requirement nestedModelIsCode { doc /* A folder of the code that shares a name with a left-out folder, such as adapter/model, is searched and read like the rest of the code. */ }
         }
