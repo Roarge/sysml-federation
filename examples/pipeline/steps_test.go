@@ -245,8 +245,12 @@ var recordRowRE = regexp.MustCompile(`(?m)^\| (\d{4}-\d\d-\d\d) \| ([^|]+) \| ([
 func (w *world) theRecordIsRead() {
 	data, err := os.ReadFile("README.md")
 	readme := string(assert.Must(w.t, data, err))
-	section := readme[strings.Index(readme, "## Verification record"):]
-	for _, m := range recordRowRE.FindAllStringSubmatch(section, -1) {
+	start := strings.Index(readme, "## Verification record")
+	if start < 0 {
+		w.t.Error("README.md has no verification record")
+		return
+	}
+	for _, m := range recordRowRE.FindAllStringSubmatch(readme[start:], -1) {
 		w.rows = append(w.rows, []string{m[1], strings.TrimSpace(m[2]), strings.TrimSpace(m[3])})
 	}
 }
