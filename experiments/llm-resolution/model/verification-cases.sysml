@@ -354,6 +354,10 @@ package Experiment_VerificationCases {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
             doc /* Numbered lines around the one asked, within the limit. */
         }
+        action <'TestEXPSR18_ANestedModelPackageIsCode'> nestedModelIsCode {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* A word in the fixture's adapter/model file is found by grep and its lines are shown by read, while the top-level model folder stays out. */
+        }
     }
 
     verification def VC_EXP_SR_19 {
