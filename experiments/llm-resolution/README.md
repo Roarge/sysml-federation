@@ -109,7 +109,9 @@ as in `2026-10-02T091504Z-full`.
 
 Each published run also has a row in `published/README.md`, giving its run id,
 its kind, its commit, the language model with its digest, and its status:
-complete, resumed or failed.
+complete, resumed or failed. A complete run reached its summary line without a
+stop, a resumed run reached it through `-resume` after one or more stops, and a
+failed run ended without one.
 
 #### Reading the article's rules
 

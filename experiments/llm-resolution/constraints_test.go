@@ -160,6 +160,7 @@ func TestEXPSC04_PublishedRunsAreTracked(t *testing.T) {
 	for _, path := range []string{
 		run + "notes.txt", run + "run.jsonl.orig", run + "sub/run.jsonl",
 		run + "view.sysml", run + "helper.go", run + "notes.md", run + "extra.json", run + "gqlgen.yml",
+		run + "extra.jsonl", run + "extra.csv",
 		run + "features/x.feature", run + "testdata/x.txt",
 		"experiments/llm-resolution/published/notes.md", "experiments/llm-resolution/published/view.sysml",
 	} {
