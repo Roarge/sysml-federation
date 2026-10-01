@@ -58,8 +58,9 @@ type CodeFile struct {
 }
 
 // CodeBase is the built system's files in the checkout: its Go, JavaScript,
-// TypeScript, YAML and JSON files, Dockerfiles and shell scripts, outside
-// model, docs, experiments and test data.
+// TypeScript, YAML and JSON files, Dockerfiles and shell scripts, outside the
+// checkout's top-level model, docs and experiments folders and outside test
+// data.
 type CodeBase struct {
 	Root   string
 	Files  []*CodeFile
@@ -70,8 +71,15 @@ type CodeBase struct {
 var codeExtensions = map[string]bool{".go": true, ".js": true, ".mjs": true, ".cjs": true, ".ts": true, ".tsx": true,
 	".yml": true, ".yaml": true, ".json": true, ".sh": true}
 
-var skippedDirs = map[string]bool{"model": true, "docs": true, "experiments": true, "testdata": true, "vendor": true,
-	"node_modules": true, "results": true}
+// The code tools leave out hidden folders and the folders in skippedDirs
+// (testdata, vendor, node_modules and results) wherever they sit. They leave
+// out the folders in topSkippedDirs only as direct children of the root
+// LoadCode is given (EXP-SR-18), so that a package of the code such as
+// adapter/model is still code.
+var (
+	skippedDirs    = map[string]bool{"testdata": true, "vendor": true, "node_modules": true, "results": true}
+	topSkippedDirs = map[string]bool{"model": true, "docs": true, "experiments": true}
+)
 
 const maxCodeFile = 512 << 10
 
@@ -84,7 +92,8 @@ func LoadCode(root string) (*CodeBase, error) {
 		}
 		name := d.Name()
 		if d.IsDir() {
-			if path != root && (strings.HasPrefix(name, ".") || skippedDirs[name]) {
+			top := topSkippedDirs[name] && filepath.Clean(filepath.Dir(path)) == filepath.Clean(root)
+			if path != root && (strings.HasPrefix(name, ".") || skippedDirs[name] || top) {
 				return filepath.SkipDir
 			}
 			return nil

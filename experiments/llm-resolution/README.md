@@ -98,7 +98,7 @@ The language model never sees the whole systems model, which would not fit in it
 | `doc id` | its description, attributes, decisions and evidence |
 | `path id id` | up to three shortest paths of at most three links |
 | `code id` | where the systems model puts it in the code: evidence locations, paths its description names, and where its distinctive values occur |
-| `grep text` | lines of the built system's code: Go, JavaScript, TypeScript, YAML, JSON, Dockerfiles and shell scripts, outside `model`, `docs`, `experiments` and test data |
+| `grep text` | lines of the built system's code: Go, JavaScript, TypeScript, YAML, JSON, Dockerfiles and shell scripts, outside the top-level `model`, `docs` and `experiments` folders and outside test data |
 | `read file line` | thirty numbered lines around the one asked for |
 
 A browse is one question per tool call. Each question carries the task, the viewpoint the language model has framed, its view, the calls it has left and the last tool's answer, and nothing older. The view is the language model's working state: the elements it has exposed, each with a note saying why, which it can prune again. A browse stops when the language model says it is done or when its calls run out, eight for a test and twenty for the incident, and a final question asks for the answer. At the end the view is written out as a SysML v2 viewpoint definition and a view that exposes each element, which both reference tools accept beside the systems model.

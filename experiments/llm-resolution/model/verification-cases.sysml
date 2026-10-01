@@ -348,11 +348,15 @@ package Experiment_VerificationCases {
         objective { verify EXP_SR_18_ToolsOverTheCode.acceptance; }
         action <'TestEXPSR18_GrepSearchesTheBuiltSystemOnly'> builtSystemOnly {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
-            doc /* A word in a fixture model file, a doc and test data is found only in the built system's file. */
+            doc /* A word in fixture files under the top-level model and docs folders and in test data is found only in the built system's file. */
         }
         action <'TestEXPSR18_ReadShowsTheLinesAroundTheOneAsked'> linesAround {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
             doc /* Numbered lines around the one asked, within the limit. */
+        }
+        action <'TestEXPSR18_ANestedModelPackageIsCode'> nestedModelIsCode {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* A word in the fixture's adapter/model file is found by grep and its lines are shown by read, while the top-level model, docs and experiments folders, which hold the same word, stay out. */
         }
     }
 
