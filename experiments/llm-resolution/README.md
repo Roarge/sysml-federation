@@ -74,16 +74,77 @@ git ignores:
 ### Stopping, resuming and other flags
 
 If a run stops, every reply so far is in the file. `run.sh -resume <that
-file>` asks only what's missing, and refuses a file made from a different
-checkout, systems model or settings. From `experiments/llm-resolution/`,
-`go run . -report <file>` rebuilds the report from a file alone, without a
-server.
+file>` asks only what's missing, and refuses a file made from other tests or
+requirements, another systems model or other settings. From
+`experiments/llm-resolution/`, `go run . -report <file>` rebuilds the report
+from a file alone, without a server.
 
 `run.sh` passes any other flag on to the program. `-model NAME` asks another
 language model the server holds, `-out DIR` writes the results elsewhere, and
 `-seed N` changes the seed for the language model and for the probes' random
 choices. A run with another language model or seed is a different experiment,
 and resuming refuses to mix the two.
+
+### Publishing a run
+
+A run writes its working files under `results/`, unless `-out` names another
+folder, and git ignores `results/`. A run is published by copying them into
+`published/<run-id>/`, which git tracks, once they have been checked for
+private data: the server's address, a login, a host name, a home folder or a
+credential. A value that must go is replaced by a placeholder such as
+`<ollama-url>`. The program's JSON escapes every `<` it writes, so a bare one
+always marks a replacement, and the run's `deviations.md` lists each. The run
+id is the time in the results file's name, then the kind, `quick` or `full`,
+as in `2026-10-02T091504Z-full`.
+
+| File | What it holds |
+|---|---|
+| `run.jsonl` | the results file, byte for byte apart from the replacements `deviations.md` lists |
+| `report.md` | the report the run wrote, unchanged |
+| `environment.json` | what the results file's header doesn't record, such as the graphics card and the server's settings, each fact with its source |
+| `deviations.md` | everything that differed from this README and from [the article that set the experiment out](../../docs/articles/18-a-resolver-that-reads-the-systems-model.md#what-will-count-for-and-against-it), dated |
+| `outcomes.md` | for a full run only, the four results that article said would count for the approach and against it, set against the run's figures, each with its place in the summary line or, where the summary line lacks it, in the call lines and how it was computed |
+| `judgements.csv` | for a full run only, one person's judgement of the links proposed for tests with no key, first blind and then with the reasons |
+| `SHA256SUMS` | the checksum of every other file, so `sha256sum -c SHA256SUMS` in the folder checks them |
+
+Each published run also has a row in `published/README.md`, giving its run id,
+its kind, its commit, the language model with its digest, and its status:
+complete, resumed or failed. A complete run reached its summary line without a
+stop, a resumed run reached it through `-resume` after one or more stops, and a
+failed run ended without one.
+
+#### Reading the article's rules
+
+The article's rules are applied as written. Where their words leave a choice
+open, they are read as below. These readings were fixed before the first run.
+
+- Every p is McNemar's exact two-sided p as the summary line records it, and
+  a difference is real when it is below 0.05.
+- In the first rule, a difference in the baseline's favour is an outcome the
+  rule doesn't name.
+- In the second, deletion changes answers more often than the rare-shared
+  control when p is below 0.05 and more of the discordant tests changed under
+  deletion. Reconstruction mostly gives the same answer back when the 95%
+  Wilson interval of the reconstruction row's share of changed answers, over
+  all its links, lies wholly below one half, and rarely when it lies wholly
+  above. Otherwise the rule leaves it undecided.
+- In the third, the summary line counts a repeat whose final reply didn't
+  parse as an error and doesn't compare it. Such a repeat is compared with the
+  first browse's final reply by its raw text, from the call lines. The
+  incident's second browse doesn't count as a repeat.
+- In the fourth, the account names the cause when the key's first item is
+  found, the mechanism when the second or third is, and the first file to
+  read when the fourth or fifth is. It changes when the found-or-missed
+  pattern of the twelve items differs between the browse as reported and the
+  browse with the transition removed. It says the systems model no longer
+  explains the code when that browse raises a suspicion naming
+  `onRouterExit`, `SupervisorStates` or `serve.go`, and it still cites the
+  missing transition when that browse's citation check flags a reference
+  ending in `onRouterExit`.
+
+`outcomes.md` also says whether the known mismatch was among the suspicions.
+It counts when a suspicion names `Adapter::serve` as its element and
+`adapter/projection/store.go` in its text.
 
 ## The systems model as a wiki
 
@@ -98,7 +159,7 @@ The language model never sees the whole systems model, which would not fit in it
 | `doc id` | its description, attributes, decisions and evidence |
 | `path id id` | up to three shortest paths of at most three links |
 | `code id` | where the systems model puts it in the code: evidence locations, paths its description names, and where its distinctive values occur |
-| `grep text` | lines of the built system's code: Go, JavaScript, TypeScript, YAML, JSON, Dockerfiles and shell scripts, outside `model`, `docs`, `experiments` and test data |
+| `grep text` | lines of the built system's code: Go, JavaScript, TypeScript, YAML, JSON, Dockerfiles and shell scripts, outside the top-level `model`, `docs` and `experiments` folders and outside test data |
 | `read file line` | thirty numbered lines around the one asked for |
 
 A browse is one question per tool call. Each question carries the task, the viewpoint the language model has framed, its view, the calls it has left and the last tool's answer, and nothing older. The view is the language model's working state: the elements it has exposed, each with a note saying why, which it can prune again. A browse stops when the language model says it is done or when its calls run out, eight for a test and twenty for the incident, and a final question asks for the answer. At the end the view is written out as a SysML v2 viewpoint definition and a view that exposes each element, which both reference tools accept beside the systems model.

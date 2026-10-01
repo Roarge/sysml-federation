@@ -301,15 +301,16 @@ package Experiment_SystemStories {
         @StoryMeta { status = StoryStatus::inProgress; }
         subject :>> system : ExperimentElement;
         stakeholder :>> role : OnCallEngineer;
-        attribute statement : String = "When the language model calls grep or read, the experiment shall answer from the built system's files in the checkout, its Go, JavaScript, TypeScript, YAML and JSON files, Dockerfiles and shell scripts outside model, docs, experiments and test data, within the call's limit.";
+        attribute statement : String = "When the language model calls grep or read, the experiment shall answer from the built system's files in the checkout, its Go, JavaScript, TypeScript, YAML and JSON files, Dockerfiles and shell scripts outside the checkout's top-level model, docs and experiments folders and outside test data, within the call's limit.";
         attribute pattern : EarsPattern = EarsPattern::EventDriven;
         attribute verificationMethods : VerificationMethod[1..*] = (VerificationMethod::Test);
         attribute :>> capability = "match what the systems model says against what the code does";
         attribute :>> benefit    = "a place where the system was not built as modelled can be found";
         frame concern : ExplainTheOutage;
         requirement :>> acceptance {
-            requirement builtSystemOnly { doc /* A search finds nothing under model, docs, experiments or test data. */ }
+            requirement builtSystemOnly { doc /* A search finds nothing under the checkout's top-level model, docs or experiments folders, or in test data. */ }
             requirement linesAround { doc /* A read shows the lines around the one asked for, numbered, within its limit. */ }
+            requirement nestedModelIsCode { doc /* A folder of the code that shares a name with a left-out folder, such as adapter/model, is searched and read like the rest of the code. */ }
         }
     }
 

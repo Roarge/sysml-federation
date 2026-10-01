@@ -53,6 +53,6 @@ Inside the records, `SR-nn` is a system requirement and `SC-nn` a design constra
 - <span class="rec-id">AD-0029</span> [The demo's own model in SysML v2](AD-0029-the-demos-own-model-in-sysml-v2.md)
 - <span class="rec-id">AD-0030</span> [Model validation in continuous integration](AD-0030-model-validation-in-continuous-integration.md)
 - <span class="rec-id">AD-0031</span> [An optional check session through a tunnel, with traces](AD-0031-an-optional-check-session.md)
-- <span class="rec-id">AD-0032</span> [A language model experiment kept outside the product](AD-0032-a-language-model-experiment-outside-the-product.md)
+- <span class="rec-id">AD-0032</span> [A language model experiment kept outside the product](AD-0032-a-language-model-experiment-outside-the-product.md) (amended)
 - <span class="rec-id">AD-0033</span> [The demo on the owner's Proxmox host, declared in OpenTofu](AD-0033-the-demo-on-the-owners-proxmox-host.md)
 - <span class="rec-id">AD-0034</span> [Acceptance criteria as Gherkin scenarios, run by godog from go test](AD-0034-acceptance-criteria-as-gherkin-scenarios.md)

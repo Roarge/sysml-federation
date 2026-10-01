@@ -348,11 +348,15 @@ package Experiment_VerificationCases {
         objective { verify EXP_SR_18_ToolsOverTheCode.acceptance; }
         action <'TestEXPSR18_GrepSearchesTheBuiltSystemOnly'> builtSystemOnly {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
-            doc /* A word in a fixture model file, a doc and test data is found only in the built system's file. */
+            doc /* A word in fixture files under the top-level model and docs folders and in test data is found only in the built system's file. */
         }
         action <'TestEXPSR18_ReadShowsTheLinesAroundTheOneAsked'> linesAround {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
             doc /* Numbered lines around the one asked, within the limit. */
+        }
+        action <'TestEXPSR18_ANestedModelPackageIsCode'> nestedModelIsCode {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/tools_test.go"; }
+            doc /* A word in the fixture's adapter/model file is found by grep and its lines are shown by read, while the top-level model, docs and experiments folders, which hold the same word, stay out. */
         }
     }
 
@@ -491,12 +495,16 @@ package Experiment_VerificationCases {
     }
 
     verification def VC_EXP_SC_04 {
-        doc /* Results stay out of the repository. */
+        doc /* Working files stay out, and a published copy is tracked. */
         subject experiment : Experiment;
-        objective { verify EXP_SC_04_ResultsStayOutOfTheRepository.acceptance; }
-        action <'TestEXPSC04_ResultsAreIgnoredByGit'> ignored {
+        objective { verify EXP_SC_04_ResultsArePublishedByCopy.acceptance; }
+        action <'TestEXPSC04_ResultsAreIgnoredByGit'> workingFilesIgnored {
             @Evidence { kind = "go-test"; location = "experiments/llm-resolution/constraints_test.go"; }
             doc /* git check-ignore reports a file under results/ as ignored. */
+        }
+        action <'TestEXPSC04_PublishedRunsAreTracked'> publishedCopiesTracked {
+            @Evidence { kind = "go-test"; location = "experiments/llm-resolution/constraints_test.go"; }
+            doc /* git tracks the published folder's README and the seven files of a run's folder, and ignores any other file put there. */
         }
     }
 }

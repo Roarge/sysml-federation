@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -116,6 +117,56 @@ func TestEXPSC04_ResultsAreIgnoredByGit(t *testing.T) {
 		"experiments/llm-resolution/results/llm-resolution-2026-09-25T0000Z.md",
 	} {
 		if err := exec.Command("git", "-C", root, "check-ignore", "-q", path).Run(); err != nil {
+			t.Errorf("git doesn't ignore %s", path)
+		}
+	}
+}
+
+func TestEXPSC04_PublishedRunsAreTracked(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("no git")
+	}
+	top, err := exec.Command("git", "rev-parse", "--show-toplevel").Output()
+	if err != nil {
+		t.Skip("not in a git checkout")
+	}
+	root := strings.TrimSpace(string(top))
+	// isIgnored asks the rules alone, without the index, so the answer still
+	// holds once a published run is committed. git check-ignore exits with 0
+	// for an ignored path and with 1 for one that isn't.
+	isIgnored := func(path string) (bool, error) {
+		err := exec.Command("git", "-C", root, "check-ignore", "-q", "--no-index", path).Run()
+		var exit *exec.ExitError
+		switch {
+		case err == nil:
+			return true, nil
+		case errors.As(err, &exit) && exit.ExitCode() == 1:
+			return false, nil
+		}
+		return false, err
+	}
+	run := "experiments/llm-resolution/published/2026-09-25T000000Z-full/"
+	tracked := []string{"experiments/llm-resolution/published/README.md"}
+	for _, name := range []string{"run.jsonl", "report.md", "environment.json", "deviations.md", "outcomes.md", "judgements.csv", "SHA256SUMS"} {
+		tracked = append(tracked, run+name)
+	}
+	for _, path := range tracked {
+		if ignored, err := isIgnored(path); err != nil {
+			t.Errorf("git check-ignore failed on %s: %v", path, err)
+		} else if ignored {
+			t.Errorf("git ignores %s", path)
+		}
+	}
+	for _, path := range []string{
+		run + "notes.txt", run + "run.jsonl.orig", run + "sub/run.jsonl",
+		run + "view.sysml", run + "helper.go", run + "notes.md", run + "extra.json", run + "gqlgen.yml",
+		run + "extra.jsonl", run + "extra.csv",
+		run + "features/x.feature", run + "testdata/x.txt",
+		"experiments/llm-resolution/published/notes.md", "experiments/llm-resolution/published/view.sysml",
+	} {
+		if ignored, err := isIgnored(path); err != nil {
+			t.Errorf("git check-ignore failed on %s: %v", path, err)
+		} else if !ignored {
 			t.Errorf("git doesn't ignore %s", path)
 		}
 	}
