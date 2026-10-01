@@ -71,9 +71,11 @@ type CodeBase struct {
 var codeExtensions = map[string]bool{".go": true, ".js": true, ".mjs": true, ".cjs": true, ".ts": true, ".tsx": true,
 	".yml": true, ".yaml": true, ".json": true, ".sh": true}
 
-// The folders the code tools leave out (EXP-SR-18): skippedDirs at any depth,
-// and topSkippedDirs only as direct children of the root LoadCode is given,
-// so that a package of the code such as adapter/model is still code.
+// The code tools leave out hidden folders and the folders in skippedDirs
+// (testdata, vendor, node_modules and results) wherever they sit. They leave
+// out the folders in topSkippedDirs only as direct children of the root
+// LoadCode is given (EXP-SR-18), so that a package of the code such as
+// adapter/model is still code.
 var (
 	skippedDirs    = map[string]bool{"testdata": true, "vendor": true, "node_modules": true, "results": true}
 	topSkippedDirs = map[string]bool{"model": true, "docs": true, "experiments": true}
