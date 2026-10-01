@@ -29,11 +29,13 @@ package Experiment_DesignConstraints {
         }
     }
 
-    requirement <'EXP-SC-04'> EXP_SC_04_ResultsStayOutOfTheRepository : DesignConstraint {
+    requirement <'EXP-SC-04'> EXP_SC_04_ResultsArePublishedByCopy : DesignConstraint {
         subject :>> system : ExperimentElement;
-        attribute :>> statement = "Results files are written under experiments/llm-resolution/results, which git ignores, and are never committed.";
+        attribute :>> statement = "A run writes its working files under experiments/llm-resolution/results, which git ignores, and they are never committed. A run is published by copying its files, once they have been checked for private data, into experiments/llm-resolution/published/<run-id>/, which git tracks.";
         requirement :>> acceptance {
-            requirement ignored { doc /* git reports a file under results/ as ignored. */ }
+            requirement workingFilesIgnored { doc /* git reports a file under results/ as ignored. */ }
+            requirement publishedCopiesTracked { doc /* git tracks the published folder's README and each of the seven files a run's folder holds, and ignores any other file put there. */ }
         }
+        doc /* Decisions: AD-0032. */
     }
 }

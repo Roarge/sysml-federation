@@ -77,5 +77,5 @@ package Experiment_LogicalArchitecture {
     satisfy EXP_SC_01_StandardLibraryInItsOwnModule by experiment;
     satisfy EXP_SC_02_NoEmptyInterface by experiment;
     satisfy EXP_SC_03_AboutTwoHours by experiment.runner;
-    satisfy EXP_SC_04_ResultsStayOutOfTheRepository by experiment.store;
+    satisfy EXP_SC_04_ResultsArePublishedByCopy by experiment.store;
 }
