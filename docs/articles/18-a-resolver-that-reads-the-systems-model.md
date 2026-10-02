@@ -2,7 +2,7 @@
 
 *Roar Elias Georgsen, 28 September 2026*
 
-Part 6 of 7 in [Automating traceability](../README.md).
+Part 6 of 9 in [Automating traceability](../README.md).
 
 > [!IMPORTANT]
 > **The story so far**
@@ -194,8 +194,8 @@ My position before the run is narrow. If the language model beats the systems mo
 
 I took the key off the test at the top so that an answer could be checked against it. The probes do the same to the explanations, taking away what the language model cited to see whether the answer goes with it.
 
-Part 7, coming up next, runs all of this on the server in my network and reports what happened, whichever way it went.
+[Part 7](19-why-did-the-language-model-go-round-in-circles.md) runs all of this on the server in my network and reports what happened, whichever way it went.
 
 ---
 
-Previous: [What makes a resolver worth running?](17-what-makes-a-resolver-worth-running.md) · Index: [Automating traceability](../README.md)
+Previous: [What makes a resolver worth running?](17-what-makes-a-resolver-worth-running.md) · Index: [Automating traceability](../README.md) · Next: [Why did the language model go round in circles?](19-why-did-the-language-model-go-round-in-circles.md)
