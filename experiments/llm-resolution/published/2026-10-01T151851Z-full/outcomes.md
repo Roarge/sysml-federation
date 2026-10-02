@@ -306,7 +306,7 @@ The program's own seconds, on each call line and in the summary line's `timing`,
 
 ### Judgement of the links proposed for tests with no key
 
-These judgements count in no score of the experiment. Each of the 198 rows of [judgements.csv](judgements.csv) is one entry of the summary line's `blind`, with the same number, test and proposed element, judged first blind and then with the reasons (`judgement_blind` and `judgement_with_reasons`). A row counts for every resolver with an entry in `proposals` that carries its test and element, so the rows of the three resolvers add up to more than 198.
+These judgements count in no score of the experiment. Each answers whether the test verifies or exercises the proposed element, and for a requirement, whether the test verifies it. Each of the 198 rows of [judgements.csv](judgements.csv) is one entry of the summary line's `blind`, with the same number, test and proposed element, judged first blind and then with the reasons (`judgement_blind` and `judgement_with_reasons`). A row counts for every resolver with an entry in `proposals` that carries its test and element, so the rows of the three resolvers add up to more than 198.
 
 | Resolver | Judged | Blind, correct | Blind, incorrect | Blind, unsure | With the reasons, correct | With the reasons, incorrect | With the reasons, unsure |
 |---|---|---|---|---|---|---|---|
