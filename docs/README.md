@@ -104,6 +104,8 @@ Can a language model on your own hardware follow the links in a systems model, a
 
 6. [A resolver that reads the systems model](articles/18-a-resolver-that-reads-the-systems-model.md)  
    What does it take to put a language model on a real traceability job, on your own hardware, so that a success is one a sceptic would believe?
+7. [Why did the language model go round in circles?](articles/19-why-did-the-language-model-go-round-in-circles.md)  
+   A language model on my own hardware read my web service's systems model like a wiki, one element at a time, under rules fixed before the run, and a program with no language model beat it 42 to 17 of 69. Why did it go round in circles, and what would have had a better chance?
 
 ## The repository
 
